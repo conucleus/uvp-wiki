@@ -11,6 +11,32 @@ Nucleation / 凝结核
   -> registry/state-machine projections
 ```
 
+## Store 的一天
+
+普通 Store workflow 应该读起来像这样：
+
+```text
+凝结核导入 Zhixu draft
+  -> Store 展示 compile preview 和 plan hash
+  -> 凝结核组织 supplier slots、resources 和 fairness notes
+  -> Store operator 审核发布材料
+  -> governance admin 请求 plan 或 supplier attestation
+  -> trust domain 发出 PlanAttested / SupplierAttested
+  -> Store 把 trusted version 展示为 order-creatable
+  -> operator 或参与者定位一个 Order 并检查 proof rows
+```
+
+Store 可以组织材料、workflow、搜索、review、contact 和 audit trail。官方事实仍来自 trust registry 和 state-machine 事件。
+
+## Store 命名
+
+| 名字 | 用法 |
+| --- | --- |
+| Store | 产品工作台和 catalog experience。 |
+| Store Console | 面向 operator/admin 的 Store API 和 workflow surface。 |
+| Store Workbench | 面向凝结核的 draft、version、supplier、resource 和 proof 工作区。 |
+| `zhixu-store` | 实现包名 / app 名。 |
+
 ## 三层治理
 
 | 层 | 负责人 | Store 做什么 | 事实边界 |
@@ -47,7 +73,7 @@ Store metadata、平台标签、联系信息、通知状态、review、audit、�
 | Contact / Notification | delivery intent、retry、failure reason、负责人、SLA。 | [联系与通知](contact-notifications.md) |
 | Platform Workflow / Audit | review、attestation request、revocation request、operator audit。 | [Operator 权限、治理与 Audit](governance-audit.md) |
 | Docking Sandbox | peer Zhixu、adapter、signalMap、capability plugin 的试拼。 | [Docking Sandbox](docking-sandbox.md) |
-| Service Surface | Store Console API、draft routes、supplier routes、docking routes、audit storage。 | [非可信执行层：Chain Services](../components/chain-services.md) |
+| Service Surface | Store Console API、draft routes、supplier routes、docking routes、audit storage。 | [可重建服务层：Chain Services](../components/chain-services.md) |
 
 ## Zhixu 在 Store 的发布路径
 
@@ -93,4 +119,4 @@ Store 的 supplier registry 帮凝结核组织现实履约能力网络：
 - [联系与通知](contact-notifications.md)
 - [Operator 权限、治理与 Audit](governance-audit.md)
 - [Docking Sandbox](docking-sandbox.md)
-- [非可信执行层：Chain Services](../components/chain-services.md)
+- [可重建服务层：Chain Services](../components/chain-services.md)

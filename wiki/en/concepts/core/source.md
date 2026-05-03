@@ -1,16 +1,8 @@
 # Source Causal Chain
 
-`source` is the causal context of a signal, meaning the traceable causal chain in which a sequence of signals lives. Hook expressions are written as `source::condition`, and the signals inside the condition are interpreted under that source by default.
+`source` is the causal namespace of a signal. It answers: "which line of business progress does this signal belong to?" Roles, Suppliers, and wallets say who acts; Source says which causal chain the action enters.
 
-The core value of Source is to express three things:
-
-- Same-source chaining: actions in the same business chain move forward in sequence.
-- Branching: one input or decision splits into multiple downstream paths.
-- Convergence: originally independent paths form a new shared path after a certain event.
-
-## What Source Answers
-
-Source answers “which causal line does this signal belong to.” The same wallet can submit signals on multiple sources; the same Supplier can participate in multiple sources; a single Order can also contain multiple sources.
+Hook expressions are written as `source::condition`, and the signals inside the condition are interpreted under that source by default.
 
 ```text
 sourceId = keccak256(source)
@@ -18,11 +10,27 @@ signalId = keccak256(signalName)
 signalKey = keccak256(abi.encode(sourceId, signalId))
 ```
 
-On-chain authorization, signal deduplication, and hook dependency resolution all happen around `signalKey`. Therefore, `seller::pack.cmp` and `buyer::pack.cmp` belong to two different business facts even if the signal name is the same.
+On-chain authorization, signal deduplication, and hook dependency resolution all happen around `signalKey`. Therefore, `seller::pack.cmp` and `buyer::pack.cmp` are different business facts even if the signal name is the same.
+
+## Source in One Cross-Border Order
+
+In a cross-border supply Order, several causal lanes may progress in parallel and converge at specific hooks:
+
+| Source | Real-world lane | Example signal | Typical submitter | Later dependency |
+| --- | --- | --- | --- | --- |
+| `sales` | Commercial demand and offer. | `master.commercial_offer.cmp` | sales or buyer-facing operator. | Buyer commitment can open. |
+| `solution` | Technical scope and solution confirmation. | `master.technical_scope.cmp` | solution engineer. | Supplier sourcing can open. |
+| `supply` | Supplier sourcing and procurement preparation. | `master.supplier_sourcing.cmp` | procurement executor. | Logistics or payment tasks can wait on it. |
+| `payment` | Payment route, funding, or settlement adapter result. | `master.supplier_usdc_direct.cmp` | payment executor or adapter. | Procurement execution may require payment result. |
+| `logistics` | International logistics and customs. | `master.customs_clearance.cmp` | logistics/customs executor. | Delivery or field work can open. |
+| `field` | On-site delivery, installation, or commissioning. | `master.site_acceptance.cmp` | field executor or buyer representative. | Final acceptance can open. |
+| `buyer` | Buyer commitment and acceptance. | `master.acceptance.cmp` | buyer wallet. | Order closure or after-sales branch. |
+
+These sources are not departments. A single wallet may submit signals on different sources if authorized. The same Supplier may appear in multiple sources. The Source is the namespace used by hooks and signals so the state machine can replay the correct causal line.
 
 ## Same-Source Chaining
 
-In a supplier-sourcing linked Zhixu, multiple stages progress under the `sourcing` source:
+In a supplier-sourcing linked Zhixu, multiple stages can progress under the same `sourcing` source:
 
 ```yaml
 market_scan:
@@ -43,25 +51,24 @@ quote_compare:
 
 This describes one sourcing causal chain: intake must complete before market scan, market scan before RFQ, and RFQ before quote comparison.
 
-## Cross-Source Convergence: A New Source After a Deal
+## Cross-Source Dependency
 
-Before a deal is matched, seller orders and buyer orders are two separate sources.
+A stage can belong to one source while waiting on another source. If a procurement stage belongs to `supply` but waits on `payment::...`, it means the supply lane cannot proceed until the payment lane produces the required result:
 
-The seller source may already have done substantial preparation:
+```yaml
+procurement_execution:
+  source: supply
+  receiveSignals:
+    SUPPLIER_FUNDED: payment::master.supplier_usdc_direct.cmp | master.supplier_settlement_exec.cmp
+```
 
-- stock preparation, quality inspection, packaging, and labeling;
-- uploading hashes for inventory proof or packaging photos;
-- preparing quotes, lead time, and sellable conditions.
+This is a convergence point: the procurement stage belongs to the supply source, but it depends on payment proof.
 
-The buyer source may also have done its own preparation:
+## Advanced Modeling Examples
 
-- budget approval, withdrawal, FX conversion, or stablecoin readiness;
-- delivery address, acceptance criteria, and procurement request;
-- logistics preference or payment path selection.
+### Deal Matching and New Fulfillment Source
 
-Before the deal is matched, the seller and buyer each prepare independently, forming two real causal chains. After the deal is matched, a new shared fulfillment source or a new Order instance appears.
-
-After the deal, a new source or Order instance should be created, such as `trade`, `deal`, or `fulfillment`:
+Before a deal is matched, seller preparation and buyer preparation may be separate sources. After a deal is matched, a new shared fulfillment source or a new Order instance can be created:
 
 ```text
 seller-prep source
@@ -74,22 +81,11 @@ buyer-prep source
        -> acceptance
 ```
 
-After convergence, the Order enters a new shared fulfillment causal chain, which can continue to include logistics, delivery, acceptance, after-sales, or dispute handling.
+More complex dynamic matching across multiple parties is usually expressed through a new source, a docked linked Order, or Store/Product workflow.
 
-The current hook DSL expression is a single `source::condition`. If a stage’s `source` is `supply` but it waits on `payment::...`, that means the stage in the supply chain depends on the result of the payment chain:
+### Oil Fractionation
 
-```yaml
-procurement_execution:
-  source: supply
-  receiveSignals:
-    SUPPLIER_FUNDED: payment::master.supplier_usdc_direct.cmp | master.supplier_settlement_exec.cmp
-```
-
-This is a convergence point: the procurement execution stage belongs to the supply source, but it must wait for the payment result from the payment source. More complex dynamic matching across multiple parties is usually expressed through a new source, a docked linked Order, or Store/Product workflow.
-
-## Branching: Oil Fractionation
-
-Oil fractionation is the most intuitive example of source branching. After crude oil enters a refinery, it splits into gasoline, diesel, naphtha, lubricants, and other paths. They share the upstream input, but their downstream quality metrics, transport, inventory, buyers, and delivery conditions differ.
+Oil fractionation is an example of source branching. After crude oil enters a refinery, it can split into gasoline, diesel, naphtha, lubricants, and other paths. They share the upstream input, but their downstream quality metrics, transport, inventory, buyers, and delivery conditions differ.
 
 ```text
 crude_intake
@@ -100,13 +96,9 @@ crude_intake
        -> lubricant source
 ```
 
-In Zhixu, `fractionation` can be a selection or branching stage, and each product line can become a separate source. Each source has its own signals and hooks, and if there is a unified settlement or unified dispatch, they can converge again into a new source.
+### Agricultural Procurement
 
-## Branching Then Rejoining: Agricultural Procurement
-
-An agricultural buyer needs to source oranges from many farmers. Each farmer harvests, inspects, packs, and weighs the fruit, and everything is then gathered back to the buyer for grading, loading, or settlement.
-
-Conceptually:
+An agricultural buyer may source oranges from many farmers. If the number of farmers is fixed in the Plan, each farmer path can be explicit. If the number is dynamic, each farmer's harvesting and packing is usually better modeled as a docked linked Order or sub-Zhixu.
 
 ```text
 collector_intake
@@ -119,30 +111,10 @@ collector_intake
        -> payment settlement
 ```
 
-If the number of farmers is fixed in the Plan, it can be written explicitly as multiple branch sources. If the number of farmers is dynamic at runtime, it is more appropriate to model each farmer’s harvesting and packing as a docked linked Order or sub-Zhixu, and then let the collector Order gather them through proof and `signalMap`.
-
-## Source in Cross-Border Supply
-
-In a cross-border supply Zhixu, the main Order may include these sources:
-
-| Source | Causal chain |
-| --- | --- |
-| `growth` | Acquisition and lead generation. |
-| `sales` | Demand confirmation and commercial progress. |
-| `solution` | Technical scope and solution confirmation. |
-| `supply` | Supplier sourcing, procurement, and delivery preparation. |
-| `payment` | Payment-path selection, direct USDC payment, or linked settlement Zhixu. |
-| `logistics` | International logistics, customs clearance, and delivery. |
-| `field` | On-site installation, commissioning, and acceptance. |
-| `buyer` | Buyer commitment and final acceptance. |
-| `coordinator` | Exception coordination and closure. |
-
-These sources are namespaces for different causal chains within the same main Order. Some stages make them converge, such as procurement waiting on payment, logistics waiting on procurement, or site installation waiting on logistics.
-
 ## Boundary Checks
 
 - Role slots describe participant roles; Source describes causal chains.
-- Executor describes the runtime executor or submitter of an Order; Source describes the signal context.
+- Executor describes the runtime handler or submitter; Source describes signal context.
 - Supplier is the capability subject organized and endorsed by Store and the trust registry; Source is the namespace for hooks and signals.
 - A completed deal may form a new source or a new Order.
 - Source must be compilable, authorizable, and replayable; it cannot be used as an arbitrary dynamic field.

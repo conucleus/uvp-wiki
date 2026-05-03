@@ -1,6 +1,6 @@
 # Hook
 
-A Hook is the smallest rule used by the state machine to decide whether a stage condition has been satisfied. Each item in a Zhixu stage’s `receiveSignals` usually compiles into a `kind=receive` hook; if a stage docks with another Zhixu, `signalMap` also compiles into `kind=signalMap` hooks.
+A Hook is the smallest rule used by the state machine to decide whether a stage condition has been satisfied. It is not an HTTP webhook, callback, or external integration endpoint; it is a state-machine condition that may later open a task through a [Trigger](trigger.md). Each item in a Zhixu stage’s `receiveSignals` usually compiles into a `kind=receive` hook; if a stage docks with another Zhixu, `signalMap` also compiles into `kind=signalMap` hooks.
 
 A Hook is only a condition. The chain emits `HookReady` only when a hook marked as a [Trigger](trigger.md) becomes ready, and Product/Store should then project it as a formally executable task.
 

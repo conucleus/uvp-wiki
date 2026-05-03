@@ -1,6 +1,6 @@
 # Notifications 与 Reconcile
 
-Notifications 和 Reconcile 是非可信执行层里的运行辅助系统。前者把链事件和 supplier profile 转成可重试通知意图；后者检查 submission、projection 和链确认状态是否需要修复。
+Notifications 和 Reconcile 是可重建服务层里的运行辅助系统。前者把链事件和 supplier profile 转成可重试通知意图；后者检查 submission、projection 和链确认状态是否需要修复。
 
 ## Notifications 代码入口
 

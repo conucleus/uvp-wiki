@@ -1,6 +1,6 @@
 # Storage, Migration, and Runtime Profile
 
-Storage is the workflow and projection cache for the non-trusted execution layer. Chain Services supports memory, SQLite, and PostgreSQL; different profiles change runtime reliability, not the source of truth.
+Storage is the workflow and projection cache for the rebuildable service layer. Chain Services supports memory, SQLite, and PostgreSQL; different profiles change runtime reliability, not the source of truth.
 
 ## Storage Profile
 

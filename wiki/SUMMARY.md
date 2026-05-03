@@ -1,19 +1,41 @@
 # Wiki Summary
 
-## 入门
+## 认识 UVP
 
 - [Wiki 入口](README.md)
-- [项目状态](status/README.md)
 - [一个订单故事](getting-started/one-order-story.md)
+- [角色地图](getting-started/actor-map.md)
+- [证据与 Proof 路径](getting-started/evidence-proof-path.md)
 - [核心术语表](reference/glossary.md)
 - [读者入口](getting-started/README.md)
-- [快速开始](getting-started/quick-start.md)
 
-## 核心概念
+## 产品与 Store
+
+- [产品语言与 DTO/API](product/README.md)
+- [产品表面](concepts/product-surfaces.md)
+  - [事件投影](concepts/product/projections.md)
+  - [Product DTO](concepts/product/dto.md)
+  - [Signal Container](concepts/product/signal-container.md)
+  - [Store 与 Order App](concepts/product/apps.md)
+- [秩序商店入口](store/README.md)
+  - [Store 权威边界与信息架构](store/authority-and-ia.md)
+  - [凝结核工作台](store/nucleation-workbench.md)
+  - [Zhixu Catalog、配置与发布](store/zhixu-management.md)
+  - [Supplier Registry、能力与联系](store/supplier-registry.md)
+  - [履约状态、Proof 与 Trust 校验](store/runtime-proof.md)
+  - [联系与通知](store/contact-notifications.md)
+  - [Operator 权限、治理与 Audit](store/governance-audit.md)
+- [执行者与集成入口](execution/README.md)
+  - [Executor Kit](execution/executor-kit.md)
+  - [Order App 与 Executor Kit](concepts/architecture/components/order-app-executor-kit.md)
+
+## 核心协议概念
 
 - [核心概念入口](core/README.md)
 - [核心对象总览](concepts/overview.md)
   - [秩序 (Zhixu) DSL](concepts/core/zhixu.md)
+  - [Plan](concepts/core/plan.md)
+  - [订单 (Order)](concepts/core/order.md)
   - [Nucleation / 凝结核](concepts/core/nucleation.md)
   - [Supplier](concepts/core/supplier.md)
   - [Executor](concepts/core/executor.md)
@@ -22,15 +44,23 @@
   - [Hook](concepts/core/hook.md)
   - [Trigger](concepts/core/trigger.md)
   - [File Resources](concepts/core/file-resources.md)
-  - [Plan](concepts/core/plan.md)
-  - [订单 (Order)](concepts/core/order.md)
 - [信任与授权](concepts/trust-and-authorization.md)
   - [Trust Domain](concepts/trust/domains.md)
   - [Signal 授权](concepts/trust/signal-authorization.md)
   - [EIP-712 与 Relayer](concepts/trust/eip712-relayer.md)
-  - [Stage Patch 授权](concepts/trust/stage-patch.md)
 
-## 核心组件
+## 进阶组合
+
+- [Stage Overlay](concepts/state-machine/stage-overlay.md)
+- [Stage Patch 授权](concepts/trust/stage-patch.md)
+- [Docked Zhixu 与 signalMap](execution/zhixu-as-executor.md)
+- [Docking Sandbox](store/docking-sandbox.md)
+- [Periphery 与 Adapter](concepts/architecture/components/periphery-deploy.md)
+- [Protocol Mainline 旧入口](protocol/README.md)
+- [Plan 与 Order 兼容入口](concepts/core/plan-order.md)
+- [Store 核心概念侧视图](concepts/core/store.md)
+
+## 工程组件
 
 - [核心组件入口](components/README.md)
 - [组件链路与模块边界](components/architecture.md)
@@ -45,9 +75,8 @@
   - [State Machine](concepts/state-machine.md)
   - [Hook 求值](concepts/state-machine/evaluation.md)
   - [计时器与状态](concepts/state-machine/timers-and-status.md)
-  - [Stage Overlay](concepts/state-machine/stage-overlay.md)
   - [事件 Replay](concepts/state-machine/replay.md)
-- [非可信执行层：Chain Services](components/chain-services.md)
+- [可重建服务层：Chain Services](components/chain-services.md)
   - [Indexer 与投影](components/chain-services-indexer-projections.md)
   - [Relayer](components/chain-services-relayer.md)
   - [Submissions 与 Stage Patch](components/chain-services-submissions-stage-patch.md)
@@ -59,45 +88,24 @@
   - [Storage、Migration 与 Runtime Profile](components/chain-services-storage-runtime.md)
   - [API Routes](components/chain-services-api-routes.md)
 - [服务与接口](components/services-and-interfaces.md)
-- [部署与证据](components/deploy-release.md)
 - [模块地图](reference/module-map.md)
-
-## 秩序商店
-
-- [秩序商店入口](store/README.md)
-- [Store 权威边界与信息架构](store/authority-and-ia.md)
-- [凝结核工作台](store/nucleation-workbench.md)
-- [Zhixu Catalog、配置与发布](store/zhixu-management.md)
-- [Supplier Registry、能力与联系](store/supplier-registry.md)
-- [履约状态、Proof 与 Trust 校验](store/runtime-proof.md)
-- [联系与通知](store/contact-notifications.md)
-- [Operator 权限、治理与 Audit](store/governance-audit.md)
-- [Docking Sandbox](store/docking-sandbox.md)
-
-## 执行者与集成
-
-- [执行者与集成入口](execution/README.md)
-- [Executor Kit](execution/executor-kit.md)
-- [Zhixu 作为 Executor 接入另一个秩序](execution/zhixu-as-executor.md)
-- [Order App 与 Executor Kit](concepts/architecture/components/order-app-executor-kit.md)
-- [Periphery 与 Adapter](concepts/architecture/components/periphery-deploy.md)
-
-## 产品语言与 DTO/API
-
-- [产品语言与 DTO/API](product/README.md)
-- [产品表面](concepts/product-surfaces.md)
-  - [事件投影](concepts/product/projections.md)
-  - [Product DTO](concepts/product/dto.md)
-  - [Signal Container](concepts/product/signal-container.md)
-  - [Store 与 Order App](concepts/product/apps.md)
+- [工程架构入口](engineering/README.md)
+- [架构](concepts/architecture.md)
+  - [模块边界](concepts/architecture/modules.md)
+  - [数据流与事实源](concepts/architecture/flow-and-truth.md)
+  - [本地到链上路径](concepts/architecture/lifecycle.md)
+  - [Store 与 Governance](concepts/architecture/components/store-governance.md)
+  - [Chain Services BFF](concepts/architecture/components/chain-services-bff.md)
 
 ## 本地 / 预发 / 发布
 
+- [快速开始](getting-started/quick-start.md)
 - [日常开发](tasks/development.md)
 - [运行服务和前端](tasks/run-services-and-apps.md)
 - [Local Anvil 协议闭环](tutorials/local-anvil.md)
 - [Product 本地闭环](tutorials/product-local-loop.md)
 - [Base Sepolia 预发](tasks/base-sepolia-staging.md)
+- [部署与证据](components/deploy-release.md)
 - [发布与验证](operations/release-and-verification.md)
 - [排障](operations/troubleshooting.md)
 
@@ -107,7 +115,9 @@
 - [合约与事件](reference/contracts-and-events.md)
 - [Product API](reference/product-api.md)
 - [CLI 与配置](reference/cli-and-config.md)
+- [项目状态](status/README.md)
 - [阅读门槛审计](status/readability-audit-2026-05-03.md)
+- [当前阅读门槛记录](status/current-readability-notes-2026-05-03.md)
 
 ## 贡献
 

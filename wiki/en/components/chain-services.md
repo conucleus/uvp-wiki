@@ -1,6 +1,6 @@
-# Non-trusted Execution Layer: Chain Services
+# Rebuildable Service Layer: Chain Services
 
-`uvp-chain-services/service` is the non-trusted execution layer for the UVP EVM track. It sits at the same level as [Semantics, Hook Core, and Compiler](semantics-and-compiler.md) and [On-chain Execution, State Machine, and Replay](onchain-runtime.md): the compiler turns Zhixu into deterministic artifacts, the state machine handles on-chain facts, and Chain Services handles off-chain replay, projection, relaying, verification, and product-facing interfaces.
+`uvp-chain-services/service` is the rebuildable service layer for the UVP EVM track. In protocol notes it may also be called the non-trusted execution layer, meaning it is not the source of truth; it does not mean the service is unsafe or unreliable. It sits at the same level as [Semantics, Hook Core, and Compiler](semantics-and-compiler.md) and [On-chain Execution, State Machine, and Replay](onchain-runtime.md): the compiler turns Zhixu into deterministic artifacts, the state machine handles on-chain facts, and Chain Services handles off-chain replay, projection, relaying, verification, and product-facing interfaces.
 
 It is a forkable off-chain service package. Any participant, nucleation kernel, supplier, auditor, or third-party integration can download, fork, compile, and run its own instance; as long as ABI, event, EIP-712, canonical hash, Product DTO, and Store/Product API boundaries are respected, different instances can rebuild the same kind of fact view from the same chain events.
 
@@ -11,9 +11,9 @@ UVPDeploymentRegistry / UVPStateMachine / ZhixuTrustRegistry events
   -> Product API / Store Console API / executor-kit integration / ops views
 ```
 
-## Why It Is Called the Non-trusted Execution Layer
+## Why It Is Rebuildable
 
-“Non-trusted” means the source of truth is still on chain. Chain Services is still important: it turns events into task lists, proofs into DTOs, signed payloads into relayer submissions, Store drafts and audit workflows into durable records, and notifications into retryable delivery intents. Every public conclusion it emits must trace back to a chain event, signature, notarized hash, or replayable projection.
+Rebuildable means the source of truth is still on chain. Chain Services is still important: it turns events into task lists, proofs into DTOs, signed payloads into relayer submissions, Store drafts and audit workflows into durable records, and notifications into retryable delivery intents. Every public conclusion it emits must trace back to a chain event, signature, notarized hash, or replayable projection.
 
 | Question | Source of truth | Chain Services role |
 | --- | --- | --- |

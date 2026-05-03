@@ -1,105 +1,114 @@
 # uvp-eth Wiki
 
-In the AI era, the cost of getting work done is dropping quickly, but transaction costs do not disappear on their own. Knowing who should transact with whom, what to agree on, who should take the next step, who is allowed to confirm it, and what consequences follow after confirmation is still the most expensive part of cross-organization coordination.
+A cross-organization coordination protocol for the AI era: UVP, the Universal Value Protocol, uses a Zhixu DSL, standardized business signals, wallet signatures, and on-chain proof to reduce the costs of search, agreement, coordination, supervision, integration, dispute, and denial.
 
-One person with AI can work with much greater leverage, but that still only means “I can do the work.” UVP provides a standardized Signal Container: who is authorized to emit which signal, which Order the signal is bound to, which stage, evidence fingerprint, and signature it belongs to, and what coordination consequence it enters after it is emitted.
+`uvp-eth` is the EVM/Web3 implementation track for the Universal Value Protocol. It turns reusable cross-organization coordination designs into endorsed on-chain Plans, concrete Orders, wallet-signed business Signals, and replayable proof.
 
-UVP records protocol facts: a subject authorized by a particular Zhixu emits a business signal under a specific Order, stage, and evidence fingerprint, and takes responsibility for that claim. Ground truth, qualification review, guarantees, insurance, dispute rulings, and regulatory conclusions can be emitted as their own signals by the relevant trust domain, Supplier, funding party, auditor, or adapter.
+## In the AI Era, Transaction Costs Remain
 
-UVP compresses complex production relationships into coordination language that computers can understand, record on chain, and hold accountable. `Zhixu` is the transliteration of the underlying Chinese coordination term; in this repository it refers to the static coordination definition: who starts first, who owns the next step, which Supplier can take over, what evidence counts as completion, and which route applies on failure. An Order is one runtime instance of a Zhixu version. The Zhixu DSL is a low-cost way to express transactional coordination; the blockchain and smart contracts are the high-falsification-cost record system. `uvp-eth` connects the two so strangers, enterprise systems, AI agents, Suppliers, trust domains, and ordinary participants can organize production around the same signal boundary.
+In the AI era, the cost of getting work done is dropping quickly, but transaction costs do not disappear on their own. Knowing who should transact with whom, what has been agreed, who should take the next step, who is allowed to confirm, and which consequence follows after confirmation remains one of the most expensive parts of cross-organization coordination.
 
-`uvp-eth` is the EVM-native implementation track for this mechanism. It compiles coordination design into deterministic artifacts, gives plan and Supplier attestations to the trust registry, and gives Orders, signals, HookReady, and fulfillment proofs to the on-chain state machine. Backends handle indexing, projection, display, relay, and caching; object storage keeps off-chain materials; on chain keeps hashes, URIs, signatures, and events.
+One person with AI can do more work, but that still only says "I can do the work." Enterprises, strangers, AI agents, suppliers, funders, auditors, and ordinary participants still need to answer the same operational questions: who is authorized to emit which signal, which order and stage the signal belongs to, which evidence fingerprint and signature it carries, and what consequence it enters after submission.
 
-This is also the fundamental difference between `uvp-eth` and a multi-party database consistency scheme: participants are accountable for the standard signals they emit under a pre-agreed Zhixu. UVP primarily reduces search, negotiation, coordination, supervision, integration, dispute, and denial costs.
+If you are searching for how collaboration works in the AI era, how to orchestrate AI agents, how to reduce transaction costs, or how to prove cross-organization workflows on chain, UVP's answer is to turn coordination rules, execution permissions, evidence fingerprints, and state consequences into standardized signal containers.
+
+## What UVP Solves
+
+UVP records protocol facts: a subject authorized by a specific Zhixu declares, under a specific Order, stage, and evidence fingerprint, that a business Signal has been emitted and that the subject is accountable for that declaration. Real-world truth, qualification review, guarantee, insurance, dispute resolution, and regulatory conclusions can be expressed by the relevant trust domain, supplier, funder, auditor, or adapter as its own signal.
+
+UVP compresses complex production relationships into an order language that computers can interpret and chains can record. `Zhixu` is the transliteration of the underlying Chinese coordination term; in this repository it means a static coordination definition: who starts, who takes the next step, which supplier may take over, what evidence counts as completion, and where the process goes on failure. An Order is one runtime of a specific Zhixu version.
+
+The Zhixu DSL is a low-cost way to define transaction agreements; blockchains and smart contracts are high-forgery-cost recording systems. `uvp-eth` connects the two, so strangers, enterprise systems, AI agents, suppliers, trust domains, and ordinary participants can organize production around the same signal boundary.
+
+## Coase-Theorem Engineering Practice
+
+UVP aims to be an engineering practice of Coase-style transaction-cost reduction in the AI era. It is not trying to prove the theorem in prose; it turns transaction costs into implementable protocol objects.
+
+| Transaction cost | UVP engineering object |
+| --- | --- |
+| Search cost | Store, Supplier registry, trust projection, Product catalog. |
+| Agreement cost | Zhixu DSL, Plan, plan hash, file resources, supplier requirements. |
+| Coordination cost | Source, Signal, Hook, Trigger, Order, executor authorization. |
+| Supervision cost | Evidence metadata, payload hash, metadata URI, proof row, timeline. |
+| Integration cost | Product DTO, Chain Services, executor-kit, adapter/periphery boundary. |
+| Dispute and denial cost | EIP-712 signatures, `SignalSubmitted`, `HookReady`, trust-registry events, replayable chain proof. |
+
+UVP is therefore not only about what AI can do. It is about how AI agents, enterprises, humans, and on-chain state can coordinate inside the same accountable boundary.
+
+## How `uvp-eth` Implements It
+
+`uvp-eth` connects the Zhixu coordination model to EVM-compatible chains. It compiles coordination designs into deterministic artifacts, puts plan and supplier endorsement into a trust registry, and puts Orders, Signals, HookReady events, and fulfillment proof into an on-chain state machine. Backend services index, project, display, relay, and cache; object storage keeps off-chain materials; the chain stores hashes, URIs, signatures, and events.
+
+```text
+Nucleation designs a Zhixu
+  -> compiler creates deterministic Plan artifacts
+  -> trust domain attests the plan hash
+  -> publisher registers the Plan
+  -> registrar creates an Order and writes signal authorization
+  -> executor or participant signs and submits a Signal
+  -> UVPStateMachine emits SignalSubmitted / HookReady / status events
+  -> Chain Services rebuilds Product and Store views from events
+```
+
+Chain Services is the rebuildable service layer: it indexes, projects, verifies, relays, and exposes Product / Store APIs. In protocol discussions this layer is also called the non-trusted execution layer, meaning it is not the source of truth; it does not mean the software is unreliable.
+
+Funding, USDC, escrow, guarantee, and settlement can be built around this path, but they stay in periphery adapters. The core protocol boundary is the coordination state machine: Plans, Orders, authorizations, Signals, hooks, attestations, and replayable events.
+
+## Public Implementation Repositories
+
+This Wiki is not a standalone concept page. The EVM/Web3 implementation of UVP is split across these public repositories:
+
+| Repository | Responsibility |
+| --- | --- |
+| [uvp-protocol](https://github.com/conucleus/uvp-protocol) | Zhixu compiler, HookPlan, state-machine reference, Solidity contracts, ABI, EIP-712, and Product DTO. |
+| [uvp-chain-services](https://github.com/conucleus/uvp-chain-services) | Rebuildable service layer: indexer, relayer, proof verifier, Product API, Store API, projection, and workflow runtime. |
+| [zhixu-store](https://github.com/conucleus/zhixu-store) | Store / workbench frontend: Zhixu catalog, supplier registry, trust/proof views, and operator workflows. |
+| [uvp-order-app](https://github.com/conucleus/uvp-order-app) | Participant Order App: invite onboarding, task inbox, evidence fingerprints, proof display, and readiness checks. |
+| [uvp-executor-kit](https://github.com/conucleus/uvp-executor-kit) | Executor CLI/SDK/MCP: executor wallets, chain watcher, Product API signal producer, and adapter integration. |
+
+This Wiki explains how those repositories fit into one on-chain-provable coordination path; code, tests, and run scripts live in the repositories themselves.
+
+## What It Is Not
+
+This is also the core difference between `uvp-eth` and a multi-party database consistency system: participants are accountable for the standardized signals they emit inside a pre-agreed Zhixu. UVP mainly reduces the transaction costs of search, agreement, coordination, supervision, integration, dispute, and denial.
+
+| UVP is not | UVP is |
+| --- | --- |
+| Not a multi-party database synchronization scheme. | A protocol that records authorized business signals and their coordination consequences through chain events. |
+| Not an ordinary backend workflow system. | Backends may project and relay, but protocol facts come from contracts and chain events. |
+| Not a payment provider, custodian, exchange, or settlement rail. | Funding, guarantees, USDC, escrow, and settlement are adapters around the core state machine. |
+| Not plaintext business files on chain. | The chain stores hashes, URIs, signatures, and events; business materials stay off chain. |
 
 This Wiki is the human-readable entry point for `uvp-eth`. It organizes source code, tests, ABI fixtures, PRD records, and release evidence into a project manual that can be read by path.
 
-## In One Line
+## Who This Wiki Is For
 
-```text
-Nucleation designs Zhixu
-  -> Supplier / Executor capability network
-  -> deterministic HookPlan / OnchainHookPlan artifacts
-  -> ZhixuTrustRegistry plan attestation
-  -> UVPStateMachine plan/order/signal/hook events
-  -> Store Nucleation workbench, trust checks, fulfillment views, and platform workflow
-  -> non-trusted execution layer / chain-services replayed projections
-  -> Product DTOs
-  -> Store / Order App / executor-kit / docked Zhixu
-```
+| Reader | What you can learn here |
+| --- | --- |
+| New partner or ecosystem reader | Why UVP exists, what a Zhixu/Order/Signal means, and how one order is proven. |
+| Product or Store builder | How Product DTOs, Store workflow, supplier registry, proof views, and operator actions fit around chain facts. |
+| Protocol engineer | How compiler artifacts, contracts, events, EIP-712, hashes, replay, and public interfaces fit together. |
+| Executor or adapter integrator | How Order App, executor-kit, enterprise scripts, AI/MCP, docked Zhixu, and periphery adapters submit signals. |
+| Release owner | How local Anvil, Product loops, Base Sepolia staging, status labels, and release evidence should be read. |
 
-There is only one core principle: contracts and chain events are the protocol source of truth. Backend services, Store metadata, demo adapters, object storage, and frontend caches are responsible for projection, indexing, display, relay, or off-chain material storage. UVP records accountable signals emitted by authorized subjects and the consequences those signals have under Zhixu.
+## Start Reading
 
-## Read This First
+If you are new to UVP, use this order:
 
-If you want to get to engineering work quickly:
+1. [One Order Story](getting-started/one-order-story.md): follow one cross-border cargo order from design to task proof.
+2. [Actor Map](getting-started/actor-map.md): learn who Buyer, Nucleation, Store operator, Trust Domain, Registrar, Supplier, Executor, Relayer, and Chain Services are.
+3. [Evidence and Proof Path](getting-started/evidence-proof-path.md): understand how private business files become hashes, signed signals, events, and Product proof rows.
+4. [Glossary](reference/glossary.md): keep the project terms and "do not confuse" pairs nearby.
+5. [Core Concepts](core/README.md): read the protocol objects after the story is clear.
 
-1. Read [Project Status](status/README.md) to see what is verified and what is still prototype work.
-2. Read [One Order Story](getting-started/one-order-story.md) and [the glossary](reference/glossary.md) to separate “Zhixu” from “Order.”
-3. Run [Quick Start](getting-started/quick-start.md) to confirm the workspace builds.
-4. Read [Core Concepts](core/README.md) to understand Zhixu, Nucleation, Supplier, Executor, Source/Signal/Hook/Trigger, File Resources, Plan, and Order.
-5. Read [Core Components](components/README.md) to understand compiler, contracts, state machine, the non-trusted execution layer, Product DTOs, and deploy.
-6. For Store work, read [Store](store/README.md).
-7. For executor, adapter, AI/MCP, or peer Zhixu integration, read [Executors and Integrations](execution/README.md).
-8. For user-facing product language, start with [Product Language and DTO/API](product/README.md).
-9. Before changing a public boundary, read [Public Interfaces](reference/public-interfaces.md).
+## Choose Your Path
 
-## Document Map
-
-- [Getting Started](getting-started/README.md): reader entry point, one-order story, quick start, and current project status.
-- [Core Concepts](core/README.md): Zhixu, Nucleation, Supplier, Executor, Source/Signal/Hook/Trigger,
-  File Resources, Plan, Order, and the trust/authorization relationships between those protocol objects.
-- [Core Components](components/README.md): hook-core, compiler, protocol bindings,
-  artifacts/hashes, contracts/registries, state machine/replay, the non-trusted execution layer, Product DTOs, and deploy/release.
-- [Store](store/README.md): how Store gives Nucleation a workbench and organizes Zhixu/Supplier, trust checks,
-  fulfillment/proof views, contact notifications, configuration publishing, platform workflow, and audit.
-- [Executors and Integrations](execution/README.md): executor-kit, Order App, enterprise scripts,
-  AI/MCP adapters, docked Zhixu, and periphery adapter execution entry points.
-- [Product Language and DTO/API](product/README.md): Product DTO/API, Signal Container,
-  Order App, and ordinary Product UI.
-- [Local / Staging / Release](tasks/development.md): development tasks, Anvil, Base Sepolia,
-  release evidence, and troubleshooting.
-- [Reference and Evidence](reference/public-interfaces.md): public interfaces, contract events, Product API,
-  CLI/config, and release claim language.
-- [Contribution Rules](contribute/documentation-rules.md): how to update the Wiki without polluting protocol boundaries.
+| Goal | Read next |
+| --- | --- |
+| Understand the system before engineering | [Getting Started](getting-started/README.md), [Core Concepts](core/README.md), [Product Language and DTO/API](product/README.md). |
+| Build Product or Store surfaces | [Product Language and DTO/API](product/README.md), [Store](store/README.md), [Order App and Executor Kit](concepts/architecture/components/order-app-executor-kit.md). |
+| Work on protocol or public interfaces | [Core Components](components/README.md), [Public Interfaces](reference/public-interfaces.md), [Contracts and Events](reference/contracts-and-events.md). |
+| Integrate executors, adapters, or AI/MCP | [Executors and Integrations](execution/README.md), [Executor Kit](execution/executor-kit.md), [Periphery and Adapters](concepts/architecture/components/periphery-deploy.md). |
+| Verify local or staging claims | [Quick Start](getting-started/quick-start.md), [Local Anvil Protocol Loop](tutorials/local-anvil.md), [Base Sepolia Staging](tasks/base-sepolia-staging.md), [Project Status](status/README.md). |
 
 See [SUMMARY.md](SUMMARY.md) for the full table of contents. `wiki/site/` is static site build output, not an editing source.
-
-## Current Project Status
-
-At the time this Wiki was assembled, the repository already includes, and in varying degrees has been tested or supported by staging evidence:
-
-- deterministic compiler, HookPlan, and EVM-facing OnchainHookPlan artifacts;
-- `UVPStateMachine`, `ZhixuTrustRegistry`, and `UVPDeploymentRegistry` contracts;
-- explicit order-level signal submitter authorization;
-- first-writer-wins signal handling, hook status, timers, and `HookReady` events;
-- the non-trusted execution layer / chain-services that replay Product order/task/proof/trust projections from chain events;
-- Store Console, Store workbench, Order App, and executor-kit Product API / chain CLI;
-- the `supplierType=zhixu` / `signalMap` compilation semantics and the local/linked docked execution protocol surface;
-- local Anvil, Product local Anvil, Base Sepolia rehearsal, and release gate scripts;
-- the periphery directory for funding, guarantee, payment, and agent adapters and demos.
-- Base Sepolia `0.2` Product/Store staging evidence, including the 2026-05-01 managed Postgres/R2/JWT record and the 2026-05-02 local Docker Postgres release-candidate rehearsal record.
-
-Status boundaries:
-
-- Base Sepolia rehearsal supports testnet/staging claims; production claims need separate release evidence.
-- Store metadata, contact information, notification state, review state, fulfillment record views, and Product BFF state belong to the product and workflow read models.
-- Store admin owns platform workflow; Nucleation owns internal Zhixu design; trust domains own external endorsement.
-- USDC, escrow, guarantee, and settlement belong inside the periphery adapter boundary.
-- Implemented capabilities must be backed by code, tests, or release evidence; PRD plans should be labeled planned/prototype.
-- `uvp-order-app` still needs a complete proof of the same Base Sepolia Product API task flow.
-- The current head state for managed Postgres needs a fresh managed run after quota recovery before it can be claimed again.
-
-## Shortest Engineering Path
-
-1. Read [One Order Story](getting-started/one-order-story.md) to build the main path in your head.
-2. Read [the glossary](reference/glossary.md) to align the meanings of “Zhixu” and “Order.”
-3. Read [Project Status](status/README.md) and use verified/prototype/planned/blocked to judge evidence quality.
-4. Run [Quick Start](getting-started/quick-start.md) to confirm local dependencies and contract checks.
-5. Read [Core Concepts](core/README.md) and [Core Components](components/README.md) to separate protocol objects from implementation components.
-6. Run the [Local Anvil tutorial](tutorials/local-anvil.md) to see the protocol semantics close the loop.
-7. Run the [Product Local Loop](tutorials/product-local-loop.md) to see Product DTOs, signatures, submissions, and proof.
-8. For Store work, read [Store](store/README.md) first.
-9. For executor, adapter, MCP, or linked Zhixu integration, read [Executors and Integrations](execution/README.md) first.
-10. Before staging, read [Base Sepolia Staging](tasks/base-sepolia-staging.md) and
-   [Release and Verification](operations/release-and-verification.md).

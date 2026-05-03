@@ -1,6 +1,6 @@
 # Notifications and Reconcile
 
-Notifications and Reconcile are runtime support systems in the non-trusted execution layer. The former turns chain events and supplier profiles into retryable notification intents; the latter checks whether submissions, projections, and chain confirmation state need repair.
+Notifications and Reconcile are runtime support systems in the rebuildable service layer. The former turns chain events and supplier profiles into retryable notification intents; the latter checks whether submissions, projections, and chain confirmation state need repair.
 
 ## Notifications Code Entry Points
 

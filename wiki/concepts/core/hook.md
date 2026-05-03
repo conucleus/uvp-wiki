@@ -1,6 +1,6 @@
 # Hook
 
-Hook 是状态机判断“某个阶段条件是否成立”的最小规则。Zhixu stage 的 `receiveSignals` 每一项通常都会编译成一个 `kind=receive` hook；如果 stage 对接另一条 Zhixu，`signalMap` 还会编译成 `kind=signalMap` hook。
+Hook 是状态机判断“某个阶段条件是否成立”的最小规则。它不是 HTTP webhook，也不是外部系统回调；它是 Order 事件集上的状态机条件。Zhixu stage 的 `receiveSignals` 每一项通常都会编译成一个 `kind=receive` hook；如果 stage 对接另一条 Zhixu，`signalMap` 还会编译成 `kind=signalMap` hook。
 
 Hook 本身只是条件。只有被标记为 [Trigger](trigger.md) 的 hook Ready 时，链上才会发出 `HookReady`，Product/Store 才应该把它投影成正式可执行任务。
 

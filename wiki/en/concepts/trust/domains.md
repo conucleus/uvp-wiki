@@ -43,6 +43,17 @@ trustRegistry.isPlanActive(officialDomainId, planId, planHash)
 
 A plan without a valid attestation should not become a registerable protocol plan.
 
+## Official Domain FAQ
+
+| Question | Answer |
+| --- | --- |
+| Who owns a trust domain? | A domain owner is the governance subject recorded in `ZhixuTrustRegistry`. The owner or its controlled governance process can attest or revoke plan and supplier records. |
+| What is the official domain? | The official domain is the `domainId` configured for state-machine plan registration checks. `registerPlan()` checks this domain when deciding whether a plan hash is active and not revoked. |
+| Can multiple domains exist? | Yes. Multiple domains can attest the same or different plans and suppliers. Product/Store may display additional domain views, but only the configured official domain gates core plan registration unless the deployment rules change. |
+| Can Store and the official domain be operated by the same organization? | They can be operated by related organizations in a staging or product setup, but the docs and UI must still separate Store workflow approval from trust-domain attestation. A Store review row is not `PlanAttested`. |
+| What if domains disagree? | Store/Product should show which domain each attestation came from and whether the official domain is active or revoked. A non-official endorsement can be useful context, but it does not replace the official-domain registration check. |
+| Who is responsible for revocation? | The domain owner is responsible for revoking its own plan or supplier endorsement. Store can request, display, and audit the workflow, but revocation fact comes from the registry event. |
+
 ## Supplier Attestation
 
 Supplier attestation does not directly authorize `submitSignal()`. It is input for Product / API layers to show supplier trust, capability tags, risk warnings, and audit provenance. Whether a business action can actually be submitted still depends on order-level signal authorization.

@@ -1,5 +1,17 @@
 # 模块地图
 
+## 公开仓库
+
+| 仓库 | 对应模块 | 负责什么 |
+| --- | --- | --- |
+| [uvp-protocol](https://github.com/conucleus/uvp-protocol) | `uvp-protocol/` | compiler、HookPlan、state-machine reference、contracts、ABI/EIP-712、Product DTO。 |
+| [uvp-chain-services](https://github.com/conucleus/uvp-chain-services) | `uvp-chain-services/` | indexer、relayer、proof verifier、Product/Store API、projection、workflow runtime。 |
+| [zhixu-store](https://github.com/conucleus/zhixu-store) | `zhixu-store/` | Store/workbench frontend、catalog、supplier registry、trust/proof views。 |
+| [uvp-order-app](https://github.com/conucleus/uvp-order-app) | `uvp-order-app/` | participant Order App、task inbox、evidence/proof display、readiness checks。 |
+| [uvp-executor-kit](https://github.com/conucleus/uvp-executor-kit) | `uvp-executor-kit/` | executor CLI/SDK/MCP、chain watcher、Product API signal producer、adapter integration。 |
+
+## Workspace 模块
+
 | 路径 | Package | 负责什么 | 不负责什么 |
 | --- | --- | --- | --- |
 | `uvp-protocol/packages/hook-core` | `@uvp-eth/hook-core` | Hook DSL parser/evaluator、dependency extraction | DB、Solidity、escrow、runtime service |

@@ -1,6 +1,6 @@
 # Product API
 
-The Product API is the main entry point for ordinary participants, the Order App, executor-kit, and agent adapters to consume the non-trusted execution layer. It translates chain-event projections into orders, tasks, timelines, proofs, and submission containers in ordinary user language.
+The Product API is the main entry point for ordinary participants, the Order App, executor-kit, and agent adapters to consume the rebuildable service layer. It translates chain-event projections into orders, tasks, timelines, proofs, and submission containers in ordinary user language.
 
 ## Code Entry Points
 

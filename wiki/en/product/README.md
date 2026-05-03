@@ -1,10 +1,10 @@
 # Product Language and DTO/API
 
-Product language and DTO/API translate on-chain facts into ordinary Product UI, participant tasks, Product DTO/API, and signal containers. The Product API is provided by [Untrusted Execution Layer: Chain Services](../components/chain-services.md); this directory defines how the Product layer says "order, task, evidence, proof, and trust status," and how these DTOs are consumed by the Store, Order App, executor-kit, and adapters.
+Product language and DTO/API translate on-chain facts into ordinary Product UI, participant tasks, Product DTO/API, and signal containers. The Product API is provided by [Rebuildable Service Layer: Chain Services](../components/chain-services.md); this directory defines how the Product layer says "order, task, evidence, proof, and trust status," and how these DTOs are consumed by the Store, Order App, executor-kit, and adapters.
 
 ```text
 chain events
-  -> non-trusted execution layer / chain-services replayed projection
+  -> Chain Services replayed projection
   -> Product DTO / Product API
   -> Order App / Store / executor-kit / periphery adapter
 ```
@@ -19,7 +19,7 @@ chain events
 | [Signal Container](../concepts/product/signal-container.md) | The product package for task, evidence, typed data, signature, submit, and proof. |
 | [Store and Order App](../concepts/product/apps.md) | How the Store, Order App, executor-kit, and periphery adapters all consume the same Product projection. |
 | [Product API Reference](../reference/product-api.md) | The current Product API routes and semantics. |
-| [Untrusted Execution Layer: Chain Services](../components/chain-services.md) | The indexer, relayer, proof verifier, and runtime profile that the Product API depends on. |
+| [Rebuildable Service Layer: Chain Services](../components/chain-services.md) | The indexer, relayer, proof verifier, and runtime profile that the Product API depends on. |
 
 ## Division of Labor with Executors and Store
 

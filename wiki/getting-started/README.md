@@ -1,32 +1,23 @@
 # Getting Started
 
-这个部分回答三个问题：
+这一节是首页之后的学习路径。它面向已经理解 UVP 为什么重要、但还需要从故事、角色、术语一路走到本地验证的读者。
 
-- 我应该先读什么？
-- 我怎样确认本地环境没有坏？
-- 我应该跑哪个闭环来理解项目？
+## 推荐第一遍阅读
 
-推荐顺序：
+1. [一个订单故事](one-order-story.md)：用一条跨境订单理解从 Zhixu 设计到链上 proof 的路径。
+2. [角色地图](actor-map.md)：谁在行动、在哪里行动、哪条事件证明这个事实。
+3. [证据与 Proof 路径](evidence-proof-path.md)：私有证据如何变成 hash、签名 signal 和 proof row。
+4. [核心术语表](../reference/glossary.md)：项目术语和“不要混淆”的概念对。
+5. [核心概念](../core/README.md)：故事清楚之后再读协议对象。
 
-1. [一个订单故事](one-order-story.md)：先用一条跨境订单理解秩序、Plan、订单、signal、proof。
-2. [核心术语表](../reference/glossary.md)：统一“秩序 (Zhixu)”和“订单 (Order)”等专有名词。
-3. [快速开始](quick-start.md)：安装依赖，跑 workspace 级别检查。
-4. [核心概念](../concepts/overview.md)：理解项目语言。
-5. [Local Anvil 协议闭环](../tutorials/local-anvil.md)：看秩序到链事件重放的完整路径。
-6. [Product Local Loop](../tutorials/product-local-loop.md)：看 Product API 如何创建订单、提交任务和查询 proof。
+## 工程第一遍
 
-## 先理解对象
+完成概念阅读之后，用这些页面确认本地工作区：
 
-`uvp-eth` 是 UVP 的 EVM/Web3 track，核心对象按这条线组织：
-
-- 静态设计：秩序 (Zhixu)、HookPlan、OnchainHookPlan、Plan。
-- 动态运行：订单 (Order)、signal、hook runtime、stage overlay、proof。
-- 背书与授权：trust domain、plan/supplier attestation、order-level signal authorization。
-- 产品读模型：indexer、Product API、Store、Order App。
-- 外围扩展：funding、payment、escrow、guarantee、agent adapter，放在
-  `uvp-periphery/`。
-
-工程边界也很明确：这个仓库不 import 或 vendor sibling `uvp` Go repository；协议事实来自合约状态和链事件；读模型必须能从事件重建。
+1. [快速开始](quick-start.md)：安装依赖，跑 workspace 级别检查。
+2. [Local Anvil 协议闭环](../tutorials/local-anvil.md)：看 Zhixu 到链事件 replay 的完整路径。
+3. [Product 本地闭环](../tutorials/product-local-loop.md)：看 Product API 创建订单、提交任务和查询 proof。
+4. [项目状态](../status/README.md)：确认哪些是 verified、prototype、planned 或 blocked。
 
 ## 环境要求
 

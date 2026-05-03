@@ -1,6 +1,6 @@
 # Relayer
 
-The relayer is the gas payer and transaction broadcaster in the non-trusted execution layer. It broadcasts business payloads that have already been signed to chain, and it records retry, confirmation, and failure; business signatures come from the buyer, seller, executor, or selector’s own wallet.
+The relayer is the gas payer and transaction broadcaster in the rebuildable service layer. It broadcasts business payloads that have already been signed to chain, and it records retry, confirmation, and failure; business signatures come from the buyer, seller, executor, or selector’s own wallet.
 
 ## Code Entry Points
 

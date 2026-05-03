@@ -1,5 +1,7 @@
 # 秩序商店
 
+本页是为旧链接保留的核心概念侧视图。中文站的 canonical Store 产品入口是 [秩序商店](../../store/README.md)，那里按 Store 工作流、权威边界和 operator 任务组织。
+
 秩序商店是中心化产品与平台 workflow 工作台。它负责把凝结核、秩序、supplier、订单、证明和背书请求组织成人能理解的界面。它给凝结核提供舞台，给对象打平台标签，展示 proof，发起 governance request，保留 audit；凝结核、trust domain 和链上事件分别保留自己的权威来源。
 
 ## 它的权威来自哪里

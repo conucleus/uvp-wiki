@@ -9,7 +9,7 @@ hook-core
   -> protocol-bindings
   -> UVP contracts / registries
   -> statemachine replay
-  -> non-trusted execution layer / chain-services
+  -> rebuildable Chain Services projection
   -> Product DTO / Store / Order App / executor-kit
   -> uvp-deploy release evidence
 ```
@@ -30,7 +30,7 @@ hook-core
 | 组件链路与模块边界 | [组件链路与模块边界](architecture.md) | 模块边界、依赖方向、事实源、从本地到链上路径。 |
 | 语义、Hook Core 与 Compiler | [语义、Hook Core 与 Compiler](semantics-and-compiler.md) | hook-core、compiler、HookPlan、OnchainHookPlan、canonical hash、registerPlan args。 |
 | 链上执行、State Machine 与 Replay | [链上执行、State Machine 与 Replay](onchain-runtime.md) | contracts、registries、state machine、stage overlay、timer、event replay。 |
-| 非可信执行层 | [非可信执行层：Chain Services](chain-services.md) | 可 fork 的链下执行软件：indexer、projection、relayer boundary、proof verifier、Product/Store API、notifications、storage/runtime profile。 |
+| 可重建服务层 | [可重建服务层：Chain Services](chain-services.md) | 可 fork 的链下执行软件：indexer、projection、relayer boundary、proof verifier、Product/Store API、notifications、storage/runtime profile。 |
 | 服务与接口 | [服务与接口](services-and-interfaces.md) | protocol-bindings、Product DTO、Product API、Store API、executor-kit consumption 和 public interface drift。 |
 | 部署与证据 | [部署与证据](deploy-release.md) | uvp-deploy、Anvil/Base Sepolia、manifests、release evidence、staging gates。 |
 
@@ -54,4 +54,4 @@ hook-core
 - [数据流与事实源](../concepts/architecture/flow-and-truth.md)
 - [本地到链上路径](../concepts/architecture/lifecycle.md)
 - [合约与事件](../reference/contracts-and-events.md)
-- [非可信执行层：Chain Services](chain-services.md)
+- [可重建服务层：Chain Services](chain-services.md)

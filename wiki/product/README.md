@@ -1,10 +1,10 @@
 # 产品语言与 DTO/API
 
-产品语言与 DTO/API 把链上事实翻译成 ordinary Product UI、participant task、Product DTO/API 和 signal container。Product API 由 [非可信执行层：Chain Services](../components/chain-services.md) 提供；本目录定义 Product 层如何说“订单、任务、证据、proof、信任状态”，以及这些 DTO 如何被 Store、Order App、executor-kit 和 adapter 消费。
+产品语言与 DTO/API 把链上事实翻译成 ordinary Product UI、participant task、Product DTO/API 和 signal container。Product API 由 [可重建服务层：Chain Services](../components/chain-services.md) 提供；本目录定义 Product 层如何说“订单、任务、证据、proof、信任状态”，以及这些 DTO 如何被 Store、Order App、executor-kit 和 adapter 消费。
 
 ```text
 chain events
-  -> non-trusted execution layer / chain-services replayed projection
+  -> rebuildable Chain Services projection
   -> Product DTO / Product API
   -> Order App / Store / executor-kit / periphery adapter
 ```
@@ -19,7 +19,7 @@ chain events
 | [Signal Container](../concepts/product/signal-container.md) | task、evidence、typed data、签名、submit、proof 的产品包装。 |
 | [Store 与 Order App](../concepts/product/apps.md) | Store、Order App、executor-kit 和 periphery adapter 如何消费同一套 Product projection。 |
 | [Product API 参考](../reference/product-api.md) | 当前 Product API 路由和语义。 |
-| [非可信执行层：Chain Services](../components/chain-services.md) | Product API 的 indexer、relayer、proof verifier 和 runtime profile 归属。 |
+| [可重建服务层：Chain Services](../components/chain-services.md) | Product API 的 indexer、relayer、proof verifier 和 runtime profile 归属。 |
 
 ## 和执行、Store 的分工
 

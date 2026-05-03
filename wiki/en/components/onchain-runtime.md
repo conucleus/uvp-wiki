@@ -20,7 +20,7 @@ ZhixuTrustRegistry attests plan/supplier
 | `ZhixuTrustRegistry` | trust domain, plan attestation/revocation, supplier attestation/revocation. |
 | `UVPDeploymentRegistry` | records deployment cutovers and release/deployment breadcrumbs. |
 | statemachine package | reference transition model and replay tests to prevent service projections from drifting away from contract semantics. |
-| non-trusted execution layer / chain-services replay | rebuilds Product order/task/proof/trust projections from chain events. |
+| rebuildable service layer / chain-services replay | rebuilds Product order/task/proof/trust projections from chain events. |
 
 ## Read These First
 

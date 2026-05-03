@@ -10,7 +10,7 @@
 | 链上执行 | `uvp-protocol/contracts/uvp-contracts/` | ABI、events、EIP-712 domain、`UVPStateMachine`、`ZhixuTrustRegistry`。 |
 | Replay/reference | `uvp-protocol/packages/statemachine/` | reference reducer、event replay、runtime semantic tests。 |
 | Bindings | `uvp-protocol/packages/protocol-bindings/` | browser-safe ABI、typed-data builders、hash helpers、calldata builders。 |
-| 非可信执行层 | `uvp-chain-services/service/` | 可 fork 的链下 indexer、projection、relayer boundary、proof verifier、Product/Store API。 |
+| 可重建服务层 | `uvp-chain-services/service/` | 可 fork 的链下 indexer、projection、relayer boundary、proof verifier、Product/Store API。 |
 | Product language | `uvp-protocol/packages/product-dto/` | Product order/task/proof/trust DTO。 |
 | Store/Product UIs | `zhixu-store/app/`、`uvp-order-app/app/` | Store workbench、participant task UI、proof display。 |
 | Execution tools | `uvp-executor-kit/package/` | CLI/SDK/MCP signal producer。 |
@@ -24,7 +24,7 @@ core objects
   -> semantic/compiler components
   -> contracts and registries
   -> chain events
-  -> replay/non-trusted execution projections
+  -> replay/rebuildable service projections
   -> Store / Product / execution surfaces
 ```
 
