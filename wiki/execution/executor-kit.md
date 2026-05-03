@@ -1,12 +1,12 @@
 # Executor Kit
 
-`uvp-executor-kit/package` 是执行者、validator、adjudicator、企业系统和 supervised agent 的 CLI/SDK。它不是状态机，也不是可信后端；它是把任务、证据、签名和提交动作接到 UVP 链上事实源的工具箱。
+`uvp-executor-kit/package` 是 executor、企业系统和 supervised agent 的 CLI/SDK。它把任务、证据、签名和提交动作接到 UVP 链上事实源。
 
 Executor Kit 有两个同等重要的 signal producer 表面：
 
 | 模式 | 输入 | 输出 | 适用场景 |
 | --- | --- | --- | --- |
-| Chain-native | `UVPStateMachine.HookReady`、本地 handler config、钱包。 | 直接构造 `submitSignal` 交易或 dry-run job。 | 高级链原生 executor、validator、自管 watcher。 |
+| Chain-native | `UVPStateMachine.HookReady`、本地 handler config、钱包。 | 直接构造 `submitSignal` 交易或 dry-run job。 | 高级链原生 executor、自管 watcher。 |
 | Product API | Product task / signal container / evidence id。 | prepare/sign/submit/proof 的标准流程。 | 企业脚本、supervised AI/MCP、普通自动化集成。 |
 
 ## Product API 模式

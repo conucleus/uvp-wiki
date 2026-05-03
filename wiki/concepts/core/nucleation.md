@@ -5,7 +5,7 @@
 ```yaml
 spec:
   nucleation:
-    id: africa-mro-demo
+    id: procurement-nucleus
 ```
 
 ## 凝结核负责什么

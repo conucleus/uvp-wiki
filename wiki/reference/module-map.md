@@ -16,7 +16,6 @@
 | `uvp-deploy/deploy` | `@uvp-eth/deploy` | deploy scripts、manifests、release records | sibling `/Users/uyhendu/project/uvp-deploy` |
 | `uvp-deploy/apps/ops-console-web` | `@uvp-eth/ops-console-web` | operator console prototype | protocol runtime |
 | `uvp-periphery` | mixed | funding/payment/guarantee/agent adapters and demos | core protocol truth |
-| `demo` | scripts/resources | Africa MRO docking demo and Zhixu resources | production deployment evidence |
 
 ## Workspace Packages
 

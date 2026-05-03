@@ -52,4 +52,4 @@ ZhixuTrustRegistry attests plan/supplier
 - Store review 不能让 plan 或 supplier 变成 attested。
 - Relayer 不能生成业务签名。
 - Runtime-host 只是 reference harness，不是 ETH runtime authority。
-- Docking relation metadata 不能让父订单自动继续；父订单必须收到授权 mapped signal。
+- Docking relation metadata 不能让local order自动继续；local order必须收到授权 mapped signal。

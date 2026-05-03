@@ -66,10 +66,10 @@ Supplier 页面应该像 capability passport，而不是普通联系人表。
 当 supplier 的 `supplierType=zhixu` 时，它表示一条可被其他秩序调用的 peer Zhixu 能力。Store 要展示的是接入材料，而不是替 peer Zhixu 治理内部流程：
 
 - peer Zhixu 的凝结核、active plan version 和 plan trust；
-- 可接受的父 stage 输入；
+- 可接受的local stage 输入；
 - 输出 `str/cmp/err` signalMap；
-- 子订单创建或定位方式；
+- linked order创建或定位方式；
 - proof bridge 规则；
 - 历史 docking 履约记录。
 
-这类 supplier 仍然不能自己获得父订单提交权。父订单必须在 order registration 或后续授权路径中明确允许某个 submitter 提交映射 signal。
+这类 supplier 仍然不能自己获得local order提交权。local order必须在 order registration 或后续授权路径中明确允许某个 submitter 提交映射 signal。

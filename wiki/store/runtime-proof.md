@@ -13,7 +13,7 @@ Store 的履约视图把订单、任务、供应商参与、证据 hash 和链�
 | Evidence 绑定 | Product evidence metadata、content hash、metadata hash、payload hash。 |
 | Supplier 历史参与 | order/task projection + supplier metadata/trust projection。 |
 | Plan/Supplier trust | `ZhixuTrustRegistry` plan/supplier attestation projection。 |
-| Docked child order | parent/child relation metadata + 两边 state-machine proof + mapped parent signal。 |
+| Docked linked order | local/linked relation metadata + 两边 state-machine proof + mapped local signal。 |
 
 ## Store 应展示什么
 
@@ -23,7 +23,7 @@ Store 的履约视图把订单、任务、供应商参与、证据 hash 和链�
 - indexer syncing/rebuild 状态；
 - evidence hash 和 metadata URI，不展示业务文件明文。
 - trigger hook、ready time、assigned executor、blocked reason；
-- parent/child order proof chain，当 stage 由 peer Zhixu 执行时。
+- local/linked order proof chain，当 stage 由 peer Zhixu 执行时。
 
 ## Proof 卡片最低字段
 
@@ -43,4 +43,4 @@ Store 的履约视图把订单、任务、供应商参与、证据 hash 和链�
 - 不把 notification delivered 当成 signal submitted。
 - 不把 Store note 或 operator review 当成业务完成。
 - 不把 local DB row 当成不可重建的权威记录。
-- 不把 child order complete 当成 parent order complete，除非父订单上已有授权 mapped signal。
+- 不把 linked order complete 当成 local order complete，除非local order上已有授权 mapped signal。

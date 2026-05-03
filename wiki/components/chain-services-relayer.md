@@ -1,6 +1,6 @@
 # Relayer
 
-Relayer 是非可信执行层里的 gas payer 和交易广播器。它可以替用户把已经签好的业务 payload 广播到链上，也可以记录 retry、confirmation 和 failure；但它不能替 buyer、seller、executor、validator、adjudicator 或 selector 生成业务签名。
+Relayer 是非可信执行层里的 gas payer 和交易广播器。它可以替用户把已经签好的业务 payload 广播到链上，也可以记录 retry、confirmation 和 failure；但它不能替 buyer、seller、executor、executor 或 selector 生成业务签名。
 
 ## 代码入口
 

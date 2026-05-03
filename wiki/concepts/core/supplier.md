@@ -84,6 +84,6 @@ Product DTO 里当前支持的 supplier capability tags 包括：
 - 支持的 `signalMap`；
 - 可用的 operator/contact/adapter；
 - 历史 docking proof；
-- 子订单创建或定位规则。
+- linked order创建或定位规则。
 
-它仍然不等于父订单提交权限。父订单要继续推进，必须出现父订单上的授权 signal。详见 [Executor](executor.md) 和 [Zhixu 作为 Executor](../../execution/zhixu-as-executor.md)。
+它仍然不等于local order提交权限。local order要继续推进，必须出现local order上的授权 signal。详见 [Executor](executor.md) 和 [Zhixu 作为 Executor](../../execution/zhixu-as-executor.md)。

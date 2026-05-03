@@ -41,7 +41,7 @@ fork 或自部署时必须守住这些兼容点：
 - 保留 `stateMachineAddress` / `deploymentId` 等 contract context；bare order id 只能在唯一时解析。
 - 不改写 ABI、event name、EIP-712 typed data、canonical hash 或 Product DTO 语义。
 - 不把本地数据库、object storage、notification state、Store review 结果写成 protocol truth。
-- 不保存用户私钥，不让 relayer key 冒充 buyer、seller、executor、validator 或 adjudicator。
+- 不保存用户私钥，不让 relayer key 冒充 buyer、seller、executor、executor 或 adjudicator。
 
 ## 下属页
 

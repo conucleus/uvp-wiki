@@ -10,8 +10,8 @@ Zhixu 是凝结核设计出的静态秩序定义。它不是订单，不是链�
 apiVersion: uvp/v0
 kind: Zhixu
 metadata:
-  name: africa-mro-master
-  uid: zhixu-demo-africa-mro-master-v1
+  name: cross-border-procurement
+  uid: zhixu-cross-border-procurement-v1
   annotations:
     version: "1"
 spec:
@@ -20,7 +20,7 @@ spec:
     provider: eth
     version: 0.1.3
   nucleation:
-    id: africa-mro-demo
+    id: procurement-nucleus
   taskPatterns:
     - name: master
       stages:
@@ -40,7 +40,7 @@ spec:
                 err: sourcing::source.close.err
 ```
 
-这段来自 Africa MRO demo。它说的是：主订单的 `master.supplier_sourcing` 阶段由 `solution::master.technical_scope.cmp` 触发；该阶段不是一个普通人直接完成，而是把另一条 `supplier-sourcing` Zhixu 当成执行接口来对接；外部执行秩序里的 `sourcing::source.close.cmp` 经 proof 校验和授权 submitter 桥接后，才能推动主订单。详见 [Zhixu 作为 Executor](../../execution/zhixu-as-executor.md)。
+这段说明：本地秩序的 `master.supplier_sourcing` 阶段由 `solution::master.technical_scope.cmp` 触发；该阶段不是一个普通人直接完成，而是把另一条 `supplier-sourcing` Zhixu 当成执行接口来对接；linked 秩序里的 `sourcing::source.close.cmp` 经 proof 校验和授权 submitter 桥接后，才能推动本地秩序。详见 [Zhixu 作为 Executor](../../execution/zhixu-as-executor.md)。
 
 ## 顶层字段
 
@@ -86,7 +86,7 @@ receiveSignals:
 
 ## `selectedStages`
 
-`selectedStages` 是选择权，不是 UI 上的“下一步”。例如 Phase 2 报关闭环中，买家的 selector stage 可以为 `customs-complete` 选择报关履约者。编译器把这个关系变成 selector binding，合约在 executor patch 时检查它。
+`selectedStages` 是某个 stage 对目标 stage 的 executor patch 能力，不是 UI 上的“下一步”。例如 Phase 2 报关闭环中，买家提交的阶段可以为 `customs-complete` 指定具体执行者。编译器把这个关系变成 selector binding，合约在 executor patch 时检查这个 stage-to-target 绑定。
 
 ```yaml
 selectedStages:
@@ -109,7 +109,7 @@ selectedStages:
 
 ## `fileResources`
 
-`fileResources` 记录阶段协议、证据要求、验收标准或资源句柄。它是句柄，不是文件明文。Africa MRO demo 中每个阶段都指向 Markdown protocol 文件和 SHA-256：
+`fileResources` 记录阶段协议、证据要求、验收标准或资源句柄。它是句柄，不是文件明文。一个阶段可以指向链下 protocol 文件、manifest URI 或对象存储资源，并带上哈希：
 
 ```yaml
 fileResources:
@@ -118,7 +118,7 @@ fileResources:
     resourceRole: stage_protocol
     mediaType: text/markdown
     localFile:
-      path: ./uvp-periphery/demos/africa-mro-docking/resources/protocols/africa-mro-master/supplier_sourcing.md
+      path: ./examples/protocols/supplier_sourcing.md
       sha256: "0x3002..."
 ```
 

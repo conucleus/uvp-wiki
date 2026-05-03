@@ -31,7 +31,7 @@ signalKey -> [hookId]
 
 ## Selector Binding
 
-selector binding 描述某个 selector stage 能否 patch 某个 target stage：
+selector binding 是 wire/API 名称，描述某个 stage 能否 patch 某个 target stage：
 
 ```text
 selectorStageIdentifier -> targetStageIdentifier

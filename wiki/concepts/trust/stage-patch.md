@@ -11,7 +11,7 @@ Product BFF 会根据 add-on manifest 自动生成内部授权：
 | `stage_executor_patch` | `EXECUTOR_PATCH_SIGNAL_ID` |
 | `stage_resource_patch` | `RESOURCE_PATCH_SIGNAL_ID` |
 
-source 通常来自 selector stage：
+source 通常来自发起 patch 的 stage：
 
 ```text
 sourceId = keccak256(stageId)
@@ -21,17 +21,18 @@ sourceId = keccak256(stageId)
 
 ## Selector Binding
 
-Patch 不是任意 stage 都能发起。计划里必须存在 selector binding：
+Patch 不是任意 stage 都能发起。计划里必须存在 stage-to-target binding
+（wire/API 字段名仍是 selector binding）：
 
 ```text
 selectorStageId -> targetStageId
 ```
 
-合约用 binding 判断 selector stage 是否允许 patch target stage。
+合约用 binding 判断该 stage 是否允许 patch target stage。
 
 ## Executor Patch
 
-Executor patch 可以做 assign、handoff、replacement 等动作。合约会检查 nonce、授权、selector binding，并根据 mode 检查前任 executor 或 approval signal。
+Executor patch 可以做 assign、handoff、replacement 等动作。合约会检查 nonce、订单级授权、stage-to-target binding，并根据 mode 检查前任 executor 或 approval signal。
 
 激活后，目标 stage 的业务 signal 必须由 active executor 提交。
 

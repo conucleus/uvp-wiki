@@ -6,7 +6,7 @@
 
 UVP 不二重验证“货物客观上是否已经到港”或“某个企业内账是否一致”。UVP 记录的是协议事实：被该秩序授权的主体，在该订单、该阶段、该凭证指纹下，声明某个业务信号已经发出，并愿意为这个声明负责。现实真实性、资质审查、担保、保险、争议裁定和监管结论，可以由对应的 trust domain、供应商、资金方、审计方或 adapter 发出自己的信号，但不能混成一个平台后台说了算。
 
-UVP 做的是把复杂生产关系压缩成计算机能理解、链上能记录和追责的秩序语言。凝结核把一类协作设计成 Zhixu：谁先开始，谁负责下一步，哪个供应商能承接，什么证据算完成，失败时走哪条路。Zhixu DSL 是低成本的交易约定方式，区块链和智能合约是高伪造成本的记录方式；`uvp-eth` 把两者接起来，让陌生人、企业系统、AI agent、供应商、验证者和普通参与者，可以围绕同一套信号边界组织生产。
+UVP 做的是把复杂生产关系压缩成计算机能理解、链上能记录和追责的秩序语言。凝结核把一类协作设计成 Zhixu：谁先开始，谁负责下一步，哪个供应商能承接，什么证据算完成，失败时走哪条路。Zhixu DSL 是低成本的交易约定方式，区块链和智能合约是高伪造成本的记录方式；`uvp-eth` 把两者接起来，让陌生人、企业系统、AI agent、供应商、trust domain 和普通参与者，可以围绕同一套信号边界组织生产。
 
 `uvp-eth` 是这套机制的 EVM-native 实现轨道。它不是普通后端订单系统，也不是“状态机文档”。它把秩序设计编译成 deterministic artifact，把计划和供应商背书交给 trust registry，把订单、signal、hook ready 和履约 proof 交给链上状态机。我们的后端可以索引、投影、展示、转发和缓存，但不能成为协议事实源；对象存储可以保存链下材料，但链上只认 hash、URI、签名和事件。
 
@@ -74,7 +74,7 @@ UVP 做的是把复杂生产关系压缩成计算机能理解、链上能记录�
 - first-writer-wins signal、hook 状态、timer 和 `HookReady` 事件；
 - 从链事件重放 Product order/task/proof/trust projection 的非可信执行层 / chain-services；
 - Store Console、Store workbench、Order App、executor-kit Product API/chain CLI；
-- `supplierType=zhixu` / `signalMap` 编译语义和 Africa MRO docked execution demo；
+- `supplierType=zhixu` / `signalMap` 编译语义和 local/linked docked execution 协议面；
 - local Anvil、Product local Anvil、Base Sepolia rehearsal 和 release gate 脚本；
 - periphery 目录，用于 funding、guarantee、payment、agent 等适配器和演示。
 - Base Sepolia `0.2` Product/Store staging evidence，包含 managed Postgres/R2/JWT
@@ -99,6 +99,6 @@ UVP 做的是把复杂生产关系压缩成计算机能理解、链上能记录�
 4. 跑 [Local Anvil 教程](tutorials/local-anvil.md)，看协议语义闭环。
 5. 跑 [Product 本地闭环](tutorials/product-local-loop.md)，看 Product DTO、签名、提交和 proof。
 6. Store 相关工作先读 [秩序商店](store/README.md)。
-7. 执行者、adapter、MCP 或子秩序接入先读 [执行者与集成](execution/README.md)。
+7. 执行者、adapter、MCP 或linked Zhixu接入先读 [执行者与集成](execution/README.md)。
 8. 准备 staging 前读 [Base Sepolia Staging](tasks/base-sepolia-staging.md) 和
    [发布与验证](operations/release-and-verification.md)。

@@ -33,7 +33,7 @@ Zhixu 定义
 
 Supplier 不是普通产品资料。它是 UVP 对现实履约能力的协议化入口：凝结核把 supplier 组织进秩序设计，Store 维护 profile、平台 tags、联系和 proof 材料，trust domain 通过 `SupplierAttested`/`SupplierRevoked` 对 supplier subject 背书，Product API 和 Order App 再把 supplier trust 作为任务、风险和授权前置条件的一部分展示。
 
-Executor 也不是普通后台 worker。它是订单运行时的执行绑定：静态 Zhixu 可以声明默认 executor，selector stage 可以通过 stage executor patch 选择 active executor，合约最终用 order-level authorization、active executor overlay 和 EIP-712 签名决定 signal 是否被接受。
+Executor 也不是普通后台 worker。它是订单运行时的执行绑定：静态 Zhixu 可以声明默认 executor，具备 stage executor patch 能力的 stage 可以选择 active executor，合约最终用 order-level authorization、active executor overlay 和 EIP-712 签名决定 signal 是否被接受。
 
 ## Store 中也会再次出现 Zhixu、凝结核和 Supplier
 
@@ -48,7 +48,7 @@ Executor 也不是普通后台 worker。它是订单运行时的执行绑定：�
 
 - Supplier trust 不等于订单 signal 授权。
 - Executor patch 不会修改 Plan，只影响单个 Order。
-- `supplierType=zhixu` 不会自动把子订单状态写入父订单；跨秩序推进必须通过 proof 校验和授权 signal 映射。
+- `supplierType=zhixu` 不会自动把linked order状态写入local order；跨秩序推进必须通过 proof 校验和授权 signal 映射。
 - Trigger 不创建链上 orderId；`registerOrder()` 才绑定链上订单身份。
 - `fileResources` 是资源句柄，不是业务文件明文。
 - Store metadata 可以组织对象，但不能创建 plan/supplier trust。

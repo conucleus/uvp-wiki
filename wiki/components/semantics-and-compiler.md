@@ -18,7 +18,7 @@ Zhixu YAML/JSON
 | 组件 | 拥有什么 | 不拥有什么 |
 | --- | --- | --- |
 | hook-core | `source::condition` 解析、AST、dependency extraction、正向锚点规则。 | Solidity ABI、钱包授权、Product task 语言。 |
-| compiler | Zhixu input schema、HookPlan、OnchainHookPlan、registerPlan args、canonical hash。 | 订单参与者选择、Supplier trust 判断、子订单注册、支付/escrow 逻辑。 |
+| compiler | Zhixu input schema、HookPlan、OnchainHookPlan、registerPlan args、canonical hash。 | 订单参与者选择、Supplier trust 判断、linked order注册、支付/escrow 逻辑。 |
 | artifact/hash | `planId`、`planHash`、`hookId`、`sourceId`、`signalId`、`signalKey` 的稳定边界。 | Store draft 状态、Product DB primary key。 |
 
 ## 先读这些
@@ -37,7 +37,7 @@ Zhixu YAML/JSON
 - Compiler 不选择订单参与者，不创建钱包授权，不判断 supplier 是否可信。
 - Artifact 不是产品说明书；普通用户看 Product DTO，Store operator 看 proof panel，协议工程师才需要读 on-chain artifact。
 - Canonical hash、artifact schema 和 registerPlan args 都是公共接口，改动时必须按 [公共接口](../reference/public-interfaces.md) 处理。
-- `supplierType=zhixu` 的 `signalMap` 只编译父 Plan 的映射语义；child order lifecycle 属于 Store/Product/adapter workflow，并必须用链上 proof 回填父 order signal。
+- `supplierType=zhixu` 的 `signalMap` 只编译local Plan 的映射语义；linked order lifecycle 属于 Store/Product/adapter workflow，并必须用链上 proof 回填父 order signal。
 - `fileResources` 是 stage resource handle；生产资源访问策略应通过 resource manifest/patch 演进，而不是把文件明文塞进编译产物。
 
 ## 当前要特别守住的语义
