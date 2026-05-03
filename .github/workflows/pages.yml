@@ -16,6 +16,9 @@ permissions:
   pages: write
   id-token: write
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 concurrency:
   group: pages
   cancel-in-progress: false
@@ -39,17 +42,17 @@ jobs:
         run: test -f wiki/site/index.html
 
       - name: Disable Jekyll processing
-        if: github.event_name != 'pull_request'
+        if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         run: touch wiki/site/.nojekyll
 
       - name: Upload Pages artifact
-        if: github.event_name != 'pull_request'
+        if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         uses: actions/upload-pages-artifact@v3
         with:
           path: wiki/site
 
   deploy:
-    if: github.event_name != 'pull_request'
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     needs: build
     runs-on: ubuntu-latest
     environment:
