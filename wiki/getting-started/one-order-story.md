@@ -1,6 +1,6 @@
 # 一个订单故事
 
-这页用一条跨境高价值货物订单串起 UVP 的主路径。先记住一句话：秩序 (Zhixu) 是静态协作设计，订单 (Order) 是这份设计的一次链上运行。
+这页用一条跨境高价值货物订单串起 UVP 的主路径。先记住一句话：秩序 (Zhixu) 是静态协作设计，订单 (Order) 是这份设计的一次链上运行。故事里的参与者和服务见 [角色地图](actor-map.md)。
 
 ## 1. 凝结核设计秩序
 
@@ -80,7 +80,9 @@ HookReady
 
 chain-services 从事件重建订单、任务、timeline、proof rows 和 trust projection，再翻译成 `ProductOrderDTO`、`ProductTaskDTO` 给 Store、Order App、executor-kit 使用。
 
-## 7. 另一条秩序承接一个阶段
+## 可选进阶扩展：另一条秩序承接一个阶段
+
+上面的基础 Order 路径不要求 linked Zhixu。下面是进阶组合模型：一条可独立运行的 Zhixu 为另一条 Zhixu 执行某个阶段。
 
 某些阶段可以交给另一条独立秩序执行，例如清关或付款结算。静态层由 `supplierType=zhixu` 和 `signalMap` 声明：
 

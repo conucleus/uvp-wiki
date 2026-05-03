@@ -6,6 +6,11 @@ const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const wikiRoot = path.resolve(scriptDir, "..");
 const outputRoot = path.join(wikiRoot, "site");
 const assetSource = path.join(wikiRoot, "assets", "site.css");
+const defaultSiteUrl =
+  process.env.GITHUB_REPOSITORY?.includes("/")
+    ? `https://${process.env.GITHUB_REPOSITORY.split("/")[0]}.github.io/${process.env.GITHUB_REPOSITORY.split("/")[1]}/`
+    : "https://conucleus.github.io/uvp-wiki/";
+const siteUrl = normalizeSiteUrl(process.env.WIKI_SITE_URL || defaultSiteUrl);
 
 const markdownFiles = [];
 const languageConfigs = {
@@ -51,6 +56,10 @@ function outputRelForMarkdown(rel) {
   return rel.replace(/\.md$/, ".html");
 }
 
+function normalizeSiteUrl(value) {
+  return value.endsWith("/") ? value : `${value}/`;
+}
+
 function ensureDir(filePath) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
 }
@@ -61,6 +70,22 @@ function escapeHtml(value) {
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;");
+}
+
+function escapeXml(value) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&apos;");
+}
+
+function publicUrlForOutputRel(outputRel) {
+  const normalizedRel = outputRel.replaceAll(path.sep, "/");
+  if (normalizedRel === "index.html") return siteUrl;
+  if (normalizedRel.endsWith("/index.html")) return `${siteUrl}${normalizedRel.slice(0, -"index.html".length)}`;
+  return `${siteUrl}${normalizedRel}`;
 }
 
 function slugify(value) {
@@ -456,9 +481,58 @@ ${body}
 `;
 }
 
+function writeRobotsTxt() {
+  const robots = [
+    "User-agent: *",
+    "Allow: /",
+    "",
+    "User-agent: Googlebot",
+    "Allow: /",
+    "",
+    "User-agent: Bingbot",
+    "Allow: /",
+    "",
+    "User-agent: OAI-SearchBot",
+    "Allow: /",
+    "",
+    "User-agent: ChatGPT-User",
+    "Allow: /",
+    "",
+    "User-agent: GPTBot",
+    "Allow: /",
+    "",
+    `Sitemap: ${siteUrl}sitemap.xml`,
+    "",
+  ].join("\n");
+
+  fs.writeFileSync(path.join(outputRoot, "robots.txt"), robots);
+}
+
+function writeSitemapXml(pages) {
+  const urls = [...pages]
+    .sort((a, b) => a.outputRel.localeCompare(b.outputRel))
+    .map((page) => [
+      "  <url>",
+      `    <loc>${escapeXml(publicUrlForOutputRel(page.outputRel))}</loc>`,
+      `    <lastmod>${page.lastmod}</lastmod>`,
+      "  </url>",
+    ].join("\n"));
+
+  const sitemap = [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ...urls,
+    "</urlset>",
+    "",
+  ].join("\n");
+
+  fs.writeFileSync(path.join(outputRoot, "sitemap.xml"), sitemap);
+}
+
 function build() {
   walk(wikiRoot);
   const sourceSet = new Set(markdownFiles.map((file) => path.relative(wikiRoot, file)));
+  const sitemapPages = [];
 
   fs.rmSync(outputRoot, { recursive: true, force: true });
   fs.mkdirSync(path.join(outputRoot, "assets"), { recursive: true });
@@ -487,7 +561,14 @@ function build() {
     const outPath = path.join(outputRoot, outputRel);
     ensureDir(outPath);
     fs.writeFileSync(outPath, renderPage({ title, body, nav, rootRel, sourceRel: rel, outputRel, altOutputRel, language }));
+    sitemapPages.push({
+      outputRel,
+      lastmod: fs.statSync(file).mtime.toISOString().slice(0, 10),
+    });
   }
+
+  writeRobotsTxt();
+  writeSitemapXml(sitemapPages);
 
   const redirect = `<!doctype html>
 <html lang="zh-CN">

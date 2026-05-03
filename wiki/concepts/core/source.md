@@ -1,16 +1,8 @@
 # Source 因果链
 
-`source` 是 signal 的因果语境，也就是一串 signal 所在的可追踪因果链。Hook 表达式写成 `source::condition`，condition 里的 signal 默认都在这个 source 下解释。
+`source` 是 signal 的因果命名空间。它回答：“这个业务动作属于哪条推进线？”角色、Supplier 和钱包说明谁在行动；Source 说明这个动作进入哪条因果链。
 
-Source 的核心价值是表达三件事：
-
-- 同源串联：同一条业务链里的动作按顺序推进。
-- 分叉：一个输入或决策拆成多条后续链路。
-- 交汇：原本独立的链路在某个事件之后形成新的共同链路。
-
-## Source 回答什么问题
-
-Source 回答“这个 signal 属于哪条因果线”。同一个钱包可以在多个 source 上提交 signal；同一个 supplier 也可以参与多个 source；一个 Order 内也可以有多个 source。
+Hook 表达式写成 `source::condition`，condition 里的 signal 默认都在这个 source 下解释。
 
 ```text
 sourceId = keccak256(source)
@@ -18,11 +10,27 @@ signalId = keccak256(signalName)
 signalKey = keccak256(abi.encode(sourceId, signalId))
 ```
 
-链上授权、signal 去重和 hook dependency 都围绕 `signalKey` 发生。因此 `seller::pack.cmp` 和 `buyer::pack.cmp` 即使 signalName 相同，也属于两个不同的业务事实。
+链上授权、signal 去重和 hook dependency 都围绕 `signalKey` 发生。因此 `seller::pack.cmp` 和 `buyer::pack.cmp` 即使 signal 名字相同，也属于两个不同的业务事实。
+
+## 一条跨境订单里的 Source
+
+一条跨境供货 Order 里，多条因果线可以并行推进，并在特定 hook 上交汇：
+
+| Source | 现实推进线 | 示例 signal | 常见提交者 | 后续依赖 |
+| --- | --- | --- | --- | --- |
+| `sales` | 商务需求、报价和买方沟通。 | `master.commercial_offer.cmp` | sales 或买方侧 operator。 | 买方承诺任务可以打开。 |
+| `solution` | 技术范围和方案确认。 | `master.technical_scope.cmp` | solution engineer。 | 供应商寻源可以打开。 |
+| `supply` | supplier sourcing 和采购准备。 | `master.supplier_sourcing.cmp` | procurement executor。 | logistics 或 payment 任务可能等待它。 |
+| `payment` | 付款路径、资金准备或 settlement adapter 结果。 | `master.supplier_usdc_direct.cmp` | payment executor 或 adapter。 | 采购执行可能要求付款 proof。 |
+| `logistics` | 国际物流和清关。 | `master.customs_clearance.cmp` | logistics/customs executor。 | delivery 或 field work 可以打开。 |
+| `field` | 现场交付、安装或调试。 | `master.site_acceptance.cmp` | field executor 或买方代表。 | 最终验收可以打开。 |
+| `buyer` | 买方承诺和验收。 | `master.acceptance.cmp` | buyer wallet。 | 订单关闭或售后分支。 |
+
+这些 source 不是部门。一个钱包只要被授权，可以在多个 source 上提交 signal；同一个 Supplier 也可以参与多个 source。Source 是 hooks 和 signals 使用的命名空间，让状态机能重放正确的因果线。
 
 ## 同源串联
 
-供应商寻源linked Zhixu里，多个阶段都在 `sourcing` source 下推进：
+供应商寻源 linked Zhixu 里，多个阶段可以都在 `sourcing` source 下推进：
 
 ```yaml
 market_scan:
@@ -41,27 +49,26 @@ quote_compare:
     RFQ_SENT: sourcing::source.rfq.cmp
 ```
 
-这里表达的是一条寻源因果链：intake 完成后才能 market scan，market scan 完成后才能 RFQ，RFQ 完成后才能 quote compare。
+这里表达一条寻源因果链：intake 完成后才能 market scan，market scan 完成后才能 RFQ，RFQ 完成后才能 quote comparison。
 
-## 异源交汇：成交后产生新的 Source
+## 跨 Source 依赖
 
-卖方订单和买方订单在成交前是两个独立 source。
+一个 stage 可以属于某个 source，同时等待另一个 source 的结果。如果采购阶段属于 `supply`，但等待 `payment::...`，意思是 supply 这条线必须等 payment 这条线产生所需结果：
 
-卖方 source 可能已经做了很多准备：
+```yaml
+procurement_execution:
+  source: supply
+  receiveSignals:
+    SUPPLIER_FUNDED: payment::master.supplier_usdc_direct.cmp | master.supplier_settlement_exec.cmp
+```
 
-- 备货、质检、包装、贴标；
-- 上传库存证明或包装照片的 hash；
-- 准备报价、交期和可售条件。
+这是一个交汇点：采购执行阶段属于 supply source，但它依赖 payment proof。
 
-买方 source 也可能已经做了自己的准备：
+## 进阶建模例子
 
-- 预算审批、取款、换汇或稳定币准备；
-- 收货地址、验收标准、采购申请；
-- 选择物流偏好或付款路径。
+### 成交撮合与新的履约 Source
 
-在成交前，卖方和买方各自准备，形成两条真实因果链。成交发生后，再产生新的共同履约 source 或新的订单实例。
-
-成交发生后，应该产生新的 source 或新的 order instance，例如 `trade` / `deal` / `fulfillment`：
+成交前，卖方准备和买方准备可以是两条独立 source。成交后，可以产生新的共同履约 source，或创建一个新的 Order instance：
 
 ```text
 seller-prep source
@@ -74,22 +81,11 @@ buyer-prep source
        -> acceptance
 ```
 
-交汇后的订单进入新的共同履约因果链，里面可以继续包含物流、派送、验收、售后或争议处理。
+更复杂的动态多方撮合，通常通过新的 source、docked linked Order 或 Store/Product workflow 表达。
 
-当前 hook DSL 的表达式是单个 `source::condition`。如果某个 stage 的 `source` 是 `supply`，但它等待 `payment::...`，这表示 supply 链上的阶段依赖 payment 链的结果：
+### 石油分馏
 
-```yaml
-procurement_execution:
-  source: supply
-  receiveSignals:
-    SUPPLIER_FUNDED: payment::master.supplier_usdc_direct.cmp | master.supplier_settlement_exec.cmp
-```
-
-这是一种交汇点：采购执行阶段属于 supply source，但它必须等 payment source 的付款结果。更复杂的动态多方撮合，通常通过新的 source、docked linked order 或 Store/Product workflow 表达。
-
-## 分叉：石油分馏
-
-石油分馏是分叉 source 的直观例子。原油进入炼厂后，分出汽油、柴油、石脑油、润滑油等链路。它们共享上游输入，但下游质量指标、运输、库存、买家和交付条件不同。
+石油分馏是 source 分叉的例子。原油进入炼厂后，可以分出汽油、柴油、石脑油、润滑油等路径。它们共享上游输入，但下游质量指标、运输、库存、买家和交付条件不同。
 
 ```text
 crude_intake
@@ -100,13 +96,9 @@ crude_intake
        -> lubricant source
 ```
 
-在 Zhixu 里，可以把 `fractionation` 作为选择或分叉 stage，把不同产物线建成不同 source。每条 source 有自己的 signal 和 hook，最后如果有统一结算或统一出库，也可以再交汇到新的 source。
+### 农产品收购
 
-## 分叉再归拢：农产品收购
-
-农产品收购商要找很多农户采橘子。每个农户都要采收、初检、包装、称重，最后归拢到收购商这里统一分级、装车或结算。
-
-概念上是：
+农产品收购商可能从很多农户采购橘子。如果农户数量在 Plan 里固定，可以显式建多条 farmer source。如果农户数量是运行时动态的，每个农户的采收包装通常更适合建成 docked linked Order 或子 Zhixu。
 
 ```text
 collector_intake
@@ -119,30 +111,10 @@ collector_intake
        -> payment settlement
 ```
 
-如果农户数量在 Plan 里是固定的，可以显式写成多个 branch source。如果农户数量是运行时动态的，更适合把每个农户采收包装建成 docked linked order 或子秩序，再由收购商 order 通过 proof 和 signalMap 归拢。
-
-## 跨境供货里的 Source
-
-一个跨境供货秩序里，主订单可以包含这些 source：
-
-| Source | 因果链 |
-| --- | --- |
-| `growth` | 获客和线索生成。 |
-| `sales` | 需求确认和商业推进。 |
-| `solution` | 技术范围和方案确认。 |
-| `supply` | 供应商寻源、采购和交付准备。 |
-| `payment` | 付款路径选择、USDC 直付或结算linked Zhixu。 |
-| `logistics` | 国际物流、清关、派送。 |
-| `field` | 现场安装、调试和验收。 |
-| `buyer` | 买方承诺和最终接受。 |
-| `coordinator` | 异常协调和关闭。 |
-
-这些 source 是同一个主订单里不同因果链的命名空间。某些 stage 会让它们交汇，例如采购等支付、物流等采购、现场安装等物流。
-
 ## 边界检查
 
 - Role slot 描述参与角色；Source 描述因果链。
-- Executor 描述订单运行时的执行者或 submitter；Source 描述 signal 语境。
-- Supplier 是被 Store 和 trust registry 组织、背书的能力主体；Source 是 hook/signal 的命名空间。
-- 成交后的履约可以形成新的 source 或新的 order。
-- Source 需要可编译、可授权、可重放，不能作为任意动态字段使用。
+- Executor 描述运行时处理者或提交者；Source 描述 signal 语境。
+- Supplier 是被 Store 和 trust registry 组织、背书的能力主体；Source 是 hook/signal 命名空间。
+- 成交后的履约可以形成新的 source 或新的 Order。
+- Source 必须可编译、可授权、可重放，不能当作任意动态字段使用。

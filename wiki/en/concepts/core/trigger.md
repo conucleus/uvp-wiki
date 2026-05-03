@@ -1,6 +1,6 @@
 # Trigger
 
-A Trigger is a special hook marker. It means that once a receive hook becomes ready, the execution entry for that stage officially opens, the chain should emit `HookReady`, and Product/Store/executor-kit can project it as an executable task, notification, or adapter job.
+A Trigger turns a ready condition into an executable task. More precisely, it is a special hook marker: once a receive hook becomes ready, the execution entry for that stage officially opens, the chain should emit `HookReady`, and Product/Store/executor-kit can project it as an executable task, notification, or adapter job.
 
 Trigger is a compile-time mark on Hook, coming from the `trigger` array in a Zhixu stage:
 

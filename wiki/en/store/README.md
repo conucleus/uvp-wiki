@@ -11,6 +11,32 @@ Nucleation
   -> registry/state-machine projections
 ```
 
+## A Day in Store
+
+The ordinary Store workflow should read like this:
+
+```text
+Nucleation imports a Zhixu draft
+  -> Store shows compile preview and plan hash
+  -> Nucleation organizes supplier slots, resources, and fairness notes
+  -> Store operator reviews publishing materials
+  -> governance admin requests plan or supplier attestation
+  -> trust domain emits PlanAttested / SupplierAttested
+  -> Store shows the trusted version as order-creatable
+  -> operator or participant locates an Order and inspects proof rows
+```
+
+Store can organize the materials, workflow, search, review, contact, and audit trail. The official facts still come from the trust registry and state-machine events.
+
+## Store Naming
+
+| Name | Use it for |
+| --- | --- |
+| Store | The product workbench and catalog experience. |
+| Store Console | Operator/admin-oriented Store API and workflow surface. |
+| Store Workbench | The Nucleation-facing area for drafts, versions, suppliers, resources, and proof. |
+| `zhixu-store` | The implementation package / app name. |
+
 ## Three-Layer Governance
 
 | Layer | Owner | What the Store does | Fact boundary |
@@ -47,7 +73,7 @@ Store metadata, platform tags, contact information, notification state, review, 
 | Contact / Notification | delivery intent, retry, failure reason, owner, SLA. | [Contact and Notifications](contact-notifications.md) |
 | Platform Workflow / Audit | review, attestation request, revocation request, operator audit. | [Operator Permissions, Governance, and Audit](governance-audit.md) |
 | Docking Sandbox | trial pairing of peer Zhixu, adapter, signalMap, and capability plugin. | [Docking Sandbox](docking-sandbox.md) |
-| Service Surface | Store Console API, draft routes, supplier routes, docking routes, audit storage. | [Untrusted Execution Layer: Chain Services](../components/chain-services.md) |
+| Service Surface | Store Console API, draft routes, supplier routes, docking routes, audit storage. | [Rebuildable Service Layer: Chain Services](../components/chain-services.md) |
 
 ## Zhixu Publication Path in the Store
 
@@ -93,4 +119,4 @@ This information helps Nucleation select, contact, and organize suppliers. Order
 - [Contact and Notifications](contact-notifications.md)
 - [Operator Permissions, Governance, and Audit](governance-audit.md)
 - [Docking Sandbox](docking-sandbox.md)
-- [Untrusted Execution Layer: Chain Services](../components/chain-services.md)
+- [Rebuildable Service Layer: Chain Services](../components/chain-services.md)

@@ -1,6 +1,6 @@
-# 非可信执行层：Chain Services
+# 可重建服务层：Chain Services
 
-`uvp-chain-services/service` 是 UVP EVM 轨道的非可信执行层。它和 [语义、Hook Core 与 Compiler](semantics-and-compiler.md)、[链上执行、State Machine 与 Replay](onchain-runtime.md) 平级：compiler 负责把 Zhixu 变成确定性产物，state machine 负责链上事实，Chain Services 负责在链下重放、投影、中继、校验和暴露产品接口。
+`uvp-chain-services/service` 是 UVP EVM 轨道的可重建服务层。协议笔记里它也可能叫 `non-trusted execution layer`，意思是它不是事实源；不是说服务不安全或不可靠。它和 [语义、Hook Core 与 Compiler](semantics-and-compiler.md)、[链上执行、State Machine 与 Replay](onchain-runtime.md) 平级：compiler 负责把 Zhixu 变成确定性产物，state machine 负责链上事实，Chain Services 负责在链下重放、投影、中继、校验和暴露产品接口。
 
 它是可 fork 的链下服务包。任何参与者、凝结核、供应商、审计方或第三方集成都可以下载、fork、编译并运行自己的实例；只要遵守 ABI、event、EIP-712、canonical hash、Product DTO 和 Store/Product API 边界，不同实例可以从同一组链事件重建同一类事实视图。
 
@@ -11,9 +11,9 @@ UVPDeploymentRegistry / UVPStateMachine / ZhixuTrustRegistry events
   -> Product API / Store Console API / executor-kit integration / ops views
 ```
 
-## 为什么叫非可信执行层
+## 为什么可重建
 
-“非可信”指事实源仍在链上。Chain Services 仍然很重要：把事件变成任务列表、把证明变成 DTO、把签名 payload 交给 relayer、把 Store draft 和 audit workflow 留痕、把通知变成可重试 delivery intents。它所有公开结论都必须能回到链上事件、签名、公证哈希或可重放投影。
+可重建的意思是事实源仍在链上。Chain Services 仍然很重要：把事件变成任务列表、把证明变成 DTO、把签名 payload 交给 relayer、把 Store draft 和 audit workflow 留痕、把通知变成可重试 delivery intents。它所有公开结论都必须能回到链上事件、签名、公证哈希或可重放投影。
 
 | 问题 | 事实源 | Chain Services 的角色 |
 | --- | --- | --- |

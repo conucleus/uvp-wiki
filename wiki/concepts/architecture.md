@@ -1,6 +1,6 @@
 # 架构
 
-`uvp-eth` 按“协议核心、链上事实、非可信执行层、产品表面、执行者工具、部署记录、periphery adapter”分层。层与层之间通过 artifact、ABI、EIP-712 typed data、事件、DTO 和 HTTP API 对接，数据库只保存可重建读模型或 workflow 状态。
+`uvp-eth` 按“协议核心、链上事实、可重建服务层、产品表面、执行者工具、部署记录、periphery adapter”分层。层与层之间通过 artifact、ABI、EIP-712 typed data、事件、DTO 和 HTTP API 对接，数据库只保存可重建读模型或 workflow 状态。
 
 ```mermaid
 flowchart TD
@@ -11,7 +11,7 @@ flowchart TD
   TR["ZhixuTrustRegistry"] --> SM
   SM --> EV["链事件"]
   TR --> EV
-  EV --> IDX["非可信执行层 / chain-services indexer"]
+  EV --> IDX["可重建服务层 / chain-services indexer"]
   IDX --> DTO["Product DTO"]
   DTO --> Store["zhixu-store"]
   DTO --> OrderApp["uvp-order-app"]
@@ -37,7 +37,7 @@ flowchart TD
 ## 设计原则
 
 - `uvp-protocol` 产出协议语义、合约、编译器、replay oracle 和共享类型。
-- `uvp-chain-services` 是非可信执行层，负责索引、验证、投影、转发；plan/order/signal 的事实源来自链事件。
+- `uvp-chain-services` 是可重建服务层，负责索引、验证、投影、转发；plan/order/signal 的事实源来自链事件。
 - `zhixu-store` 和 `uvp-order-app` 展示 Product DTO，普通用户不应理解 hook、ABI、gas 或 trust-domain 内部细节。
 - `uvp-executor-kit` 面向执行者、企业脚本、AI/MCP 和 adapter，最终仍然提交链上 signal。
 - `uvp-periphery` 可以做资金、担保、AI/MCP、demo，并通过核心接口消费 state-machine signal/proof。
@@ -47,7 +47,7 @@ flowchart TD
 ```text
 DSL 和语义层：hook-core / compiler / statemachine reference
 链上事实层：UVPStateMachine / ZhixuTrustRegistry / UVPDeploymentRegistry
-非可信执行层：chain-services indexer / relayer / proof verifier / Product BFF
+可重建服务层：chain-services indexer / relayer / proof verifier / Product BFF
 中心化治理产品：zhixu-store / Store supplier registry / Store publishing workflow
 参与者与执行者：uvp-order-app / uvp-executor-kit
 外围适配：uvp-periphery / funding、guarantee、AI/MCP、demo adapters

@@ -1,5 +1,7 @@
 # Store
 
+This is a core-concept side view kept for readers who enter from object pages. The canonical Store product entry is [Store](../../store/README.md).
+
 The Store is the centralized product and platform workflow workbench. It is responsible for organizing Nucleation, Zhixu, Supplier, Orders, proofs, and endorsement requests into a human-readable interface. It gives Nucleation a stage, tags objects with platform metadata, displays proof, initiates governance requests, and keeps audit records; Nucleation, trust domains, and chain events each keep their own authority source.
 
 ## Where Its Authority Comes From

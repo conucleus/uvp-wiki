@@ -1,6 +1,6 @@
 # Architecture
 
-`uvp-eth` is layered as “protocol core, on-chain facts, non-trusted execution layer, product surfaces, executor tools, deployment records, and periphery adapters”. The layers connect through artifacts, ABIs, EIP-712 typed data, events, DTOs, and HTTP APIs. Databases only keep rebuildable read models or workflow state.
+`uvp-eth` is layered as “protocol core, on-chain facts, rebuildable service layer, product surfaces, executor tools, deployment records, and periphery adapters”. The layers connect through artifacts, ABIs, EIP-712 typed data, events, DTOs, and HTTP APIs. Databases only keep rebuildable read models or workflow state.
 
 ```mermaid
 flowchart TD
@@ -11,7 +11,7 @@ flowchart TD
   TR["ZhixuTrustRegistry"] --> SM
   SM --> EV["chain events"]
   TR --> EV
-  EV --> IDX["non-trusted execution layer / chain-services indexer"]
+  EV --> IDX["rebuildable service layer / chain-services indexer"]
   IDX --> DTO["Product DTO"]
   DTO --> Store["zhixu-store"]
   DTO --> OrderApp["uvp-order-app"]
@@ -37,7 +37,7 @@ flowchart TD
 ## Design Principles
 
 - `uvp-protocol` produces protocol semantics, contracts, compiler output, replay oracles, and shared types.
-- `uvp-chain-services` is the non-trusted execution layer, responsible for indexing, verification, projection, and relaying; the source of truth for plan/order/signal comes from chain events.
+- `uvp-chain-services` is the rebuildable service layer, responsible for indexing, verification, projection, and relaying; the source of truth for plan/order/signal comes from chain events.
 - `zhixu-store` and `uvp-order-app` present Product DTOs; ordinary users should not need to understand hook internals, ABI, gas, or trust-domain internals.
 - `uvp-executor-kit` is for executors, enterprise scripts, AI/MCP, and adapters, but it still submits on-chain signals in the end.
 - `uvp-periphery` can provide funding, guarantee, AI/MCP, demo, and related adapters, and it consumes state-machine signal/proof through core interfaces.

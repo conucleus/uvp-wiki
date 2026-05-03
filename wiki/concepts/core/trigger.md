@@ -1,6 +1,6 @@
 # Trigger
 
-Trigger 是一种特殊 hook 标记。它表示某个 receive hook Ready 后，这个 stage 的执行入口正式打开，链上应发出 `HookReady`，Product/Store/executor-kit 才能把它投影成可执行任务、通知或 adapter job。
+Trigger 把一个 ready condition 变成可执行任务。它是一种特殊 hook 标记：某个 receive hook Ready 后，这个 stage 的执行入口正式打开，链上应发出 `HookReady`，Product/Store/executor-kit 才能把它投影成任务、通知或 adapter job。
 
 Trigger 是 Hook 的一个编译标记，来自秩序 stage 的 `trigger` 数组：
 

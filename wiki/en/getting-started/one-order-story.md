@@ -1,6 +1,6 @@
 # One Order Story
 
-This page ties the main UVP path together with one high-value cross-border cargo order. Keep one sentence in mind first: Zhixu is the static coordination design, and Order is one on-chain runtime of that design.
+This page ties the main UVP path together with one high-value cross-border cargo order. Keep one sentence in mind first: Zhixu is the static coordination design, and Order is one on-chain runtime of that design. For the people and services in this story, see [Actor Map](actor-map.md).
 
 ## 1. Nucleation Designs a Zhixu
 
@@ -80,7 +80,9 @@ HookReady
 
 chain-services rebuild the order, tasks, timeline, proof rows, and trust projection from events, then translate them into `ProductOrderDTO` and `ProductTaskDTO` for Store, Order App, and executor-kit.
 
-## 7. Another Zhixu Takes Over a Stage
+## Optional Advanced Extension: Another Zhixu Takes Over a Stage
+
+The base Order path above does not require a linked Zhixu. The following model is for advanced composition, where one independently runnable Zhixu executes a stage for another.
 
 Some stages can be handed to another independent Zhixu, such as customs clearance or payment settlement. The static layer declares this with `supplierType=zhixu` and `signalMap`:
 

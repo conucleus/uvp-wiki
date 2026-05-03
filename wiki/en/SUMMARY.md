@@ -1,19 +1,41 @@
 # Wiki Summary
 
-## Getting Started
+## Learn UVP
 
 - [Wiki Entry](README.md)
-- [Project Status](status/README.md)
 - [One Order Story](getting-started/one-order-story.md)
+- [Actor Map](getting-started/actor-map.md)
+- [Evidence and Proof Path](getting-started/evidence-proof-path.md)
 - [Glossary](reference/glossary.md)
 - [Reader Entry](getting-started/README.md)
-- [Quick Start](getting-started/quick-start.md)
 
-## Core Concepts
+## Product and Store
+
+- [Product Language and DTO/API](product/README.md)
+- [Product Surfaces](concepts/product-surfaces.md)
+  - [Event Projection](concepts/product/projections.md)
+  - [Product DTO](concepts/product/dto.md)
+  - [Signal Container](concepts/product/signal-container.md)
+  - [Store and Order App](concepts/product/apps.md)
+- [Store Entry](store/README.md)
+  - [Store Authority Boundary and Information Architecture](store/authority-and-ia.md)
+  - [Nucleation Workbench](store/nucleation-workbench.md)
+  - [Zhixu Catalog, Configuration, and Release](store/zhixu-management.md)
+  - [Supplier Registry, Capability, and Contact](store/supplier-registry.md)
+  - [Fulfillment Status, Proof, and Trust Checks](store/runtime-proof.md)
+  - [Contact and Notifications](store/contact-notifications.md)
+  - [Operator Permissions, Governance, and Audit](store/governance-audit.md)
+- [Executors and Integrations Entry](execution/README.md)
+  - [Executor Kit](execution/executor-kit.md)
+  - [Order App and Executor Kit](concepts/architecture/components/order-app-executor-kit.md)
+
+## Core Protocol Concepts
 
 - [Core Concepts Entry](core/README.md)
 - [Core Object Overview](concepts/overview.md)
   - [Zhixu DSL](concepts/core/zhixu.md)
+  - [Plan](concepts/core/plan.md)
+  - [Order](concepts/core/order.md)
   - [Nucleation](concepts/core/nucleation.md)
   - [Supplier](concepts/core/supplier.md)
   - [Executor](concepts/core/executor.md)
@@ -22,15 +44,23 @@
   - [Hook](concepts/core/hook.md)
   - [Trigger](concepts/core/trigger.md)
   - [File Resources](concepts/core/file-resources.md)
-  - [Plan](concepts/core/plan.md)
-  - [Order](concepts/core/order.md)
 - [Trust and Authorization](concepts/trust-and-authorization.md)
   - [Trust Domain](concepts/trust/domains.md)
   - [Signal Authorization](concepts/trust/signal-authorization.md)
   - [EIP-712 and Relayer](concepts/trust/eip712-relayer.md)
-  - [Stage Patch Authorization](concepts/trust/stage-patch.md)
 
-## Core Components
+## Advanced Composition
+
+- [Stage Overlay](concepts/state-machine/stage-overlay.md)
+- [Stage Patch Authorization](concepts/trust/stage-patch.md)
+- [Docked Zhixu and signalMap](execution/zhixu-as-executor.md)
+- [Docking Sandbox](store/docking-sandbox.md)
+- [Periphery and Adapters](concepts/architecture/components/periphery-deploy.md)
+- [Protocol Mainline Legacy Entry](protocol/README.md)
+- [Plan and Order Compatibility Entry](concepts/core/plan-order.md)
+- [Store Core Side View](concepts/core/store.md)
+
+## Engineering Components
 
 - [Core Components Entry](components/README.md)
 - [Component Flow and Module Boundaries](components/architecture.md)
@@ -45,9 +75,8 @@
   - [State Machine](concepts/state-machine.md)
   - [Hook Evaluation](concepts/state-machine/evaluation.md)
   - [Timers and Status](concepts/state-machine/timers-and-status.md)
-  - [Stage Overlay](concepts/state-machine/stage-overlay.md)
   - [Event Replay](concepts/state-machine/replay.md)
-- [Non-trusted Execution Layer: Chain Services](components/chain-services.md)
+- [Rebuildable Service Layer: Chain Services](components/chain-services.md)
   - [Indexer and Projections](components/chain-services-indexer-projections.md)
   - [Relayer](components/chain-services-relayer.md)
   - [Submissions and Stage Patch](components/chain-services-submissions-stage-patch.md)
@@ -59,45 +88,24 @@
   - [Storage, Migration, and Runtime Profile](components/chain-services-storage-runtime.md)
   - [API Routes](components/chain-services-api-routes.md)
 - [Services and Interfaces](components/services-and-interfaces.md)
-- [Deploy and Release Evidence](components/deploy-release.md)
 - [Module Map](reference/module-map.md)
-
-## Store
-
-- [Store Entry](store/README.md)
-- [Store Authority Boundary and Information Architecture](store/authority-and-ia.md)
-- [Nucleation Workbench](store/nucleation-workbench.md)
-- [Zhixu Catalog, Configuration, and Release](store/zhixu-management.md)
-- [Supplier Registry, Capability, and Contact](store/supplier-registry.md)
-- [Fulfillment Status, Proof, and Trust Checks](store/runtime-proof.md)
-- [Contact and Notifications](store/contact-notifications.md)
-- [Operator Permissions, Governance, and Audit](store/governance-audit.md)
-- [Docking Sandbox](store/docking-sandbox.md)
-
-## Executors and Integrations
-
-- [Executors and Integrations Entry](execution/README.md)
-- [Executor Kit](execution/executor-kit.md)
-- [Zhixu as an Executor in Another Zhixu](execution/zhixu-as-executor.md)
-- [Order App and Executor Kit](concepts/architecture/components/order-app-executor-kit.md)
-- [Periphery and Adapters](concepts/architecture/components/periphery-deploy.md)
-
-## Product Language and DTO/API
-
-- [Product Language and DTO/API](product/README.md)
-- [Product Surfaces](concepts/product-surfaces.md)
-  - [Event Projection](concepts/product/projections.md)
-  - [Product DTO](concepts/product/dto.md)
-  - [Signal Container](concepts/product/signal-container.md)
-  - [Store and Order App](concepts/product/apps.md)
+- [Engineering Architecture Entry Point](engineering/README.md)
+- [Architecture](concepts/architecture.md)
+  - [Module Boundaries](concepts/architecture/modules.md)
+  - [Data Flow and Source of Truth](concepts/architecture/flow-and-truth.md)
+  - [Local-to-Chain Path](concepts/architecture/lifecycle.md)
+  - [Store and Governance](concepts/architecture/components/store-governance.md)
+  - [Chain Services BFF](concepts/architecture/components/chain-services-bff.md)
 
 ## Local / Staging / Release
 
+- [Quick Start](getting-started/quick-start.md)
 - [Daily Development](tasks/development.md)
 - [Run Services and Frontends](tasks/run-services-and-apps.md)
 - [Local Anvil Protocol Loop](tutorials/local-anvil.md)
 - [Product Local Loop](tutorials/product-local-loop.md)
 - [Base Sepolia Staging](tasks/base-sepolia-staging.md)
+- [Deployment and Evidence](components/deploy-release.md)
 - [Release and Verification](operations/release-and-verification.md)
 - [Troubleshooting](operations/troubleshooting.md)
 
@@ -107,7 +115,9 @@
 - [Contracts and Events](reference/contracts-and-events.md)
 - [Product API](reference/product-api.md)
 - [CLI and Config](reference/cli-and-config.md)
+- [Project Status](status/README.md)
 - [Readability Audit](status/readability-audit-2026-05-03.md)
+- [Current Readability Notes](status/current-readability-notes-2026-05-03.md)
 
 ## Contribution
 

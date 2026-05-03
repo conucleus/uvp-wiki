@@ -1,6 +1,6 @@
 # Indexer and Projections
 
-The indexer is the replay entry point of the non-trusted execution layer. It reads events from `UVPDeploymentRegistry`, `UVPStateMachine`, and `ZhixuTrustRegistry`, normalizes logs into internal service events, and then projects them into views that Product, Store, executor-kit, and ops can query.
+The indexer is the replay entry point of the rebuildable service layer. It reads events from `UVPDeploymentRegistry`, `UVPStateMachine`, and `ZhixuTrustRegistry`, normalizes logs into internal service events, and then projects them into views that Product, Store, executor-kit, and ops can query.
 
 It is responsible for replaying facts and building read models. The projection database lets the UI query orders, tasks, proofs, and trust quickly; if the database is wiped, it must be possible to rebuild it from the configured deployment block.
 

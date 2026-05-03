@@ -1,6 +1,6 @@
 # Storage、Migration 与 Runtime Profile
 
-Storage 是非可信执行层的工作流和投影缓存。Chain Services 支持 memory、SQLite 和 PostgreSQL；不同 profile 只影响运行可靠性，不改变事实源。
+Storage 是可重建服务层的工作流和投影缓存。Chain Services 支持 memory、SQLite 和 PostgreSQL；不同 profile 只影响运行可靠性，不改变事实源。
 
 ## Storage profile
 

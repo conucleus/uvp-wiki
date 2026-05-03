@@ -2,6 +2,21 @@
 
 本页是 Wiki 的状态入口。它只摘要仓库中的实现、测试、PRD index 和 release evidence，不替代 `docs/product/README.md`、`docs/IMPLEMENTATION_TRACE.md` 或 `uvp-deploy/deploy/releases/`。
 
+## 成熟度快照
+
+| 区域 | 状态 | 普通读法 |
+| --- | --- | --- |
+| Core compiler 和 plan artifacts | verified | Zhixu 可以编译成 deterministic HookPlan 和 EVM-facing artifacts。 |
+| Contracts 和 event replay | verified | Plan、Order、signal authorization、signal submission、hook status、timer 和 `HookReady` 有测试或 replay evidence 支撑。 |
+| Trust registry | verified | Plan 和 supplier 的 attestation/revocation 有事件支撑，并可投影。 |
+| Product DTO / Chain Services projection | verified | Order、task、proof 和 trust 视图可以从链事件重建。 |
+| Store Console | prototype | 关键切片存在，但完整 operator workflow 和 recovery acceptance 仍不足。 |
+| Order App | prototype | Participant UI 存在，但同一条 live Base Sepolia Product API task flow 尚未完整证明。 |
+| executor-kit live operator path | prototype | CLI/SDK 和 Product API signal producer 有测试；生产 token policy 和 runbook 仍需补。 |
+| Staging release evidence | partial | Base Sepolia rehearsal evidence 存在；production claim 需要单独 release evidence。 |
+
+本页后半段是工程和发布证据细节。新读者应先读 [一个订单故事](../getting-started/one-order-story.md)、[角色地图](../getting-started/actor-map.md) 和 [核心术语表](../reference/glossary.md)。
+
 ## 状态口径
 
 | 状态 | 含义 |

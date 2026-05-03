@@ -1,6 +1,6 @@
 # Product API
 
-Product API 是普通参与者、Order App、executor-kit 和 agent adapter 消费非可信执行层的主要入口。它把链事件 projection 翻译成 ordinary user language 的订单、任务、时间线、证明和提交容器。
+Product API 是普通参与者、Order App、executor-kit 和 agent adapter 消费可重建服务层的主要入口。它把链事件 projection 翻译成 ordinary user language 的订单、任务、时间线、证明和提交容器。
 
 ## 代码入口
 

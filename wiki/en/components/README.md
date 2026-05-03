@@ -9,7 +9,7 @@ hook-core
   -> protocol-bindings
   -> UVP contracts / registries
   -> statemachine replay
-  -> non-trusted execution layer / chain-services
+  -> rebuildable service layer / chain-services
   -> Product DTO / Store / Order App / executor-kit
   -> uvp-deploy release evidence
 ```
@@ -30,7 +30,7 @@ Every core component page in this directory should meet the same bar:
 | Component chain and module boundaries | [Component Chain and Module Boundaries](architecture.md) | Module boundaries, dependency direction, source of truth, path from local to on-chain. |
 | Semantics, Hook Core, and Compiler | [Semantics, Hook Core, and Compiler](semantics-and-compiler.md) | hook-core, compiler, HookPlan, OnchainHookPlan, canonical hash, registerPlan args. |
 | On-chain execution, State Machine, and Replay | [On-chain Execution, State Machine, and Replay](onchain-runtime.md) | contracts, registries, state machine, stage overlay, timers, event replay. |
-| Non-trusted execution layer | [Non-trusted Execution Layer: Chain Services](chain-services.md) | Forkable off-chain execution software: indexer, projection, relayer boundary, proof verifier, Product/Store API, notifications, storage/runtime profile. |
+| Rebuildable service layer | [Rebuildable Service Layer: Chain Services](chain-services.md) | Forkable off-chain execution software: indexer, projection, relayer boundary, proof verifier, Product/Store API, notifications, storage/runtime profile. |
 | Services and interfaces | [Services and Interfaces](services-and-interfaces.md) | protocol-bindings, Product DTO, Product API, Store API, executor-kit consumption, and public interface drift. |
 | Deployment and evidence | [Deployment and Evidence](deploy-release.md) | uvp-deploy, Anvil/Base Sepolia, manifests, release evidence, staging gates. |
 
@@ -54,4 +54,4 @@ Every core component page in this directory should meet the same bar:
 - [Data Flow and Source of Truth](../concepts/architecture/flow-and-truth.md)
 - [Local to On-chain Path](../concepts/architecture/lifecycle.md)
 - [Contracts and Events](../reference/contracts-and-events.md)
-- [Non-trusted Execution Layer: Chain Services](chain-services.md)
+- [Rebuildable Service Layer: Chain Services](chain-services.md)

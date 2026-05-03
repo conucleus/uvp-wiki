@@ -1,6 +1,6 @@
 # Indexer 与投影
 
-Indexer 是非可信执行层的重放入口。它从链读取 `UVPDeploymentRegistry`、`UVPStateMachine` 和 `ZhixuTrustRegistry` 事件，把日志归一化成服务内部事件，再投影成 Product、Store、executor-kit 和 ops 能查询的视图。
+Indexer 是可重建服务层的重放入口。它从链读取 `UVPDeploymentRegistry`、`UVPStateMachine` 和 `ZhixuTrustRegistry` 事件，把日志归一化成服务内部事件，再投影成 Product、Store、executor-kit 和 ops 能查询的视图。
 
 它负责重放事实、建立读模型。投影数据库可以让 UI 快速查询订单、任务、proof 和 trust；擦掉数据库后必须能从配置的 deployment block 重新建立。
 

@@ -2,6 +2,21 @@
 
 This page is the Wiki status entry point. It only summarizes implementation, tests, PRD index, and release evidence in the repository, and does not replace `docs/product/README.md`, `docs/IMPLEMENTATION_TRACE.md`, or `uvp-deploy/deploy/releases/`.
 
+## Maturity Snapshot
+
+| Area | Status | Plain reading |
+| --- | --- | --- |
+| Core compiler and plan artifacts | verified | Zhixu can compile into deterministic HookPlan and EVM-facing artifacts. |
+| Contracts and event replay | verified | Plans, Orders, signal authorization, signal submission, hook status, timers, and `HookReady` are covered by tests or replay evidence. |
+| Trust registry | verified | Plan and supplier attestation/revocation are event-backed and projectable. |
+| Product DTO / Chain Services projection | verified | Orders, tasks, proof, and trust views can be rebuilt from chain events. |
+| Store Console | prototype | Key slices exist, but full operator workflow and recovery acceptance are still incomplete. |
+| Order App | prototype | Participant UI exists, but the same live Base Sepolia Product API task flow is not fully proven yet. |
+| executor-kit live operator path | prototype | CLI/SDK and Product API signal producer are tested; production token policy and runbooks need more work. |
+| Staging release evidence | partial | Base Sepolia rehearsal evidence exists; production claims need separate release evidence. |
+
+The rest of this page gives engineering and release-evidence detail. New readers should first read [One Order Story](../getting-started/one-order-story.md), [Actor Map](../getting-started/actor-map.md), and [Glossary](../reference/glossary.md).
+
 ## Status Labels
 
 | Status | Meaning |
@@ -13,7 +28,7 @@ This page is the Wiki status entry point. It only summarizes implementation, tes
 
 Do not describe fixture-only, demo fallback, local-only, simulated adapter, or planned PRD work as verified.
 
-## Current Verified Mainline
+## Current Verified Mainline Details
 
 - Hook DSL parse/eval is centralized in `hook-core` and reused by compiler/statemachine.
 - Zhixu can compile into deterministic `HookPlanArtifact` and EVM-facing `OnchainHookPlanArtifact`.
@@ -37,7 +52,7 @@ Do not describe fixture-only, demo fallback, local-only, simulated adapter, or p
 | runtime-host | off-chain reference harness, not the ETH runtime authority. |
 | Store governance broadcaster | env-key governance can be used for staging, but it is not production governance. |
 
-## P0 / PRD100-106 Summary
+## P0 / PRD100-106 Release Detail
 
 | PRD | Current status |
 | --- | --- |
