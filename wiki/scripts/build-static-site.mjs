@@ -6,6 +6,7 @@ const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const wikiRoot = path.resolve(scriptDir, "..");
 const outputRoot = path.join(wikiRoot, "site");
 const assetSource = path.join(wikiRoot, "assets", "site.css");
+const publicRoot = path.join(wikiRoot, "public");
 const defaultSiteUrl =
   process.env.GITHUB_REPOSITORY?.includes("/")
     ? `https://${process.env.GITHUB_REPOSITORY.split("/")[0]}.github.io/${process.env.GITHUB_REPOSITORY.split("/")[1]}/`
@@ -40,7 +41,7 @@ function walk(dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
-      if (["site", "scripts", "assets"].includes(entry.name)) continue;
+      if (["site", "scripts", "assets", "public"].includes(entry.name)) continue;
       walk(fullPath);
       continue;
     }
@@ -529,6 +530,11 @@ function writeSitemapXml(pages) {
   fs.writeFileSync(path.join(outputRoot, "sitemap.xml"), sitemap);
 }
 
+function copyPublicFiles() {
+  if (!fs.existsSync(publicRoot)) return;
+  fs.cpSync(publicRoot, outputRoot, { recursive: true, force: true });
+}
+
 function build() {
   walk(wikiRoot);
   const sourceSet = new Set(markdownFiles.map((file) => path.relative(wikiRoot, file)));
@@ -537,6 +543,7 @@ function build() {
   fs.rmSync(outputRoot, { recursive: true, force: true });
   fs.mkdirSync(path.join(outputRoot, "assets"), { recursive: true });
   fs.copyFileSync(assetSource, path.join(outputRoot, "assets", "site.css"));
+  copyPublicFiles();
 
   const navByLanguage = new Map();
   for (const language of Object.values(languageConfigs)) {
