@@ -46,6 +46,7 @@ jobs:
           test -f wiki/site/index.html
           test -f wiki/site/robots.txt
           test -f wiki/site/sitemap.xml
+          test -f wiki/site/google2a9c021761741535.html
 
       - name: Disable Jekyll processing
         if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
