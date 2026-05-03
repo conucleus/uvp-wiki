@@ -11,7 +11,7 @@ Zhixu stage 里有两处和 signal 直接相关：
 | `receiveSignals` | 当前 stage 等待哪些输入 signal。每个 key 会编译成一个 hook。 |
 | `sendSignals` | 当前 stage 执行后可能发出哪些输出 signal。 |
 
-例如 Africa MRO 的 `buyer_commit`：
+例如一个买方承诺 stage：
 
 ```yaml
 buyer_commit:

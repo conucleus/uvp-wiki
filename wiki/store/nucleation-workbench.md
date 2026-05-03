@@ -55,4 +55,4 @@ Store 提供的是舞台和工具：catalog、search、draft、compile preview�
 - 不能写成 Store review 已经判定 Zhixu 公平可信。
 - 不能写成 Store tag 或 capability label 已经给 supplier 链上背书。
 - 不能写成 notification delivered 等于履约完成。
-- 不能写成 Store docking session 已经让父订单继续；父订单必须收到授权 mapped signal。
+- 不能写成 Store docking session 已经让local order继续；local order必须收到授权 mapped signal。

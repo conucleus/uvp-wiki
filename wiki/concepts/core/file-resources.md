@@ -15,7 +15,8 @@ interface FileResourceLike {
 
 ## 句柄而不是文件
 
-Africa MRO demo 里的每个 stage 都带 `fileResources`，指向 Markdown 协议文件：
+一个 stage 可以用 `fileResources` 指向链下协议文件、证据模板或资源
+manifest：
 
 ```yaml
 fileResources:
@@ -24,7 +25,7 @@ fileResources:
     resourceRole: stage_protocol
     mediaType: text/markdown
     localFile:
-      path: ./uvp-periphery/demos/africa-mro-docking/resources/protocols/payment-settlement/fiat_bridge.md
+      path: ./examples/protocols/payment_settlement.md
       sha256: "..."
 ```
 

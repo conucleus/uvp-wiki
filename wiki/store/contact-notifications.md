@@ -17,7 +17,7 @@ Store 可以维护联系和通知工作流，因为真实履约需要找到人�
 - 通知状态只能说明 Store/chain-services 是否尝试联系或提醒。
 - 业务完成必须由授权 submitter 的链上 signal 表示。
 - 联系方式、凭证、私密 note、证件、合同、invoice、evidence plaintext 不应上链。
-- 对 docked Zhixu 的通知只表示“子秩序执行方已被提醒或 adapter 已被调用”，不表示子订单已经注册或完成。
+- 对 docked Zhixu 的通知只表示“linked Zhixu执行方已被提醒或 adapter 已被调用”，不表示linked order已经注册或完成。
 
 ## 与 chain-services 的关系
 

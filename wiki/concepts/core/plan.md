@@ -23,7 +23,7 @@ Zhixu DSL
 | `compiledHooks` | 编译后的 hook。 |
 | `dependencyIndex` | `signalKey -> hookIds`，用于局部求值。 |
 | `executorRoutes` | 阶段默认 executor/supplier 路由。 |
-| `selectorBindings` | selector stage 到 target stage 的选择权绑定。 |
+| `selectorBindings` | stage 到 target stage 的 executor patch 绑定。字段名保留 selector 是 wire/API 兼容名。 |
 | resource defaults | stage-level `fileResources` 句柄，用于 Product/Store 展示和后续 resource overlay 解释。 |
 
 ## Plan 不是什么
@@ -41,4 +41,4 @@ Zhixu DSL
 
 ## Plan 不应被订单修改
 
-Plan 是静态、可审计、被认证的版本。运行时变化，例如 executor 选择、resource manifest、业务 evidence、docked child order proof，都应进入 Order 的动态事件或 Product/Store workflow projection，而不是改 Plan。
+Plan 是静态、可审计、被认证的版本。运行时变化，例如 executor 选择、resource manifest、业务 evidence、docked linked order proof，都应进入 Order 的动态事件或 Product/Store workflow projection，而不是改 Plan。

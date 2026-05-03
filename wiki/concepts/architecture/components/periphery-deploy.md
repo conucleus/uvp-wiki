@@ -9,20 +9,16 @@
 - escrow、payment、guarantee adapter。
 - USDC 或稳定币 demo。
 - AI/MCP agent adapter。
-- 行业 demo，例如 Africa MRO docking。
+- 行业 demo 或场景适配器。
 - executor demo。
 
 Periphery 可以消费 `UVPStateMachine`、`ZhixuTrustRegistry`、Product DTO 或 executor-kit。它不能把资金、担保、付款、释放、退款、争议等状态改造成新的核心事实源。
 
-## Africa MRO 示例
+## 场景适配原则
 
-Africa MRO demo 展示一个 master order 加多个 docked execution orders：
-
-- master order 负责获客、寻源、付款路径、采购、物流、现场安装、验收。
-- supplier-sourcing、payment-settlement、procurement、logistics、field-service 等是 docked Zhixu。
-- 每个 stage 的协议和证据要求放在 `fileResources`，链上只保留 hash/URI/signal proof。
-
-它说明 UVP 可以协调复杂产业链，但不把支付或物流系统纳入核心协议。
+Periphery 场景可以展示资金、担保、清关、物流、AI/MCP 或企业系统如何
+作为 executor、supplier 或 adapter 接入 UVP。场景材料不能把行业 demo 写成
+核心协议事实，也不能把支付、物流或企业系统状态纳入 core state machine。
 
 ## Deploy
 

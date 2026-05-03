@@ -9,7 +9,7 @@ Docking Sandbox 用来让凝结核试拼外部 Zhixu、supplier signal map、ada
 - 保存 draft；
 - 生成 operator review 材料；
 - 帮助判断一个 supplier、adapter 或 peer Zhixu 是否能接入目标秩序。
-- 预览父 stage trigger 后要创建的 child order 或 adapter job；
+- 预览local stage trigger 后要创建的 linked order 或 adapter job；
 - 检查 peer Zhixu plan trust 和 supplier trust projection；
 - 生成 signalMap proof checklist。
 
@@ -36,20 +36,20 @@ Docking 页面必须持续标注：
 
 | 字段 | 说明 |
 | --- | --- |
-| parentPlanId / parentStage | 要接入的父 Zhixu stage。 |
+| localPlanId / localStage | 本地 Zhixu 中要开放给外部执行接口的 stage。 |
 | nucleationId | 发起这次试拼的凝结核。 |
 | executorType | `zhixu`、enterprise adapter、MCP agent、manual supplier。 |
 | peerZhixu | 目标 Zhixu subject、active plan、trust status。 |
 | signalMap | `str/cmp/err` 映射和 source validation 结果。 |
-| resourceNeeds | 父子资源句柄、manifest、证据要求。 |
+| resourceNeeds | local/linked 两侧资源句柄、manifest、证据要求。 |
 | contact | peer operator、adapter endpoint、notification policy。 |
-| proofChecklist | 子 order 注册、子 signal、父 mapped signal 的 proof 要求。 |
+| proofChecklist | linked order 注册、linked signal、local mapped signal 的 proof 要求。 |
 | review | operator note、风险、审批状态。 |
 
 ## `supplierType=zhixu` 的特别检查
 
 - `signalMap` 必须至少包含 `str` 和 `cmp`。
-- 同一个 `signalMap` 应引用同一个 child source。
+- 同一个 `signalMap` 应引用同一个 linked source。
 - peer Zhixu 的 plan trust 要可见。
-- child order lifecycle 不能只存在 Store DB；它必须能落到 state-machine events。
-- 父订单继续推进前，父订单上必须出现授权 mapped signal。
+- linked order lifecycle 不能只存在 Store DB；它必须能落到 state-machine events。
+- local order继续推进前，local order上必须出现授权 mapped signal。

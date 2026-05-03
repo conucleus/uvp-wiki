@@ -12,7 +12,7 @@
 | Order | registrar/participants/executors | `OrderRegistered` 和 state-machine events 决定运行状态。 | 搜索、排序、标签、operator note、proof summary。 |
 | Task / performance | authorized submitters | `SignalSubmitted`、`HookReady`、stage overlay events 决定状态。 | 履约视图、异常提示、联系提醒、SLA 展示。 |
 | Platform workflow | Store operator/reviewer/admin | registry tx 和 indexed events 决定 public claim。 | 审批、确认、audit、broadcast request、失败原因。 |
-| Docking relation | 父/子订单各自的 state-machine events 和 mapped signal proof | mapped signal 和 proof 决定父订单推进。 | sandbox session、peer Zhixu 选择、relation metadata、operator review。 |
+| Docking relation | local/linked order各自的 state-machine events 和 mapped signal proof | mapped signal 和 proof 决定local order推进。 | sandbox session、peer Zhixu 选择、relation metadata、operator review。 |
 
 ## Store 首页应该组织什么
 
@@ -22,7 +22,7 @@
 - Proof reachable：订单、任务、supplier participation 都应能进入 proof/timeline。
 - Store-only metadata labeled：draft、review、note、contact、notification、platform tag 必须标注为 Store/workflow 信息。
 - Revoked visible but blocked：revoked plan/supplier 可以被 operator 查到，不能被当成可创建新订单的对象。
-- Docking visible：peer Zhixu、adapter、signalMap、parent/child proof 要能从同一条 workflow 进入。
+- Docking visible：peer Zhixu、adapter、signalMap、local/linked proof 要能从同一条 workflow 进入。
 
 ## 推荐 IA
 
@@ -37,7 +37,7 @@ Store Home / Search
   -> Orders & Proof
        -> order detail / task timeline / proof rows / revoked warnings
   -> Docking
-       -> sandbox / signalMap validation / parent-child relation / proof bridge
+       -> sandbox / signalMap validation / local-linked relation / proof bridge
   -> Platform Workflow
        -> review / attestation request / revocation request / audit
 ```

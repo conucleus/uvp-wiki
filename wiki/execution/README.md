@@ -16,7 +16,7 @@ HookReady / Product task
 | 页面 | 解决的问题 |
 | --- | --- |
 | [Executor Kit](executor-kit.md) | CLI/SDK 如何监听任务、准备 signal container、签名、提交和读取 proof。 |
-| [Zhixu 作为 Executor](zhixu-as-executor.md) | 一条 Zhixu 如何 dock 进另一条秩序，父子订单如何通过 signalMap 和 proof 衔接。 |
+| [Zhixu 作为 Executor](zhixu-as-executor.md) | 一条 Zhixu 如何 dock 进另一条秩序，local/linked order如何通过 signalMap 和 proof 衔接。 |
 | [Executor 核心概念](../concepts/core/executor.md) | Supplier、Executor、active executor、selector patch、signal submitter 的对象边界。 |
 | [Order App 与 Executor Kit](../concepts/architecture/components/order-app-executor-kit.md) | 普通参与者界面和自动化执行者工具的分工。 |
 | [Periphery 与 Adapter](../concepts/architecture/components/periphery-deploy.md) | funding、guarantee、payment、agent adapter 如何围绕核心协议扩展。 |
@@ -41,6 +41,6 @@ Relayer 可以代付或转发交易，不能替业务参与方生成签名。Sto
 | --- | --- | --- |
 | Order App | 普通参与者、人工任务处理。 | 只消费 Product DTO 和 signal container。 |
 | Executor Kit Product API mode | 企业系统、supervised agent、脚本、未来 MCP 工具。 | 通过 prepare/sign/submit/proof 边界提交。 |
-| Executor Kit chain-native mode | 高级链原生 executor、validator、adjudicator。 | 直接监听 `HookReady` 并提交授权 `submitSignal`。 |
+| Executor Kit chain-native mode | 高级链原生 executor、executor。 | 直接监听 `HookReady` 并提交授权 `submitSignal`。 |
 
 多数真实集成优先走 Product API mode。chain-native mode 保留给需要低层 HookReady 和直接合约交互的执行者。

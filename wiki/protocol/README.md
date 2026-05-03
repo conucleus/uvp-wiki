@@ -48,5 +48,5 @@ Zhixu DSL
 - 业务文档、invoice、logistics、vehicle evidence 和 object bytes 不上链，只进入 hash、metadata URI 或私有存储。
 - Relayer 可以提交交易和付 gas，但不能生成参与方业务签名。
 - Funding、USDC、escrow、guarantee、settlement 和 AI/MCP agent 都是 adapter/periphery 语境，不属于状态机核心事实。
-- `supplierType=zhixu` 是组合执行模式；父子订单都必须回到各自 state-machine events 和 proof。
+- `supplierType=zhixu` 是组合执行模式；local/linked order都必须回到各自 state-machine events 和 proof。
 - Store 平台 workflow 不能替代凝结核内部治理，也不能替代 trust-domain 外部背书。

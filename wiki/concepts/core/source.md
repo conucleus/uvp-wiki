@@ -22,7 +22,7 @@ signalKey = keccak256(abi.encode(sourceId, signalId))
 
 ## 同源串联
 
-供应商寻源子秩序里，多个阶段都在 `sourcing` source 下推进：
+供应商寻源linked Zhixu里，多个阶段都在 `sourcing` source 下推进：
 
 ```yaml
 market_scan:
@@ -85,7 +85,7 @@ procurement_execution:
     SUPPLIER_FUNDED: payment::master.supplier_usdc_direct.cmp | master.supplier_settlement_exec.cmp
 ```
 
-这是一种交汇点：采购执行阶段属于 supply source，但它必须等 payment source 的付款结果。更复杂的动态多方撮合，应该通过新的 source、docked child order 或 Store/Product workflow 来表达，不要把成交后的共同履约强塞回卖方或买方 source。
+这是一种交汇点：采购执行阶段属于 supply source，但它必须等 payment source 的付款结果。更复杂的动态多方撮合，应该通过新的 source、docked linked order 或 Store/Product workflow 来表达，不要把成交后的共同履约强塞回卖方或买方 source。
 
 ## 分叉：石油分馏
 
@@ -119,11 +119,11 @@ collector_intake
        -> payment settlement
 ```
 
-如果农户数量在 Plan 里是固定的，可以显式写成多个 branch source。如果农户数量是运行时动态的，更适合把每个农户采收包装建成 docked child order 或子 Zhixu，再由收购商 order 通过 proof 和 signalMap 归拢。不要为了动态农户列表在一个静态 Plan 里制造不可审计的任意 source。
+如果农户数量在 Plan 里是固定的，可以显式写成多个 branch source。如果农户数量是运行时动态的，更适合把每个农户采收包装建成 docked linked order 或子 Zhixu，再由收购商 order 通过 proof 和 signalMap 归拢。不要为了动态农户列表在一个静态 Plan 里制造不可审计的任意 source。
 
-## Africa MRO 里的 Source
+## 跨境供货里的 Source
 
-Africa MRO master 里，主订单包含这些 source：
+一个跨境供货秩序里，主订单可以包含这些 source：
 
 | Source | 因果链 |
 | --- | --- |
@@ -131,7 +131,7 @@ Africa MRO master 里，主订单包含这些 source：
 | `sales` | 需求确认和商业推进。 |
 | `solution` | 技术范围和方案确认。 |
 | `supply` | 供应商寻源、采购和交付准备。 |
-| `payment` | 付款路径选择、USDC 直付或结算子秩序。 |
+| `payment` | 付款路径选择、USDC 直付或结算linked Zhixu。 |
 | `logistics` | 国际物流、清关、派送。 |
 | `field` | 现场安装、调试和验收。 |
 | `buyer` | 买方承诺和最终接受。 |

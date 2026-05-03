@@ -28,7 +28,7 @@ registerOrder(orderId, planId, creator, authorizations)
 | resource overlay | `StageResourcePatchApplied`。 |
 | task projection | chain-services 从 `HookReady` 和授权事件重建。 |
 | proof rows | event provenance。 |
-| docking relation | Store/Product/adapter 保存父子订单关联，并用链上 signal/proof 校验，不能替代两个订单各自事件。 |
+| docking relation | Store/Product/adapter 保存local/linked order关联，并用链上 signal/proof 校验，不能替代两个订单各自事件。 |
 
 ## Order 和 Product Order
 
@@ -38,16 +38,17 @@ Product task ID、Store docking session ID、adapter job ID 都是工作流索�
 
 ## Order 可以分叉和交汇
 
-一个 Order 内部可以有多条 source 因果链。比如 Africa MRO master 里，供应、支付、物流、现场安装和买方验收各自推进，在特定 hook 处交汇。Order 的动态性不在于数据库随便改状态，而在于不同授权 signal 按合约规则不断写入同一条可重放事件流。
+一个 Order 内部可以有多条 source 因果链。比如跨境供货里，供应、支付、物流、现场交付和买方验收各自推进，在特定 hook 处交汇。Order 的动态性不在于数据库随便改状态，而在于不同授权 signal 按合约规则不断写入同一条可重放事件流。
 
-如果某个 stage 由另一条 Zhixu 承接，通常会形成父 Order + 子 Order：
+如果某个 stage 由另一条 Zhixu 承接，通常会形成 local order 和 linked order
+之间的信号绑定：
 
 ```text
-parent order
+local order
   -> trigger hook ready
-  -> child zhixu order executes
-  -> child proof checked
-  -> authorized mapped signal submitted to parent order
+  -> linked Zhixu order executes
+  -> linked proof checked
+  -> authorized mapped signal submitted to local order
 ```
 
-父子关系可以由 Store/Product 保存和展示，但跨订单推进必须最终落成父订单上的授权 signal；否则父订单状态机不会因为子订单数据库状态变化而改变。
+local/linked relation可以由 Store/Product 保存和展示，但跨订单推进必须最终落成local order上的授权 signal；否则local order状态机不会因为linked order数据库状态变化而改变。

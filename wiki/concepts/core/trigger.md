@@ -26,9 +26,9 @@ HookReady(orderId, hookId, stageId, hookName)
 - Product task 可以创建或变成 ready。
 - Store 可以产生联系或通知 intent。
 - executor-kit chain watcher 可以领取或路由 job。
-- adapter 可以分配外部执行编号、工单号或子秩序启动请求。
+- adapter 可以分配外部执行编号、工单号或linked Zhixu启动请求。
 
-但要注意编号边界：链上 `orderId` 由 `registerOrder()` 绑定，不是由 Trigger 分配。Trigger 可以触发 Product task ID、Store docking session ID、外部工单号或子订单创建流程；这些都是工作流编号，不能替代父订单的链上 `orderId` 和 signal proof。
+但要注意编号边界：链上 `orderId` 由 `registerOrder()` 绑定，不是由 Trigger 分配。Trigger 可以触发 Product task ID、Store docking session ID、外部工单号或linked order创建流程；这些都是工作流编号，不能替代local order的链上 `orderId` 和 signal proof。
 
 ## 编译和合约语义
 
@@ -46,17 +46,17 @@ stage.receiveSignals.START
 
 ## 和 docked Zhixu 的关系
 
-当父订单某个 stage 由另一个 Zhixu 执行时，父 stage 的 Trigger 表示“现在可以把这个 stage 交给 peer Zhixu 或 adapter 执行”。后续子秩序的 `str`、`cmp`、`err` 应通过 `signalMap` 和授权 submitter 映射回父订单。
+当local order某个 stage 由另一个 Zhixu 执行时，local stage 的 Trigger 表示“现在可以把这个 stage 交给 peer Zhixu 或 adapter 执行”。后续linked Zhixu的 `str`、`cmp`、`err` 应通过 `signalMap` 和授权 submitter 映射回local order。
 
 ```text
-父 stage trigger Ready
+local stage trigger Ready
   -> Store/Product 启动 docking workflow
   -> 子 Zhixu order 执行
-  -> 子 order proof 被校验
+  -> linked order proof 被校验
   -> 授权 submitter 向父 order 提交映射 signal
 ```
 
-父订单不自动读取子订单事件。每一次跨秩序推进都必须能回到链上 signal、proof 和可重放事件。
+local order不自动读取linked order事件。每一次跨秩序推进都必须能回到链上 signal、proof 和可重放事件。
 
 ## 常见误解
 
