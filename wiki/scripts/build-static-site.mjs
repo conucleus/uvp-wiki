@@ -8,6 +8,28 @@ const outputRoot = path.join(wikiRoot, "site");
 const assetSource = path.join(wikiRoot, "assets", "site.css");
 
 const markdownFiles = [];
+const languageConfigs = {
+  zh: {
+    code: "zh",
+    htmlLang: "zh-CN",
+    sourcePrefix: "",
+    outputPrefix: "",
+    summaryRel: "SUMMARY.md",
+    homeLabel: "首页",
+    brandSubtitle: "EVM 原生 UVP 文档",
+    footer: "由 Markdown 生成。修改源文件后运行 <code>node wiki/scripts/build-static-site.mjs</code> 重新构建。",
+  },
+  en: {
+    code: "en",
+    htmlLang: "en",
+    sourcePrefix: "en/",
+    outputPrefix: "en/",
+    summaryRel: "en/SUMMARY.md",
+    homeLabel: "Home",
+    brandSubtitle: "EVM-native UVP docs",
+    footer: "Generated from Markdown. After editing source files, run <code>node wiki/scripts/build-static-site.mjs</code> to rebuild.",
+  },
+};
 
 function walk(dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -271,7 +293,17 @@ function pageTitle(markdown, fallback) {
   return heading ? heading[1].trim() : fallback;
 }
 
-function parseSummary(summaryMarkdown) {
+function languageForSourceRel(sourceRel) {
+  return sourceRel.startsWith(languageConfigs.en.sourcePrefix) ? languageConfigs.en : languageConfigs.zh;
+}
+
+function stripLanguagePrefix(sourceRel, language) {
+  return language.sourcePrefix && sourceRel.startsWith(language.sourcePrefix)
+    ? sourceRel.slice(language.sourcePrefix.length)
+    : sourceRel;
+}
+
+function parseSummary(summaryMarkdown, language) {
   const sections = [];
   let section = { title: "Docs", items: [] };
   let stack = [];
@@ -293,7 +325,7 @@ function parseSummary(summaryMarkdown) {
       ensureSection();
       const indent = itemMatch[1].replace(/\t/g, "  ").length;
       const level = Math.floor(indent / 2);
-      const href = outputRelForMarkdown(itemMatch[3].trim());
+      const href = `${language.outputPrefix}${outputRelForMarkdown(itemMatch[3].trim())}`;
       const node = { label: itemMatch[2].trim(), href, children: [] };
 
       if (level === 0 || stack.length === 0) {
@@ -346,14 +378,47 @@ function renderNav(navSections, currentOutputRel, rootRel) {
   return parts.join("\n");
 }
 
-function renderPage({ title, body, nav, rootRel, sourceRel }) {
+function alternateOutputRel(sourceRel, sourceSet) {
+  const language = languageForSourceRel(sourceRel);
+  if (language.code === "en") {
+    const zhRel = stripLanguagePrefix(sourceRel, language);
+    return sourceSet.has(zhRel) ? outputRelForMarkdown(zhRel) : "index.html";
+  }
+
+  const enRel = `${languageConfigs.en.sourcePrefix}${sourceRel}`;
+  return sourceSet.has(enRel) ? outputRelForMarkdown(enRel) : "en/index.html";
+}
+
+function renderLanguageSwitch(language, rootRel, outputRel, altOutputRel) {
+  const currentHref = `${rootRel}${outputRel}`;
+  const altHref = `${rootRel}${altOutputRel}`;
+
+  if (language.code === "en") {
+    return [
+      '<nav class="language-switch" aria-label="Language">',
+      `<a href="${altHref}">中文</a>`,
+      `<a class="active" href="${currentHref}" aria-current="page">EN</a>`,
+      "</nav>",
+    ].join("");
+  }
+
+  return [
+    '<nav class="language-switch" aria-label="语言">',
+    `<a class="active" href="${currentHref}" aria-current="page">中文</a>`,
+    `<a href="${altHref}">EN</a>`,
+    "</nav>",
+  ].join("");
+}
+
+function renderPage({ title, body, nav, rootRel, sourceRel, outputRel, altOutputRel, language }) {
   const sourceMeta =
     sourceRel === "README.md"
       ? `<a href="${rootRel}../README.md">${escapeHtml(sourceRel)}</a>`
       : escapeHtml(sourceRel);
+  const languageSwitch = renderLanguageSwitch(language, rootRel, outputRel, altOutputRel);
 
   return `<!doctype html>
-<html lang="zh-CN">
+<html lang="${language.htmlLang}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -363,23 +428,26 @@ function renderPage({ title, body, nav, rootRel, sourceRel }) {
 <body>
   <div class="mobile-header">
     <span class="mobile-title">uvp-eth Wiki</span>
-    <a href="${rootRel}index.html">首页</a>
+    <a href="${rootRel}${language.outputPrefix}index.html">${language.homeLabel}</a>
   </div>
   <div class="site-shell">
     <aside class="site-sidebar">
-      <a class="brand" href="${rootRel}index.html">
+      <a class="brand" href="${rootRel}${language.outputPrefix}index.html">
         <span class="brand-title">uvp-eth Wiki</span>
-        <span class="brand-subtitle">EVM 原生 UVP 文档</span>
+        <span class="brand-subtitle">${language.brandSubtitle}</span>
       </a>
       ${nav}
     </aside>
     <main class="site-main">
       <article class="doc-card">
-        <div class="doc-meta">${sourceMeta}</div>
+        <div class="doc-toolbar">
+          <div class="doc-meta">${sourceMeta}</div>
+          ${languageSwitch}
+        </div>
         <div class="doc-content">
 ${body}
         </div>
-        <div class="page-footer">由 Markdown 生成。修改源文件后运行 <code>node wiki/scripts/build-static-site.mjs</code> 重新构建。</div>
+        <div class="page-footer">${language.footer}</div>
       </article>
     </main>
   </div>
@@ -390,25 +458,35 @@ ${body}
 
 function build() {
   walk(wikiRoot);
+  const sourceSet = new Set(markdownFiles.map((file) => path.relative(wikiRoot, file)));
 
   fs.rmSync(outputRoot, { recursive: true, force: true });
   fs.mkdirSync(path.join(outputRoot, "assets"), { recursive: true });
   fs.copyFileSync(assetSource, path.join(outputRoot, "assets", "site.css"));
 
-  const summary = fs.readFileSync(path.join(wikiRoot, "SUMMARY.md"), "utf8");
-  const navItems = parseSummary(summary);
+  const navByLanguage = new Map();
+  for (const language of Object.values(languageConfigs)) {
+    const summaryPath = path.join(wikiRoot, language.summaryRel);
+    if (fs.existsSync(summaryPath)) {
+      const summary = fs.readFileSync(summaryPath, "utf8");
+      navByLanguage.set(language.code, parseSummary(summary, language));
+    }
+  }
 
   for (const file of markdownFiles) {
     const rel = path.relative(wikiRoot, file);
+    const language = languageForSourceRel(rel);
     const markdown = fs.readFileSync(file, "utf8");
     const outputRel = outputRelForMarkdown(rel);
     const rootRel = currentRootRel(outputRel);
     const body = markdownToHtml(markdown);
     const title = pageTitle(markdown, rel);
+    const navItems = navByLanguage.get(language.code) || navByLanguage.get(languageConfigs.zh.code) || [];
     const nav = renderNav(navItems, outputRel, rootRel);
+    const altOutputRel = alternateOutputRel(rel, sourceSet);
     const outPath = path.join(outputRoot, outputRel);
     ensureDir(outPath);
-    fs.writeFileSync(outPath, renderPage({ title, body, nav, rootRel, sourceRel: rel }));
+    fs.writeFileSync(outPath, renderPage({ title, body, nav, rootRel, sourceRel: rel, outputRel, altOutputRel, language }));
   }
 
   const redirect = `<!doctype html>

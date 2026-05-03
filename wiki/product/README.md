@@ -1,6 +1,6 @@
-# 产品与执行面
+# 产品语言与 DTO/API
 
-产品与执行面把链上事实翻译成 ordinary Product UI、participant task、Product DTO/API 和 signal container。Product API 由 [非可信执行层：Chain Services](../components/chain-services.md) 提供；本页只讲 Product 语言和用户/执行者消费方式。Store 和执行者集成都已经是单独一级目录；本页只在需要说明 DTO/API 消费方时链接它们。
+产品语言与 DTO/API 把链上事实翻译成 ordinary Product UI、participant task、Product DTO/API 和 signal container。Product API 由 [非可信执行层：Chain Services](../components/chain-services.md) 提供；本目录定义 Product 层如何说“订单、任务、证据、proof、信任状态”，以及这些 DTO 如何被 Store、Order App、executor-kit 和 adapter 消费。
 
 ```text
 chain events
@@ -21,13 +21,13 @@ chain events
 | [Product API 参考](../reference/product-api.md) | 当前 Product API 路由和语义。 |
 | [非可信执行层：Chain Services](../components/chain-services.md) | Product API 的 indexer、relayer、proof verifier 和 runtime profile 归属。 |
 
-## 跳转到执行与 Store
+## 和执行、Store 的分工
 
-| 页面 | 集成语境 |
+| 目录 | 负责什么 |
 | --- | --- |
-| [秩序商店](../store/README.md) | Store 作为凝结核工作台和一级 trust/workflow 系统，组织 Zhixu/Supplier、proof 和平台 workflow。 |
-| [执行者与集成](../execution/README.md) | Executor Kit、AI/MCP adapter、enterprise script、docked Zhixu 和 periphery adapter。 |
-| [Executor](../concepts/core/executor.md) | 订单运行时执行者和 signal submitter 的核心对象边界。 |
+| 本目录 | DTO、API 路由、task/proof/trust 的产品语言、Signal Container 数据合约。 |
+| [执行者与集成](../execution/README.md) | Executor Kit、Order App、enterprise script、AI/MCP adapter、docked Zhixu 和 periphery adapter 如何签名、提交 signal、读取 proof。 |
+| [秩序商店](../store/README.md) | 凝结核工作台、Zhixu/Supplier 管理、trust 校验、平台 workflow 和 operator audit。 |
 
 ## 当前注意事项
 

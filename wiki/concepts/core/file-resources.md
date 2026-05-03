@@ -11,7 +11,7 @@ interface FileResourceLike {
 }
 ```
 
-这说明 `fileResources` 的第一责任是“可解析的资源引用”。具体存储后端可以是本地文件、对象存储、外部 URI 或后续 manifest。
+这说明 `fileResources` 的第一责任是“可解析的资源引用”。具体存储后端可以是对象存储、外部 URI、内容寻址存储或后续 manifest。
 
 ## 资源句柄
 
@@ -21,12 +21,16 @@ manifest：
 ```yaml
 fileResources:
   stage_protocol:
-    fileType: local
+    fileType: manifest
     resourceRole: stage_protocol
-    mediaType: text/markdown
-    localFile:
-      path: ./examples/protocols/payment_settlement.md
-      sha256: "..."
+    resourceType: document
+    mediaType: application/json
+    manifest:
+      manifestURI: "urn:uvp:resource-manifest:payment-settlement:v1"
+      manifestHash: "0x3002..."
+      policyHash: "0x7120..."
+      visibility: protected
+      accessPolicy: buyer_supplier_executor
 ```
 
 这个 YAML 给 Store、Product API、executor-kit 或 adapter 一个资源句柄：可以显示协议、计算 hash、提示证据要求、检查验收规则。链上保存 hash、URI 或 patch event。
@@ -37,8 +41,8 @@ fileResources:
 
 | fileType | 语义 |
 | --- | --- |
-| `local` | 本地 demo 或开发句柄，通常带路径和 sha256。 |
 | `manifest` | 指向规范化资源 manifest，适合生产资源包。 |
+| `uri` | 指向可解析的 metadata URI，并配合 hash 校验。 |
 | `ipfs` / `arweave` | 内容寻址存储句柄。 |
 | `object_storage` | 链下对象存储句柄；生产环境不应暴露明文 bucket key 或凭证。 |
 | `onchain` | 少量可公开资源直接链上存储或链上可读引用，成本高但可行。 |
@@ -74,7 +78,7 @@ Order App 和 executor-kit 应把它翻译成“需要上传什么证据、hash 
 
 ## 不允许的用法
 
-- 合同、发票、物流文件、照片或报告明文留在链下。
+- 合同、发票、物流文件、照片或报告明文上链。
 - `fileResources` 表示资源要求，业务完成看 signal/proof。
 - 对象存储可访问性是辅助条件，链上 proof 看事件和 hash。
 - resource patch 和 executor patch 是两个授权动作。

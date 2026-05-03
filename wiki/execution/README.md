@@ -1,6 +1,6 @@
 # 执行者与集成
 
-执行者与集成目录回答“谁来执行、怎么接进来、怎么提交 signal”。它连接核心概念中的 [Executor](../concepts/core/executor.md)、[Chain Services](../components/chain-services.md) 暴露的 Product API signal container、executor-kit、Order App、periphery adapter 和 docked Zhixu。
+执行者与集成目录回答“谁来执行、怎么接进来、怎么提交 signal”。它连接核心概念中的 [Executor](../concepts/core/executor.md)、[产品语言与 DTO/API](../product/README.md) 暴露的 signal container、executor-kit、Order App、periphery adapter 和 docked Zhixu。
 
 ```text
 HookReady / Product task
@@ -34,6 +34,14 @@ Executor Kit、Order App、enterprise script、AI/MCP adapter 都是 signal prod
 - chain event proof。
 
 Relayer 可以代付或转发交易；业务签名来自被授权参与方。Store 可以联系 executor、保存通知状态、展示履约记录；业务完成看 state-machine signal/proof。
+
+## 和产品语言的分工
+
+| 层 | 负责什么 |
+| --- | --- |
+| 产品语言与 DTO/API | 把链上事件投影成订单、任务、proof、trust 状态和 signal container。 |
+| 执行者与集成 | 消费任务和 signal container，完成证据准备、EIP-712 签名、提交和 proof 回读。 |
+| Store | 管理 Zhixu/Supplier、docking session、operator review 和平台 workflow。 |
 
 ## 三种执行入口
 

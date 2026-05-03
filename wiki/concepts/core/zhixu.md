@@ -114,12 +114,15 @@ selectedStages:
 ```yaml
 fileResources:
   sourcing_contract:
-    fileType: local
+    fileType: manifest
     resourceRole: stage_protocol
-    mediaType: text/markdown
-    localFile:
-      path: ./examples/protocols/supplier_sourcing.md
-      sha256: "0x3002..."
+    resourceType: document
+    mediaType: application/json
+    manifest:
+      manifestURI: "urn:uvp:resource-manifest:supplier-sourcing:v1"
+      manifestHash: "0x3002..."
+      policyHash: "0x7120..."
+      visibility: protected
 ```
 
 这些业务文件不进链。链上只记录哈希、URI 或 resource patch 事件。

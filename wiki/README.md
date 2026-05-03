@@ -41,7 +41,7 @@ UVP 把复杂生产关系压缩成计算机能理解、链上能记录和追责�
 5. 读 [核心组件](components/README.md)，理解 compiler、contracts、state machine、非可信执行层、Product DTO 和 deploy。
 6. 做 Store 相关工作时读 [秩序商店](store/README.md)。
 7. 做执行者、adapter、AI/MCP 或 peer Zhixu 接入时读 [执行者与集成](execution/README.md)。
-8. 按用户产品面进入 [产品与执行面](product/README.md)。
+8. 按用户产品面进入 [产品语言与 DTO/API](product/README.md)。
 9. 改 public boundary 前读 [公共接口](reference/public-interfaces.md)。
 
 ## 文档结构
@@ -55,7 +55,7 @@ UVP 把复杂生产关系压缩成计算机能理解、链上能记录和追责�
   履约/proof 视图、联系通知、配置发布、平台 workflow 和 audit。
 - [执行者与集成](execution/README.md)：executor-kit、Order App、enterprise script、
   AI/MCP adapter、docked Zhixu、periphery adapter 的执行入口。
-- [产品与执行面](product/README.md)：Product DTO/API、Signal Container、
+- [产品语言与 DTO/API](product/README.md)：Product DTO/API、Signal Container、
   Order App 和 ordinary Product UI。
 - [本地 / 预发 / 发布](tasks/development.md)：开发任务、Anvil、Base Sepolia、
   release evidence 和排障。

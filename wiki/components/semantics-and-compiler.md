@@ -46,4 +46,5 @@ Zhixu YAML/JSON
 - receive hook 的 `trigger=true` 才会在 Ready 时发出 `HookReady`。
 - `signalMap` hook 当前 `trigger=false`。
 - `supplierType=zhixu` 的 `signalMap` 必须包含 `str` 和 `cmp`，并且同一个 map 引用同一个 source。
-- Hook 表达式必须有正向锚点；纯负条件不能成为可推进 hook。
+- Hook 表达式按单调存在逻辑求值：`A` 表示 signal 已出现，`~A` 表示 signal 尚未出现；signal 出现后不会消失。
+- Hook 表达式必须有正向锚点；纯缺席条件不能成为可推进 hook。

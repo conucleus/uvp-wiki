@@ -19,7 +19,7 @@ struct HookRuntime {
 | `Init` | 尚未满足，也没有进入明确等待。 |
 | `Wait` | 有正向锚点，正在等待 timer 或后续条件。 |
 | `Ready` | hook 条件满足。 |
-| `Cancelled` | hook 被负条件或取消路径终止。 |
+| `Cancelled` | hook 被缺席条件或取消路径终止。 |
 
 ## 状态变化事件
 

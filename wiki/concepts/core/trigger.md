@@ -48,6 +48,25 @@ stage.receiveSignals.START
 
 当 local order 某个 stage 由另一个秩序执行时，local stage 的 Trigger 表示“现在可以把这个 stage 交给 peer 秩序或 adapter 执行”。后续 linked 秩序的 `str`、`cmp`、`err` 通过 `signalMap` 和授权 submitter 或 docking events 映射回 local order。
 
+如果这个对接阶段不是由上一条业务 signal 打开，而是由 Product、registrar 或 operator workflow 从订单外部打开，建议给这个 link stage 一个显式入口：
+
+```yaml
+trigger:
+  - LINK_READY
+receiveSignals:
+  LINK_READY: ::OUTSIDE
+executor:
+  supplierType: zhixu
+  supplierID: "{{ .peer_zhixu_uid }}"
+  zhixuExecutorConfig:
+    signalMap:
+      str: peer::task.start.str
+      cmp: peer::task.close.cmp
+      err: peer::task.close.err
+```
+
+这里的 `::OUTSIDE` 是空 source 上的外部入口 signal，用来打开本地 stage 的 docking workflow。它仍然需要订单级授权；常见提交方是 registrar 或被 Product workflow 授权的系统账户。`signalMap` 负责解释 linked order 输出，不会自己发出 `HookReady`。
+
 ```text
 local stage trigger Ready
   -> Store/Product 启动 docking workflow

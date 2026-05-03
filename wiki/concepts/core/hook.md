@@ -18,7 +18,9 @@ source::condition
 buyer::(task.pay.cmp +5s) & ~task.pay.refund
 ```
 
-这句话表示：来自 `buyer` 的 `task.pay.cmp` signal 出现后等待 5 秒，并且 `task.pay.refund` 没有出现，条件才成立。
+这句话表示：来自 `buyer` 的 `task.pay.cmp` signal 出现后等待 5 秒；在这个判断窗口里，如果 `task.pay.refund` 还没有出现，条件成立。
+
+Hook 表达式里的 `~A` 是存在逻辑里的缺席判断。它表示“当前订单事件集中还没有出现 A signal”。signal 一旦被授权提交到订单中，就成为可重放事件，不能在后续判断里消失或变回未出现。因此 `~task.pay.refund` 的含义是“退款 signal 尚未发出”；如果退款 signal 已经出现，这个依赖它缺席的分支会被取消。
 
 ## 支持的 AST 节点
 
@@ -28,12 +30,12 @@ buyer::(task.pay.cmp +5s) & ~task.pay.refund
 | --- | --- |
 | `signal` | 等待某个 `task.stage.signal` 出现。 |
 | `external` | 外部条件占位，必须由适配器或后续实现解释。 |
-| `not` | 负条件，表示内部条件出现时取消。 |
+| `not` | 缺席条件，表示某个 signal 尚未出现；如果它后来出现，依赖该缺席条件的分支取消。 |
 | `and` | 多个条件都满足。 |
 | `or` | 任一分支满足。 |
 | `delay` | 某个正向锚点出现后等待一段时间。 |
 
-解析器会拒绝没有正向锚点的条件，也会拒绝 `OR` 中没有正向锚点的分支。纯负条件例如 `buyer::~task.cancel.cmp` 不能成为 hook，因为状态机需要知道从哪个正向事件开始等待或判断。
+解析器会拒绝没有正向锚点的条件，也会拒绝 `OR` 中没有正向锚点的分支。纯缺席条件例如 `buyer::~task.cancel.cmp` 不能成为 hook，因为状态机需要先有一个正向事件，才能知道从什么时候开始判断“尚未出现”。
 
 ## HookPlan 里保存什么
 

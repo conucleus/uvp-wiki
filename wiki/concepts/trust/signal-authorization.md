@@ -56,6 +56,8 @@ submitter = registrar address
 
 这条授权用于 registrar 触发订单初始路径。它不是让后端拥有所有业务动作权限。
 
+docked Zhixu 的 link stage 如果使用 `::OUTSIDE` 作为入口，也必须走同样的订单级授权边界：只有被授权的钱包能提交这个空 source 上的 `OUTSIDE` signal。linked order 后续的 `str/cmp/err` 映射仍按 `signalMap`、docking link 和 mapped signal 授权检查。
+
 ## 授权和任务展示
 
 Projection 会根据授权给任务分配 assignee，但这只是产品视图。合约真正接受提交时仍重新检查授权，所以服务层展示错误不会突破协议边界。

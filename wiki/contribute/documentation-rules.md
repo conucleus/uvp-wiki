@@ -17,7 +17,7 @@ Wiki 的目标是让人读懂项目，并把源码、测试、ABI fixture、PRD 
 ## 信息架构规则
 
 - `SUMMARY.md` 是唯一导航真相。新增页面后必须放进合适的一级栏目。
-- 一级栏目优先按工程读者路径划分：入门、核心概念、核心组件、秩序商店、执行者与集成、产品与执行面、本地/预发/发布、参考与证据、贡献规则。
+- 一级栏目优先按工程读者路径划分：入门、核心概念、核心组件、秩序商店、执行者与集成、产品语言与 DTO/API、本地/预发/发布、参考与证据、贡献规则。
 - `core` 负责“对象是什么”；`components` 负责“系统怎么实现”；`store` 负责“秩序商店怎么组织和校验真实世界对象”；`execution` 负责“执行者、adapter、AI/MCP、docked Zhixu 怎么接入和提交 signal”。
 - 同一个 Markdown 文件只在 `SUMMARY.md` 里挂到一个一级目录。不同目录需要不同侧面时，新增侧面页；旧页可以通过正文链接引用。
 - `store` 页面写 Store 平台 workflow 和凝结核工作台；Store admin 是平台 workflow 角色，凝结核是秩序内部治理者。
@@ -35,7 +35,7 @@ Wiki 的目标是让人读懂项目，并把源码、测试、ABI fixture、PRD 
 | 秩序商店入口 | `wiki/store/` |
 | 凝结核工作台 | `wiki/store/nucleation-workbench.md` |
 | 执行者与集成入口 | `wiki/execution/` |
-| 产品与执行面入口 | `wiki/product/` |
+| 产品语言与 DTO/API 入口 | `wiki/product/` |
 | 状态摘要 | `wiki/status/` |
 | 概念和架构细页 | `wiki/concepts/` |
 | 端到端教程 | `wiki/tutorials/` |
@@ -59,7 +59,7 @@ PRD 仍放在 `docs/product/`。Release record 仍放在 `uvp-deploy/deploy/rele
 改 Product API 时：
 
 - 更新 [Product API 参考](../reference/product-api.md)；
-- 更新 [产品与执行面](../product/README.md)；
+- 更新 [产品语言与 DTO/API](../product/README.md)；
 - 更新 Store/Order App/Executor Kit 相关任务文档；
 - 标明旧 route 是否只是 compatibility alias。
 

@@ -82,9 +82,9 @@
 - [Order App 与 Executor Kit](concepts/architecture/components/order-app-executor-kit.md)
 - [Periphery 与 Adapter](concepts/architecture/components/periphery-deploy.md)
 
-## 产品与执行面
+## 产品语言与 DTO/API
 
-- [产品与执行面](product/README.md)
+- [产品语言与 DTO/API](product/README.md)
 - [产品表面](concepts/product-surfaces.md)
   - [事件投影](concepts/product/projections.md)
   - [Product DTO](concepts/product/dto.md)

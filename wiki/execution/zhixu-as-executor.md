@@ -50,6 +50,27 @@ local order 和 linked order 都是独立的 `UVPStateMachine` order。它们各
 
 本地 stage 的 source 是 `settlement`。它选择一条 linked Zhixu 作为 executor，并声明 linked Zhixu 输出的 `str/cmp/err` 如何映射成本地秩序可消费的信号。
 
+如果这个对接阶段由订单外部的 Product/registrar workflow 直接打开，而不是等待上一条业务 signal，可以把 link stage entrance 写成 `::OUTSIDE`：
+
+```yaml
+- name: dock_customs_clearance
+  source: customs
+  trigger:
+    - LINK_READY
+  receiveSignals:
+    LINK_READY: ::OUTSIDE
+  executor:
+    supplierType: zhixu
+    supplierID: "{{ .customs_clearance_zhixu_uid }}"
+    zhixuExecutorConfig:
+      signalMap:
+        str: customs_peer::clearance.start.str
+        cmp: customs_peer::clearance.close.cmp
+        err: customs_peer::clearance.close.err
+```
+
+`LINK_READY` 只是打开本地对接 workflow 的 trigger。linked order 的开始、完成或失败仍然通过 `signalMap`、docking link、proof 校验和授权 mapped signal 回填到本地 order。
+
 ## 运行时证明
 
 一个完整的 docked Zhixu proof 至少覆盖：
@@ -57,6 +78,7 @@ local order 和 linked order 都是独立的 `UVPStateMachine` order。它们各
 | 问题 | 证明来源 |
 | --- | --- |
 | local stage 为什么开放执行 | local order 的 `HookReady`。 |
+| link stage 的外部入口是谁打开的 | `::OUTSIDE` signal 的订单级授权和提交事件，或上一条业务 signal 的 proof。 |
 | linked Zhixu 使用哪个计划 | linked order 的 `OrderRegistered` 和 linked plan projection。 |
 | linked Zhixu 是否被背书 | linked plan 的 `PlanAttested` projection。 |
 | linked order 如何推进 | linked order 的 `SignalSubmitted` / hook proof。 |
