@@ -102,7 +102,7 @@ doctor 不需要私钥，也不应打印协议 secrets。
 
 ## MCP/AI adapter
 
-MCP adapter 是 `product.ts` SDK 的薄封装，不是第二套 Product API 实现。AI agent、MCP tool、企业脚本和浏览器 Order App 都必须 dock 到同一个 Product API prepare/sign/submit/proof 边界。
+MCP adapter 是 `product.ts` SDK 的薄封装。AI agent、MCP tool、企业脚本和浏览器 Order App 都接到同一个 Product API prepare/sign/submit/proof 边界。
 
 ```ts
 import { createProductMcpAdapter } from "@uvp-eth/executor-kit/mcp";
@@ -113,13 +113,13 @@ await uvp.uvp_prepare_signal({ taskId: "task_123", walletAddress });
 await uvp.uvp_submit_signal({ prepared, privateKeyEnv: "UVP_PARTICIPANT_PRIVATE_KEY", walletAddress });
 ```
 
-MCP 可以协助准备、路由和展示结果，不能代替授权参与方签名。`includeRaw: true` 只应在明确的钱包签名交接或协议调试中使用。
+MCP 可以协助准备、路由和展示结果；授权参与方签名仍由对应钱包完成。`includeRaw: true` 只应在明确的钱包签名交接或协议调试中使用。
 
-## Executor Kit 不能做什么
+## 权限边界
 
-- 不能创建 order-level signal authorization。
-- 不能绕过 active executor overlay。
-- 不能把 relayer key 当业务 signer。
-- 不能把 local job state 当链上状态。
-- 不能把 funding、guarantee、payment placeholder 写成 UVP 核心协议能力。
-- 不能把私钥、seed phrase、RPC secret、JWT secret 打印到日志或 wiki。
+- order-level signal authorization 由 registrar/product flow 或合约授权路径创建。
+- active executor overlay 由 state machine 检查。
+- relayer key 用于广播交易，业务 signer 是授权参与方。
+- local job state 是执行工具状态，链上状态看 events/proof。
+- funding、guarantee、payment placeholder 属于 periphery/adapter 口径。
+- 私钥、seed phrase、RPC secret、JWT secret 保持在环境或密钥系统中，日志和 wiki 只写 redacted 信息。

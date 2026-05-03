@@ -39,7 +39,7 @@ GET /product/me/tasks/:taskId
 - `x-uvp-wallet-address`
 - `x-wallet-address`
 
-它不能从角色 label 推断权限。任务必须来自 indexed state-machine projection 和
+角色 label 只用于展示。任务必须来自 indexed state-machine projection 和
 order-level submitter authorization。
 
 ## Submission
@@ -52,7 +52,7 @@ GET  /product/submissions/:submissionId
 
 `prepare-submit` 生成 EIP-712 typed data。`submit` 验证签名并把 signed payload
 交给 relayer adapter。Relayer broadcast disabled 时，API 可以在签名验证后记录
-`broadcast_disabled`，但不能伪造链上信号。
+`broadcast_disabled`；链上信号仍以 `SignalSubmitted` 为准。
 
 ## Stage Overlay
 
@@ -97,7 +97,7 @@ GET /product/staging/readiness
 
 ## Store Console API
 
-Store routes 是 nucleus/operator 表面，不是 ordinary participant 表面：
+Store routes 是 nucleus/operator 表面；ordinary participant 表面走 Product/Order App routes：
 
 ```text
 GET  /store/search
@@ -122,4 +122,4 @@ POST /store/suppliers/:supplierId/request-revocation
 ```
 
 Store write routes 需要 operator/admin identity。Store draft、docking session 和
-supplier metadata 不能替代 chain attestation。
+supplier metadata 是 workflow/material；chain attestation 看 trust registry projection。

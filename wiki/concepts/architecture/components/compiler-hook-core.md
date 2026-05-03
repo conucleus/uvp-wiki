@@ -8,6 +8,7 @@ Compiler 和 Hook Core 是协议语义进入链上前的入口。它们不处理
 
 - 解析 `source::condition`。
 - 支持 `&`、`|`、`~`、delay、`OUTSIDE`、`OUTSOURCE`。
+- 把 `~A` 解释为“A signal 尚未出现在当前订单事件集中”。signal 一旦出现就不会消失，所以这里是单调存在逻辑。
 - 抽取 positive、negative、timer dependencies。
 - 提供本地 evaluator，供 compiler 和 reference runtime 共享。
 
@@ -24,9 +25,9 @@ Hook Core 的输出仍然是平台中立语义，不含 Solidity ABI。
 - 生成 Solidity `registerPlan` 参数。
 - 计算 `planId`、`planHash`、hook/stage/source/signal/dependency/route id。
 
-## 编译器不做什么
+## Compiler 的输入输出边界
 
-Compiler 不选择订单参与者，不创建钱包授权，不部署合约，不判断 supplier 是否可信，也不执行 escrow 或 funding。它只回答一个问题：这份静态 Zhixu 能否被确定性地编译成 EVM 可注册计划。
+Compiler 的输出是确定性的计划产物和注册参数。订单参与者、钱包授权、合约部署、supplier trust、escrow 或 funding 由后续的 Product、registry、deployment 或 periphery 层处理。Compiler 只回答一个问题：这份静态 Zhixu 能否被确定性地编译成 EVM 可注册计划。
 
 ## 为什么它是架构核心
 

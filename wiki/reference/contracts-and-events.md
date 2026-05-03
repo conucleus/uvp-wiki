@@ -22,6 +22,8 @@
 - authorization-bearing `registerOrder` overloads；
 - `submitSignal`；
 - `submitSignalFor`；
+- `linkDockedOrder` / `linkDockedOrderFor`；
+- `submitDockedSignal`；
 - `applyStageExecutorPatch` / `applyStageExecutorPatchFor`；
 - `applyStageResourcePatch` / `applyStageResourcePatchFor`；
 - EIP-712 digest helpers；
@@ -54,6 +56,9 @@ SignalSubmitterAuthorized
 PlanRegistered
 OrderRegistered
 SignalSubmitted
+DockedOrderLinked
+DockedSignalMapped
+DockedSignalSubmitted
 StageExecutorPatchApplied
 StageResourcePatchApplied
 StageExecutorActivated
@@ -85,7 +90,7 @@ forge test
 
 ## Funding Boundary
 
-当前合约模块不包含 funding、escrow、custody、settlement、release、refund、
-dispute-payment、ERC20 或 USDC 合约。未来资金相关工作必须作为 adapter，有自己的
-authorization、event mapping、tests 和 PRD，并消费 `UVPStateMachine` signal，而不是
-替换核心协议。
+当前合约模块的 core boundary 聚焦 state machine、trust registry 和 deployment registry。
+funding、escrow、custody、settlement、release、refund、dispute-payment、ERC20 或
+USDC 合约属于 adapter/periphery 工作。未来资金相关工作必须有自己的 authorization、
+event mapping、tests 和 PRD，并消费 `UVPStateMachine` signal。

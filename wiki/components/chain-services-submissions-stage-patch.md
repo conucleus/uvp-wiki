@@ -1,6 +1,6 @@
 # Submissions 与 Stage Patch
 
-Submissions 负责记录已准备、已签名、已广播、失败、确认和可重试的提交状态。Stage Patch 是 selector 授权路径，用来在某个订单里修改目标 stage 的 executor 或 resource manifest，而不是改 Plan 本身。
+Submissions 负责记录已准备、已签名、已广播、失败、确认和可重试的提交状态。Stage Patch 是 selector 授权路径，用来在某个订单里修改目标 stage 的 executor 或 resource manifest；Plan 本身保持静态版本。
 
 ## Submissions 代码入口
 
@@ -26,7 +26,7 @@ prepare typed data
   -> indexer confirms chain event
 ```
 
-Submission 状态是 operational state，不是业务 truth。它可以说明一笔交易是否送出、是否失败、是否确认；不能说明订单已经进入下一阶段。下一阶段必须来自 `SignalSubmitted`、`HookReady` 或 stage patch events。
+Submission 状态是 operational state。它可以说明一笔交易是否送出、是否失败、是否确认；订单是否进入下一阶段来自 `SignalSubmitted`、`HookReady` 或 stage patch events。
 
 ## Stage Patch 代码入口
 
@@ -40,17 +40,17 @@ Submission 状态是 operational state，不是业务 truth。它可以说明一
 
 ## 两类 Stage Patch
 
-| Patch | 改什么 | 不改什么 |
+| Patch | 改什么 | 边界 |
 | --- | --- | --- |
-| executor patch | 某个订单里 target stage 的 active executor。 | 不改 Plan，不改 supplier registry，不自动授权其他 signal。 |
-| resource patch | 某个订单里 target stage 的 resource handle / manifest。 | 不塞入证据明文，不替代 File Resource policy。 |
+| executor patch | 某个订单里 target stage 的 active executor。 | Plan 和 supplier registry 保持原状，其他 signal 仍按授权检查。 |
+| resource patch | 某个订单里 target stage 的 resource handle / manifest。 | 证据明文留在链下，File Resource policy 仍按资源层解释。 |
 
-Executor patch 绑定 selector 签名和 target stage。Resource patch 绑定 `resourceKey`、`manifestHash`、`policyHash`、`manifestURI`。两类 patch 不能混用字段；生产 profile 应拒绝 legacy `http`、`txcloud`、`plain_text` resource handle。
+Executor patch 绑定 selector 签名和 target stage。Resource patch 绑定 `resourceKey`、`manifestHash`、`policyHash`、`manifestURI`。两类 patch 使用不同字段；生产 profile 应拒绝 legacy `http`、`txcloud`、`plain_text` resource handle。
 
 ## 边界
 
 - selector 签名必须来自被授权的 selector，不来自 relayer。
 - patch 只影响单个 order 的 overlay，不修改 plan version。
-- active executor overlay 影响后续 signal authorization 检查，但不能伪造已经发生的 signal。
-- resource manifest 是句柄和 hash，不是证据明文。
-- patch workflow rows 可以被重建或审计，但不替代 contract event。
+- active executor overlay 影响后续 signal authorization 检查；已经发生的 signal 仍以事件为准。
+- resource manifest 是句柄和 hash，证据明文留在链下。
+- patch workflow rows 可以被重建或审计；contract event 是链上 proof。

@@ -1,6 +1,6 @@
 # Docking Sandbox
 
-Docking Sandbox 用来让凝结核试拼外部 Zhixu、supplier signal map、adapter workflow 或 executor integration。它是配置和验证工具，不是发布路径本身，也不是 Store admin 替凝结核治理 peer Zhixu。
+Docking Sandbox 用来让凝结核试拼外部秩序、supplier signal map、adapter workflow 或 executor integration。它负责配置验证、proof checklist 和 operator review 材料；正式发布和运行态对接继续走 Zhixu 发布、trust attestation、order registration、signal authorization 和 docking events。
 
 ## 可以做什么
 
@@ -13,21 +13,21 @@ Docking Sandbox 用来让凝结核试拼外部 Zhixu、supplier signal map、ada
 - 检查 peer Zhixu plan trust 和 supplier trust projection；
 - 生成 signalMap proof checklist。
 
-## 不能做什么
+## 正式路径交接
 
-- 不能发布正式 Zhixu。
-- 不能注册 plan。
-- 不能创建 order。
-- 不能创建 signal authorization。
-- 不能把 sandbox validation 说成 trust attestation。
-- 不能把 Store 保存的 relation metadata 说成凝结核已经完成内部治理。
+- 正式秩序发布进入 [Zhixu Catalog、配置与发布](zhixu-management.md)。
+- Plan 注册进入 trust attestation 和 `registerPlan()` 路径。
+- 订单创建进入 Product/registrar 的 `registerOrder()` 路径。
+- Signal 授权进入 order-level authorization 或 stage overlay 路径。
+- 运行态 peer order 对接进入 `linkDockedOrder` / `submitDockedSignal` 事件路径。
+- Sandbox validation 输出 review 材料和风险提示，trust 仍由 registry attestation 表达。
 
 ## 页面提示
 
-Docking 页面必须持续标注：
+Docking 页面必须持续提示：
 
 ```text
-试拼不等于发布。
+试拼完成后还要发布、背书、注册订单和提交链上 proof。
 ```
 
 正式发布仍要走 Zhixu 配置与发布、governance attestation、registerPlan/registerOrder 和 Product projection 路径。
@@ -51,5 +51,5 @@ Docking 页面必须持续标注：
 - `signalMap` 必须至少包含 `str` 和 `cmp`。
 - 同一个 `signalMap` 应引用同一个 linked source。
 - peer Zhixu 的 plan trust 要可见。
-- linked order lifecycle 不能只存在 Store DB；它必须能落到 state-machine events。
-- local order继续推进前，local order上必须出现授权 mapped signal。
+- linked order lifecycle 要能落到 state-machine events。
+- local order 继续推进前，local order 上必须出现授权 mapped signal 或 `DockedSignalSubmitted`。

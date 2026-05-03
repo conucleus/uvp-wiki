@@ -20,7 +20,7 @@ Notifications 和 Reconcile 是非可信执行层里的运行辅助系统。前�
 - supplier trust projection：供应商是否 active/revoked。
 - supplier contact profile：如何联系、通知偏好、负责人、可用时段。
 
-通知不能改变这些事实。delivery state 只能说明服务是否尝试发送、是否失败、是否进入 retry 或 dead-letter。
+通知派生自这些事实。delivery state 说明服务是否尝试发送、是否失败、是否进入 retry 或 dead-letter。
 
 ## Reconcile 代码入口
 
@@ -39,7 +39,7 @@ Reconcile 主要检查：
 
 ## 边界
 
-- 通知成功不是 signal submitted。
-- dead-letter 不是业务失败；业务失败要由 Zhixu/状态机语义表达。
-- reconcile 可以提示修复或重试，不能手工改写链上状态。
-- ops diagnostics 必须 redacted，不能泄露 private key、JWT secret、RPC secret 或 storage credential。
+- 通知成功是联系状态；signal submitted 看 state-machine event。
+- dead-letter 是通知状态；业务失败由秩序/状态机语义表达。
+- reconcile 可以提示修复或重试；链上状态只能由交易和事件改变。
+- ops diagnostics 必须 redacted，private key、JWT secret、RPC secret 或 storage credential 不进入输出。

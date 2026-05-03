@@ -1,26 +1,29 @@
 # 文档规则
 
-Wiki 的目标是让人读懂项目，不是制造第二套事实源。
+Wiki 的目标是让人读懂项目，并把源码、测试、ABI fixture、PRD 记录和 release evidence 整理成同一套阅读路径。协议事实仍以代码、链事件和可复跑证据为准。
 
 ## 写作原则
 
 - 先写读者要做什么，再链接到源码和 PRD。
+- 首次出现专有名词时用中文优先写法，例如“秩序 (Zhixu)”和“订单 (Order)”。
+- 每个核心对象页先写“是什么 / 谁使用 / 产生什么结果 / 权威来自哪里”，再写边界检查。
+- 少用“不是 A，而是 B”作为主解释结构；确实需要硬边界时，放到“边界检查”或 checklist。
 - 区分已实现、fixture/local demo、staging evidence、planned PRD。
-- 不把 PRD 计划写成已实现功能。
-- 不把 Store metadata、database row、relayer queue 写成协议事实。
-- 不把 funding、USDC、escrow、guarantee 写进 core protocol 边界。
-- 不暴露私钥、RPC secret、JWT secret、object storage credential。
+- PRD 计划按 planned/prototype 写，已实现功能需要代码、测试或 release evidence 支撑。
+- Store metadata、database row、relayer queue 写成读模型或 workflow 状态；协议事实写成 registry/state-machine event。
+- funding、USDC、escrow、guarantee 写在 adapter/periphery 边界内。
+- 私钥、RPC secret、JWT secret、object storage credential 只写 redacted 口径。
 
 ## 信息架构规则
 
 - `SUMMARY.md` 是唯一导航真相。新增页面后必须放进合适的一级栏目。
-- 一级栏目优先按工程读者路径划分：入门、核心概念、核心组件、秩序商店、执行者与集成、产品与执行面、本地/预发/发布、参考与证据、贡献规则。
+- 一级栏目优先按工程读者路径划分：入门、核心概念、核心组件、秩序商店、执行者与集成、产品语言与 DTO/API、本地/预发/发布、参考与证据、贡献规则。
 - `core` 负责“对象是什么”；`components` 负责“系统怎么实现”；`store` 负责“秩序商店怎么组织和校验真实世界对象”；`execution` 负责“执行者、adapter、AI/MCP、docked Zhixu 怎么接入和提交 signal”。
-- 同一个 Markdown 文件不要在 `SUMMARY.md` 里挂到多个一级目录。不同目录需要不同侧面时，新增侧面页；旧页可以通过正文链接引用。
-- `store` 页面写 Store 平台 workflow 和凝结核工作台，不要把 Store admin 写成 Zhixu 内部治理者。
-- 不把所有东西塞进 `concepts/`。Supplier、Executor、compiler、Store、Product API、Signal Container、release evidence 都是一级读者路径。
+- 同一个 Markdown 文件只在 `SUMMARY.md` 里挂到一个一级目录。不同目录需要不同侧面时，新增侧面页；旧页可以通过正文链接引用。
+- `store` 页面写 Store 平台 workflow 和凝结核工作台；Store admin 是平台 workflow 角色，凝结核是秩序内部治理者。
+- Supplier、Executor、compiler、Store、Product API、Signal Container、release evidence 都是一级读者路径，按读者入口分布。
 - 重排时先保留旧细页和旧链接，等新结构稳定后再合并重复内容。
-- `wiki/site/` 是可重建静态输出，不是编辑源。
+- `wiki/site/` 是可重建静态输出，编辑源在 Markdown。
 
 ## 文档放置
 
@@ -32,7 +35,7 @@ Wiki 的目标是让人读懂项目，不是制造第二套事实源。
 | 秩序商店入口 | `wiki/store/` |
 | 凝结核工作台 | `wiki/store/nucleation-workbench.md` |
 | 执行者与集成入口 | `wiki/execution/` |
-| 产品与执行面入口 | `wiki/product/` |
+| 产品语言与 DTO/API 入口 | `wiki/product/` |
 | 状态摘要 | `wiki/status/` |
 | 概念和架构细页 | `wiki/concepts/` |
 | 端到端教程 | `wiki/tutorials/` |
@@ -56,7 +59,7 @@ PRD 仍放在 `docs/product/`。Release record 仍放在 `uvp-deploy/deploy/rele
 改 Product API 时：
 
 - 更新 [Product API 参考](../reference/product-api.md)；
-- 更新 [产品与执行面](../product/README.md)；
+- 更新 [产品语言与 DTO/API](../product/README.md)；
 - 更新 Store/Order App/Executor Kit 相关任务文档；
 - 标明旧 route 是否只是 compatibility alias。
 
@@ -65,7 +68,7 @@ PRD 仍放在 `docs/product/`。Release record 仍放在 `uvp-deploy/deploy/rele
 - 更新 [秩序商店](../store/README.md)；
 - 更新 [凝结核工作台](../store/nucleation-workbench.md)；
 - 同步 [核心概念](../core/README.md) 中的对象边界；
-- 说明 Store metadata、平台标签、联系信息、通知状态、审核状态、履约记录视图不能替代链上事件或 trust-domain 背书；
+- 说明 Store metadata、平台标签、联系信息、通知状态、审核状态、履约记录视图属于读模型或 workflow，链上事件和 trust-domain 背书另行展示；
 - 说明凝结核内部治理、Store 平台 workflow、trust-domain 外部背书三者的边界。
 
 改 Executor / executor-kit / docked Zhixu 路径时：
@@ -73,7 +76,7 @@ PRD 仍放在 `docs/product/`。Release record 仍放在 `uvp-deploy/deploy/rele
 - 更新 [执行者与集成](../execution/README.md)；
 - 更新 [Executor](../concepts/core/executor.md)；
 - 更新 [Zhixu 作为 Executor](../execution/zhixu-as-executor.md)；
-- 说明 Product task、Store docking session、adapter job 不能替代链上 order/signal proof。
+- 说明 Product task、Store docking session、adapter job 是工作流索引，链上 order/signal/docking proof 另行展示。
 
 改 release/staging gate 时：
 
@@ -86,4 +89,4 @@ PRD 仍放在 `docs/product/`。Release record 仍放在 `uvp-deploy/deploy/rele
 
 - 说明它消费哪些 core interface；
 - 说明它不拥有哪些事实；
-- 不把 adapter event 当成 order/trust/funding source of truth。
+- adapter event 写成 adapter 侧事实，order/trust/funding source of truth 分别引用对应 core interface 或 periphery 合约。

@@ -1,6 +1,6 @@
 # 履约状态、Proof 与 Trust 校验
 
-Store 的履约视图把订单、任务、供应商参与、证据 hash 和链上 proof 组织给 operator 看。它是视图，不是事实源。
+Store 的履约视图把订单、任务、供应商参与、证据 hash 和链上 proof 组织给 operator 看。它是围绕链事件重建的视图，事实来源是 registry/state-machine events。
 
 ## 履约视图来源
 
@@ -37,10 +37,10 @@ Store 的履约视图把订单、任务、供应商参与、证据 hash 和链�
 | payload | payload hash、metadata hash、manifest hash，不含明文。 |
 | projection | Product task/order row 由哪个 event replay 得出。 |
 
-## Store 不能做什么
+## 展示边界
 
-- 不把 proof row 缺失解释成业务未发生，除非 indexer 已同步到足够高度。
-- 不把 notification delivered 当成 signal submitted。
-- 不把 Store note 或 operator review 当成业务完成。
-- 不把 local DB row 当成不可重建的权威记录。
-- 不把 linked order complete 当成 local order complete，除非local order上已有授权 mapped signal。
+- proof row 缺失要结合 indexer 同步高度解释。
+- notification delivered 是联系状态；signal submitted 看 `SignalSubmitted`。
+- Store note 或 operator review 是运营记录；业务完成看 signal/proof。
+- local DB row 是可重建读模型。
+- linked order complete 要通过 local order 上的授权 mapped signal 或 `DockedSignalSubmitted` 才能推动 local order。

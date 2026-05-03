@@ -20,7 +20,7 @@ hook-core
 
 - 说明它在组件链路中的上游和下游。
 - 说明它拥有的 public interface，例如 ABI、EIP-712、hash、DTO、CLI 或 release manifest。
-- 说明它绝对不能承担的职责，避免把 Store metadata、Product DB、periphery adapter 或 relayer 写成事实源。
+- 说明它的职责边界，避免把 Store metadata、Product DB、periphery adapter 或 relayer 写成事实源。
 - 给出读代码的入口，让工程师能从文档走到具体模块。
 
 ## 组件链路
@@ -34,9 +34,9 @@ hook-core
 | 服务与接口 | [服务与接口](services-and-interfaces.md) | protocol-bindings、Product DTO、Product API、Store API、executor-kit consumption 和 public interface drift。 |
 | 部署与证据 | [部署与证据](deploy-release.md) | uvp-deploy、Anvil/Base Sepolia、manifests、release evidence、staging gates。 |
 
-## 为什么不能只写状态机
+## 为什么还有其他核心组件
 
-`UVPStateMachine` 是链上事实源的核心，但不是唯一核心组件。没有 compiler，trust domain 背书的 plan hash 不可复现；没有 protocol-bindings，Product submit 和 stage patch typed data 会漂移；没有 replay oracle，chain-services 无法证明投影可重建；没有 deploy/release evidence，Base Sepolia claim 无法审计。因此状态机放在“核心组件 / 链上执行与 Replay”下，而不是放在“核心概念”对象列表里。
+`UVPStateMachine` 是链上事实源的核心，但核心组件还包括 compiler、protocol-bindings、replay oracle、chain-services 和 deploy/release evidence。compiler 让 trust domain 背书的 plan hash 可复现；protocol-bindings 固定 Product submit 和 stage patch typed data；replay oracle 证明投影可重建；deploy/release evidence 支撑 Base Sepolia claim。因此状态机放在“核心组件 / 链上执行与 Replay”下，核心概念页只解释 Signal、Hook、Order 等对象。
 
 ## 改动影响面
 

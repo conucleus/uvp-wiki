@@ -1,8 +1,8 @@
 # 公共接口
 
-`uvp-eth` 的公共接口不是只有 HTTP API。ABI、event、EIP-712、canonical hash、artifact schema、Product DTO、deployment manifest 和 release evidence 都会被其他模块或外部审计消费。
+`uvp-eth` 的公共接口包括 ABI、event、EIP-712、canonical hash、artifact schema、Product DTO、deployment manifest、HTTP API 和 release evidence。这些接口都会被其他模块或外部审计消费。
 
-改这些内容时，应当按协议边界处理，而不是按普通重构处理。
+改这些内容时，应当按协议边界处理，并同步 fixture、消费者、参考文档和 release 口径。
 
 ## 接口地图
 
@@ -34,13 +34,13 @@ wiki reference pages
 release record or PRD trace
 ```
 
-## 不能伪装成接口的内容
+## 非接口状态
 
-- Store metadata 不是 trust registry attestation。
-- Product BFF database 不是 plan/order/signal/hook 的 source of truth。
-- Relayer 配置不是业务授权。
-- Demo fallback、fixture catalog、mock frontend mode 不是 chain-backed Product claim。
-- Funding、USDC、escrow、guarantee、settlement adapter 不是 core protocol state，除非通过明确的 signal/event boundary 被状态机消费。
+- Store metadata 是平台 workflow/材料状态；trust registry attestation 是链上背书接口。
+- Product BFF database 是可重建读模型；plan/order/signal/hook 的 source of truth 是链上事件。
+- Relayer 配置是广播配置；业务授权来自 order authorization 和签名。
+- Demo fallback、fixture catalog、mock frontend mode 只能支撑 demo 或测试口径。
+- Funding、USDC、escrow、guarantee、settlement adapter 属于 adapter/periphery；进入 core 语义必须有明确 signal/event boundary。
 
 ## 相关参考
 

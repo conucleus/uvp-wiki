@@ -1,6 +1,6 @@
 # 联系与通知
 
-Store 可以维护联系和通知工作流，因为真实履约需要找到人、系统或 adapter。但联系与通知只是 operational workflow，不是链上业务动作。
+Store 可以维护联系和通知工作流，因为真实履约需要找到人、系统或 adapter。联系与通知属于 operational workflow；链上业务动作由授权 signal 表达。
 
 ## 可组织的信息
 
@@ -17,7 +17,7 @@ Store 可以维护联系和通知工作流，因为真实履约需要找到人�
 - 通知状态只能说明 Store/chain-services 是否尝试联系或提醒。
 - 业务完成必须由授权 submitter 的链上 signal 表示。
 - 联系方式、凭证、私密 note、证件、合同、invoice、evidence plaintext 不应上链。
-- 对 docked Zhixu 的通知只表示“linked Zhixu执行方已被提醒或 adapter 已被调用”，不表示linked order已经注册或完成。
+- 对 docked Zhixu 的通知表示“linked 秩序执行方已被提醒或 adapter 已被调用”；linked order 注册、完成和映射回填看链上 proof。
 
 ## 与 chain-services 的关系
 
@@ -25,7 +25,7 @@ chain-services 可以派生 supplier delivery intents，并保存 retryable oper
 
 ## 通知状态建议
 
-| 状态 | 含义 | 不能推导 |
+| 状态 | 含义 | 推进订单还需要 |
 | --- | --- | --- |
 | `pending` | 已生成 delivery intent，尚未发送。 | 任务已开始。 |
 | `sent` | Store/chain-services 尝试发送成功。 | 对方已执行。 |

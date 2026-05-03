@@ -1,6 +1,6 @@
 # Stage Patch 授权
 
-Stage patch 不是普通业务 signal，但它仍复用订单级授权。这样运行时选择执行者或资源时，仍然遵守同一套 source/signal/submitter 权限模型。
+Stage patch 是订单运行时的受控变更动作，用来选择执行者或资源 manifest。它复用订单级授权，因此仍遵守同一套 source/signal/submitter 权限模型。
 
 ## 内部 Signal
 
@@ -21,7 +21,7 @@ sourceId = keccak256(stageId)
 
 ## Selector Binding
 
-Patch 不是任意 stage 都能发起。计划里必须存在 stage-to-target binding
+Patch 由计划中的 stage-to-target binding 控制
 （wire/API 字段名仍是 selector binding）：
 
 ```text
@@ -38,7 +38,7 @@ Executor patch 可以做 assign、handoff、replacement 等动作。合约会检
 
 ## Resource Patch
 
-Resource patch 保存的是资源 manifest、policy、patch 的哈希和 URI。它不保存文件明文，也不能在目标业务 signal 已经提交后再覆盖资源。
+Resource patch 保存的是资源 manifest、policy、patch 的哈希和 URI。文件明文留在链下；目标业务 signal 已经提交后，资源覆盖应被合约拒绝。
 
 ## 为什么它属于授权体系
 

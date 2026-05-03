@@ -13,7 +13,7 @@ Supplier 是能力主体和 trust subject；Executor 是运行时绑定和 signa
 
 ## Executor 怎么被选出来
 
-Executor 不是从后端表里“生效”的。产品路径通常是：
+Executor 的生效路径通常是：
 
 ```text
 Supplier 在秩序商店注册
@@ -29,7 +29,7 @@ Store 给凝结核和 operator 提供候选网络、联系能力和 proof 材料
 
 ## 静态 Executor
 
-Zhixu DSL 的 `executor` 是计划里的静态默认配置。它表达“这个 stage 预期由哪类主体承接”，但不等于当前订单已经授权某个钱包。
+秩序 DSL 的 `executor` 是计划里的静态默认配置。它表达“这个 stage 预期由哪类主体承接”。当前订单的钱包提交权由 order authorization 和 active executor overlay 决定。
 
 ```yaml
 executor:
@@ -41,7 +41,7 @@ executor:
 
 ## 动态 Active Executor
 
-某些 stage 不是在 Plan 里写死 executor，而是由带有 `stage_executor_patch` 能力的 control stage 在订单运行中选择。control stage 必须在 `selectedStages` 里被授权选择目标 stage。
+某些 stage 的 executor 在订单运行中由带有 `stage_executor_patch` 能力的 control stage 选择。control stage 必须在 `selectedStages` 里被授权选择目标 stage。
 
 ```yaml
 selectedStages:
@@ -88,10 +88,11 @@ executor:
 2. `supplierID` 指向 Store/Trust Registry 可以识别的 peer Zhixu 或其 supplier subject。
 3. `signalMap` 声明 local stage 如何等待或解释 linked Zhixu 输出信号。
 4. 编译器会为 `signalMap` 生成 `kind=signalMap` hook，`str` 和 `cmp` 必须存在，且同一个 signalMap 必须引用同一个 source。
-5. linked Zhixu 的创建、通知、proof 校验和 local signal 桥接由 Store/Product/adapter/executor-kit 工作流完成。
-6. local order 和 linked order 各自以自己的 `UVPStateMachine` 事件为事实源。
+5. linked 秩序的创建、通知、proof 校验和 local signal 映射由 Store/Product/adapter/executor-kit 工作流组织。
+6. 运行态对接可以落到 `linkDockedOrder`、`DockedOrderLinked`、`DockedSignalMapped`、`submitDockedSignal`、`DockedSignalSubmitted`。
+7. local order 和 linked order 各自以自己的 `UVPStateMachine` 事件为事实源。
 
-Docked Zhixu 的工程模型是：linked Zhixu 独立运行，Store/Product 或 adapter 观察 linked proof，再由被授权的 submitter 把映射后的 signal 提交回 local order。这个桥接动作留下链上 signal proof。
+Docked Zhixu 的工程模型是：linked 秩序独立运行，Store/Product 或 adapter 观察 linked proof，再用链上 docking link 和授权 signal 映射推动 local order。这个桥接动作留下 local order 上的 signal proof。
 
 ## Docked Zhixu 的运行时路径
 
@@ -102,17 +103,17 @@ local order 某个 trigger hook Ready
   -> Product/adapter 注册或定位 linked order
   -> linked order 按自己的 Plan、授权、executor 执行
   -> linked order 产生 str/cmp/err proof
-  -> adapter 校验 proof 和 signalMap
-  -> 授权 submitter 向 local order 提交映射后的 signal
+  -> adapter 或 Product workflow 校验 proof 和 signalMap
+  -> linkDockedOrder / submitDockedSignal 或授权 submitter 映射 local signal
   -> local order 对应 hook Ready / Cancelled / next stage
 ```
 
 这里可以出现两个编号体系：
 
 - 链上 local `orderId` 和 linked `orderId` 由各自的 `registerOrder()` 产生或绑定。
-- Product task、Store docking session、adapter job 可以有自己的执行编号，但这些编号只是工作流索引，不能替代链上 order/signal proof。
+- Product task、Store docking session、adapter job 可以有自己的执行编号；运行态 proof 仍回到链上 order/signal/docking events。
 
-## signalMap 不是普通回调
+## signalMap 的协议含义
 
 `signalMap` 是 local stage 接受 linked Zhixu 输出的语义契约。
 

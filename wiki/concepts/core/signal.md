@@ -44,11 +44,11 @@ signalId = keccak256(signalName)
 signalKey = keccak256(abi.encode(sourceId, signalId))
 ```
 
-`source` 表示动作来源，例如某个角色、供应商、系统入口或 stage source。`signalName` 表示具体动作名。合约最终按 `signalKey` 去重和查依赖。
+`source` 表示因果语境，也就是这个动作被放进哪条可追踪链路里。角色、供应商或系统入口可以是提交者或业务解释的一部分，但链上 signal key 由 `source` 和 `signalName` 决定。`signalName` 表示具体动作名，合约最终按 `signalKey` 去重和查依赖。
 
 ## 常见 Signal 名称约定
 
-`str`、`cmp`、`err`、`cxl`、`pass`、`fail` 不是神奇保留字，而是当前 DSL 和产品语义里常见的 signal 约定：
+`str`、`cmp`、`err`、`cxl`、`pass`、`fail` 是当前 DSL 和产品语义里常见的 signal 约定：
 
 | 名称 | 常见含义 |
 | --- | --- |
@@ -84,7 +84,7 @@ signalKey = keccak256(abi.encode(sourceId, signalId))
 
 这条边界很重要：链提供可验证顺序和权限，不提供业务文件存储。
 
-## 授权不是展示字段
+## 授权是链上检查项
 
 Product API 可以把某个任务显示给某个参与方，但最终能否提交仍由合约检查：
 
@@ -94,6 +94,6 @@ orderId + signalKey + submitter
 
 如果没有对应的 `SignalSubmitterAuthorized` 记录，即使 UI 显示了按钮，合约也会拒绝提交。
 
-## Signal 是因果输入，不是业务全文
+## Signal 的协议边界
 
-一个 signal 只表示“某个授权动作发生了”。它不把供应商内部工作流、采购过程、融资过程或 AI 推理过程搬到 UVP 核心里。那些内部过程可以在 evidence、metadata URI 或 supplier 系统里保存；UVP 核心只验证标准边界：授权、签名、payload hash、事件证明。
+一个 signal 表示“某个授权动作发生了”。供应商内部工作流、采购过程、融资过程或 AI 推理过程可以在 evidence、metadata URI 或 supplier 系统里保存；UVP 核心验证标准边界：授权、签名、payload hash、事件证明。

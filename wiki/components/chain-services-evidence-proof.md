@@ -1,6 +1,6 @@
 # Evidence、Proof 与 File Resource
 
-Evidence 和 proof 子系统处理链下材料的句柄、hash、metadata 和证明视图。它帮助 Product UI、Store、审计方和执行者确认“某个材料和某个链上事件是否对得上”，但不判断业务是否完成。
+Evidence 和 proof 子系统处理链下材料的句柄、hash、metadata 和证明视图。它帮助 Product UI、Store、审计方和执行者确认“某个材料和某个链上事件是否对得上”。业务完成仍看状态机 signal/hook proof。
 
 ## 代码入口
 
@@ -18,7 +18,7 @@ Evidence 和 proof 子系统处理链下材料的句柄、hash、metadata 和证
 
 ## File Resource 是句柄
 
-File Resource 不是“真实文件上链”。它是一个可验证的资源引用：
+File Resource 是一个可验证的资源引用：
 
 ```text
 file resource handle
@@ -27,7 +27,7 @@ file resource handle
   -> chain event proof row
 ```
 
-常见形态是链下对象存储：S3、R2、私有对象存储或本地 rehearsal adapter。也可以设计成链上存储，但那是不同 `fileType` 和成本模型，不应该把默认对象存储写成链上明文。
+常见形态是链下对象存储：S3、R2、私有对象存储或本地 rehearsal adapter。也可以设计成链上存储，但那是不同 `fileType` 和成本模型；默认对象存储口径写成链下句柄。
 
 ## Proof verifier 做什么
 
@@ -36,12 +36,12 @@ file resource handle
 - 检查 Zhixu hash / plan hash 是否和当前版本对齐。
 - 把 mismatch 以 UI/API 能展示的形式报告出来。
 
-Proof verifier 不做这些事：
+Proof verifier 的边界：
 
-- 不判断一票货是否真的送达。
-- 不替 trust domain 判定供应商可信。
-- 不因为 object handle 可访问就生成 `SignalSubmitted`。
-- 不因为 hash 对齐就宣布 hook ready；hook ready 来自状态机事件。
+- 货物是否真的送达由业务参与方、证据和争议/审查体系判断。
+- 供应商可信由 trust domain attestation 表达。
+- object handle 可访问性不能生成 `SignalSubmitted`。
+- hash 对齐是证明条件；hook ready 来自状态机事件。
 
 ## 证据明文边界
 

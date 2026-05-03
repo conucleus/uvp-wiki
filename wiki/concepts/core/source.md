@@ -1,6 +1,6 @@
 # Source 因果链
 
-`source` 是 signal 的因果语境。它不是“谁点了按钮”，也不是“谁付款”，而是把一串 signal 放进同一条可追踪的因果链里。Hook 表达式写成 `source::condition`，condition 里的 signal 默认都在这个 source 下解释。
+`source` 是 signal 的因果语境，也就是一串 signal 所在的可追踪因果链。Hook 表达式写成 `source::condition`，condition 里的 signal 默认都在这个 source 下解释。
 
 Source 的核心价值是表达三件事：
 
@@ -8,9 +8,9 @@ Source 的核心价值是表达三件事：
 - 分叉：一个输入或决策拆成多条后续链路。
 - 交汇：原本独立的链路在某个事件之后形成新的共同链路。
 
-## 不是角色，也不是订单归属
+## Source 回答什么问题
 
-Source 不回答“这是谁的订单”。它回答“这个 signal 属于哪条因果线”。同一个钱包可以在多个 source 上提交 signal；同一个 supplier 也可以参与多个 source；一个 Order 内也可以有多个 source。
+Source 回答“这个 signal 属于哪条因果线”。同一个钱包可以在多个 source 上提交 signal；同一个 supplier 也可以参与多个 source；一个 Order 内也可以有多个 source。
 
 ```text
 sourceId = keccak256(source)
@@ -18,7 +18,7 @@ signalId = keccak256(signalName)
 signalKey = keccak256(abi.encode(sourceId, signalId))
 ```
 
-链上授权、signal 去重和 hook dependency 都围绕 `signalKey` 发生。因此 `seller::pack.cmp` 和 `buyer::pack.cmp` 即使 signalName 相同，也不是同一个业务事实。
+链上授权、signal 去重和 hook dependency 都围绕 `signalKey` 发生。因此 `seller::pack.cmp` 和 `buyer::pack.cmp` 即使 signalName 相同，也属于两个不同的业务事实。
 
 ## 同源串联
 
@@ -41,7 +41,7 @@ quote_compare:
     RFQ_SENT: sourcing::source.rfq.cmp
 ```
 
-这里不是三个数据库状态，而是一条寻源因果链：intake 完成后才能 market scan，market scan 完成后才能 RFQ，RFQ 完成后才能 quote compare。
+这里表达的是一条寻源因果链：intake 完成后才能 market scan，market scan 完成后才能 RFQ，RFQ 完成后才能 quote compare。
 
 ## 异源交汇：成交后产生新的 Source
 
@@ -59,7 +59,7 @@ quote_compare:
 - 收货地址、验收标准、采购申请；
 - 选择物流偏好或付款路径。
 
-在成交前，卖方不一定要卖给这个买方，买方也不一定必须买这个卖方。两边的准备都是真实因果链，但不能把它们提前写成同一个订单的共同状态。
+在成交前，卖方和买方各自准备，形成两条真实因果链。成交发生后，再产生新的共同履约 source 或新的订单实例。
 
 成交发生后，应该产生新的 source 或新的 order instance，例如 `trade` / `deal` / `fulfillment`：
 
@@ -74,7 +74,7 @@ buyer-prep source
        -> acceptance
 ```
 
-交汇后的订单不能再说“属于卖方 source”或“属于买方 source”。它是一个新的共同履约因果链，里面可以继续包含物流、派送、验收、售后或争议处理。
+交汇后的订单进入新的共同履约因果链，里面可以继续包含物流、派送、验收、售后或争议处理。
 
 当前 hook DSL 的表达式是单个 `source::condition`。如果某个 stage 的 `source` 是 `supply`，但它等待 `payment::...`，这表示 supply 链上的阶段依赖 payment 链的结果：
 
@@ -85,7 +85,7 @@ procurement_execution:
     SUPPLIER_FUNDED: payment::master.supplier_usdc_direct.cmp | master.supplier_settlement_exec.cmp
 ```
 
-这是一种交汇点：采购执行阶段属于 supply source，但它必须等 payment source 的付款结果。更复杂的动态多方撮合，应该通过新的 source、docked linked order 或 Store/Product workflow 来表达，不要把成交后的共同履约强塞回卖方或买方 source。
+这是一种交汇点：采购执行阶段属于 supply source，但它必须等 payment source 的付款结果。更复杂的动态多方撮合，通常通过新的 source、docked linked order 或 Store/Product workflow 表达。
 
 ## 分叉：石油分馏
 
@@ -119,7 +119,7 @@ collector_intake
        -> payment settlement
 ```
 
-如果农户数量在 Plan 里是固定的，可以显式写成多个 branch source。如果农户数量是运行时动态的，更适合把每个农户采收包装建成 docked linked order 或子 Zhixu，再由收购商 order 通过 proof 和 signalMap 归拢。不要为了动态农户列表在一个静态 Plan 里制造不可审计的任意 source。
+如果农户数量在 Plan 里是固定的，可以显式写成多个 branch source。如果农户数量是运行时动态的，更适合把每个农户采收包装建成 docked linked order 或子秩序，再由收购商 order 通过 proof 和 signalMap 归拢。
 
 ## 跨境供货里的 Source
 
@@ -137,12 +137,12 @@ collector_intake
 | `buyer` | 买方承诺和最终接受。 |
 | `coordinator` | 异常协调和关闭。 |
 
-这些 source 不是部门表，而是同一个主订单里不同因果链的命名空间。某些 stage 会让它们交汇，例如采购等支付、物流等采购、现场安装等物流。
+这些 source 是同一个主订单里不同因果链的命名空间。某些 stage 会让它们交汇，例如采购等支付、物流等采购、现场安装等物流。
 
-## 常见误解
+## 边界检查
 
-- Source 不是 role slot。买家、卖家、物流商都可以在不同 source 中提交 signal。
-- Source 不是 executor。executor 是订单运行时的执行者或 submitter。
-- Source 不是 supplier。supplier 是被 Store 和 trust registry 组织、背书的能力主体。
-- Source 不是“订单归属”。成交后的履约可以形成新的 source 或新的 order。
-- Source 不是任意动态字段。需要可编译、可授权、可重放。
+- Role slot 描述参与角色；Source 描述因果链。
+- Executor 描述订单运行时的执行者或 submitter；Source 描述 signal 语境。
+- Supplier 是被 Store 和 trust registry 组织、背书的能力主体；Source 是 hook/signal 的命名空间。
+- 成交后的履约可以形成新的 source 或新的 order。
+- Source 需要可编译、可授权、可重放，不能作为任意动态字段使用。

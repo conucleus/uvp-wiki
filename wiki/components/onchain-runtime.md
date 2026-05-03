@@ -33,7 +33,7 @@ ZhixuTrustRegistry attests plan/supplier
 | [Stage Overlay](../concepts/state-machine/stage-overlay.md) | executor/resource patch 如何影响单个订单而不改 Plan。 |
 | [事件 Replay](../concepts/state-machine/replay.md) | reference reducer 如何从链事件复算状态。 |
 
-## 状态机不是普通概念页
+## 状态机所在层级
 
 状态机是核心组件：它是链上执行环境和事件源的一部分。核心概念页可以解释 Signal、Hook、Order 这些对象，但状态机本身应该和 contracts、registries、replay oracle、非可信执行层投影放在同一条组件链路里。
 
@@ -46,10 +46,10 @@ ZhixuTrustRegistry attests plan/supplier
 - `StageExecutorPatchApplied` / `StageExecutorActivated` 只改变单个订单的 target stage executor，不改 Plan。
 - `StageResourcePatchApplied` 只改变单个订单的 resource reference，不应与 executor patch 混用。
 
-## 不能替代链上执行的东西
+## 运行时边界
 
-- 非可信执行层 projection 不能创造 signal 或 hook truth。
-- Store review 不能让 plan 或 supplier 变成 attested。
-- Relayer 不能生成业务签名。
-- Runtime-host 只是 reference harness，不是 ETH runtime authority。
-- Docking relation metadata 不能让local order自动继续；local order必须收到授权 mapped signal。
+- 非可信执行层 projection 从事件重建 signal 和 hook truth。
+- Store review 进入 workflow/audit；plan/supplier attestation 来自 trust registry。
+- Relayer 广播已签名交易；业务签名来自授权参与方。
+- Runtime-host 是 reference harness；ETH runtime authority 是部署的合约。
+- Docking relation metadata 组织 workflow；local order 继续推进需要授权 mapped signal 或 `DockedSignalSubmitted`。

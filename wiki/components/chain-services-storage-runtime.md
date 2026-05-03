@@ -1,6 +1,6 @@
 # Storage、Migration 与 Runtime Profile
 
-Storage 是非可信执行层的工作流和投影缓存，不是协议数据库。Chain Services 支持 memory、SQLite 和 PostgreSQL；不同 profile 只影响运行可靠性，不改变事实源。
+Storage 是非可信执行层的工作流和投影缓存。Chain Services 支持 memory、SQLite 和 PostgreSQL；不同 profile 只影响运行可靠性，不改变事实源。
 
 ## Storage profile
 
@@ -12,7 +12,7 @@ CHAIN_SERVICES_MIGRATIONS_AUTO_RUN=false
 
 | Profile | 用途 | 约束 |
 | --- | --- | --- |
-| memory | 单元测试、临时 prototype。 | 不能用于 staging/production claim。 |
+| memory | 单元测试、临时 prototype。 | 只支撑 test/prototype 口径。 |
 | SQLite | 本地 durable run、开发者自测。 | 适合个人 fork，不适合公共测试网服务。 |
 | PostgreSQL | Base Sepolia staging、长期服务、生产 profile。 | migration 显式管理，runtime fail-closed。 |
 
@@ -52,11 +52,11 @@ Base Sepolia / testnet profile 必须拒绝：
 - 缺失 `UVPStateMachine` / `ZhixuTrustRegistry` address manifest。
 - broadcast 关闭但仍声明 staging ready。
 
-Readiness 可以说明“这个服务实例是否按正确配置运行”，但不能替代链上 plan/order/signal/trust 事实。
+Readiness 可以说明“这个服务实例是否按正确配置运行”；链上 plan/order/signal/trust 事实仍来自事件。
 
 ## 边界
 
 - 所有 projection 数据必须可擦除重建。
 - Store draft、supplier metadata、audit 和 notification delivery 是 workflow state。
-- PostgreSQL durable 不等于 canonical。
+- PostgreSQL durable 是运行可靠性，不是 canonical truth。
 - diagnostics 和 audit output 必须 redacted。
