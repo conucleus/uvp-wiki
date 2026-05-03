@@ -1,0 +1,348 @@
+:root {
+  color-scheme: light;
+  --bg: #f6f7f9;
+  --panel: #ffffff;
+  --panel-muted: #f0f3f6;
+  --text: #1d2733;
+  --muted: #647386;
+  --line: #d7dde5;
+  --line-strong: #c5ced9;
+  --brand: #1267a8;
+  --brand-dark: #0c4f82;
+  --code-bg: #0e1726;
+  --code-text: #edf4ff;
+  --table-head: #eef3f8;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+  color: var(--text);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+a {
+  color: var(--brand);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--brand-dark);
+  text-decoration: underline;
+}
+
+.site-shell {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.site-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  border-right: 1px solid var(--line);
+  background: #fbfcfd;
+  padding: 22px 18px 28px;
+}
+
+.brand {
+  display: block;
+  color: var(--text);
+  margin-bottom: 18px;
+}
+
+.brand-title {
+  display: block;
+  font-size: 21px;
+  font-weight: 760;
+  letter-spacing: 0;
+}
+
+.brand-subtitle {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.nav-section {
+  margin-top: 18px;
+}
+
+.nav-section-title {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 720;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0 0 7px;
+}
+
+.nav-link {
+  display: block;
+  border-radius: 6px;
+  color: #334155;
+  font-size: 14px;
+  line-height: 1.35;
+  padding: 7px 9px;
+}
+
+.nav-link:hover {
+  background: var(--panel-muted);
+  text-decoration: none;
+}
+
+.nav-link.active {
+  background: #e6f1fa;
+  color: var(--brand-dark);
+  font-weight: 680;
+}
+
+.nav-group {
+  margin: 1px 0;
+}
+
+.nav-group-summary {
+  align-items: center;
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr);
+  list-style: none;
+}
+
+.nav-group-summary::-webkit-details-marker {
+  display: none;
+}
+
+.nav-group-summary::before {
+  color: #7a8a9c;
+  content: "›";
+  font-size: 17px;
+  line-height: 1;
+  transform: rotate(0deg);
+  transition: transform 120ms ease;
+}
+
+.nav-group[open] > .nav-group-summary::before {
+  transform: rotate(90deg);
+}
+
+.nav-group-summary .nav-link {
+  min-width: 0;
+  padding-left: 4px;
+}
+
+.nav-parent {
+  font-weight: 590;
+}
+
+.nav-children {
+  border-left: 1px solid var(--line);
+  margin: 1px 0 5px 7px;
+  padding-left: 8px;
+}
+
+.nav-depth-1 {
+  font-size: 13.5px;
+}
+
+.nav-depth-2,
+.nav-depth-3 {
+  font-size: 13px;
+}
+
+.site-main {
+  min-width: 0;
+  padding: 34px 44px 80px;
+}
+
+.doc-card {
+  max-width: 980px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 10px 28px rgba(28, 45, 67, 0.06);
+  padding: 42px 54px 58px;
+}
+
+.doc-meta {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 18px;
+}
+
+.doc-content {
+  font-size: 16px;
+  line-height: 1.72;
+}
+
+.doc-content h1,
+.doc-content h2,
+.doc-content h3,
+.doc-content h4 {
+  color: #142033;
+  letter-spacing: 0;
+  line-height: 1.26;
+}
+
+.doc-content h1 {
+  font-size: 38px;
+  margin: 0 0 22px;
+}
+
+.doc-content h2 {
+  border-top: 1px solid var(--line);
+  font-size: 25px;
+  margin: 34px 0 14px;
+  padding-top: 26px;
+}
+
+.doc-content h3 {
+  font-size: 19px;
+  margin: 26px 0 10px;
+}
+
+.doc-content h4 {
+  font-size: 16px;
+  margin: 22px 0 8px;
+}
+
+.doc-content p {
+  margin: 0 0 16px;
+}
+
+.doc-content ul,
+.doc-content ol {
+  margin: 0 0 18px 24px;
+  padding: 0;
+}
+
+.doc-content li {
+  margin: 5px 0;
+}
+
+.doc-content code {
+  background: #eef2f6;
+  border: 1px solid #dbe3ec;
+  border-radius: 5px;
+  color: #1f334a;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.88em;
+  padding: 0.1em 0.32em;
+}
+
+.code-block {
+  background: var(--code-bg);
+  border-radius: 8px;
+  color: var(--code-text);
+  overflow-x: auto;
+  padding: 16px 18px;
+  margin: 18px 0 22px;
+}
+
+.code-block code {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  display: block;
+  font-size: 14px;
+  line-height: 1.55;
+  padding: 0;
+}
+
+.mermaid-block {
+  background: #f3f7fb;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: #26364a;
+  overflow-x: auto;
+  padding: 16px 18px;
+  margin: 18px 0 22px;
+}
+
+.doc-content table {
+  border-collapse: collapse;
+  display: block;
+  margin: 18px 0 24px;
+  overflow-x: auto;
+  width: 100%;
+}
+
+.doc-content th,
+.doc-content td {
+  border: 1px solid var(--line);
+  min-width: 120px;
+  padding: 9px 11px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.doc-content th {
+  background: var(--table-head);
+  font-weight: 720;
+}
+
+.doc-content blockquote {
+  border-left: 4px solid var(--line-strong);
+  color: var(--muted);
+  margin: 18px 0;
+  padding: 2px 0 2px 16px;
+}
+
+.page-footer {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 34px;
+}
+
+.mobile-header {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .site-shell {
+    display: block;
+  }
+
+  .mobile-header {
+    align-items: center;
+    background: #fbfcfd;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    padding: 14px 18px;
+  }
+
+  .mobile-title {
+    font-size: 17px;
+    font-weight: 760;
+  }
+
+  .site-sidebar {
+    height: auto;
+    max-height: 48vh;
+    position: static;
+  }
+
+  .site-main {
+    padding: 20px 14px 48px;
+  }
+
+  .doc-card {
+    border-radius: 8px;
+    padding: 28px 22px 36px;
+  }
+
+  .doc-content h1 {
+    font-size: 30px;
+  }
+}

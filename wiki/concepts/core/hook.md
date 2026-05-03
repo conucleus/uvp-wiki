@@ -1,0 +1,75 @@
+# Hook
+
+Hook 是状态机判断“某个阶段条件是否成立”的最小规则。Zhixu stage 的 `receiveSignals` 每一项通常都会编译成一个 `kind=receive` hook；如果 stage 对接另一条 Zhixu，`signalMap` 还会编译成 `kind=signalMap` hook。
+
+Hook 本身只是条件。只有被标记为 [Trigger](trigger.md) 的 hook Ready 时，链上才会发出 `HookReady`，Product/Store 才应该把它投影成正式可执行任务。
+
+## Hook 表达式
+
+Hook 表达式不是任意 JSON。`parseHookExpression()` 要求表达式有 source 和 condition：
+
+```text
+source::condition
+```
+
+例如：
+
+```text
+buyer::(task.pay.cmp +5s) & ~task.pay.refund
+```
+
+这句话表示：来自 `buyer` 的 `task.pay.cmp` signal 出现后等待 5 秒，并且 `task.pay.refund` 没有出现，条件才成立。
+
+## 支持的 AST 节点
+
+解析后的节点类型只有这些：
+
+| 节点 | 含义 |
+| --- | --- |
+| `signal` | 等待某个 `task.stage.signal` 出现。 |
+| `external` | 外部条件占位，必须由适配器或后续实现解释。 |
+| `not` | 负条件，表示内部条件出现时取消。 |
+| `and` | 多个条件都满足。 |
+| `or` | 任一分支满足。 |
+| `delay` | 某个正向锚点出现后等待一段时间。 |
+
+解析器会拒绝没有正向锚点的条件，也会拒绝 `OR` 中没有正向锚点的分支。纯负条件例如 `buyer::~task.cancel.cmp` 不能成为 hook，因为状态机需要知道从哪个正向事件开始等待或判断。
+
+## HookPlan 里保存什么
+
+编译器为每个 `receiveSignals` 生成一个 hook；如果 executor 是 `supplierType=zhixu`，还会为 `signalMap` 生成额外 hook。当前实现里，`signalMap` hook 的 `trigger=false`，它们用于解释 docked Zhixu 的输出关系，不直接变成 Product task。
+
+可读 hook 通常包含：
+
+| 字段 | 含义 |
+| --- | --- |
+| `hookId` | 平台中立字符串，形如 `stageIdentifier#hookName`。 |
+| `kind` | `receive` 或 `signalMap`。 |
+| `stageIdentifier` | 这个 hook 属于哪个 stage。 |
+| `hookName` | hook 名称，常来自 receive signal 或 signal map。 |
+| `trigger` | 是否在 Ready 时发出 `HookReady`。 |
+| `rawExpression` | 原始表达式。 |
+| `normalizedExpression` | 编译器规范化后的表达式。 |
+| `ast` | hook 条件 AST。 |
+| `dependencies` | 依赖的 source/signal/timer。 |
+| `route` | executor 或 dispatch 相关路由信息。 |
+
+## Trigger 的含义
+
+不是所有 hook Ready 都会变成任务。只有 `trigger=true` 的 hook 在合约里第一次变成 `Ready` 时会发出 `HookReady`。Product 任务创建、Store 通知和 executor-kit watcher 都应该跟随 `HookReady`，而不是跟随 UI 草稿或后端临时状态。
+
+详细语义见 [Trigger](trigger.md)。
+
+## Hook 和 HookPlan 的关系
+
+Hook 是单个条件；HookPlan 是某个 Zhixu 编译后所有 hook、依赖索引、executor routes 和 selector bindings 的集合。
+
+```text
+Zhixu stage.receiveSignals
+  -> Hook
+  -> HookPlanArtifact
+  -> OnchainHookPlanArtifact
+  -> UVPStateMachine.StoredHook
+```
+
+普通用户不应该直接读 HookPlan。HookPlan 是工程和审计材料，Product DTO 应把它翻译成“任务何时出现、谁能提交、需要什么证据、 proof 在哪里”。
