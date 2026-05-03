@@ -6,7 +6,7 @@ Hook 本身只是条件。只有被标记为 [Trigger](trigger.md) 的 hook Read
 
 ## Hook 表达式
 
-Hook 表达式不是任意 JSON。`parseHookExpression()` 要求表达式有 source 和 condition：
+Hook 表达式使用 `source::condition` 形式。`parseHookExpression()` 要求表达式有 source 和 condition：
 
 ```text
 source::condition
@@ -56,7 +56,7 @@ buyer::(task.pay.cmp +5s) & ~task.pay.refund
 
 ## Trigger 的含义
 
-不是所有 hook Ready 都会变成任务。只有 `trigger=true` 的 hook 在合约里第一次变成 `Ready` 时会发出 `HookReady`。Product 任务创建、Store 通知和 executor-kit watcher 都应该跟随 `HookReady`，而不是跟随 UI 草稿或后端临时状态。
+只有 `trigger=true` 的 hook 在合约里第一次变成 `Ready` 时会发出 `HookReady`。Product 任务创建、Store 通知和 executor-kit watcher 都应该跟随 `HookReady`，UI 草稿或后端临时状态只用于辅助展示。
 
 详细语义见 [Trigger](trigger.md)。
 

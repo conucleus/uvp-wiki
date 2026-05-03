@@ -1,8 +1,8 @@
-# Zhixu DSL
+# 秩序 (Zhixu) DSL
 
-Zhixu 是凝结核设计出的静态秩序定义。它不是订单，不是链上合约，也不是 Store 里的产品卡片。它是一份 DSL，用来声明一类可复用的生产关系：有哪些任务模式、每个任务有哪些阶段、阶段在哪条 source 因果链上、接收什么 signal、发出什么 signal、默认 supplier 是谁、哪些阶段能为其他阶段选择 executor、需要哪些资源。
+`Zhixu` 是“秩序”的拼音。在本仓库里，秩序 (Zhixu) 是凝结核设计出的静态协作定义。它用 DSL 声明一类可复用的生产关系：有哪些任务模式、每个任务有哪些阶段、阶段在哪条 source 因果链上、接收什么 signal、发出什么 signal、默认 supplier 是谁、哪些阶段能为其他阶段选择 executor、需要哪些资源。
 
-代码入口是 `uvp-protocol/packages/compiler/src/types/index.ts` 的 `ZhixuDefinition`。
+代码入口是 `uvp-protocol/packages/compiler/src/types/index.ts` 的 `ZhixuDefinition`。订单 (Order) 是这份静态定义编译、注册之后的一次运行实例。
 
 ## 最小骨架
 
@@ -40,17 +40,17 @@ spec:
                 err: sourcing::source.close.err
 ```
 
-这段说明：本地秩序的 `master.supplier_sourcing` 阶段由 `solution::master.technical_scope.cmp` 触发；该阶段不是一个普通人直接完成，而是把另一条 `supplier-sourcing` Zhixu 当成执行接口来对接；linked 秩序里的 `sourcing::source.close.cmp` 经 proof 校验和授权 submitter 桥接后，才能推动本地秩序。详见 [Zhixu 作为 Executor](../../execution/zhixu-as-executor.md)。
+这段说明：本地秩序的 `master.supplier_sourcing` 阶段由 `solution::master.technical_scope.cmp` 触发；该阶段把另一条 `supplier-sourcing` 秩序作为执行接口；linked 秩序里的 `sourcing::source.close.cmp` 经 proof 校验和授权 submitter 映射后，推动本地秩序继续运行。详见 [Zhixu 作为 Executor](../../execution/zhixu-as-executor.md)。
 
 ## 顶层字段
 
 | 字段 | 解释 |
 | --- | --- |
 | `apiVersion` | DSL 版本，目前是 `uvp/v0`。 |
-| `kind` | 对流程定义来说是 `Zhixu`。编译器也定义了 `SupplierDefinition`，但它不是同一种对象。 |
+| `kind` | 对秩序定义来说是 `Zhixu`；supplier 身份和能力声明使用 `SupplierDefinition`。 |
 | `metadata.name` | 可读名称，也会参与计划身份。 |
 | `metadata.uid` | 稳定 Zhixu ID。没有时会回退到名称。 |
-| `metadata.labels` | 业务分类、行业、demo 标签。它们是元数据，不是链上权限。 |
+| `metadata.labels` | 业务分类、行业、demo 标签。链上权限由 order authorization 和 overlay 决定。 |
 | `metadata.annotations.version` | 计划版本。版本变化会进入 `planId`。 |
 | `spec.platform` | 目标平台。EVM track 使用 `type=blockchain`、`provider=eth`。 |
 | `spec.nucleation.id` | 秩序的发起核、设计者或组织域标识。详见 [Nucleation / 凝结核](nucleation.md)。 |
@@ -61,7 +61,7 @@ spec:
 | 字段 | 解释 |
 | --- | --- |
 | `name` | 阶段名称。和 task pattern 名拼成 `stageIdentifier`。 |
-| `source` | 该阶段 signal 所属的因果链，不等于用户角色。 |
+| `source` | 该阶段 signal 所属的因果链；用户角色由 Product/authorization 另行解释。 |
 | `trigger` | 哪些 hook ready 后会发出 `HookReady`，从而形成可处理任务。详见 [Trigger](trigger.md)。 |
 | `receiveSignals` | hook key 到 Hook DSL 表达式的映射。 |
 | `sendSignals` | 阶段完成后可能发出的 signal 名称。 |
@@ -82,18 +82,18 @@ receiveSignals:
   SCOPE_READY: solution::master.technical_scope.cmp
 ```
 
-如果 `trigger` 引用的 key 不存在，编译器会报错。不是所有 hook 都必须 trigger；非 trigger hook 可以用于内部依赖、signalMap 或观察，但不会直接发 `HookReady`。
+如果 `trigger` 引用的 key 不存在，编译器会报错。只有被 stage `trigger` 标记的 hook Ready 后会发 `HookReady`；其他 hook 可以用于内部依赖、signalMap 或观察。
 
 ## `selectedStages`
 
-`selectedStages` 是某个 stage 对目标 stage 的 executor patch 能力，不是 UI 上的“下一步”。例如 Phase 2 报关闭环中，买家提交的阶段可以为 `customs-complete` 指定具体执行者。编译器把这个关系变成 selector binding，合约在 executor patch 时检查这个 stage-to-target 绑定。
+`selectedStages` 是某个 stage 对目标 stage 的 executor patch 能力。例如 Phase 2 报关闭环中，买家提交的阶段可以为 `customs-complete` 指定具体执行者。编译器把这个关系变成 selector binding，合约在 executor patch 时检查这个 stage-to-target 绑定。
 
 ```yaml
 selectedStages:
   - customs-complete
 ```
 
-没有 selector binding 的 stage，不能任意为目标 stage 改 executor。
+只有存在 selector binding 的 stage 才能为对应目标 stage 改 executor。
 
 ## `executor`
 
@@ -105,11 +105,11 @@ selectedStages:
 | `organization` | 组织、企业系统、服务商或团队。 |
 | `zhixu` | 另一条 Zhixu 作为执行接口对接。 |
 
-`supplierID` 是 Store/治理/部署材料中解析的 supplier 或 Zhixu 标识。它本身不等于订单里的 active executor 钱包。订单运行时可能通过 `StageExecutorPatchApplied` 选出具体 executor。
+`supplierID` 是 Store/治理/部署材料中解析的 supplier 或 peer 秩序标识。订单里的 active executor 钱包由订单注册授权或 `StageExecutorPatchApplied` 运行时事件决定。
 
 ## `fileResources`
 
-`fileResources` 记录阶段协议、证据要求、验收标准或资源句柄。它是句柄，不是文件明文。一个阶段可以指向链下 protocol 文件、manifest URI 或对象存储资源，并带上哈希：
+`fileResources` 记录阶段协议、证据要求、验收标准或资源句柄。一个阶段可以指向链下 protocol 文件、manifest URI 或对象存储资源，并带上哈希：
 
 ```yaml
 fileResources:
@@ -129,7 +129,7 @@ fileResources:
 | 概念 | 静态/动态 | 解释 |
 | --- | --- | --- |
 | Nucleation / 凝结核 | 组织主体 | 发起、设计和维护 Zhixu 的秩序组织者。 |
-| Zhixu | 静态 DSL | 可复用的秩序定义。 |
+| 秩序 (Zhixu) | 静态 DSL | 可复用的秩序定义。 |
 | Plan | 链目标产物 | 某个 Zhixu 针对 EVM 编译出的 artifact、hash 和注册参数。 |
 | Order | 动态实例 | 某个 Plan 的一次运行，包含 signal、hook runtime、stage overlay 和 proof。 |
 

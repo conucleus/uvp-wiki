@@ -1,6 +1,6 @@
 # Supplier
 
-Supplier 是能力主体。它可以是个人、公司、报关行、物流商、支付 adapter、担保方、AI 服务、MCP agent、企业系统，也可以是一条可对接的 Zhixu。Supplier 说明“谁具备某类能力”，但它本身不等于凝结核，也不等于订单里的最终 executor。
+Supplier 是能力主体。它可以是个人、公司、报关行、物流商、支付 adapter、担保方、AI 服务、MCP agent、企业系统，也可以是一条可对接的秩序 (Zhixu)。Supplier 说明“谁具备某类能力”。凝结核负责设计秩序；executor 负责当前订单、当前阶段的实际提交；supplier 提供能力和 trust subject。
 
 ## Supplier 从哪里来
 
@@ -40,7 +40,7 @@ spec
   SupplierHandlerConfig
 ```
 
-这个定义描述 supplier 身份和能力声明。它不是订单授权。真正能不能提交某个订单里的某个 signal，仍然要看 `SignalSubmitterAuthorized`。
+这个定义描述 supplier 身份和能力声明。订单提交权限由 `SignalSubmitterAuthorized` 和 active executor overlay 决定。
 
 ## Capability Tags
 
@@ -57,13 +57,13 @@ Product DTO 里当前支持的 supplier capability tags 包括：
 
 这些标签帮助 Store 和 Product API 推荐或校验执行网络，但标签本身不创建链上权限。
 
-如果标签来自凝结核，它表示“在这条 Zhixu 的内部设计中适合某个 role/stage”。如果标签来自 Store，它表示平台目录和搜索语义。两者都不是 `SupplierAttested`。
+如果标签来自凝结核，它表示“在这条秩序的内部设计中适合某个 role/stage”。如果标签来自 Store，它表示平台目录和搜索语义。trust-domain 背书由 `SupplierAttested` 单独表达。
 
 ## Supplier Trust
 
 `SupplierAttested` 表示某个 trust domain 认可某个 supplier subject。`SupplierRevoked` 表示撤销。Product BFF 在创建未来订单授权时会拒绝或警告 revoked supplier wallet。
 
-这层 trust 解决“这个主体是否被某个权威背书”。它不解决“这个主体是否能在当前订单提交当前 signal”。后者由订单级授权解决。
+这层 trust 解决“这个主体是否被某个权威背书”。当前订单能否提交当前 signal，由订单级授权解决。
 
 ## Supplier 和 Executor 的区别
 
@@ -76,7 +76,7 @@ Product DTO 里当前支持的 supplier capability tags 包括：
 
 ## Zhixu 作为 Supplier
 
-当 `supplierType=zhixu` 时，Supplier 表示一条可被其他秩序调用的 peer Zhixu 能力。它仍然是 trust subject，但履约方式不是“某个公司完成一个任务”，而是“启动或对接另一条可执行秩序”。
+当 `supplierType=zhixu` 时，Supplier 表示一条可被其他秩序调用的 peer 秩序能力。它仍然是 trust subject，履约方式是启动或对接另一条可执行秩序。
 
 这类 supplier 在 Store 里应展示：
 
@@ -84,6 +84,7 @@ Product DTO 里当前支持的 supplier capability tags 包括：
 - 支持的 `signalMap`；
 - 可用的 operator/contact/adapter；
 - 历史 docking proof；
-- linked order创建或定位规则。
+- linked order 创建或定位规则；
+- `DockedOrderLinked`、`DockedSignalMapped`、`DockedSignalSubmitted` proof。
 
-它仍然不等于local order提交权限。local order要继续推进，必须出现local order上的授权 signal。详见 [Executor](executor.md) 和 [Zhixu 作为 Executor](../../execution/zhixu-as-executor.md)。
+local order 要继续推进，必须出现 local order 上的授权 signal 或 docking mapped signal。详见 [Executor](executor.md) 和 [Zhixu 作为 Executor](../../execution/zhixu-as-executor.md)。

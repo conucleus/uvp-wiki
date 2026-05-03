@@ -1,10 +1,10 @@
 # 秩序商店
 
-秩序商店是中心化产品与平台 workflow 工作台。它负责把凝结核、Zhixu、supplier、订单、证明和背书请求组织成人能理解的界面。它可以给凝结核提供舞台，给对象打平台标签，展示 proof，发起 governance request，保留 audit；但它不能替代凝结核、trust domain 或链上事实。
+秩序商店是中心化产品与平台 workflow 工作台。它负责把凝结核、秩序、supplier、订单、证明和背书请求组织成人能理解的界面。它给凝结核提供舞台，给对象打平台标签，展示 proof，发起 governance request，保留 audit；凝结核、trust domain 和链上事件分别保留自己的权威来源。
 
 ## 它的权威来自哪里
 
-Store 的权威是组织权威和平台 workflow 权威，不是协议事实源。它可以说：
+Store 的权威是组织权威和平台 workflow 权威。它可以说：
 
 - 这条 Zhixu 由某个凝结核提交，并通过 Store workflow review。
 - 这个 supplier 被平台标记为 `customs` 或 `logistics` 能力。
@@ -12,7 +12,7 @@ Store 的权威是组织权威和平台 workflow 权威，不是协议事实源�
 - 这个 draft 通过了编译预览和 schema 校验。
 - 某个 attestation request 已经被发起或正在等待索引。
 
-但它不能单方面说：
+协议事实需要链上事件支撑：
 
 - plan 已经链上 attested。
 - order 已经注册。
@@ -29,10 +29,10 @@ Store 的权威是组织权威和平台 workflow 权威，不是协议事实源�
 | --- | --- | --- |
 | Nucleation / 凝结核 | 提供设计、发布、供应商组织、proof 和 attestation request 工作台。 | 不替凝结核治理秩序内部。 |
 | Zhixu | 导入、编译预览、版本展示、发布材料审核、背书请求。 | 不直接判定公平可信。 |
-| Supplier | 注册 profile、平台标签、联系、proof、背书材料。 | 不把标签变成链上 trust 或订单授权。 |
+| Supplier | 注册 profile、平台标签、联系、proof、背书材料。 | 标签、链上 trust 和订单授权分层展示。 |
 | Order | 搜索、定位、查看投影、查看 proof。 | 不创建链上运行事实。 |
 | Governance workflow | 帮 operator/admin 发起计划或供应商背书请求。 | 不让 audit row 替代 registry event。 |
-| Metadata | 业务说明、风险标签、能力标签、资源说明、审计材料 URI。 | 不把 metadata 写成协议事实。 |
+| Metadata | 业务说明、风险标签、能力标签、资源说明、审计材料 URI。 | metadata 写成 workflow/material；协议事实写成 event/proof。 |
 
 ## 中心化和去中心化的分工
 

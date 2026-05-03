@@ -21,11 +21,11 @@
 
 ## 公共接口意识
 
-ABI、event topic、EIP-712 typed data、canonical hash domain、artifact schema 都属于公共协议接口。改动这些内容时，应当把它当成协议版本变化，而不是普通重构。
+ABI、event topic、EIP-712 typed data、canonical hash domain、artifact schema 都属于公共协议接口。改动这些内容时，应当按协议版本变化处理。
 
-## Artifact 不是产品说明书
+## Artifact 的读者
 
-Artifact 让机器和审核者复现计划，不负责给普通用户解释业务。普通用户看到的是 Product DTO；Store operator 可以看到 proof panel；协议工程师才需要读 HookPlan、on-chain artifact 和 Solidity args。
+Artifact 让机器和审核者复现计划。普通用户看到的是 Product DTO；Store operator 可以看到 proof panel；协议工程师读 HookPlan、on-chain artifact 和 Solidity args。
 
 这层分工能避免两个问题：
 

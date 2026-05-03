@@ -28,7 +28,7 @@ Product API 是普通参与者、Order App、executor-kit 和 agent adapter 消�
 | `POST /product/evidence` | 写入 evidence metadata / object handle。 |
 | `GET /product/staging/readiness` | release evidence gate 的 Product API readiness。 |
 
-`/product/flows` 不应出现。Product object 是 Zhixu order，不是传统线性 flow。
+Product object 是订单 (Order)，即某个秩序 (Zhixu) 的一次运行；文档和 route 命名不要再引入 `/product/flows` 这种传统线性 flow 口径。
 
 ## 语言边界
 
@@ -36,12 +36,12 @@ Product API 应该隐藏 HookPlan、sourceId、signalId、ABI、gas 等底层细
 
 ## `/product/me`
 
-`/product/me` 必须从显式 wallet 地址过滤任务，可以来自 query、header 或钱包上下文。它不能根据 display name、role label 或 Store metadata 猜 authority。返回的任务仍然要来自 state-machine projection 和 order-level submitter authorization。
+`/product/me` 必须从显式 wallet 地址过滤任务，可以来自 query、header 或钱包上下文。display name、role label 或 Store metadata 只能辅助展示，authority 来自 state-machine projection 和 order-level submitter authorization。
 
 ## 边界
 
 - Product API 可以 prepare typed data、验证签名、调用 relayer、返回 proof。
-- Product API 不能绕过 order-level authorization。
-- Product API 不能把 draft、submission status 或 notification state 写成 hook truth。
-- Revoked plan/supplier 不能通过 fallback 被包装成 active。
-- Staging readiness 是服务实例健康和边界检查，不是生产可用声明。
+- order-level authorization 仍由合约检查。
+- draft、submission status 或 notification state 写成 workflow/projection 状态。
+- revoked plan/supplier 在 Product API 中保持 revoked/blocked 展示。
+- Staging readiness 是服务实例健康和边界检查；production claim 需要 release evidence。

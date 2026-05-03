@@ -1,6 +1,6 @@
 # 秩序商店
 
-秩序商店是凝结核、供应商、trust domain、operator 和普通执行界面之间的产品工作台。它提供目录、编译预览、资源和供应商组织、proof 视图、联系通知、发布 workflow、attestation request 和 audit；但它不替凝结核治理 Zhixu 内部，也不能替代 `UVPStateMachine` 和 `ZhixuTrustRegistry` 的链上事实。
+秩序商店是凝结核、供应商、trust domain、operator 和普通执行界面之间的产品工作台。它提供目录、编译预览、资源和供应商组织、proof 视图、联系通知、发布 workflow、attestation request 和 audit。凝结核负责秩序内部设计，trust domain 负责外部背书，`UVPStateMachine` 和 `ZhixuTrustRegistry` 负责链上事实。
 
 ```text
 Nucleation / 凝结核
@@ -16,10 +16,10 @@ Nucleation / 凝结核
 | 层 | 负责人 | Store 做什么 | 事实边界 |
 | --- | --- | --- | --- |
 | 凝结核内部治理 | Zhixu 设计者和秩序组织者 | 提供设计、组织、版本、供应商和 proof 工作台。 | 内部规则要进入 Zhixu/Plan/Order/proof 才可验证。 |
-| Store 平台 workflow | Store operator/reviewer/admin | 做目录打标、材料审核、发布流程、attestation request、audit。 | Store metadata/review/audit 不是 trust。 |
+| Store 平台 workflow | Store operator/reviewer/admin | 做目录打标、材料审核、发布流程、attestation request、audit。 | Store metadata/review/audit 是平台 workflow 证据。 |
 | Trust domain 外部背书 | trust domain owner/reviewer | Store 展示结果和请求状态。 | `PlanAttested`、`SupplierAttested` 等 registry 事件才是背书事实。 |
 
-所以 Store 页面里写“治理”时，指的是平台 workflow 和证据组织；不是 Store admin 亲自设计秩序环节、决定内部公平，或替凝结核组织履约。
+所以 Store 页面里写“治理”时，指的是平台 workflow 和证据组织；秩序环节、内部公平和供应商组织原则仍由凝结核维护。
 
 ## Registry vs Store 权威边界
 
@@ -32,9 +32,9 @@ Nucleation / 凝结核
 | Supplier 是否被背书 | `SupplierAttested` / `SupplierRevoked`。 | 组织 profile、能力标签、联系、履约 proof 和背书材料。 |
 | Order 是否注册 | `UVPStateMachine.OrderRegistered`。 | 搜索、定位、展示状态和 proof。 |
 | Signal 是否提交 | `SignalSubmitted` 和 proof rows。 | 展示履约记录、证据 hash、tx/block/event。 |
-| Store review 是否通过 | Store metadata / audit。 | 说明平台 workflow 走到哪一步，但不能冒充链上 trust。 |
+| Store review 是否通过 | Store metadata / audit。 | 说明平台 workflow 走到哪一步；trust badge 仍取 registry projection。 |
 
-Store metadata、平台标签、联系信息、通知状态、review、audit、履约视图和 search ranking 都不是协议事实源。
+Store metadata、平台标签、联系信息、通知状态、review、audit、履约视图和 search ranking 都是产品和 workflow 读模型。协议事实来自 registry/state-machine 事件。
 
 ## Store 信息架构
 
@@ -49,7 +49,7 @@ Store metadata、平台标签、联系信息、通知状态、review、audit、�
 | Docking Sandbox | peer Zhixu、adapter、signalMap、capability plugin 的试拼。 | [Docking Sandbox](docking-sandbox.md) |
 | Service Surface | Store Console API、draft routes、supplier routes、docking routes、audit storage。 | [非可信执行层：Chain Services](../components/chain-services.md) |
 
-## Zhixu 不是 Store 的内部流程
+## Zhixu 在 Store 的发布路径
 
 详见 [Zhixu Catalog、配置与发布](zhixu-management.md)。
 
@@ -66,7 +66,7 @@ Store 里的 Zhixu 页面应该帮助凝结核把秩序设计变成可审查、�
   -> active/order-creatable version
 ```
 
-`approved_for_broadcast` 是平台 workflow 状态，不是链上背书。只有匹配 plan id/hash 的 indexed `PlanAttested` 才能支撑 official trusted plan 的展示。
+`approved_for_broadcast` 是平台 workflow 状态。official trusted plan 的展示需要匹配 plan id/hash 的 indexed `PlanAttested`。
 
 ## Supplier 是凝结核组织网络的一部分
 
@@ -81,7 +81,7 @@ Store 的 supplier registry 帮凝结核组织现实履约能力网络：
 - 履约参与记录、open task、历史 proof；
 - supplier attestation/revocation request 和 trust projection。
 
-这些信息帮助凝结核选择、联系和组织供应商，但不能直接授权 `submitSignal()`。订单级 signal 授权和 active executor overlay 仍由合约检查。
+这些信息帮助凝结核选择、联系和组织供应商。订单级 signal 授权和 active executor overlay 仍由合约检查。
 
 ## 相关页面
 

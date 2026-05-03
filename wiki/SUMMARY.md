@@ -4,6 +4,8 @@
 
 - [Wiki 入口](README.md)
 - [项目状态](status/README.md)
+- [一个订单故事](getting-started/one-order-story.md)
+- [核心术语表](reference/glossary.md)
 - [读者入口](getting-started/README.md)
 - [快速开始](getting-started/quick-start.md)
 
@@ -11,7 +13,7 @@
 
 - [核心概念入口](core/README.md)
 - [核心对象总览](concepts/overview.md)
-  - [Zhixu DSL](concepts/core/zhixu.md)
+  - [秩序 (Zhixu) DSL](concepts/core/zhixu.md)
   - [Nucleation / 凝结核](concepts/core/nucleation.md)
   - [Supplier](concepts/core/supplier.md)
   - [Executor](concepts/core/executor.md)
@@ -21,7 +23,7 @@
   - [Trigger](concepts/core/trigger.md)
   - [File Resources](concepts/core/file-resources.md)
   - [Plan](concepts/core/plan.md)
-  - [Order](concepts/core/order.md)
+  - [订单 (Order)](concepts/core/order.md)
 - [信任与授权](concepts/trust-and-authorization.md)
   - [Trust Domain](concepts/trust/domains.md)
   - [Signal 授权](concepts/trust/signal-authorization.md)
@@ -105,6 +107,7 @@
 - [合约与事件](reference/contracts-and-events.md)
 - [Product API](reference/product-api.md)
 - [CLI 与配置](reference/cli-and-config.md)
+- [阅读门槛审计](status/readability-audit-2026-05-03.md)
 
 ## 贡献
 

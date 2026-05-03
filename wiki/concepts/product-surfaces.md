@@ -1,6 +1,6 @@
 # 产品表面
 
-产品表面是把链上事实翻译成人类能用的订单、任务、证明和信任信息。它不改变协议状态，只把 `UVPStateMachine` 和 `ZhixuTrustRegistry` 的事件投影成 Product API、Store 和 Order App 能消费的 DTO。
+产品表面把链上事实翻译成人类能用的订单、任务、证明和信任信息。它把 `UVPStateMachine` 和 `ZhixuTrustRegistry` 的事件投影成 Product API、Store 和 Order App 能消费的 DTO；协议状态仍由链上事件决定。
 
 ## 本篇子项
 
@@ -21,11 +21,11 @@
 | `SignalSubmitted` | 参与方已提交凭证指纹或确认动作。 |
 | `HookStatusChanged` | 条件等待、就绪、取消或仍未满足。 |
 
-普通用户不需要理解 `sourceId`、`signalId`、`hookId`、gas、ABI 或 trust-domain 内部结构。高级证明视图可以展示这些字段，但它们应当服务于可验证性，而不是变成主要操作语言。
+普通用户主要看到订单、任务、参与方、证据和 proof。`sourceId`、`signalId`、`hookId`、gas、ABI 或 trust-domain 内部结构可以放在高级证明视图中，服务可验证性。
 
-## 不是一个普通后台
+## 产品表面的数据流
 
-产品表面不是“把链上事件同步到数据库，然后由数据库决定订单状态”。正确关系是：
+产品表面的正确关系是：
 
 ```text
 链上事件
@@ -34,4 +34,4 @@
   -> Store / Order App / executor-kit
 ```
 
-如果 Product API 返回的状态无法追溯到 event provenance 或 Store 明确标注的 metadata，就不能把它说成协议事实。
+如果 Product API 返回的状态无法追溯到 event provenance 或 Store 明确标注的 metadata，就应写成产品读模型或 workflow 状态。

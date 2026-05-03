@@ -8,7 +8,7 @@
 | --- | --- |
 | [Trust Domain](trust/domains.md) | 官方域、计划认证、供应商认证、撤销和投影。 |
 | [Signal 授权](trust/signal-authorization.md) | 订单注册时如何绑定 source/signal/submitter 权限。 |
-| [EIP-712 与 Relayer](trust/eip712-relayer.md) | 为什么 relayer 可以提交交易但不能生成业务签名。 |
+| [EIP-712 与 Relayer](trust/eip712-relayer.md) | relayer 如何提交已签交易，业务签名为何必须来自授权钱包。 |
 | [Stage Patch 授权](trust/stage-patch.md) | executor/resource patch 如何复用订单级授权并加上 selector binding。 |
 
 ## 三层校验
@@ -19,11 +19,11 @@
 | Publisher / registrar allowlist | 谁可以注册计划、谁可以注册订单。 |
 | Order-level signal authorization | 某个订单里，哪个钱包可以提交哪个 source/signal。 |
 
-这三层不是互相替代的关系。计划被认证，不代表任何人都能注册订单；订单已注册，也不代表任意钱包能提交 signal；relayer 有交易能力，也不代表它拥有业务签名权。
+这三层分别检查不同问题：计划认证解决 plan/supplier trust，allowlist 解决谁能注册，order-level signal authorization 解决谁能提交当前订单动作。
 
-## Supplier Trust 不是 Signal 授权
+## Supplier Trust 和 Signal 授权
 
-Supplier trust 只说明某个 trust domain 背书了某个 supplier subject。它可以影响 Store 推荐、Product 警告、BFF 创建授权时的准入判断、executor-kit 是否 fail closed。它不等于 `submitSignal()` 权限。
+Supplier trust 说明某个 trust domain 背书了某个 supplier subject。它可以影响 Store 推荐、Product 警告、BFF 创建授权时的准入判断、executor-kit 是否 fail closed。`submitSignal()` 权限仍落在订单级授权。
 
 真正的提交权限永远落在订单级：
 

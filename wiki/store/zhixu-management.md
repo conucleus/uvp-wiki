@@ -1,6 +1,6 @@
 # Zhixu Catalog、配置与发布
 
-Store 中的 Zhixu Catalog 不是“平台 admin 管理秩序内部”的地方，而是凝结核把秩序设计发布出来、组织材料、接受平台 workflow、申请 trust-domain 背书的地方。DSL 对象本身见核心概念里的 Zhixu；本页只讲 Store 侧面。
+Store 中的 Zhixu Catalog 是凝结核把秩序设计发布出来、组织材料、接受平台 workflow、申请 trust-domain 背书的地方。秩序内部 stage、公平规则和供应商组织原则由凝结核维护；本页只讲 Store 侧面。DSL 对象本身见核心概念里的 [秩序 (Zhixu)](../concepts/core/zhixu.md)。
 
 ## 页面目标
 
@@ -39,7 +39,7 @@ Zhixu Catalog 要让凝结核、Store operator 和 trust reviewer 分别看清�
   -> active/order-creatable version
 ```
 
-`approved_for_broadcast` 只表示平台 workflow 允许发起背书请求。它不是 `PlanAttested`，也不是 Store 对秩序公平性的最终判定。
+`approved_for_broadcast` 表示平台 workflow 允许发起背书请求。链上背书由 `PlanAttested` 表达，秩序公平性由凝结核材料和 trust-domain 审查共同支撑。
 
 ## Store 可以保存什么
 
@@ -51,17 +51,17 @@ Zhixu Catalog 要让凝结核、Store operator 和 trust reviewer 分别看清�
 - Product Schema bundle、add-on manifest、capability/plugin metadata；
 - governance request id、broadcast state、audit reference。
 
-## Store 不能声称什么
+## Store 展示口径
 
-- Store review approved 不等于 Zhixu 已经公平可信。
-- 编译预览通过不等于 plan 已注册。
-- active recommendation 不等于所有订单自动迁移。
-- Store copy 不能改 planId、planHash 或 on-chain artifact。
-- Store admin 不能替凝结核决定秩序内部 stage、公平规则或供应商组织原则。
+- Store review approved：平台 workflow 已通过，可进入背书请求或发布操作。
+- 编译预览通过：artifact 可生成，链上注册仍看 `registerPlan()` 和 registry projection。
+- active recommendation：Store 推荐某个版本作为新订单入口，已有订单仍绑定原 `planId`。
+- Store copy：解释材料和运营状态；`planId`、`planHash` 和 on-chain artifact 保持编译结果。
+- Store admin：维护平台 workflow，凝结核维护秩序内部 stage、公平规则和供应商组织原则。
 
 ## Trust domain 看什么
 
-Trust domain 不是 Store 页面里的普通标签。它应基于可审查材料判断一条 Zhixu 是否可背书，例如：
+Trust domain 是 Store 页面里的外部背书来源。它应基于可审查材料判断一条秩序是否可背书，例如：
 
 - stage、source、trigger 是否透明可解释；
 - supplier selection 和 selector 权限是否清楚；

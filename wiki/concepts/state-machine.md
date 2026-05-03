@@ -30,9 +30,9 @@ SignalSubmitted(orderId, sourceId, signalId)
 | `HookRuntime` | hook 当前状态、等待到期时间、是否已经发出 `HookReady`。 |
 | stage overlay | 订单级 executor/resource patch，不改计划本身。 |
 
-## 状态机不管什么
+## 状态机边界
 
-状态机不负责：
+状态机只验证 plan/order/signal/hook/patch/authorization 的链上边界。以下内容由 Store、Product API、executor-kit 或 periphery adapter 处理：
 
 - supplier 是否在 Store 中被运营审核；
 - supplier capability tags 是否匹配某个行业；
@@ -42,4 +42,4 @@ SignalSubmitted(orderId, sourceId, signalId)
 - relayer retry 数据库；
 - executor 内部工作流。
 
-这些由 Store、Product API、executor-kit 或 periphery adapter 处理。状态机只验证 plan/order/signal/hook/patch/authorization 的链上边界。
+这些内容可以通过 signal、metadata hash、resource handle、adapter proof 或 Product DTO 与状态机连接。

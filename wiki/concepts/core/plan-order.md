@@ -2,7 +2,7 @@
 
 本页只作为旧链接兼容入口，不再出现在 `SUMMARY.md`。请分别阅读 [Plan](plan.md) 和 [Order](order.md)。
 
-Plan 是“某个 Zhixu 定义编译出的可执行版本”。Order 是“某个 Plan 的一次链上实例”。这两个概念必须分开：Plan 负责静态版本、hash 和 trust attestation；Order 负责运行时 signal、hook、executor/resource overlay 和 proof。
+Plan 是“某个秩序 (Zhixu) 定义编译出的可执行版本”。Order 是“某个 Plan 的一次链上实例”。这两个概念必须分开：Plan 负责静态版本、hash 和 trust attestation；Order 负责运行时 signal、hook、executor/resource overlay、docking link 和 proof。
 
 ## Plan
 
@@ -50,8 +50,8 @@ struct Order {
 
 产品路径应该使用带 `SignalAuthorization[]` 的订单注册重载。这个重载会在订单创建时写入允许提交的 source/signal/submitter 组合。
 
-不带授权的重载只是兼容路径。它能创建订单，但不会给任何参与方业务提交权，因此真实产品流程不应依赖它。
+不带授权的重载是兼容路径。它能创建订单，业务提交权需要后续授权；真实产品流程应使用带 `SignalAuthorization[]` 的重载。
 
 ## 版本关系
 
-Plan 版本变化应体现在 `planId` 或 `planHash` 上。Order 一旦绑定某个 `planId`，后续状态必须按该计划解释。新的流程版本应注册新的 Plan，而不是让旧订单偷偷切换语义。
+Plan 版本变化应体现在 `planId` 或 `planHash` 上。Order 一旦绑定某个 `planId`，后续状态必须按该计划解释。新的流程版本应注册新的 Plan，旧订单继续按原 Plan 解释。

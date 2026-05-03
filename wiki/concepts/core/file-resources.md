@@ -1,6 +1,6 @@
 # File Resources
 
-`fileResources` 是阶段资源句柄，不是文件本身。它描述一个 stage 需要引用哪些链下对象、协议文件、证据模板、验收标准或资源 manifest。链上事实仍然来自授权 signal、hash、metadata URI 和事件，不来自文件明文。
+`fileResources` 是阶段资源句柄。它描述一个 stage 需要引用哪些链下对象、协议文件、证据模板、验收标准或资源 manifest。链上事实来自授权 signal、hash、metadata URI 和事件；文件明文留在链下。
 
 当前 compiler 类型把它定义成宽松句柄：
 
@@ -11,9 +11,9 @@ interface FileResourceLike {
 }
 ```
 
-这说明 `fileResources` 的第一责任是“可解析的资源引用”，不是固定存储后端。
+这说明 `fileResources` 的第一责任是“可解析的资源引用”。具体存储后端可以是本地文件、对象存储、外部 URI 或后续 manifest。
 
-## 句柄而不是文件
+## 资源句柄
 
 一个 stage 可以用 `fileResources` 指向链下协议文件、证据模板或资源
 manifest：
@@ -29,11 +29,11 @@ fileResources:
       sha256: "..."
 ```
 
-这个 YAML 不把文件内容写进链上，也不表示链上保存了 Markdown。它只是给 Store、Product API、executor-kit 或 adapter 一个资源句柄：可以显示协议、计算 hash、提示证据要求、检查验收规则。
+这个 YAML 给 Store、Product API、executor-kit 或 adapter 一个资源句柄：可以显示协议、计算 hash、提示证据要求、检查验收规则。链上保存 hash、URI 或 patch event。
 
 ## fileType 的含义
 
-`fileType` 表示句柄类型，不是业务文件类型。常见形态可以包括：
+`fileType` 表示句柄类型。常见形态可以包括：
 
 | fileType | 语义 |
 | --- | --- |
@@ -47,7 +47,7 @@ fileResources:
 
 ## 和 StageResourcePatch 的关系
 
-静态 `fileResources` 来自 Zhixu stage，是 Plan 编译时的默认资源说明。运行中如果某个订单、某个 stage 需要替换或补充资源，应使用 resource overlay，而不是修改 Plan。
+静态 `fileResources` 来自秩序 stage，是 Plan 编译时的默认资源说明。运行中如果某个订单、某个 stage 需要替换或补充资源，应使用 resource overlay，Plan 仍保持静态版本。
 
 PRD87 里的目标模型是：
 
@@ -74,8 +74,8 @@ Order App 和 executor-kit 应把它翻译成“需要上传什么证据、hash 
 
 ## 不允许的用法
 
-- 不把合同、发票、物流文件、照片或报告明文写上链。
-- 不把 `fileResources` 当成业务完成状态。
-- 不把对象存储可访问性当成链上 proof。
-- 不把 resource patch 和 executor patch 混成同一个授权动作。
+- 合同、发票、物流文件、照片或报告明文留在链下。
+- `fileResources` 表示资源要求，业务完成看 signal/proof。
+- 对象存储可访问性是辅助条件，链上 proof 看事件和 hash。
+- resource patch 和 executor patch 是两个授权动作。
 - 不在 wiki、fixtures 或日志里写真实 storage credential。

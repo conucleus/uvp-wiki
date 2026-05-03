@@ -1,6 +1,6 @@
 # 事件投影
 
-事件投影把链上事件变成产品可读状态。它是 view，不是事实源。删除 indexer 数据库后，理论上应能从链事件重建同样的 projection。
+事件投影把链上事件变成产品可读状态。它是可重建 view；删除 indexer 数据库后，理论上应能从链事件重建同样的 projection。
 
 ## ChainEvent
 
@@ -59,4 +59,4 @@ chainId:contractAddress:blockNumber:transactionHash:logIndex
 | `HookReady` | 创建或打开任务，并把订单状态推向 action_required。 |
 | `TimerPoked` | 记录 timer proof 和 timeline。 |
 
-任务创建应由 `HookReady` 驱动，不能由后端草稿或 UI 状态直接伪造。
+任务创建由 `HookReady` 驱动；后端草稿或 UI 状态只做辅助 workflow。

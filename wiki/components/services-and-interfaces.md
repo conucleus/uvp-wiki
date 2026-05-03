@@ -13,13 +13,13 @@ ABI / EIP-712 / calldata helpers
 
 ## 组件职责
 
-| 组件 | 拥有的接口 | 不应承担 |
+| 组件 | 拥有的接口 | 职责边界 |
 | --- | --- | --- |
 | protocol-bindings | ABI、typed data、hash helpers、calldata helpers、ResourceManifest/StagePatch helpers。 | 网络请求、私钥、数据库、业务授权决策。 |
-| 非可信执行层 / chain-services | Product API、Store API、submission API、evidence/proof API、notification ops、runtime diagnostics。 | 成为 plan/order/signal/hook/trust 的事实源，或替参与方签名。 |
+| 非可信执行层 / chain-services | Product API、Store API、submission API、evidence/proof API、notification ops、runtime diagnostics。 | 事实源来自链事件，业务签名来自参与方。 |
 | product-dto | ordinary user language 的 order/task/proof/trust DTO。 | HookPlan 原文、低层 sourceId/signalId、gas/ABI 细节。 |
-| Store API | nucleation workspace、draft、review、supplier metadata、contact、audit、governance workflow。 | 伪造 trust attestation、替凝结核治理内部秩序或伪造业务完成。 |
-| Executor Kit | signal producer CLI/SDK/MCP。 | 创建授权、托管默认私钥、替业务方签名。 |
+| Store API | nucleation workspace、draft、review、supplier metadata、contact、audit、governance workflow。 | trust attestation、凝结核内部治理和业务完成分别由 registry、凝结核、state-machine proof 表达。 |
+| Executor Kit | signal producer CLI/SDK/MCP。 | 授权创建、默认私钥托管和业务签名分别由 Product/registrar、密钥系统和业务方钱包处理。 |
 
 ## 先读这些
 
@@ -36,6 +36,6 @@ ABI / EIP-712 / calldata helpers
 
 - Protocol bindings 只提供 browser-safe ABI、typed data、calldata、hash helpers，不读 env、不持有私钥、不提交交易。
 - 非可信执行层可以索引、投影、验证、转发和记录 workflow 状态，但数据库必须可重建。
-- Product API 可以 prepare typed data、验证 participant signature、调用 relayer、返回 proof；它不能绕过 order-level authorization。
-- Store API 可以管理 nucleation workspace、drafts、supplier metadata、audit 和 review，但不能把 metadata 写成 trust truth，也不能替凝结核治理内部秩序。
+- Product API 可以 prepare typed data、验证 participant signature、调用 relayer、返回 proof；order-level authorization 仍由合约检查。
+- Store API 可以管理 nucleation workspace、drafts、supplier metadata、audit 和 review；metadata 写成 workflow/material，trust truth 看 registry projection，内部秩序治理归凝结核。
 - Docking、contact、notification、resource availability 都是 workflow/projection；任何 public claim 必须回到 registry/state-machine events。

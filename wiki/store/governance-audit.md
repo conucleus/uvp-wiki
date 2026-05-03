@@ -1,6 +1,6 @@
 # Operator 权限、治理与 Audit
 
-Store 里的权限和 audit 约束的是平台 workflow，不是 Zhixu 内部治理权。Audit 记录证明某个 Store 操作发生过，但不能替代凝结核的秩序设计、trust-domain 背书或 state-machine 事件。
+Store 里的权限和 audit 约束平台 workflow。Audit 记录证明某个 Store 操作发生过；凝结核的秩序设计、trust-domain 背书和 state-machine 事件仍各自保留权威来源。
 
 ## 三类权限
 
@@ -21,7 +21,7 @@ Store 里的权限和 audit 约束的是平台 workflow，不是 Zhixu 内部治
 - inspect failed governance broadcast or index state；
 - mark revoked plan/supplier as hidden from new-order creation。
 
-这些动作可以被审计，但不等于 chain attestation、supplier trust 或业务完成。
+这些动作可以被审计；chain attestation、supplier trust 和业务完成分别来自 registry 或 state-machine 事件。
 
 ## 权限和确认
 
@@ -38,7 +38,7 @@ Store 应区分 read、nucleation_operator、operator、reviewer、governance_ad
 
 ## Audit 边界
 
-| Audit 能证明 | Audit 不能证明 |
+| Audit 能证明 | Audit 边界 |
 | --- | --- |
 | 某个 Store principal 发起、审批或确认了一个 workflow 动作。 | plan 已经 attested。 |
 | 某个 metadata 字段、platform tag 或 contact 被修改。 | supplier 已经 trusted。 |

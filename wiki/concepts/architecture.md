@@ -1,6 +1,6 @@
 # 架构
 
-`uvp-eth` 按“协议核心、链上事实、非可信执行层、产品表面、执行者工具、部署记录、periphery adapter”分层。层与层之间不共享数据库事实，而是通过 artifact、ABI、EIP-712 typed data、事件、DTO 和 HTTP API 对接。
+`uvp-eth` 按“协议核心、链上事实、非可信执行层、产品表面、执行者工具、部署记录、periphery adapter”分层。层与层之间通过 artifact、ABI、EIP-712 typed data、事件、DTO 和 HTTP API 对接，数据库只保存可重建读模型或 workflow 状态。
 
 ```mermaid
 flowchart TD
@@ -37,10 +37,10 @@ flowchart TD
 ## 设计原则
 
 - `uvp-protocol` 产出协议语义、合约、编译器、replay oracle 和共享类型。
-- `uvp-chain-services` 是非可信执行层，只索引、验证、投影、转发；不能成为 plan/order/signal 的事实源。
+- `uvp-chain-services` 是非可信执行层，负责索引、验证、投影、转发；plan/order/signal 的事实源来自链事件。
 - `zhixu-store` 和 `uvp-order-app` 展示 Product DTO，普通用户不应理解 hook、ABI、gas 或 trust-domain 内部细节。
 - `uvp-executor-kit` 面向执行者、企业脚本、AI/MCP 和 adapter，最终仍然提交链上 signal。
-- `uvp-periphery` 可以做资金、担保、AI/MCP、demo，但必须消费核心接口，不能重新定义核心状态。
+- `uvp-periphery` 可以做资金、担保、AI/MCP、demo，并通过核心接口消费 state-machine signal/proof。
 
 ## 组件层级
 

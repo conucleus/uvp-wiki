@@ -1,16 +1,16 @@
 # 凝结核工作台
 
-凝结核工作台是秩序商店给 Zhixu 设计者和秩序组织者提供的舞台。这里的核心用户不是“平台 admin 亲自下场治理每条秩序”，而是凝结核：它设计秩序、组织供应商、维护内部公平和运转；Store 提供工具、目录、proof、发布流程和申请背书的入口。
+凝结核工作台是秩序商店给秩序设计者和秩序组织者提供的舞台。核心用户是凝结核：它设计秩序、组织供应商、维护内部公平和运转；Store 提供工具、目录、proof、发布流程和申请背书的入口。
 
 ## 三层治理
 
-| 层 | 谁负责 | 负责什么 | 不能替代什么 |
+| 层 | 谁负责 | 负责什么 | 权威边界 |
 | --- | --- | --- | --- |
-| 凝结核内部治理 | Zhixu 设计者 / 秩序组织者 | 设计 stage、source、supplier slots、资源要求、公平规则、内部运行机制。 | 不能绕过 plan hash、order authorization 和 chain proof。 |
-| Store 平台 workflow | Store operator / reviewer / governance admin | 导入、编译预览、目录打标、发布材料审核、attestation request、audit。 | 不能直接判定 plan/supplier 已可信。 |
-| Trust domain 外部背书 | trust domain owner / reviewer | 判断 Zhixu 是否公平、透明、可背书，判断 supplier subject 是否可信。 | 不能替 Store 保存联系人，也不能替订单 submit signal。 |
+| 凝结核内部治理 | 秩序设计者 / 秩序组织者 | 设计 stage、source、supplier slots、资源要求、公平规则、内部运行机制。 | 运行时仍经过 plan hash、order authorization 和 chain proof。 |
+| Store 平台 workflow | Store operator / reviewer / governance admin | 导入、编译预览、目录打标、发布材料审核、attestation request、audit。 | trust 状态来自 registry projection。 |
+| Trust domain 外部背书 | trust domain owner / reviewer | 判断秩序是否公平、透明、可背书，判断 supplier subject 是否可信。 | 联系人和订单 signal 分别属于 Store workflow 和 state-machine 授权。 |
 
-文档中凡是写“Store 治理”，都应理解为平台 workflow 和证据组织，而不是 Store admin 替凝结核治理秩序内部。
+文档中凡是写“Store 治理”，都应理解为平台 workflow 和证据组织；秩序内部治理由凝结核负责。
 
 ## 工作台提供什么
 
@@ -32,13 +32,13 @@ Store 提供的是舞台和工具：catalog、search、draft、compile preview�
 
 | 动作 | 含义 | 权威边界 |
 | --- | --- | --- |
-| 凝结核内标签 | 某 supplier 适合某 stage、role slot 或 resource/evidence 类型。 | 秩序内部组织语义；不能自动创建链上 trust 或 signal authorization。 |
-| Store 平台标签 | catalog 分类、搜索、风险提示、行业、能力展示。 | Store metadata；不能冒充 trust-domain 背书。 |
+| 凝结核内标签 | 某 supplier 适合某 stage、role slot 或 resource/evidence 类型。 | 秩序内部组织语义；链上 trust 或 signal authorization 另行产生。 |
+| Store 平台标签 | catalog 分类、搜索、风险提示、行业、能力展示。 | Store metadata；trust-domain 背书由 registry 事件表达。 |
 | Trust attestation | trust domain 对 plan/supplier subject 作外部背书。 | `ZhixuTrustRegistry` 事件。 |
 | Workflow permission | 谁能导入、review、请求 attestation、编辑 metadata。 | Store 权限和 audit。 |
 | Order authorization | 谁能提交某个 order 的某个 signal。 | `UVPStateMachine` order-level authorization 和 active executor overlay。 |
 
-这五件事必须分开写。尤其是“授权”：Store 里的发布权限、review 权限、attestation request 权限，不等于订单级 signal authorization。
+这五件事必须分开写。尤其是“授权”：Store 里的发布权限、review 权限、attestation request 权限，和订单级 signal authorization 是两层授权。
 
 ## 页面应该展示什么
 
@@ -49,10 +49,10 @@ Store 提供的是舞台和工具：catalog、search、draft、compile preview�
 - 发布状态：compile preview、Store review、attestation request、PlanAttested/PlanRevoked projection；
 - Audit：谁提交了材料、谁请求了背书、对应 tx/proof、失败原因和重试记录。
 
-## 不能写成什么
+## 文档口径
 
-- 不能写成 Store admin 亲自维护 Zhixu 内部公平。
-- 不能写成 Store review 已经判定 Zhixu 公平可信。
-- 不能写成 Store tag 或 capability label 已经给 supplier 链上背书。
-- 不能写成 notification delivered 等于履约完成。
-- 不能写成 Store docking session 已经让local order继续；local order必须收到授权 mapped signal。
+- Store admin 维护平台 workflow；凝结核维护秩序内部公平。
+- Store review 说明材料通过平台流程；fair/trusted 展示依赖 trust-domain projection。
+- Store tag 或 capability label 是目录语义；supplier 链上背书看 `SupplierAttested`。
+- notification delivered 是联系状态；履约完成看 signal/proof。
+- Store docking session 是试拼和运营记录；local order 继续推进看授权 mapped signal 或 `DockedSignalSubmitted`。

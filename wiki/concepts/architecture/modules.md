@@ -21,7 +21,7 @@
 | `uvp-chain-services/service` | indexer、relayer、proof verifier、Product API、Store API。 |
 | `uvp-protocol/packages/product-dto` | Product API、Store、Order App 共享的 DTO contract。 |
 
-服务层可以缓存和投影，但数据库必须能从链事件重建。它不能让 `miniprogram-backend`、外部数据库或任意 HTTP 服务成为 plan/order/signal/hook 的事实源。
+服务层可以缓存和投影，但数据库必须能从链事件重建。`miniprogram-backend`、外部数据库或任意 HTTP 服务都只能作为读模型或 workflow，而不是 plan/order/signal/hook 的事实源。
 
 ## 产品与执行者
 
@@ -31,7 +31,7 @@
 | `uvp-order-app/app` | 普通参与者 App，处理 invite onboarding、任务 inbox、证据指纹、证明展示。 |
 | `uvp-executor-kit/package` | executor、executor 的 CLI 和 SDK。 |
 
-这些表面消费 DTO、签名请求或链事件。它们可以改善 UX，但不能替代合约授权。
+这些表面消费 DTO、签名请求或链事件。它们改善 UX；合约授权仍是提交检查边界。
 
 ## 部署与 Periphery
 
@@ -40,4 +40,4 @@
 | `uvp-deploy/deploy` | uvp-eth 自己的部署脚本、环境 manifest、发布记录。 |
 | `uvp-periphery` | escrow、payment、guarantee、agent、demo adapter。 |
 
-部署状态必须留在本仓库，不依赖 sibling `/Users/uyhendu/project/uvp-deploy`。资金、担保和 agent 集成属于 periphery，必须围绕核心状态机消费接口，不能重写核心事实。
+部署状态必须留在本仓库，不依赖 sibling `/Users/uyhendu/project/uvp-deploy`。资金、担保和 agent 集成属于 periphery，必须围绕核心状态机消费接口。

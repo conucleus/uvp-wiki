@@ -14,7 +14,7 @@ local Zhixu / local order
   -> authorized mapped signal is submitted to local order
 ```
 
-local order 和 linked order 都是独立的 `UVPStateMachine` order。它们各自有自己的 plan、授权、事件、proof 和生命周期。Docking relation 只是说明两条秩序之间哪些 signal 可以对接；它不是层级关系。
+local order 和 linked order 都是独立的 `UVPStateMachine` order。它们各自有自己的 plan、授权、事件、proof 和生命周期。Docking relation 说明两条秩序之间哪些 signal 可以对接；运行态关系由 docking link 和 mapped signal 事件记录。
 
 ## 为什么要这样设计
 
@@ -60,7 +60,7 @@ local order 和 linked order 都是独立的 `UVPStateMachine` order。它们各
 | linked Zhixu 使用哪个计划 | linked order 的 `OrderRegistered` 和 linked plan projection。 |
 | linked Zhixu 是否被背书 | linked plan 的 `PlanAttested` projection。 |
 | linked order 如何推进 | linked order 的 `SignalSubmitted` / hook proof。 |
-| local order 如何继续 | local order 上被授权 submitter 提交的 mapped signal。 |
+| local order 如何继续 | local order 上的 mapped signal，来源可以是授权 submitter 或 `DockedSignalSubmitted`。 |
 
 Store 可以把这些 proof 拼成一张履约卡片；状态真相仍来自两边各自的链上事件。
 
@@ -76,7 +76,8 @@ Store 应把 docked Zhixu 管成一个可审核 workflow：
   -> 保存 docking session draft
   -> operator review
   -> 发布或绑定到 local order workflow
-  -> 运行时观察 linked proof 并桥接 local signal
+  -> linkDockedOrder 记录 local/linked relation
+  -> submitDockedSignal 或授权 submitter 映射 local signal
 ```
 
-Sandbox validation 是试拼和审核材料。正式运行仍需要 plan attestation、order registration、signal authorization 和 proof。
+Sandbox validation 是试拼和审核材料。正式运行需要 plan attestation、order registration、signal authorization、docking link 和 proof。

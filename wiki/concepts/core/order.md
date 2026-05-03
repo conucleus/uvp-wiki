@@ -1,6 +1,6 @@
-# Order
+# 订单 (Order)
 
-Order 是某个 Plan 的一次动态运行实例。它记录这个订单里哪些 signal 被接受、哪些 hook ready 或 cancelled、哪些 executor/resource overlay 被应用，以及这些事实对应的链上 proof。
+Order 是“订单”。在协议里，它是某个 Plan 的一次动态运行实例。它记录这个订单里哪些 signal 被接受、哪些 hook ready 或 cancelled、哪些 executor/resource overlay 被应用，以及这些事实对应的链上 proof。
 
 ## Order 注册
 
@@ -28,11 +28,11 @@ registerOrder(orderId, planId, creator, authorizations)
 | resource overlay | `StageResourcePatchApplied`。 |
 | task projection | chain-services 从 `HookReady` 和授权事件重建。 |
 | proof rows | event provenance。 |
-| docking relation | Store/Product/adapter 保存local/linked order关联，并用链上 signal/proof 校验，不能替代两个订单各自事件。 |
+| docking relation | `DockedOrderLinked`、`DockedSignalMapped`、`DockedSignalSubmitted`，以及两边订单各自的 signal/proof。 |
 
 ## Order 和 Product Order
 
-链上 Order 是协议状态。`ProductOrderDTO` 是产品视图。Product Order 会把链上字段翻译成阶段、任务、参与方、证明和普通语言，但不能改变 Order 的事实。
+链上 Order 是协议状态。`ProductOrderDTO` 是产品视图。Product Order 会把链上字段翻译成阶段、任务、参与方、证明和普通语言。事实仍来自 `UVPStateMachine` 事件。
 
 Product task ID、Store docking session ID、adapter job ID 都是工作流索引。链上 Order 的身份仍是 `orderId`，链上状态仍来自 `UVPStateMachine` 事件。
 
@@ -51,4 +51,4 @@ local order
   -> authorized mapped signal submitted to local order
 ```
 
-local/linked relation可以由 Store/Product 保存和展示，但跨订单推进必须最终落成local order上的授权 signal；否则local order状态机不会因为linked order数据库状态变化而改变。
+当前合约已经把运行时 docking 作为公共事件面暴露：`linkDockedOrder` 记录 local/linked order 关系和 signal binding，`submitDockedSignal` 把 linked order 中已经存在的 signal 映射成本地订单的 signal。Store/Product 可以保存 sandbox、contact、operator review 和展示状态；运行态 proof 以两边订单的链上事件为准。
