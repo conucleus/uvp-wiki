@@ -1,0 +1,91 @@
+# 合约与事件
+
+合约源码在 `uvp-protocol/contracts/uvp-contracts/`。
+
+## Contracts
+
+| 合约 | 作用 |
+| --- | --- |
+| `ZhixuTrustRegistry` | trust domain、plan attestation、supplier attestation、revocation。 |
+| `UVPStateMachine` | plan/order/signal/hook/timer/stage overlay runtime。 |
+| `UVPDeploymentRegistry` | versioned state-machine deployment cutover ledger。 |
+| `ECDSA` | minimal signature recovery helper。 |
+| `UVPSignatures` | relayed state-machine signal submission shared signature structs。 |
+
+## Public Interface
+
+`UVPStateMachine` public boundary 包括：
+
+- constructor args；
+- publisher/registrar governance；
+- `registerPlan`；
+- authorization-bearing `registerOrder` overloads；
+- `submitSignal`；
+- `submitSignalFor`；
+- `applyStageExecutorPatch` / `applyStageExecutorPatchFor`；
+- `applyStageResourcePatch` / `applyStageResourcePatchFor`；
+- EIP-712 digest helpers；
+- `DOMAIN_SEPARATOR`；
+- `pokeTimer`；
+- order/plan/hook/status/signal authorization view helpers；
+- stage overlay view helpers；
+- event topics、function selectors、ABI hash、bytecode hash。
+
+改变这些内容必须更新 fixture 并审查 adapter。
+
+## Stable Events
+
+Indexer 和 replay tooling 应把这些 event name 当作 public interface：
+
+```text
+DomainRegistered
+DomainUpdated
+DomainOwnerTransferred
+PlanAttested
+PlanRevoked
+SupplierAttested
+SupplierRevoked
+OwnershipTransferred
+PlanPublisherSet
+OrderRegistrarSet
+PlanPublisherRecorded
+OrderRegistrarRecorded
+SignalSubmitterAuthorized
+PlanRegistered
+OrderRegistered
+SignalSubmitted
+StageExecutorPatchApplied
+StageResourcePatchApplied
+StageExecutorActivated
+HookStatusChanged
+HookReady
+TimerPoked
+DeploymentRegistered
+DeploymentCanaryMarked
+DeploymentActivated
+DeploymentDeprecated
+DeploymentRetired
+```
+
+## Fixture Verification
+
+从仓库根目录：
+
+```bash
+pnpm verify:protocol-freeze
+```
+
+从合约目录：
+
+```bash
+cd uvp-protocol/contracts/uvp-contracts
+forge build
+forge test
+```
+
+## Funding Boundary
+
+当前合约模块不包含 funding、escrow、custody、settlement、release、refund、
+dispute-payment、ERC20 或 USDC 合约。未来资金相关工作必须作为 adapter，有自己的
+authorization、event mapping、tests 和 PRD，并消费 `UVPStateMachine` signal，而不是
+替换核心协议。
