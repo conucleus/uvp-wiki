@@ -45,4 +45,4 @@ Proof verifier boundaries:
 
 ## Plain-Text Evidence Boundary
 
-Contracts, invoices, logistics records, vehicle records, photos, OCR originals, and similar business materials should not be written on chain in plaintext. On-chain storage should contain only hashes, URIs, signatures, events, and the minimum necessary metadata. Chain Services may store object handles and reconstructable metadata, but they must not write private credentials, RPC secrets, JWT secrets, or database passwords into docs, logs, or proof output.
+Contracts, invoices, logistics records, vehicle records, photos, OCR originals, and similar business materials should not be written on chain in plaintext. On-chain storage should contain only hashes, URIs, signatures, events, and the minimum necessary metadata. Chain Services may store object handles and reconstructable metadata. Private credentials, RPC secrets, JWT secrets, and database passwords must stay out of docs, logs, and proof output.

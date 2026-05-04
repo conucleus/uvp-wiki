@@ -1,116 +1,87 @@
 # 一个订单故事
 
-这页用一条跨境高价值货物订单串起 UVP 的主路径。先记住一句话：秩序 (Zhixu) 是静态协作设计，订单 (Order) 是这份设计的一次链上运行。故事里的参与者和服务见 [角色地图](actor-map.md)。
+这页先从一张真实生产关系图理解 UVP，再进入订单。先记住一句话：秩序 (Zhixu) 是一类协作的静态约定，订单 (Order) 是这份约定的一次具体执行。
 
-## 1. 凝结核设计秩序
+## 1. 一个跨境光伏项目是一张生产关系图
 
-凝结核先设计一类可复用的跨境供货秩序：需求确认、供应商寻源、付款路径、物流、清关、现场交付、买方验收。这个静态定义写成 `ZhixuDefinition`：
+以蒙古光伏项目为例，一个项目顺利落地，要同时牵动政策审批、公共 EPC、项目公司、EPC/EPCM、组件和逆变器 OEM、进口报关、口岸物流、仓储到现场、安装验收、O&M、资金方、保险、审计和监管。
+
+这类生意很难用“我有货，你买货”概括。它更像一张互相依赖的生产关系图：政府许可影响 EPC 招标，EPC 需求影响 OEM 排产，出厂文件影响报关，清关状态影响现场安装，安装记录影响验收和付款，O&M 记录又影响后续责任。
+
+## 2. 生产关系靠信号运转
+
+生产关系能跑起来，是因为每个参与者不断发出信号：
+
+- 政府或监管发出许可、备案、并网、验收等信号。
+- 项目公司发出需求确认、合同确认、付款安排等信号。
+- EPC/EPCM 发出设计确认、采购指令、现场条件确认等信号。
+- OEM 发出定稿、打样、开模、小批量、出厂、质检等信号。
+- 进口和物流参与方发出装箱、发运、到港、清关、入库、出库、到场等信号。
+- O&M 发出安装完成、巡检、故障响应、维护完成等信号。
+
+信号回答三个问题：谁完成了什么，下一步能不能开始，谁愿意为这个声明承担后果。
+
+## 3. 信号为什么有用
+
+信号有用，是因为现实社会给它后果。付款凭证让供应商继续排产，监管许可让项目进入下一步，报关材料让货物可以放行，验收确认让付款或质保责任开始，保险和审计记录让风险可以被计算。
+
+UVP 记录协议事实：被授权的主体，在某个订单、某个阶段、某个证据指纹下，签名声明某个业务信号已经发出。现实真实性由对应的人、企业、trust domain、审计方、资金方、监管方或 adapter 发出自己的信号并承担责任。链下事实由现实责任主体声明，链上记录这些声明、签名、证据指纹和状态后果。
+
+## 4. Zhixu DSL 把生产关系写成代码
+
+UVP 的第一个核心动作，是把“生产关系 + 信号边界”写成计算机可读的秩序。这个秩序叫 `Zhixu`，写法是一个面向协作的 DSL，实际形式接近 YAML 约定。
+
+一个光伏交付 Zhixu 会描述：
 
 ```text
-秩序 (Zhixu)
-  -> task patterns
-  -> stages
-  -> sources
-  -> receive/send signals
-  -> supplier/executor requirements
-  -> file resource handles
+谁可以开始
+哪些阶段需要哪些证据
+哪些 Supplier 可以承接哪些环节
+每个阶段会接收什么 signal
+收到哪些 signal 后，下一步 task 可以打开
+失败、超时、拒绝或改派时走哪条路径
 ```
 
-这里还没有具体订单，也没有任何参与方提交证据。它只是说明“这类协作应该怎样运行”。
+这不是法律文书本身，也不替代现实合同。它是让计算机、链上合约、企业系统、AI agent、Store、Order App 和 executor-kit 能理解同一套协作边界的标准语言。
 
-## 2. 编译成 Plan
+继续读核心对象时，从 [核心概念入口](../core/README.md) 和 [秩序 (Zhixu) DSL](../concepts/core/zhixu.md) 开始。
 
-compiler 把秩序编译成 deterministic artifacts：
+## 5. 从 Zhixu 到 Plan，再到 Order
+
+写出 Zhixu 后，compiler 会把它编译成确定性 Plan artifact。Plan 是某个 Zhixu 版本面向链目标的稳定版本；影响语义的字段变化会改变 hash。Trust domain 可以审查这个 Plan 的材料、hash 和 policy，并发出 `PlanAttested`。
+
+Order 是这个 Plan 的一次具体执行。比如某个蒙古光伏项目真的要采购一批组件并交付到现场，registrar 创建一个 Order，并写入本订单里谁能提交哪些 signal：
 
 ```text
-ZhixuDefinition
-  -> HookPlanArtifact
-  -> OnchainHookPlanArtifact
-  -> registerPlan args
-  -> planId / planHash
+Zhixu DSL
+  -> Plan / planHash
+  -> PlanAttested
+  -> OrderRegistered
+  -> SignalSubmitterAuthorized
 ```
 
-Plan 是秩序的链目标版本。影响语义的字段变化会改变 hash，所以后续审查、注册和订单运行都有稳定边界。
+从 `OrderRegistered` 开始，业务不再只是模板。它变成一次可以被跟踪、签名、提交证据、打开下一步任务并重放证明的具体运行。
 
-## 3. Trust domain 背书 Plan
+## 6. 参与者的日常工作怎样变化
 
-官方 trust domain 审查这份 Plan 的材料、hash 和 policy，然后在 `ZhixuTrustRegistry` 发出：
+从参与者角度看，原来要做的工作基本保持不变：生产厂家仍然定稿、打样、开模、小批量和出厂；物流商仍然订舱、发运、清关和交付；EPC 仍然组织设计、采购、安装和验收。
 
-```text
-PlanAttested(domainId, planId, planHash, ...)
-```
-
-这一步把“可审查材料”变成链上可验证的 plan trust。Store 可以展示申请、审核材料和投影，但 official trusted plan 的依据是 registry 事件。
-
-## 4. 注册订单并写入授权
-
-当某个买方真的要跑一次跨境供货流程时，registrar 在 `UVPStateMachine` 注册订单：
+UVP 标准化的是信号边界。你在某个阶段完成了约定动作，就按要求提交证据指纹，用授权钱包签名发出 signal。别人的 signal 到达后，UVP 按 Zhixu 的约定打开你的 ready task，通知你可以开始下一步。
 
 ```text
-registerOrder(orderId, planId, creator, authorizations)
-```
-
-订单绑定一个已注册并被背书的 Plan。`authorizations` 同时写入本订单允许谁提交哪些 source/signal：
-
-```text
-SignalSubmitterAuthorized(orderId, sourceId, signalId, submitter, ...)
-```
-
-从这一步开始，`orderId` 才代表一次具体运行。
-
-## 5. 参与方提交 signal
-
-被授权的钱包用 EIP-712 签名提交业务 signal，例如物流商提交“清关完成”的证据 hash，买方提交“验收通过”的确认：
-
-```text
-submitSignal(orderId, sourceId, signalId, payloadHash, metadataURI, ...)
+指令
+  -> 执行
+  -> 证据指纹
+  -> 签名 signal
   -> SignalSubmitted
+  -> HookReady
+  -> 下一步任务
 ```
 
-合约按 `(orderId, sourceId, signalId)` first-writer-wins 去重。业务文件留在链下，链上保存 hash、URI、submitter、时间和事件 proof。
+复杂生产关系被压缩成一条可读路径：谁被授权、做了什么、证据指纹是什么、签名是谁、链上事件是什么、下一步为什么可以开始。
 
-## 6. HookReady 生成任务和证明
+## 接着读
 
-每个 signal 进入状态机后，合约只评估受影响的 hooks。条件成立时会发出：
-
-```text
-HookStatusChanged
-HookReady
-```
-
-chain-services 从事件重建订单、任务、timeline、proof rows 和 trust projection，再翻译成 `ProductOrderDTO`、`ProductTaskDTO` 给 Store、Order App、executor-kit 使用。
-
-## 可选进阶扩展：另一条秩序承接一个阶段
-
-上面的基础 Order 路径不要求 linked Zhixu。下面是进阶组合模型：一条可独立运行的 Zhixu 为另一条 Zhixu 执行某个阶段。
-
-某些阶段可以交给另一条独立秩序执行，例如清关或付款结算。静态层由 `supplierType=zhixu` 和 `signalMap` 声明：
-
-```text
-local stage
-  -> peer Zhixu plan
-  -> linked order
-  -> linked signal proof
-  -> mapped local signal
-```
-
-当前合约已经提供运行时 docking 事件路径：
-
-```text
-DockedOrderLinked
-DockedSignalMapped
-DockedSignalSubmitted
-```
-
-Store/Product 可以先组织 sandbox、contact、operator review 和 proof checklist；一旦进入运行态，两边订单仍各自以 `UVPStateMachine` 事件为事实源。
-
-## 事实来源速查
-
-| 问题 | 事实来源 | 产品展示 |
-| --- | --- | --- |
-| 这个秩序版本是否可信 | `PlanAttested` / `PlanRevoked` | Store trust badge、Product proof row。 |
-| 这个订单是否存在 | `OrderRegistered` | Product order、Store runtime view。 |
-| 谁能提交某个动作 | `SignalSubmitterAuthorized`、active executor overlay | task assignment、canSubmit、blocked reason。 |
-| 某个动作是否发生 | `SignalSubmitted` | task submitted、timeline、proof row。 |
-| 下一步是否 ready | `HookReady` | task inbox、executor-kit watcher。 |
-| peer 秩序是否已对接 | `DockedOrderLinked`、`DockedSignalMapped`、`DockedSignalSubmitted` | docking proof、linked runtime view。 |
+- [角色地图](actor-map.md)：把光伏项目里的现实角色映射到 UVP 角色。
+- [证据与 Proof 路径](evidence-proof-path.md)：看业务文件如何变成 hash、签名 signal、链事件和 Product proof row。
+- [核心术语表](../reference/glossary.md)：遇到 Zhixu、Order、Signal、Hook、Trigger、Supplier、Executor 时随时查。

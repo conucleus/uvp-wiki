@@ -1,37 +1,41 @@
 # Actor Map
 
-This page names the people, organizations, wallets, and services in the one-order path. Keep the main split in mind: people and services help prepare, submit, display, and relay actions; registry and state-machine events prove protocol facts.
+This page maps real roles in a cross-border PV project to UVP roles. Keep the main split in mind: real-world subjects do the work and accept responsibility; UVP records authorized signals, signatures, evidence fingerprints, and chain consequences.
 
-## One Cross-Border Order
+## From Real Roles to UVP Roles
 
-| Actor | What they do | Where they act | What proves it |
+| Real role | What they do in the PV project | UVP role | What proves it |
 | --- | --- | --- | --- |
-| Buyer | Starts or participates in a concrete supply order, reviews tasks, and signs buyer-side confirmations. | Product UI, Order App, wallet. | `OrderRegistered` for the order; `SignalSubmitted` for signed buyer actions. |
-| Nucleation | Designs and maintains the reusable Zhixu for this kind of order. For example, a procurement team can own `spec.nucleation.id=procurement-nucleus`, maintain versions, define stages, and organize supplier slots. | Store Nucleation workbench and Zhixu source materials. | The compiled `planId` / `planHash`; later `PlanAttested` if endorsed. |
-| Store operator | Imports the Zhixu, checks compile previews, organizes supplier profiles, reviews materials, and starts attestation workflows. | Store / Store Console. | Store audit records for workflow actions; registry events for official trust. |
-| Trust Domain | Externally endorses a plan version or supplier subject. | Trust registry workflow and governance wallet. | `PlanAttested`, `PlanRevoked`, `SupplierAttested`, or `SupplierRevoked`. |
-| Registrar | Registers a concrete Order against an endorsed Plan and writes initial order-level signal permissions. | Product BFF, governance flow, or direct contract call. | `OrderRegistered` and `SignalSubmitterAuthorized`. |
-| Supplier | Provides a real-world capability such as customs, logistics, inspection, payment adapter, guarantee, or another Zhixu. | Store supplier registry and Product projection. | `SupplierAttested` for trust; order authorization for current action permission. |
-| Executor | Actually handles a task or submits a signal for the current Order and stage. | Order App, executor-kit, enterprise system, or adapter. | EIP-712 signature plus `SignalSubmitted`; stage overlay events if an active executor was chosen. |
-| Relayer | Broadcasts a participant-signed transaction and may pay gas. | Chain Services relayer. | Transaction hash and on-chain event; the relayer does not prove business authority. |
-| Chain Services | Rebuilds order, task, timeline, proof, and trust views from chain events, and exposes Product / Store APIs. | Rebuildable service layer. | Projection rows with tx, block, log, contract, chain id, and event provenance. |
+| Government / regulator | Permits, filings, grid connection, acceptance, regulatory conclusions. | Trust Domain or external signal issuer. | `PlanAttested`, regulatory signal, Product proof row. |
+| Project company / owner | Starts the project and confirms demand, contracts, payment, and acceptance. | Buyer / Owner, Order participant. | `OrderRegistered`, owner-side `SignalSubmitted`. |
+| Nucleation | Designs this class of PV delivery coordination as a reusable Zhixu, maintains versions and supplier slots. | Nucleation. | Compiled `planId` / `planHash`; `PlanAttested` after endorsement. |
+| Store operator | Imports the Zhixu, organizes supplier profiles, reviews materials, and starts endorsement workflows. | Store operator. | Store audit record; official trust still comes from registry events. |
+| EPC / EPCM | Design, procurement, construction management, installation coordination, acceptance materials. | Supplier or Executor, depending on the Order stage. | supplier trust, order authorization, EPC-stage `SignalSubmitted`. |
+| OEM / tier-1 supplier | Final spec, samples, tooling, pilot run, factory release, inspection, packing. | Supplier; sometimes Executor for an Order stage. | `SupplierAttested`, factory or inspection signal, payload hash. |
+| Importer / customs / logistics | Shipment, port arrival, customs declaration, customs release, port transport. | Supplier / Executor / adapter. | customs or logistics `SignalSubmitted`, tx/block/log proof. |
+| Warehouse / site delivery | Warehouse receipt, outbound, site arrival, handover, delivery confirmation. | Executor or site supplier. | warehouse receipt, site-delivery signal, Product proof row. |
+| O&M | Post-installation inspection, fault response, maintenance records. | Supplier / Executor. | O&M signal, maintenance evidence hash, proof row. |
+| Funder / insurer / auditor | Payment, credit, insurance, audit, risk confirmation. | Trust Domain, adapter, or signal issuer. | endorsement, payment/audit/insurance signal, chain-event proof. |
+| Registrar | Creates a concrete Order against an endorsed Plan and writes initial signal permissions. | Registrar. | `OrderRegistered`, `SignalSubmitterAuthorized`. |
+| Relayer | Broadcasts participant-signed transactions and may pay gas. | Relayer. | transaction hash and chain event; business responsibility comes from submitter signature. |
+| Chain Services | Rebuilds order, task, timeline, proof, and trust views from chain events. | Rebuildable Service Layer. | projection row with tx, block, log, contract, chain id, and event provenance. |
 
-## Who Has Authority
+## Authority Sources in One Order
 
 | Question | Authority source |
 | --- | --- |
-| Is this Zhixu version trusted? | Trust-domain `PlanAttested` / `PlanRevoked`. |
-| Does this Order exist? | `UVPStateMachine.OrderRegistered`. |
-| Who may submit this action for this Order? | `SignalSubmitterAuthorized` plus active executor overlay when present. |
-| Did a business action happen? | Authorized signature and `SignalSubmitted`. |
+| Is this PV delivery Zhixu endorsed? | Trust-domain `PlanAttested` / `PlanRevoked`. |
+| Does this project-delivery Order exist? | `UVPStateMachine.OrderRegistered`. |
+| Who may submit a stage signal? | `SignalSubmitterAuthorized`, plus active executor overlay when present. |
+| Did a business action happen? | Authorized wallet signature and `SignalSubmitted`. |
 | Is the next task open? | `HookReady`. |
-| Is a Product or Store view reliable? | It must point back to chain events or clearly marked workflow metadata. |
+| Where does the Product or Store view come from? | Chain-event projection; workflow metadata must be marked clearly. |
 
-## Do Not Confuse
+## How to Read a Role
 
-| Pair | Correct reading |
+| Question | How to decide |
 | --- | --- |
-| Nucleation / Store operator | Nucleation owns the internal Zhixu design; Store operators manage platform workflow and review materials. |
-| Trust Domain / Registrar | The trust domain endorses plans or suppliers; the registrar creates concrete Orders and writes signal authorizations. |
-| Supplier / Executor | Supplier is capability and trust identity; Executor is the runtime handler or submitter for this Order and stage. |
-| Relayer / Submitter | The relayer broadcasts; the submitter signs the business action. |
+| Is this subject designing a coordination template or executing a concrete Order? | Template design maps to Nucleation / Store; concrete execution maps to Order participant / Supplier / Executor. |
+| Does this subject provide long-term capability or handle the current stage? | Long-term capability maps to Supplier; current-stage submitter maps to Executor or submitter. |
+| Does this subject endorse real-world trust or create an Order? | Endorsement maps to Trust Domain; Order creation and initial authorization map to Registrar. |
+| Does this subject broadcast a transaction or sign the business statement? | Broadcasting maps to Relayer; business statement maps to submitter signature. |

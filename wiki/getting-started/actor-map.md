@@ -1,37 +1,41 @@
 # 角色地图
 
-这一页把一条订单路径里的参与者、组织、钱包和服务先讲清楚。记住一个主分工：人和服务负责准备、提交、展示和转发动作；registry 和 state-machine 事件证明协议事实。
+这一页把光伏跨境项目里的现实角色映射到 UVP 角色。记住一个主分工：现实主体做事并承担责任；UVP 记录被授权的 signal、签名、证据指纹和链上后果。
 
-## 一条跨境订单里的角色
+## 从现实角色到 UVP 角色
 
-| 角色 | 做什么 | 在哪里行动 | 什么证明它 |
+| 现实角色 | 在光伏项目里做什么 | 对应 UVP 角色 | 什么证明它 |
 | --- | --- | --- | --- |
-| Buyer | 发起或参与具体供货订单，查看任务，签名确认买方侧动作。 | Product UI、Order App、钱包。 | `OrderRegistered` 证明订单存在；`SignalSubmitted` 证明买方签名动作。 |
-| 凝结核 / Nucleation | 设计并维护这一类订单复用的 Zhixu。例如采购团队可以拥有 `spec.nucleation.id=procurement-nucleus`，维护版本、定义阶段、组织 supplier slot。 | Store 凝结核工作台和 Zhixu 源材料。 | 编译出的 `planId` / `planHash`；被背书后是 `PlanAttested`。 |
-| Store operator | 导入 Zhixu、查看 compile preview、组织 supplier profile、审核材料、发起 attestation workflow。 | Store / Store Console。 | Store audit 证明 workflow 动作；registry event 证明官方 trust。 |
-| Trust Domain | 对 plan version 或 supplier subject 做外部背书。 | Trust registry workflow 和 governance wallet。 | `PlanAttested`、`PlanRevoked`、`SupplierAttested`、`SupplierRevoked`。 |
-| Registrar | 基于已背书 Plan 注册具体 Order，并写入初始 order-level signal 权限。 | Product BFF、治理流程或直接合约调用。 | `OrderRegistered` 和 `SignalSubmitterAuthorized`。 |
-| Supplier | 提供现实履约能力，例如 customs、logistics、inspection、payment adapter、guarantee，或另一个 Zhixu。 | Store supplier registry 和 Product projection。 | `SupplierAttested` 证明 trust；当前动作权限仍看 order authorization。 |
-| Executor | 实际处理当前 Order 某个阶段的任务，或提交该阶段 signal。 | Order App、executor-kit、企业系统或 adapter。 | EIP-712 签名加 `SignalSubmitted`；如有 active executor，则看 stage overlay events。 |
-| Relayer | 广播参与者已签名的交易，并可能代付 gas。 | Chain Services relayer。 | 交易 hash 和链上事件；relayer 不证明业务授权。 |
-| Chain Services | 从链事件重建 order、task、timeline、proof、trust 视图，并提供 Product / Store API。 | 可重建服务层。 | 带 tx、block、log、contract、chain id、event provenance 的 projection row。 |
+| 政府 / 监管 | 许可、备案、并网、验收、监管结论。 | Trust Domain 或外部 signal issuer。 | `PlanAttested`、监管类 signal、Product proof row。 |
+| 项目公司 / 业主 | 发起项目，确认需求、合同、付款和验收。 | Buyer / Owner、Order participant。 | `OrderRegistered`、买方或业主侧 `SignalSubmitted`。 |
+| 凝结核 / Nucleation | 把这类光伏交付协作设计成可复用 Zhixu，维护版本和 supplier slot。 | Nucleation。 | 编译出的 `planId` / `planHash`；被背书后是 `PlanAttested`。 |
+| Store operator | 导入 Zhixu，组织 supplier profile，审核材料，发起背书 workflow。 | Store operator。 | Store audit record；official trust 仍看 registry event。 |
+| EPC / EPCM | 设计、采购、施工管理、安装协调、验收资料组织。 | Supplier 或 Executor，视具体订单阶段而定。 | supplier trust、order authorization、EPC 阶段 `SignalSubmitted`。 |
+| OEM / 一级供应商 | 定稿、打样、开模、小批量、出厂、质检、装箱。 | Supplier；在订单阶段里也可能是 Executor。 | `SupplierAttested`、出厂或质检 signal、payload hash。 |
+| 进口商 / 报关 / 物流 | 发运、到港、报关、清关、口岸运输。 | Supplier / Executor / adapter。 | 清关或物流 `SignalSubmitted`、tx/block/log proof。 |
+| 仓储 / 现场交付 | 入库、出库、到场、签收、交付。 | Executor 或现场 supplier。 | 仓储签收、现场交付 signal、Product proof row。 |
+| O&M | 安装后巡检、故障响应、维护记录。 | Supplier / Executor。 | O&M signal、维护 evidence hash、proof row。 |
+| 资金方 / 保险 / 审计 | 付款、授信、保险、审计、风险确认。 | Trust Domain、adapter 或 signal issuer。 | 背书、付款/审计/保险 signal、链上事件 proof。 |
+| Registrar | 基于已背书 Plan 创建具体订单，并写入初始 signal 权限。 | Registrar。 | `OrderRegistered`、`SignalSubmitterAuthorized`。 |
+| Relayer | 广播参与者已签名的交易，可能代付 gas。 | Relayer。 | transaction hash 和链上事件；业务责任看 submitter 签名。 |
+| Chain Services | 从链事件重建 order、task、timeline、proof 和 trust 视图。 | Rebuildable Service Layer。 | 带 tx、block、log、contract、chain id、event provenance 的 projection row。 |
 
-## 谁有权威
+## 一条订单里的权威来源
 
 | 问题 | 权威来源 |
 | --- | --- |
-| 这个 Zhixu version 是否可信？ | Trust-domain 的 `PlanAttested` / `PlanRevoked`。 |
-| 这个 Order 是否存在？ | `UVPStateMachine.OrderRegistered`。 |
-| 谁可以提交这个 Order 的这个动作？ | `SignalSubmitterAuthorized`，以及存在时的 active executor overlay。 |
-| 某个业务动作是否发生？ | 授权签名和 `SignalSubmitted`。 |
-| 下一个任务是否打开？ | `HookReady`。 |
-| Product 或 Store 视图是否可靠？ | 必须能指回链事件，或明确标注为 workflow metadata。 |
+| 这类光伏交付 Zhixu 是否被背书？ | Trust-domain 的 `PlanAttested` / `PlanRevoked`。 |
+| 这次项目交付 Order 是否存在？ | `UVPStateMachine.OrderRegistered`。 |
+| 谁能提交某个阶段 signal？ | `SignalSubmitterAuthorized`，以及存在时的 active executor overlay。 |
+| 某个业务动作是否发生？ | 授权钱包签名和 `SignalSubmitted`。 |
+| 下一步任务是否打开？ | `HookReady`。 |
+| Product 或 Store 展示从哪里来？ | 链事件 projection；workflow metadata 需要明确标注。 |
 
-## 不要混淆
+## 读角色时的判断法
 
-| 概念对 | 正确理解 |
+| 问题 | 判断方式 |
 | --- | --- |
-| 凝结核 / Store operator | 凝结核负责内部 Zhixu 设计；Store operator 管平台 workflow 和审核材料。 |
-| Trust Domain / Registrar | Trust domain 负责背书 plan 或 supplier；registrar 负责创建具体 Order 并写 signal authorization。 |
-| Supplier / Executor | Supplier 是能力和 trust 身份；Executor 是这个 Order/阶段的运行时处理者或提交者。 |
-| Relayer / Submitter | Relayer 负责广播；submitter 签业务声明。 |
+| 这个主体是在设计协作模板，还是在执行具体订单？ | 设计模板看 Nucleation / Store；执行订单看 Order participant / Supplier / Executor。 |
+| 这个主体提供长期能力，还是处理当前阶段？ | 长期能力看 Supplier；当前阶段提交者看 Executor 或 submitter。 |
+| 这个主体提供现实背书，还是创建订单？ | 背书看 Trust Domain；创建订单和写入初始授权看 Registrar。 |
+| 这个主体广播交易，还是签业务声明？ | 广播看 Relayer；业务声明看 submitter 签名。 |
