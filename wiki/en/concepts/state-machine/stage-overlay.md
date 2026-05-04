@@ -11,7 +11,7 @@ An executor patch changes the execution constraint of a target stage. The contra
 - The nonce must increase, so older patches cannot overwrite newer ones.
 - Different modes such as assign, handoff, and replacement have different signature or approval requirements.
 
-After the patch becomes active, future business signals for the target stage must be submitted not only under the original signal authorization, but also by the active executor.
+After the patch becomes active, future business signals for the target stage require both the original signal authorization and the active executor.
 
 ## Resource Patch
 

@@ -1,6 +1,6 @@
 # Event Replay
 
-`uvp-protocol/packages/statemachine` provides a platform-neutral reference reducer. Its goal is not to replace the contract, but to replay order state from chain events and verify whether the contract output matches the local semantics.
+`uvp-protocol/packages/statemachine` provides a platform-neutral reference reducer. It replays order state from chain events and verifies whether the contract output matches the local semantics.
 
 ## Input Events
 

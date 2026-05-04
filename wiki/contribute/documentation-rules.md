@@ -7,7 +7,7 @@ Wiki 的目标是让人读懂项目，并把源码、测试、ABI fixture、PRD 
 - 先写读者要做什么，再链接到源码和 PRD。
 - 首次出现专有名词时用中文优先写法，例如“秩序 (Zhixu)”和“订单 (Order)”。
 - 每个核心对象页先写“是什么 / 谁使用 / 产生什么结果 / 权威来自哪里”，再写边界检查。
-- 少用“不是 A，而是 B”作为主解释结构；确实需要硬边界时，放到“边界检查”或 checklist。
+- 优先用直接定义作为主解释结构；确实需要硬边界时，放到“边界检查”或 checklist。
 - 区分已实现、fixture/local demo、staging evidence、planned PRD。
 - PRD 计划按 planned/prototype 写，已实现功能需要代码、测试或 release evidence 支撑。
 - Store metadata、database row、relayer queue 写成读模型或 workflow 状态；协议事实写成 registry/state-machine event。

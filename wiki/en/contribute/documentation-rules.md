@@ -7,7 +7,7 @@ The goal of the Wiki is to help people understand the project, and to organize s
 - Start with what the reader needs to do, then link to source and PRD.
 - When a technical term appears for the first time, prefer the project term with a Chinese alias where useful, such as "Zhixu (秩序)" and "Order (订单)".
 - Each core-object page should start with "what it is / who uses it / what it produces / where authority comes from", then move to boundary checks.
-- Avoid using "not A, but B" as the main explanatory structure; when a hard boundary is necessary, put it under "boundary checks" or a checklist.
+- Prefer direct definitions as the main explanatory structure; when a hard boundary is necessary, put it under "boundary checks" or a checklist.
 - Distinguish implemented, fixture/local demo, staging evidence, and planned PRD.
 - PRD plans should use planned/prototype language; implemented features need code, tests, or release evidence.
 - Write Store metadata, database rows, and relayer queues as read-model or workflow state; write protocol facts as registry/state-machine events.

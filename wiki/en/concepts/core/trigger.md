@@ -48,7 +48,7 @@ The contract has a `readyEmitted` flag, so `HookReady` for the same hook is emit
 
 When a stage in a local Order is executed by another Zhixu, the Trigger on the local stage means “it is now possible to hand this stage to the peer Zhixu or adapter for execution.” The linked Zhixu’s `str`, `cmp`, and `err` are then mapped back into the local Order through `signalMap` and authorized submitters or docking events.
 
-If this docking stage is not opened by the previous business signal but by Product, registrar, or operator workflow from outside the Order, it is better to give the link stage an explicit entry:
+If Product, registrar, or operator workflow opens this docking stage from outside the Order, give the link stage an explicit entry:
 
 ```yaml
 trigger:
@@ -79,7 +79,7 @@ Every cross-Zhixu advancement must still return to on-chain signal, proof, and r
 
 ## Boundary Checks
 
-- Trigger is a hook mark compiled into HookPlan and the contract, not a manual UI button.
+- Trigger is a hook mark compiled into HookPlan and the contract. Manual UI buttons call product actions that eventually submit signals or patches.
 - On-chain `orderId` comes from `registerOrder()`.
 - Trigger becoming ready usually means execution has started or a task can be claimed; business completion is decided by later signal/proof.
 - `signalMap` hooks do not currently emit `HookReady`; they are used for docked Zhixu output mapping.

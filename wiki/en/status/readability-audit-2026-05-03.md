@@ -12,7 +12,7 @@ The Wiki’s strengths are clear: it guards the protocol boundary tightly, and m
 
 The main reading barrier is also concentrated: the docs unfold the whole protocol universe first and explain each term afterward. On a first read, you have to remember Zhixu, nucleation, Supplier, Executor, Source, Signal, Hook, Trigger, Plan, Order, Trust Domain, Product DTO, Projection, Proof, Overlay, Docking, and similar objects at the same time. Each term is explained, but many explanations depend on other specialized terms, so the reader can follow along without forming an initial mental map.
 
-What is most needed is not more detail, but a minimum story that an ordinary reader can follow end to end: how a cross-border procurement order moves from design, endorsement, creation, authorization, evidence submission, task readiness, on-chain proof, to product display, and who does each step, in which system, and which chain event finally counts.
+What is most needed is a minimum story that an ordinary reader can follow end to end: how a cross-border procurement order moves from design, endorsement, creation, authorization, evidence submission, task readiness, on-chain proof, to product display, and who does each step, in which system, and which chain event finally counts.
 
 ## Highest-Priority Barriers
 
@@ -109,7 +109,7 @@ What is most needed is not more detail, but a minimum story that an ordinary rea
 
 - This is the hardest topic, and the page puts in a lot of effort, but the examples jump from cross-border trade to oil fractionation and agricultural procurement, which raises the learning cost.
 - Start with one cross-border procurement example that runs across the whole site, then move oil and agriculture into "advanced modeling examples".
-- There is also a potential ambiguity to fix: `source.md` stresses that Source is not a role, but `signal.md` says "source means the origin of an action, such as a role, supplier, system entry point, or stage source". These two statements can make readers think Source can simply equal a role.
+- There is also a potential ambiguity to fix: `source.md` defines Source as a namespace, while `signal.md` says "source means the origin of an action, such as a role, supplier, system entry point, or stage source". These two statements can make readers think Source can simply equal a role.
 
 ### `concepts/core/signal.md`
 

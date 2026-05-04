@@ -12,7 +12,7 @@ Reader stance: a technically literate reader with strong business and software c
 
 The current Wiki is much more readable than the pre-remediation audit record. The most important fixes are already present: [One Order Story](../getting-started/one-order-story.md), [Glossary](../reference/glossary.md), role-specific sections for Store/Product/Execution, and repeated source-of-truth boundaries.
 
-The remaining barrier is not lack of information. It is density and abstraction. A new reader can eventually learn the system, but they still have to hold too many invented or UVP-specific terms at the same time: Zhixu, Nucleation, Supplier, Executor, Source, Signal, Hook, Trigger, Plan, Order, Trust Domain, Attestation, Authorization, Product DTO, Product BFF, Signal Container, Stage Overlay, Selector Binding, signalMap, Docking, and Periphery.
+The remaining barrier is density and abstraction. A new reader can eventually learn the system, but they still have to hold too many invented or UVP-specific terms at the same time: Zhixu, Nucleation, Supplier, Executor, Source, Signal, Hook, Trigger, Plan, Order, Trust Domain, Attestation, Authorization, Product DTO, Product BFF, Signal Container, Stage Overlay, Selector Binding, signalMap, Docking, and Periphery.
 
 The docs should now move from "complete explanation" toward "guided comprehension". The first pass should make the reader confident about one concrete business order, one actor map, and one event path. The second pass can teach compiler, contract, DTO, and release details.
 
@@ -67,7 +67,7 @@ The docs should now move from "complete explanation" toward "guided comprehensio
 
 8. `non-trusted` and `Untrusted` were inconsistent and emotionally loaded.
 
-   Before the navigation reorganization, the main term and some link labels used variants of "trusted / untrusted" language. The explanation said it was forkable and not source of truth, which was good, but "untrusted" could sound unsafe or unreliable.
+   Before the navigation reorganization, the main term and some link labels used variants of "trusted / untrusted" language. The intended meaning was forkable projection layer outside the protocol fact source; "untrusted" could sound unsafe or unreliable.
 
    Recommended fix: use "Rebuildable Service Layer: Chain Services" as the reader-facing phrase, while keeping "non-trusted execution layer" only as the protocol alias.
 
