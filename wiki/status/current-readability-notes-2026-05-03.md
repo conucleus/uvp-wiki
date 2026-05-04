@@ -12,7 +12,7 @@
 
 Wiki 已经从“工程模块目录”向“读者理解路径”移动：现在有首页、一个订单故事、角色地图、证据与 proof 路径、术语表、Store/Product/执行/工程组件分层入口。
 
-剩余门槛主要不是信息不足，而是抽象密度高。新读者会同时遇到 Zhixu、Nucleation、Plan、Order、Source、Signal、Hook、Trigger、Trust Domain、Attestation、Authorization、Product DTO、Stage Overlay、signalMap、Docking、Periphery 等术语。第一遍阅读应先稳定在一条具体业务订单、一张角色图和一条事件路径上，第二遍再进入 compiler、contracts、DTO 和 release details。
+剩余门槛主要是抽象密度高。新读者会同时遇到 Zhixu、Nucleation、Plan、Order、Source、Signal、Hook、Trigger、Trust Domain、Attestation、Authorization、Product DTO、Stage Overlay、signalMap、Docking、Periphery 等术语。第一遍阅读应先稳定在一条具体业务订单、一张角色图和一条事件路径上，第二遍再进入 compiler、contracts、DTO 和 release details。
 
 ## 仍需注意的问题
 

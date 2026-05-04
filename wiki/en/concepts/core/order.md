@@ -38,7 +38,7 @@ Product task IDs, Store docking session IDs, and adapter job IDs are workflow in
 
 ## An Order Can Branch and Converge
 
-An Order can contain multiple source causal chains. For example, in cross-border supply, supply, payment, logistics, on-site delivery, and buyer acceptance all progress independently and converge at specific hooks. The dynamic nature of an Order does not come from a database freely mutating state, but from different authorized signals continuously writing into the same replayable event stream under contract rules.
+An Order can contain multiple source causal chains. For example, in cross-border supply, supply, payment, logistics, on-site delivery, and buyer acceptance all progress independently and converge at specific hooks. The dynamic nature of an Order comes from different authorized signals continuously writing into the same replayable event stream under contract rules.
 
 If a stage is taken over by another Zhixu, it usually creates signal binding between the local Order and the linked Order:
 

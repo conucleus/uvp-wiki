@@ -46,7 +46,7 @@ AND 2
 
 ## EvalValue
 
-The contract evaluation result is not a simple boolean; it carries time information:
+The contract evaluation result is a structured value with time information:
 
 ```solidity
 struct EvalValue {

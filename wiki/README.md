@@ -1,8 +1,8 @@
-# uvp-eth Wiki
+# UVP Wiki
 
 AI 时代的跨组织协作协议：UVP（通用价值协议，Universal Value Protocol）用秩序 DSL、标准化业务信号、钱包签名和链上 proof，降低搜索、议约、协调、监督、集成、争议和抵赖成本。
 
-`uvp-eth` 是通用价值协议的 EVM/Web3 实现轨道。它把可复用的跨组织协作设计变成被背书的链上 Plan、具体 Order、钱包签名的业务 Signal，以及可重放的 proof。
+UVP Wiki 是通用价值协议的公开阅读入口。当前可运行实现轨道是 EVM/Web3：可复用的跨组织协作设计会变成被背书的链上 Plan、具体 Order、钱包签名的业务 Signal，以及可重放的 proof。UVP 作为协议可以面向不同链目标；EVM 轨道当前可运行，Solana 边界已预留为明确的 TODO 接口。
 
 ## AI 时代，交易成本仍然存在
 
@@ -16,13 +16,13 @@ AI 时代的跨组织协作协议：UVP（通用价值协议，Universal Value P
 
 UVP 记录协议事实：被某条秩序授权的主体，在某个订单、某个阶段、某个凭证指纹下，声明某个业务信号已经发出，并愿意为这个声明负责。现实真实性、资质审查、担保、保险、争议裁定和监管结论，可以由对应的 trust domain、供应商、资金方、审计方或 adapter 发出自己的信号。
 
-UVP 把复杂生产关系压缩成计算机能理解、链上能记录和追责的秩序语言。`Zhixu` 是“秩序”的拼音，在本仓库里指静态的秩序定义：谁先开始，谁负责下一步，哪个供应商能承接，什么证据算完成，失败时走哪条路。订单 (Order) 是某个秩序版本的一次运行。
+UVP 把复杂生产关系压缩成计算机能理解、链上能记录和追责的秩序语言。`Zhixu` 是“秩序”的拼音，在 UVP 中指静态的秩序定义：谁先开始，谁负责下一步，哪个供应商能承接，什么证据算完成，失败时走哪条路。订单 (Order) 是某个秩序版本的一次运行。
 
-秩序 DSL 是低成本的交易约定方式，区块链和智能合约是高伪造成本的记录方式。`uvp-eth` 把两者接起来，让陌生人、企业系统、AI agent、供应商、trust domain 和普通参与者，可以围绕同一套信号边界组织生产。
+秩序 DSL 是低成本的交易约定方式，区块链和智能合约是高伪造成本的记录方式。EVM 实现把两者接起来，让陌生人、企业系统、AI agent、供应商、trust domain 和普通参与者，可以围绕同一套信号边界组织生产。
 
 ## 科斯定理的工程实践
 
-UVP 的目标是成为科斯定理在 AI 时代的工程实践：不是在文档里证明理论，而是把交易成本拆成可实现的协议对象。
+UVP 的目标是成为科斯定理在 AI 时代的工程实践：把交易成本拆成可实现的协议对象。
 
 | 交易成本 | UVP 的工程对象 |
 | --- | --- |
@@ -33,11 +33,13 @@ UVP 的目标是成为科斯定理在 AI 时代的工程实践：不是在文档
 | 集成成本 | Product DTO、Chain Services、executor-kit、adapter/periphery boundary。 |
 | 争议和抵赖成本 | EIP-712 签名、`SignalSubmitted`、`HookReady`、trust registry events、replayable chain proof。 |
 
-所以 UVP 不是只讨论“AI 能干什么”，而是回答“AI、企业、人和链上状态如何在同一套可追责边界里协作”。
+UVP 定义 AI、企业、人和链上状态如何在同一套可追责边界里协作。
 
-## `uvp-eth` 如何实现
+## 当前 EVM 实现
 
-`uvp-eth` 把秩序协作模型接到 EVM 兼容链上。它把秩序设计编译成 deterministic artifact，把计划和供应商背书交给 trust registry，把订单、signal、hook ready 和履约 proof 交给链上状态机。后端负责索引、投影、展示、转发和缓存；对象存储保存链下材料；链上保存 hash、URI、签名和事件。
+当前 EVM 实现把秩序协作模型接到 EVM 兼容链上。它把秩序设计编译成 deterministic artifact，把计划和供应商背书交给 trust registry，把订单、signal、hook ready 和履约 proof 交给链上状态机。后端负责索引、投影、展示、转发和缓存；对象存储保存链下材料；链上保存 hash、URI、签名和事件。
+
+编译边界现在分成平台中立的 `HookPlanArtifact` 和具体链目标产物。当前可运行目标是 EVM（`EvmHookPlanArtifact`，兼容旧的 `OnchainHookPlanArtifact` 名称）。Solana target 目前只是明确的 TODO 边界；在 Solana program、索引 adapter、钱包签名和 release evidence 路径完成前，应当 fail closed。
 
 ```text
 凝结核设计 Zhixu
@@ -50,13 +52,13 @@ UVP 的目标是成为科斯定理在 AI 时代的工程实践：不是在文档
   -> Chain Services 从事件重建 Product 和 Store 视图
 ```
 
-Chain Services 是可重建服务层：它负责索引、投影、校验、转发，并提供 Product / Store API。协议讨论里它也叫 non-trusted execution layer，意思是“它不是事实源”，不是说软件不可靠。
+Chain Services 是可重建服务层：它负责索引、投影、校验、转发，并提供 Product / Store API。协议讨论里它也叫 non-trusted execution layer，意思是合约和链事件是协议事实源，Chain Services 是可重建的投影和转发层。
 
 Funding、USDC、escrow、guarantee、settlement 可以围绕这条路径构建，但它们属于 periphery adapter。核心协议边界是协作状态机：Plans、Orders、authorizations、Signals、hooks、attestations 和可重放事件。
 
 ## 公开实现仓库
 
-这个 Wiki 不是孤立的概念页。UVP 的 EVM/Web3 实现由这些公开仓库组成：
+UVP Wiki 是工作实现的阅读层，UVP 的 EVM/Web3 实现由这些公开仓库组成：
 
 | 仓库 | 负责什么 |
 | --- | --- |
@@ -66,22 +68,22 @@ Funding、USDC、escrow、guarantee、settlement 可以围绕这条路径构建�
 | [uvp-order-app](https://github.com/conucleus/uvp-order-app) | 普通参与者 Order App：invite onboarding、task inbox、evidence fingerprint、proof display 和 readiness checks。 |
 | [uvp-executor-kit](https://github.com/conucleus/uvp-executor-kit) | Executor CLI/SDK/MCP：executor wallet、chain watcher、Product API signal producer 和 adapter 接入。 |
 
-本 Wiki 解释这些仓库如何拼成一条链上可证明的协作路径；具体代码、测试和运行脚本在各仓库里。
+UVP Wiki 解释这些仓库如何拼成一条链上可证明的协作路径；具体代码、测试和运行脚本在各仓库里。
 
-## 它不是什么
+## 协议边界
 
-这也是 `uvp-eth` 和多方数据库一致性方案的根本区别：参与方在预先约定的秩序里，对自己发出的标准信号负责。UVP 主要降低搜索、议约、协调、监督、集成、争议和抵赖这些交易成本。
+UVP 的协议边界是在预先约定的秩序里记录标准化信号责任。参与方对自己发出的信号负责；合约和链事件提供记录；可重建服务和 adapter 围绕这份记录组织展示、提交和集成。UVP 主要降低搜索、议约、协调、监督、集成、争议和抵赖这些交易成本。
 
-| UVP 不是 | UVP 是 |
+| 范围 | UVP 定义 |
 | --- | --- |
-| 不是多方数据库同步方案。 | 用链事件记录被授权业务信号及其秩序后果。 |
-| 不是普通后端工作流系统。 | 后端可以投影和中继，但协议事实来自合约和链事件。 |
-| 不是支付 provider、托管方、交易所或结算 rail。 | 资金、担保、USDC、escrow 和 settlement 是围绕核心状态机的 adapter。 |
-| 不是把业务文件明文上链。 | 链上保存 hash、URI、签名和事件；业务材料留在链下。 |
+| 多方协作 | 用链事件记录被授权业务信号及其秩序后果。 |
+| 后端工作流 | 后端围绕来自合约和链事件的协议事实做投影和中继。 |
+| 资金和结算 | 资金、担保、USDC、escrow 和 settlement 是围绕核心状态机的 adapter。 |
+| 业务文件 | 链上保存 hash、URI、签名和事件；业务材料留在链下。 |
 
-本 Wiki 是 `uvp-eth` 的人类阅读入口。它把源码、测试、ABI fixture、PRD 记录和 release evidence 整理成一个可以按路径阅读的项目手册。
+UVP Wiki 是协议和当前公开实现轨道的人类阅读入口。它把源码、测试、ABI fixture、PRD 记录和 release evidence 整理成一个可以按路径阅读的项目手册。
 
-## 这个 Wiki 给谁看
+## UVP Wiki 给谁看
 
 | 读者 | 你能在这里学到什么 |
 | --- | --- |

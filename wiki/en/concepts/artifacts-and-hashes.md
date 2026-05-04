@@ -1,6 +1,6 @@
 # Artifacts and Hashes
 
-The compiler turns a Zhixu definition into two kinds of artifacts: a human-readable `HookPlanArtifact`, and an `OnchainHookPlanArtifact` that the contract can register. Every step uses deterministic encoding and stable hashes to avoid “the same workflow producing different plans on different machines”.
+The compiler turns a Zhixu definition into a platform-neutral `HookPlanArtifact`, then lowers it into a target-specific artifact. The runnable target today is EVM: `EvmHookPlanArtifact`, compatible with the legacy `OnchainHookPlanArtifact` name, is what the contract can register. Every step uses deterministic encoding and stable hashes to avoid “the same workflow producing different plans on different machines”.
 
 ## Subpages
 
@@ -15,7 +15,8 @@ The compiler turns a Zhixu definition into two kinds of artifacts: a human-reada
 | Artifact | Purpose |
 | --- | --- |
 | `HookPlanArtifact` | Platform-neutral, retaining stage names, hook expressions, AST, dependencies, routes, and readable labels. |
-| `OnchainHookPlanArtifact` | EVM-oriented, using `bytes32` IDs, stack instructions, dependency indexes, and selector bindings. |
+| `EvmHookPlanArtifact` / `OnchainHookPlanArtifact` | EVM-oriented, using `bytes32` IDs, stack instructions, dependency indexes, and selector bindings. |
+| `SolanaHookPlanArtifact` | Reserved target boundary only; it is intentionally not runnable until the Solana program and adapters exist. |
 
 The contract ultimately checks the on-chain plan hash. `ZhixuTrustRegistry` attests `(domainId, planId, planHash)`, and `UVPStateMachine.registerPlan()` then checks whether that attestation is valid.
 

@@ -46,7 +46,7 @@ AND 2
 
 ## EvalValue
 
-合约求值结果不是简单布尔值，而是带时间信息：
+合约求值结果是带时间信息的结构化值：
 
 ```solidity
 struct EvalValue {

@@ -1,6 +1,6 @@
 # 事件 Replay
 
-`uvp-protocol/packages/statemachine` 提供平台中立的 reference reducer。它的目标不是替代合约，而是用链事件重放订单状态，验证合约事件和本地语义是否一致。
+`uvp-protocol/packages/statemachine` 提供平台中立的 reference reducer。它用链事件重放订单状态，验证合约事件和本地语义是否一致。
 
 ## 输入事件
 

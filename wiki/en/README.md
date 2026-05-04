@@ -1,8 +1,8 @@
-# uvp-eth Wiki
+# UVP Wiki
 
 A cross-organization coordination protocol for the AI era: UVP, the Universal Value Protocol, uses a Zhixu DSL, standardized business signals, wallet signatures, and on-chain proof to reduce the costs of search, agreement, coordination, supervision, integration, dispute, and denial.
 
-`uvp-eth` is the EVM/Web3 implementation track for the Universal Value Protocol. It turns reusable cross-organization coordination designs into endorsed on-chain Plans, concrete Orders, wallet-signed business Signals, and replayable proof.
+UVP Wiki is the public reading entry for the Universal Value Protocol. The current runnable implementation track is EVM/Web3: reusable cross-organization coordination designs become endorsed on-chain Plans, concrete Orders, wallet-signed business Signals, and replayable proof. UVP is chain-targetable as a protocol; the EVM track is working today, and Solana boundaries are reserved as explicit TODO surfaces.
 
 ## In the AI Era, Transaction Costs Remain
 
@@ -16,13 +16,13 @@ If you are searching for how collaboration works in the AI era, how to orchestra
 
 UVP records protocol facts: a subject authorized by a specific Zhixu declares, under a specific Order, stage, and evidence fingerprint, that a business Signal has been emitted and that the subject is accountable for that declaration. Real-world truth, qualification review, guarantee, insurance, dispute resolution, and regulatory conclusions can be expressed by the relevant trust domain, supplier, funder, auditor, or adapter as its own signal.
 
-UVP compresses complex production relationships into an order language that computers can interpret and chains can record. `Zhixu` is the transliteration of the underlying Chinese coordination term; in this repository it means a static coordination definition: who starts, who takes the next step, which supplier may take over, what evidence counts as completion, and where the process goes on failure. An Order is one runtime of a specific Zhixu version.
+UVP compresses complex production relationships into an order language that computers can interpret and chains can record. `Zhixu` is the transliteration of the underlying Chinese coordination term; in UVP it means a static coordination definition: who starts, who takes the next step, which supplier may take over, what evidence counts as completion, and where the process goes on failure. An Order is one runtime of a specific Zhixu version.
 
-The Zhixu DSL is a low-cost way to define transaction agreements; blockchains and smart contracts are high-forgery-cost recording systems. `uvp-eth` connects the two, so strangers, enterprise systems, AI agents, suppliers, trust domains, and ordinary participants can organize production around the same signal boundary.
+The Zhixu DSL is a low-cost way to define transaction agreements; blockchains and smart contracts are high-forgery-cost recording systems. The EVM implementation connects the two, so strangers, enterprise systems, AI agents, suppliers, trust domains, and ordinary participants can organize production around the same signal boundary.
 
 ## Coase-Theorem Engineering Practice
 
-UVP aims to be an engineering practice of Coase-style transaction-cost reduction in the AI era. It is not trying to prove the theorem in prose; it turns transaction costs into implementable protocol objects.
+UVP aims to be an engineering practice of Coase-style transaction-cost reduction in the AI era. Its engineering goal is to turn transaction costs into implementable protocol objects.
 
 | Transaction cost | UVP engineering object |
 | --- | --- |
@@ -33,11 +33,13 @@ UVP aims to be an engineering practice of Coase-style transaction-cost reduction
 | Integration cost | Product DTO, Chain Services, executor-kit, adapter/periphery boundary. |
 | Dispute and denial cost | EIP-712 signatures, `SignalSubmitted`, `HookReady`, trust-registry events, replayable chain proof. |
 
-UVP is therefore not only about what AI can do. It is about how AI agents, enterprises, humans, and on-chain state can coordinate inside the same accountable boundary.
+UVP defines how AI agents, enterprises, humans, and on-chain state coordinate inside the same accountable boundary.
 
-## How `uvp-eth` Implements It
+## Current EVM Implementation
 
-`uvp-eth` connects the Zhixu coordination model to EVM-compatible chains. It compiles coordination designs into deterministic artifacts, puts plan and supplier endorsement into a trust registry, and puts Orders, Signals, HookReady events, and fulfillment proof into an on-chain state machine. Backend services index, project, display, relay, and cache; object storage keeps off-chain materials; the chain stores hashes, URIs, signatures, and events.
+The current EVM implementation connects the Zhixu coordination model to EVM-compatible chains. It compiles coordination designs into deterministic artifacts, puts plan and supplier endorsement into a trust registry, and puts Orders, Signals, HookReady events, and fulfillment proof into an on-chain state machine. Backend services index, project, display, relay, and cache; object storage keeps off-chain materials; the chain stores hashes, URIs, signatures, and events.
+
+The compiler boundary now separates the platform-neutral `HookPlanArtifact` from chain target artifacts. The current runnable target is EVM (`EvmHookPlanArtifact`, still compatible with the legacy `OnchainHookPlanArtifact` name). Solana target interfaces are reserved as explicit TODO boundaries; they should fail closed until a Solana program, indexing adapter, wallet signer, and release-evidence path exist.
 
 ```text
 Nucleation designs a Zhixu
@@ -50,13 +52,13 @@ Nucleation designs a Zhixu
   -> Chain Services rebuilds Product and Store views from events
 ```
 
-Chain Services is the rebuildable service layer: it indexes, projects, verifies, relays, and exposes Product / Store APIs. In protocol discussions this layer is also called the non-trusted execution layer, meaning it is not the source of truth; it does not mean the software is unreliable.
+Chain Services is the rebuildable service layer: it indexes, projects, verifies, relays, and exposes Product / Store APIs. In protocol discussions this layer is also called the non-trusted execution layer. The phrase means contracts and chain events are the protocol fact source, while Chain Services is a rebuildable projection and relay layer.
 
 Funding, USDC, escrow, guarantee, and settlement can be built around this path, but they stay in periphery adapters. The core protocol boundary is the coordination state machine: Plans, Orders, authorizations, Signals, hooks, attestations, and replayable events.
 
 ## Public Implementation Repositories
 
-This Wiki is not a standalone concept page. The EVM/Web3 implementation of UVP is split across these public repositories:
+UVP Wiki is the reading layer for a working implementation, and the EVM/Web3 implementation of UVP is split across these public repositories:
 
 | Repository | Responsibility |
 | --- | --- |
@@ -66,22 +68,22 @@ This Wiki is not a standalone concept page. The EVM/Web3 implementation of UVP i
 | [uvp-order-app](https://github.com/conucleus/uvp-order-app) | Participant Order App: invite onboarding, task inbox, evidence fingerprints, proof display, and readiness checks. |
 | [uvp-executor-kit](https://github.com/conucleus/uvp-executor-kit) | Executor CLI/SDK/MCP: executor wallets, chain watcher, Product API signal producer, and adapter integration. |
 
-This Wiki explains how those repositories fit into one on-chain-provable coordination path; code, tests, and run scripts live in the repositories themselves.
+UVP Wiki explains how those repositories fit into one on-chain-provable coordination path; code, tests, and run scripts live in the repositories themselves.
 
-## What It Is Not
+## Protocol Boundaries
 
-This is also the core difference between `uvp-eth` and a multi-party database consistency system: participants are accountable for the standardized signals they emit inside a pre-agreed Zhixu. UVP mainly reduces the transaction costs of search, agreement, coordination, supervision, integration, dispute, and denial.
+UVP's protocol boundary is standardized signal accountability inside a pre-agreed Zhixu. Participants are accountable for the signals they emit; contracts and chain events provide the record; rebuildable services and adapters organize views, submissions, and integrations around that record. UVP mainly reduces the transaction costs of search, agreement, coordination, supervision, integration, dispute, and denial.
 
-| UVP is not | UVP is |
+| Area | UVP definition |
 | --- | --- |
-| Not a multi-party database synchronization scheme. | A protocol that records authorized business signals and their coordination consequences through chain events. |
-| Not an ordinary backend workflow system. | Backends may project and relay, but protocol facts come from contracts and chain events. |
-| Not a payment provider, custodian, exchange, or settlement rail. | Funding, guarantees, USDC, escrow, and settlement are adapters around the core state machine. |
-| Not plaintext business files on chain. | The chain stores hashes, URIs, signatures, and events; business materials stay off chain. |
+| Multi-party coordination | A protocol that records authorized business signals and their coordination consequences through chain events. |
+| Backend workflow | Backends project and relay around protocol facts from contracts and chain events. |
+| Funding and settlement | Funding, guarantees, USDC, escrow, and settlement are adapters around the core state machine. |
+| Business files | The chain stores hashes, URIs, signatures, and events; business materials stay off chain. |
 
-This Wiki is the human-readable entry point for `uvp-eth`. It organizes source code, tests, ABI fixtures, PRD records, and release evidence into a project manual that can be read by path.
+UVP Wiki is the human-readable entry point for the protocol and its current public implementation tracks. It organizes source code, tests, ABI fixtures, PRD records, and release evidence into a project manual that can be read by path.
 
-## Who This Wiki Is For
+## Who UVP Wiki Is For
 
 | Reader | What you can learn here |
 | --- | --- |

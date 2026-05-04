@@ -26,7 +26,7 @@ Order App 和 executor-kit 都是 signal producer 的入口，但用户不同。
 | Chain mode | 直接 watch `HookReady`，提交低层 signal，适合高级链原生集成。 |
 | Product API mode | 读取 Product API task/signal container，准备证据、签名、提交和证明，适合大多数集成。 |
 
-它的位置不是“普通产品表面”，而是执行者集成面。多数执行者应该走 Product API mode；只有需要直接监听 `HookReady`、自管 handler 和直接合约交易的高级集成才走 chain mode。
+它的位置是执行者集成面。多数执行者应该走 Product API mode；只有需要直接监听 `HookReady`、自管 handler 和直接合约交易的高级集成才走 chain mode。
 
 ## 共同边界
 

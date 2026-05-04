@@ -437,6 +437,7 @@ function renderLanguageSwitch(language, rootRel, outputRel, altOutputRel) {
 }
 
 function renderPage({ title, body, nav, rootRel, sourceRel, outputRel, altOutputRel, language }) {
+  const documentTitle = title === "UVP Wiki" ? "UVP Wiki" : `${title} · UVP Wiki`;
   const sourceMeta =
     sourceRel === "README.md"
       ? `<a href="${rootRel}../README.md">${escapeHtml(sourceRel)}</a>`
@@ -448,18 +449,18 @@ function renderPage({ title, body, nav, rootRel, sourceRel, outputRel, altOutput
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>${escapeHtml(title)} · uvp-eth Wiki</title>
+  <title>${escapeHtml(documentTitle)}</title>
   <link rel="stylesheet" href="${rootRel}assets/site.css">
 </head>
 <body>
   <div class="mobile-header">
-    <span class="mobile-title">uvp-eth Wiki</span>
+    <span class="mobile-title">UVP Wiki</span>
     <a href="${rootRel}${language.outputPrefix}index.html">${language.homeLabel}</a>
   </div>
   <div class="site-shell">
     <aside class="site-sidebar">
       <a class="brand" href="${rootRel}${language.outputPrefix}index.html">
-        <span class="brand-title">uvp-eth Wiki</span>
+        <span class="brand-title">UVP Wiki</span>
         <span class="brand-subtitle">${language.brandSubtitle}</span>
       </a>
       ${nav}
@@ -582,10 +583,10 @@ function build() {
 <head>
   <meta charset="utf-8">
   <meta http-equiv="refresh" content="0; url=site/index.html">
-  <title>uvp-eth Wiki</title>
+  <title>UVP Wiki</title>
 </head>
 <body>
-  <p><a href="site/index.html">打开 uvp-eth Wiki 文档站</a></p>
+  <p><a href="site/index.html">打开 UVP Wiki 文档站</a></p>
 </body>
 </html>
 `;
