@@ -8,7 +8,7 @@
 | --- | --- | --- |
 | UVP / 通用价值协议 | Universal Value Protocol，一套协作协议和产品语言，用来记录被授权的业务信号，以及这些信号带来的状态后果。 | `uvp-eth` 是 EVM/Web3 实现轨道。 |
 | 秩序 / Zhixu | 描述“一类订单应该怎么运行”的静态协作定义。 | `ZhixuDefinition`、`kind: "Zhixu"`、compiler input。 |
-| Plan / 秩序版本 | 某个 Zhixu 编译到 EVM 目标后的确定性版本。 | `HookPlanArtifact`、`OnchainHookPlanArtifact`、`registerPlan()`、`PlanRegistered`。 |
+| Plan / 秩序版本 | 某个 Zhixu 编译后的确定性版本，再降到具体链目标。 | `HookPlanArtifact`、`EvmHookPlanArtifact`、`OnchainHookPlanArtifact`、`registerPlan()`、`PlanRegistered`。 |
 | Order / 订单 | 某个 Plan 的一次具体运行。 | `UVPStateMachine.Order`、`registerOrder()`、`OrderRegistered`。 |
 | 凝结核 / Nucleation | 发起、设计并维护某类 Zhixu 的组织主体。例如采购团队可以拥有跨境采购 Zhixu。 | `spec.nucleation.id`、Store 凝结核工作台。 |
 | Stage / 阶段 | task pattern 里的一个步骤或执行段。 | `taskPatterns[].stages[]`、`stageIdentifier`、`stageId`。 |
@@ -21,7 +21,8 @@
 | Trigger | 会通过 `HookReady` 打开可执行任务的 hook 标记。 | stage `trigger`、`HookReady`。 |
 | File Resource | 阶段协议、证据模板、资源清单等链下材料的句柄，不是明文文件存储。 | `fileResources`、resource patch、metadata URI/hash。 |
 | HookPlan | 编译后的人类可读产物，包含 hooks、dependencies、routes 和审计标签。 | `HookPlanArtifact`。 |
-| OnchainHookPlan | 面向 EVM 注册和背书的紧凑链上产物。 | `OnchainHookPlanArtifact`、compact hooks、dependency indexes。 |
+| OnchainHookPlan | 面向 EVM 注册和背书的紧凑链上产物旧名。 | `EvmHookPlanArtifact`、`OnchainHookPlanArtifact`、compact hooks、dependency indexes。 |
+| Solana target | 预留的未来链目标边界；在 Solana programs、adapters、signer support 和 release evidence 完成前不可运行。 | `SolanaHookPlanArtifact`、`chainTarget: "solana"`、TODO errors。 |
 
 ## 动作与事件
 

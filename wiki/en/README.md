@@ -2,7 +2,7 @@
 
 A cross-organization coordination protocol for the AI era: UVP, the Universal Value Protocol, uses a Zhixu DSL, standardized business signals, wallet signatures, and on-chain proof to reduce the costs of search, agreement, coordination, supervision, integration, dispute, and denial.
 
-`uvp-eth` is the EVM/Web3 implementation track for the Universal Value Protocol. It turns reusable cross-organization coordination designs into endorsed on-chain Plans, concrete Orders, wallet-signed business Signals, and replayable proof.
+`uvp-eth` is the EVM/Web3 implementation track for the Universal Value Protocol. It turns reusable cross-organization coordination designs into endorsed on-chain Plans, concrete Orders, wallet-signed business Signals, and replayable proof. UVP as a protocol is meant to be chain-targetable; this repository is the working EVM track, with Solana boundaries reserved but not implemented.
 
 ## In the AI Era, Transaction Costs Remain
 
@@ -38,6 +38,8 @@ UVP is therefore not only about what AI can do. It is about how AI agents, enter
 ## How `uvp-eth` Implements It
 
 `uvp-eth` connects the Zhixu coordination model to EVM-compatible chains. It compiles coordination designs into deterministic artifacts, puts plan and supplier endorsement into a trust registry, and puts Orders, Signals, HookReady events, and fulfillment proof into an on-chain state machine. Backend services index, project, display, relay, and cache; object storage keeps off-chain materials; the chain stores hashes, URIs, signatures, and events.
+
+The compiler boundary now separates the platform-neutral `HookPlanArtifact` from chain target artifacts. The current runnable target is EVM (`EvmHookPlanArtifact`, still compatible with the legacy `OnchainHookPlanArtifact` name). Solana target interfaces are reserved as explicit TODO boundaries; they should fail closed until a Solana program, indexing adapter, wallet signer, and release-evidence path exist.
 
 ```text
 Nucleation designs a Zhixu

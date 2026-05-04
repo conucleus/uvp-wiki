@@ -8,7 +8,7 @@ This page explains project terms in plain language first, then points to code or
 | --- | --- | --- |
 | UVP / Universal Value Protocol | A coordination protocol and product vocabulary for recording authorized business signals and their consequences. In Chinese, UVP is 通用价值协议. | `uvp-eth` is the EVM/Web3 implementation track. |
 | Zhixu | A static coordination definition that describes how a class of Orders should run. | `ZhixuDefinition`, `kind: "Zhixu"`, compiler input. |
-| Plan / Zhixu version | A deterministic EVM-targeted version compiled from a Zhixu. | `HookPlanArtifact`, `OnchainHookPlanArtifact`, `registerPlan()`, `PlanRegistered`. |
+| Plan / Zhixu version | A deterministic version compiled from a Zhixu, then lowered to a chain target. | `HookPlanArtifact`, `EvmHookPlanArtifact`, `OnchainHookPlanArtifact`, `registerPlan()`, `PlanRegistered`. |
 | Order | One runtime instance of a Plan. | `UVPStateMachine.Order`, `registerOrder()`, `OrderRegistered`. |
 | Nucleation | The organizing subject that originates, designs, and maintains a kind of Zhixu. For example, a procurement team can own the cross-border procurement Zhixu. | `spec.nucleation.id`, Store Nucleation workbench. |
 | Stage | A step or execution segment inside a task pattern. | `taskPatterns[].stages[]`, `stageIdentifier`, `stageId`. |
@@ -21,7 +21,8 @@ This page explains project terms in plain language first, then points to code or
 | Trigger | A hook mark that opens an executable task by emitting `HookReady`. | stage `trigger`, `HookReady`. |
 | File Resource | A handle for off-chain materials such as stage protocols, evidence templates, and resource manifests. It is not plaintext file storage. | `fileResources`, resource patch, metadata URI/hash. |
 | HookPlan | Human-readable compiled artifact containing hooks, dependencies, routes, and audit labels. | `HookPlanArtifact`. |
-| OnchainHookPlan | Compact EVM-facing artifact used for registration and attestation. | `OnchainHookPlanArtifact`, compact hooks, dependency indexes. |
+| OnchainHookPlan | Legacy name for the compact EVM-facing artifact used for registration and attestation. | `EvmHookPlanArtifact`, `OnchainHookPlanArtifact`, compact hooks, dependency indexes. |
+| Solana target | Reserved future chain target boundary. It is not runnable until Solana programs, adapters, signer support, and release evidence exist. | `SolanaHookPlanArtifact`, `chainTarget: "solana"`, TODO errors. |
 
 ## Actions and Events
 

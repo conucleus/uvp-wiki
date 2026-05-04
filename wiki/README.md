@@ -2,7 +2,7 @@
 
 AI 时代的跨组织协作协议：UVP（通用价值协议，Universal Value Protocol）用秩序 DSL、标准化业务信号、钱包签名和链上 proof，降低搜索、议约、协调、监督、集成、争议和抵赖成本。
 
-`uvp-eth` 是通用价值协议的 EVM/Web3 实现轨道。它把可复用的跨组织协作设计变成被背书的链上 Plan、具体 Order、钱包签名的业务 Signal，以及可重放的 proof。
+`uvp-eth` 是通用价值协议的 EVM/Web3 实现轨道。它把可复用的跨组织协作设计变成被背书的链上 Plan、具体 Order、钱包签名的业务 Signal，以及可重放的 proof。UVP 协议目标本身可以面向不同链目标；本仓库当前是可运行的 EVM 轨道，Solana 边界已预留但尚未实现。
 
 ## AI 时代，交易成本仍然存在
 
@@ -38,6 +38,8 @@ UVP 的目标是成为科斯定理在 AI 时代的工程实践：不是在文档
 ## `uvp-eth` 如何实现
 
 `uvp-eth` 把秩序协作模型接到 EVM 兼容链上。它把秩序设计编译成 deterministic artifact，把计划和供应商背书交给 trust registry，把订单、signal、hook ready 和履约 proof 交给链上状态机。后端负责索引、投影、展示、转发和缓存；对象存储保存链下材料；链上保存 hash、URI、签名和事件。
+
+编译边界现在分成平台中立的 `HookPlanArtifact` 和具体链目标产物。当前可运行目标是 EVM（`EvmHookPlanArtifact`，兼容旧的 `OnchainHookPlanArtifact` 名称）。Solana target 目前只是明确的 TODO 边界；在 Solana program、索引 adapter、钱包签名和 release evidence 路径完成前，应当 fail closed。
 
 ```text
 凝结核设计 Zhixu
