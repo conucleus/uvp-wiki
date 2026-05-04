@@ -295,6 +295,7 @@ a:hover {
   padding: 0;
 }
 
+.mermaid,
 .mermaid-block {
   background: #f3f7fb;
   border: 1px solid var(--line);
@@ -303,6 +304,12 @@ a:hover {
   overflow-x: auto;
   padding: 16px 18px;
   margin: 18px 0 22px;
+}
+
+.mermaid svg {
+  display: block;
+  height: auto;
+  max-width: 100%;
 }
 
 .doc-content table {

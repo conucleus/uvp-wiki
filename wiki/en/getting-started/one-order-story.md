@@ -8,6 +8,48 @@ Take a Mongolia photovoltaic project as the example. A working project connects 
 
 This kind of business is larger than "I have goods, you buy goods." It is a production-relationship map. Government permits affect EPC bidding. EPC demand affects OEM production. Factory documents affect customs clearance. Clearance status affects site installation. Installation records affect acceptance and payment. O&M records affect later responsibility.
 
+```mermaid
+flowchart LR
+  subgraph reality["Real production relationship"]
+    gov["Government / regulator"]
+    owner["Project company / owner"]
+    epc["EPC / EPCM"]
+    oem["OEM / tier-1 supplier"]
+    customs["Importer / customs / logistics"]
+    warehouse["Warehouse / site delivery"]
+    om["O&M"]
+    finance["Funder / insurer / auditor"]
+  end
+
+  subgraph uvp["UVP record layer"]
+    zhixu["Zhixu DSL\nhow this class of coordination runs"]
+    order["Order\nthis project run"]
+    proof["Proof\nhash + signature + event"]
+    zhixu --> order --> proof
+  end
+
+  gov -- "permit / grid / acceptance" --> owner
+  owner -- "demand / contract / payment" --> epc
+  epc -- "design / procurement / site condition" --> oem
+  oem -- "factory release / inspection / packing" --> customs
+  customs -- "port arrival / customs release / transport" --> warehouse
+  warehouse -- "site arrival / receipt / handover" --> epc
+  epc -- "installation / acceptance materials" --> owner
+  om -- "inspection / maintenance / fault response" --> owner
+  finance -- "credit / insurance / audit / payment" --> owner
+
+  gov -. "signal" .-> order
+  owner -. "signal" .-> order
+  epc -. "signal" .-> order
+  oem -. "signal" .-> order
+  customs -. "signal" .-> order
+  warehouse -. "signal" .-> order
+  om -. "signal" .-> order
+  finance -. "signal" .-> order
+```
+
+Solid lines are real coordination relationships. Dotted lines are business progress written as UVP signals. UVP does not require every company to rebuild its internal system; it standardizes the key coordination boundary into signed, recordable, accountable signals.
+
 ## 2. Production Relationships Run on Signals
 
 A production relationship runs because participants keep emitting signals:
@@ -42,22 +84,42 @@ which received signals open the next task
 which path handles failure, timeout, rejection, or reassignment
 ```
 
-Zhixu is the standard language that lets computers, contracts, enterprise systems, AI agents, Store, Order App, and executor-kit understand the same coordination boundary. It works alongside real contracts and business documents.
+Zhixu is the standard language that lets computers, contracts, enterprise systems, AI agents, Store, Order App, and executor-kit understand the same coordination boundary. Real contracts keep defining business responsibility; Zhixu writes the coordination boundary as executable signal rules.
 
 For the core objects, start with [Core Concepts Entry](../core/README.md) and [Zhixu DSL](../concepts/core/zhixu.md).
 
 ## 5. From Zhixu to Plan, Then to Order
 
-After a Zhixu is written, the compiler turns it into deterministic Plan artifacts. A Plan is the stable chain-targeted version of one Zhixu version; semantic changes alter the hash. A trust domain can review the Plan materials, hash, and policy, then emit `PlanAttested`.
+Read this part as four actions.
 
-An Order is one concrete execution of that Plan. For example, when a Mongolia PV project actually procures a batch of modules and delivers them to site, the registrar creates an Order and records who may submit which signals for this Order:
+### 5.1 Write How This Kind of Project Coordinates
+
+The Nucleation first writes the reusable coordination method for PV project delivery as a Zhixu. It answers ordinary business questions: who starts first, what EPC waits for, when OEM can ship, who is notified after customs release, who can accept after site receipt, and which path handles failure or timeout.
+
+This step is like writing an operating manual in machine-readable YAML. It is not one specific project yet. It is the operating rule for a class of projects.
+
+### 5.2 Freeze the Rule Into a Version
+
+The compiler can be read as "checker and packager". It reads the Zhixu, checks whether references are complete, whether stages and signals line up, and which conditions open which tasks. Then it creates a stable version. That stable version is called a Plan.
+
+A Plan has a `planHash`. You can read it as the fingerprint of this rule set. The same rule set gets the same fingerprint; changes that alter coordination meaning get a new fingerprint. Later review, order registration, and accountability all point to the same version.
+
+### 5.3 A Trust Domain Endorses That Version
+
+A trust domain is a responsible subject willing to endorse a kind of judgment. It can review the Plan materials, evidence requirements, supplier requirements, applicability, and `planHash`. After approval, it emits `PlanAttested` on chain.
+
+`PlanAttested` means this trust domain recognizes this Plan version under its endorsement policy. It gives Store displays, Order creation, and partner review a verifiable basis.
+
+### 5.4 Create This Concrete Run
+
+An Order is one concrete execution of a Plan. For example, when a Mongolia PV project actually procures a batch of modules and delivers them to site, the registrar creates an Order and records who may submit which signals for this Order.
 
 ```text
-Zhixu DSL
-  -> Plan / planHash
-  -> PlanAttested
-  -> OrderRegistered
-  -> SignalSubmitterAuthorized
+Zhixu DSL: how this class of PV project coordinates
+  -> Plan / planHash: stable version and fingerprint of the rule set
+  -> PlanAttested: a trust domain endorses this version
+  -> OrderRegistered: one project starts running under this version
+  -> SignalSubmitterAuthorized: who may emit which signal in this Order
 ```
 
 From `OrderRegistered` onward, the business is a concrete runtime that can be tracked, signed, supplied with evidence, used to open the next task, and replayed as proof.

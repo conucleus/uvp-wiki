@@ -246,7 +246,11 @@ function markdownToHtml(markdown) {
         index += 1;
       }
       if (index < lines.length) index += 1;
-      const className = language === "mermaid" ? "mermaid-block" : "code-block";
+      if (language === "mermaid") {
+        html.push(`<pre class="mermaid">${escapeHtml(code.join("\n"))}</pre>`);
+        continue;
+      }
+      const className = "code-block";
       const langClass = language ? ` class="language-${escapeHtml(language)}"` : "";
       html.push(`<pre class="${className}"><code${langClass}>${escapeHtml(code.join("\n"))}</code></pre>`);
       continue;
@@ -438,6 +442,14 @@ function renderLanguageSwitch(language, rootRel, outputRel, altOutputRel) {
 
 function renderPage({ title, body, nav, rootRel, sourceRel, outputRel, altOutputRel, language }) {
   const documentTitle = title === "UVP Wiki" ? "UVP Wiki" : `${title} · UVP Wiki`;
+  const mermaidScript = body.includes('class="mermaid"')
+    ? [
+        '  <script type="module">',
+        '    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";',
+        '    mermaid.initialize({ startOnLoad: true, securityLevel: "strict", theme: "default" });',
+        "  </script>",
+      ].join("\n")
+    : "";
   const sourceMeta =
     sourceRel === "README.md"
       ? `<a href="${rootRel}../README.md">${escapeHtml(sourceRel)}</a>`
@@ -478,6 +490,7 @@ ${body}
       </article>
     </main>
   </div>
+${mermaidScript}
 </body>
 </html>
 `;

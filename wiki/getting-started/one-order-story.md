@@ -8,6 +8,48 @@
 
 这类生意很难用“我有货，你买货”概括。它更像一张互相依赖的生产关系图：政府许可影响 EPC 招标，EPC 需求影响 OEM 排产，出厂文件影响报关，清关状态影响现场安装，安装记录影响验收和付款，O&M 记录又影响后续责任。
 
+```mermaid
+flowchart LR
+  subgraph reality["现实生产关系"]
+    gov["政府 / 监管"]
+    owner["项目公司 / 业主"]
+    epc["EPC / EPCM"]
+    oem["OEM / 一级供应商"]
+    customs["进口商 / 报关 / 物流"]
+    warehouse["仓储 / 现场交付"]
+    om["O&M"]
+    finance["资金方 / 保险 / 审计"]
+  end
+
+  subgraph uvp["UVP 记录层"]
+    zhixu["Zhixu DSL\n这类协作怎么运行"]
+    order["Order\n本项目这一次执行"]
+    proof["Proof\nhash + signature + event"]
+    zhixu --> order --> proof
+  end
+
+  gov -- "许可 / 并网 / 验收" --> owner
+  owner -- "需求 / 合同 / 付款安排" --> epc
+  epc -- "设计 / 采购 / 现场条件" --> oem
+  oem -- "出厂 / 质检 / 装箱" --> customs
+  customs -- "到港 / 清关 / 运输" --> warehouse
+  warehouse -- "到场 / 签收 / 交付" --> epc
+  epc -- "安装 / 验收资料" --> owner
+  om -- "巡检 / 维护 / 故障响应" --> owner
+  finance -- "授信 / 保险 / 审计 / 付款" --> owner
+
+  gov -. "signal" .-> order
+  owner -. "signal" .-> order
+  epc -. "signal" .-> order
+  oem -. "signal" .-> order
+  customs -. "signal" .-> order
+  warehouse -. "signal" .-> order
+  om -. "signal" .-> order
+  finance -. "signal" .-> order
+```
+
+图里的每条实线是现实协作关系，每条虚线是某个参与者把业务进展写成 UVP signal。UVP 不需要替每个企业重做内部系统；它把关键协作边界统一成可签名、可记录、可追责的信号。
+
 ## 2. 生产关系靠信号运转
 
 生产关系能跑起来，是因为每个参与者不断发出信号：
@@ -42,22 +84,42 @@ UVP 的第一个核心动作，是把“生产关系 + 信号边界”写成计�
 失败、超时、拒绝或改派时走哪条路径
 ```
 
-这不是法律文书本身，也不替代现实合同。它是让计算机、链上合约、企业系统、AI agent、Store、Order App 和 executor-kit 能理解同一套协作边界的标准语言。
+Zhixu 是一份让计算机、链上合约、企业系统、AI agent、Store、Order App 和 executor-kit 理解同一套协作边界的标准语言。现实合同继续约定商业责任，Zhixu 负责把协作边界写成可执行的信号规则。
 
 继续读核心对象时，从 [核心概念入口](../core/README.md) 和 [秩序 (Zhixu) DSL](../concepts/core/zhixu.md) 开始。
 
 ## 5. 从 Zhixu 到 Plan，再到 Order
 
-写出 Zhixu 后，compiler 会把它编译成确定性 Plan artifact。Plan 是某个 Zhixu 版本面向链目标的稳定版本；影响语义的字段变化会改变 hash。Trust domain 可以审查这个 Plan 的材料、hash 和 policy，并发出 `PlanAttested`。
+这一段可以拆成四个动作读。
 
-Order 是这个 Plan 的一次具体执行。比如某个蒙古光伏项目真的要采购一批组件并交付到现场，registrar 创建一个 Order，并写入本订单里谁能提交哪些 signal：
+### 5.1 先写“这类项目怎么协作”
+
+凝结核先把光伏项目交付的通用协作方式写成 Zhixu。它回答普通业务问题：谁先开始，EPC 等什么，OEM 什么时候能发货，清关完成后谁收到通知，现场签收后谁可以验收，失败或超时时走哪条路。
+
+这一步像把一套项目操作手册写成机器能读懂的 YAML。它还不是某一个具体项目，只是一类项目的运行规则。
+
+### 5.2 再把规则固化成一个版本
+
+compiler 的工作可以理解成“检查和打包”。它读取 Zhixu，检查引用是否完整、阶段和 signal 是否能对上、哪些条件会打开哪些任务，然后生成一个稳定版本。这个稳定版本叫 Plan。
+
+Plan 有一个 `planHash`，可以把它理解成这份规则的指纹。同一份规则会得到同一个指纹；影响协作语义的改动会得到新的指纹。这样后面审查、注册订单、追责时，大家讨论的是同一个版本。
+
+### 5.3 Trust domain 背书这个版本
+
+trust domain 是愿意为某类判断提供背书的责任主体。它可以审查 Plan 对应的材料、证据要求、supplier 要求、适用范围和 `planHash`。审查通过后，它在链上发出 `PlanAttested`。
+
+`PlanAttested` 的含义是：这个 trust domain 承认这个 Plan 版本符合它的背书口径。它给后续 Store 展示、订单创建和合作方判断提供可验证依据。
+
+### 5.4 最后创建这一次执行
+
+Order 是某个 Plan 的一次具体执行。比如某个蒙古光伏项目真的要采购一批组件并交付到现场，registrar 创建一个 Order，并写入本订单里谁能提交哪些 signal。
 
 ```text
-Zhixu DSL
-  -> Plan / planHash
-  -> PlanAttested
-  -> OrderRegistered
-  -> SignalSubmitterAuthorized
+Zhixu DSL: 这类光伏项目怎么协作
+  -> Plan / planHash: 这套规则的稳定版本和指纹
+  -> PlanAttested: 某个 trust domain 背书这个版本
+  -> OrderRegistered: 某个项目开始按这个版本执行
+  -> SignalSubmitterAuthorized: 本订单里谁能发什么 signal
 ```
 
 从 `OrderRegistered` 开始，业务不再只是模板。它变成一次可以被跟踪、签名、提交证据、打开下一步任务并重放证明的具体运行。
