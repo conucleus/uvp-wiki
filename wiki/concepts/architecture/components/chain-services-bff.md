@@ -1,6 +1,6 @@
 # Product BFF
 
-Product BFF 位于 `uvp-chain-services/service/src/product/bff/`。它负责订单草稿、邀请、参与方确认、授权构建和订单注册提交工作流。
+Product BFF 指 Product Backend-for-Frontend。它位于 `uvp-chain-services/service/src/product/bff/`，负责订单草稿、邀请、参与方确认、授权构建和订单注册提交工作流。
 
 ## 职责
 

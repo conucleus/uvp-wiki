@@ -2,6 +2,18 @@
 
 这一页把光伏跨境项目里的现实角色映射到 UVP 角色。记住一个主分工：现实主体做事并承担责任；UVP 记录被授权的 signal、签名、证据指纹和链上后果。
 
+先按这条顺序读：
+
+```text
+凝结核设计可复用规则书
+  -> Trust Domain 背书 Plan 或 Supplier
+  -> Publisher 注册 Plan
+  -> Registrar 注册一笔 Order 和 signal 权限
+  -> Submitter 签名业务 Signal
+  -> Relayer 可以广播交易
+  -> Chain Services 展示重建后的 Product / Store 视图
+```
+
 ## 从现实角色到 UVP 角色
 
 | 现实角色 | 在光伏项目里做什么 | 对应 UVP 角色 | 什么证明它 |
@@ -19,6 +31,17 @@
 | Registrar | 基于已背书 Plan 创建具体订单，并写入初始 signal 权限。 | Registrar。 | `OrderRegistered`、`SignalSubmitterAuthorized`。 |
 | Relayer | 广播参与者已签名的交易，可能代付 gas。 | Relayer。 | transaction hash 和链上事件；业务责任看 submitter 签名。 |
 | Chain Services | 从链事件重建 order、task、timeline、proof 和 trust 视图。 | Rebuildable Service Layer。 | 带 tx、block、log、contract、chain id、event provenance 的 projection row。 |
+
+## 一个具体阶段里的 Supplier 和 Executor
+
+以清关完成阶段为例：
+
+| 层 | 例子 |
+| --- | --- |
+| Supplier | 有清关能力、可以被 trust domain 背书的报关行公司。 |
+| Executor | 这家报关行被授权处理本 Order 阶段的操作钱包、员工钱包、API 钱包或 adapter。 |
+| Authorization | `SignalSubmitterAuthorized` 把这个 submitter 钱包绑定到本 Order 的 customs source/signal。 |
+| Proof | `SignalSubmitted` 加 payload hash 和交易 provenance 证明提交过什么。 |
 
 ## 一条订单里的权威来源
 

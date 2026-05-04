@@ -9,7 +9,7 @@ ZhixuTrustRegistry attests plan/supplier
   -> UVPStateMachine registers plan/order/authorization
   -> authorized wallets submit signals or stage patches
   -> contract emits status and readiness events
-  -> statemachine / non-trusted execution replay events
+  -> statemachine / rebuildable service replay events
 ```
 
 ## Component Responsibilities
@@ -35,7 +35,7 @@ ZhixuTrustRegistry attests plan/supplier
 
 ## Where the State Machine Belongs
 
-The state machine is a core component: it is part of the on-chain execution environment and the event source. The core concept pages can explain objects such as Signal, Hook, and Order, but the state machine itself should sit in the same component chain as contracts, registries, the replay oracle, and non-trusted execution projections.
+The state machine is a core component: it is part of the on-chain execution environment and the event source. The core concept pages can explain objects such as Signal, Hook, and Order, but the state machine itself should sit in the same component chain as contracts, registries, the replay oracle, and rebuildable service projections.
 
 ## Runtime Semantics at a Glance
 
@@ -48,7 +48,7 @@ The state machine is a core component: it is part of the on-chain execution envi
 
 ## Runtime Boundary
 
-- Non-trusted execution layer projections rebuild signal and hook truth from events.
+- Rebuildable service projections rebuild signal and hook truth from events.
 - Store review goes into workflow/audit; plan/supplier attestation comes from the trust registry.
 - The relayer broadcasts signed transactions; business signatures come from authorized participants.
 - The runtime host is the reference harness; the ETH runtime authority is the deployed contract.

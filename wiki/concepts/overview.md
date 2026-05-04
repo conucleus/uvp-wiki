@@ -1,6 +1,6 @@
 # 核心概念
 
-`uvp-eth` 的核心是一套把秩序 (Zhixu) 协作定义落到 EVM 链上的状态机协议。合约和链事件是事实源；服务、Store、Order App、executor-kit 围绕这个事实源做编译、索引、展示、签名和提交。
+`uvp-eth` 的核心是一套把秩序 (Zhixu) 协作规则书落到 EVM 链上的状态机协议。合约和链事件是事实源；服务、Store、Order App、executor-kit 围绕这个事实源做编译、索引、展示、签名和提交。
 
 最短路径如下：
 
@@ -19,7 +19,7 @@
 
 ## 读法
 
-先读这些基础词。秩序 (Zhixu) 是静态定义，订单 (Order) 是运行实例，其余对象分别服务编译、授权、背书、执行和展示：
+先读这些基础词。秩序 (Zhixu) 是可复用规则书，订单 (Order) 是运行实例，其余对象分别服务编译、授权、背书、执行和展示：
 
 | 子页 | 说明 |
 | --- | --- |
@@ -30,7 +30,7 @@
 | [Source 因果链](core/source.md) | signal 所在的因果语境，同源串联、分叉、交汇都靠它表达。 |
 | [Signal](core/signal.md) | 状态机接受的最小业务输入，由授权钱包签名提交。 |
 | [Hook](core/hook.md) | 从 signal 条件求出阶段 readiness 的规则。 |
-| [Trigger](core/trigger.md) | 特殊 hook 标记，决定何时发出 `HookReady` 并打开执行入口。 |
+| [Trigger](core/trigger.md) | 特殊 hook 标记，决定何时发出 `HookReady` 并打开可处理任务。 |
 | [File Resources](core/file-resources.md) | 阶段资源句柄，指向链下对象、协议文件或资源 manifest。 |
 | [Plan](core/plan.md) | 某个 Zhixu 针对某条链编译出的确定性产物。 |
 | [Order](core/order.md) | 某个 Plan 的动态运行实例，保存 signal、hook runtime 和 overlay。 |

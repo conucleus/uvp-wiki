@@ -1,8 +1,12 @@
 # Source 因果链
 
-`source` 是 signal 的因果命名空间。它回答：“这个业务动作属于哪条推进线？”角色、Supplier 和钱包说明谁在行动；Source 说明这个动作进入哪条因果链。
+`source` 是 signal 的因果推进线。它回答：“这个业务动作属于哪条推进线？”角色、Supplier 和钱包说明谁在行动；Source 说明这个动作进入哪条业务推进线。
+
+可以先把 source 当作一笔项目里的多条 lane：sales、solution、supply、payment、logistics、field、buyer 可以并行推进，也可以在某个阶段等待另一条 lane 的 proof 后交汇。这些 source 不是部门。一个钱包只要被授权，可以在多个 source 上提交 signal；同一个 Supplier 也可以参与多个 source。
 
 Hook 表达式写成 `source::condition`，condition 里的 signal 默认都在这个 source 下解释。
+
+工程细节：
 
 ```text
 sourceId = keccak256(source)
@@ -26,7 +30,7 @@ signalKey = keccak256(abi.encode(sourceId, signalId))
 | `field` | 现场交付、安装或调试。 | `master.site_acceptance.cmp` | field executor 或买方代表。 | 最终验收可以打开。 |
 | `buyer` | 买方承诺和验收。 | `master.acceptance.cmp` | buyer wallet。 | 订单关闭或售后分支。 |
 
-这些 source 不是部门。一个钱包只要被授权，可以在多个 source 上提交 signal；同一个 Supplier 也可以参与多个 source。Source 是 hooks 和 signals 使用的命名空间，让状态机能重放正确的因果线。
+Source 是 hooks 和 signals 使用的命名空间，让状态机能重放正确的因果线。
 
 ## 同源串联
 

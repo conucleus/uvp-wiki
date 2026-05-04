@@ -2,6 +2,18 @@
 
 产品表面把链上事实翻译成人类能用的订单、任务、证明和信任信息。它把 `UVPStateMachine` 和 `ZhixuTrustRegistry` 的事件投影成 Product API、Store 和 Order App 能消费的 DTO；协议状态仍由链上事件决定。
 
+最重要的翻译是从 DSL stage 到 Product task：
+
+```text
+stage.receiveSignals
+  -> compiled Hook
+  -> trigger=true
+  -> HookReady
+  -> ProductTaskDTO
+  -> 用户或 executor 提交 Signal
+  -> Product proof row
+```
+
 ## 本篇子项
 
 | 子页 | 说明 |

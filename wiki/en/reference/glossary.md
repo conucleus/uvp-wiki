@@ -7,12 +7,12 @@ This page explains project terms in plain language first, then points to code or
 | Term | Plain meaning | Code or on-chain counterpart |
 | --- | --- | --- |
 | UVP / Universal Value Protocol | A coordination protocol and product vocabulary for recording authorized business signals and their consequences. In Chinese, UVP is 通用价值协议. | `uvp-eth` is the EVM/Web3 implementation track. |
-| Zhixu | A static coordination definition that describes how a class of Orders should run. | `ZhixuDefinition`, `kind: "Zhixu"`, compiler input. |
+| Zhixu | A reusable coordination rulebook that describes how a class of Orders should run. | `ZhixuDefinition`, `kind: "Zhixu"`, compiler input. |
 | Plan / Zhixu version | A deterministic version compiled from a Zhixu, then lowered to a chain target. | `HookPlanArtifact`, `EvmHookPlanArtifact`, `OnchainHookPlanArtifact`, `registerPlan()`, `PlanRegistered`. |
 | Order | One runtime instance of a Plan. | `UVPStateMachine.Order`, `registerOrder()`, `OrderRegistered`. |
-| Nucleation | The organizing subject that originates, designs, and maintains a kind of Zhixu. For example, a procurement team can own the cross-border procurement Zhixu. | `spec.nucleation.id`, Store Nucleation workbench. |
+| Nucleation | The organizing subject that originates, designs, and maintains a kind of Zhixu. It can be a team, organization, program owner, or workflow owner, depending on the business context. | `spec.nucleation.id`, Store Nucleation workbench. |
 | Stage | A step or execution segment inside a task pattern. | `taskPatterns[].stages[]`, `stageIdentifier`, `stageId`. |
-| Task Pattern | A reusable grouping of stages inside a Zhixu. | `taskPatterns[].name`. |
+| Task Pattern | A reusable grouping of stages inside a Zhixu. Many examples use `master` as the main task pattern. | `taskPatterns[].name`. |
 | Supplier | A subject with real-world fulfillment capability that can be organized by Store and endorsed by a trust domain. | `SupplierDefinition`, `SupplierAttested`, `SupplierRevoked`. |
 | Executor | The subject that actually handles the current Order stage or submits its signal. | order authorization, stage executor overlay, EIP-712 submitter. |
 | Source | The causal namespace a signal belongs to. | `source`, `sourceId`, `signalKey`. |
@@ -49,7 +49,7 @@ This page explains project terms in plain language first, then points to code or
 | Proof | A traceable record that a claim maps to chain events or hashes. In Product, proof rows should include tx, block, log, contract, chain id, event, and payload context. | Product proof row, event provenance. |
 | Projection | A read model rebuilt from chain events for display. | chain-services indexer, Product DTO. |
 | Product DTO | Data format translating chain facts into orders, tasks, proof, and trust views ordinary users can read. | `ZhixuDetailDTO`, `ProductOrderDTO`, `ProductTaskDTO`. |
-| Product BFF | Product workflow service that handles drafts, invites, participant confirmation, authorization building, and order registration. | `uvp-chain-services/service/src/product/bff/`. |
+| Product BFF | Product Backend-for-Frontend workflow service that handles drafts, invites, participant confirmation, authorization building, and order registration. | `uvp-chain-services/service/src/product/bff/`. |
 | Signal Container | Product wrapper for task, evidence, typed data, signature, submission, and proof. | prepare/submit/proof Product API flow. |
 | Store | Product workbench for Nucleation, Suppliers, trust domains, operators, and proof views. | `zhixu-store/app`, Store Console API. |
 | Chain Services | Rebuildable service layer for indexing, projection, proof, relaying, Product API, and Store API. | `@uvp-eth/chain-services`. |

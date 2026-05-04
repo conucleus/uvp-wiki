@@ -1,6 +1,8 @@
 # Trigger
 
-A Trigger turns a ready condition into an executable task. More precisely, it is a special hook marker: once a receive hook becomes ready, the execution entry for that stage officially opens, the chain should emit `HookReady`, and Product/Store/executor-kit can project it as an executable task, notification, or adapter job.
+A Trigger turns a ready condition into an executable task. More precisely, it is a special hook marker: once a receive hook becomes ready, the task for that stage can open, the chain should emit `HookReady`, and Product/Store/executor-kit can project it as an executable task, notification, or adapter job.
+
+For first-pass readers, `HookReady` means "this task is ready to handle." It does not mean the business work is complete. Completion is proven later by an authorized `SignalSubmitted` event and its evidence fingerprint.
 
 Trigger is a compile-time mark on Hook, coming from the `trigger` array in a Zhixu stage:
 
@@ -19,7 +21,7 @@ HookReady(orderId, hookId, stageId, hookName)
 
 ## Why Trigger Must Be Explicit
 
-A stage may have multiple hooks: some wait for inputs, some belong to `signalMap`, some are for failure paths or internal conditions. Trigger’s job is to lift “the condition is satisfied” into “this execution segment has officially started.”
+A stage may have multiple hooks: some wait for inputs, some belong to `signalMap`, some are for failure paths or internal conditions. Trigger’s job is to lift “the condition is satisfied” into “this task can now be opened or claimed.”
 
 On the product side, Trigger can be understood as:
 

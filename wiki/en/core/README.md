@@ -1,6 +1,6 @@
 # Core Concepts
 
-Core concepts answer the question “what are the protocol objects.” These objects form the language layer consumed by Store, Product API, Order App, executor-kit, and periphery adapters. `Zhixu` is the transliteration of the underlying Chinese coordination term and means the static coordination definition; `Order` means a runtime instance of a Plan.
+Core concepts answer the question “what are the protocol objects.” These objects form the language layer consumed by Store, Product API, Order App, executor-kit, and periphery adapters. `Zhixu` is the transliteration of the underlying Chinese coordination term and means the reusable coordination rulebook; `Order` means a runtime instance of a Plan.
 
 ```text
 Zhixu definition
@@ -15,7 +15,7 @@ Zhixu definition
 
 ## How to Read This
 
-Start with these basic terms. Zhixu is the static definition, Order is the runtime instance, and the remaining objects serve compilation, authorization, endorsement, execution, and display:
+Start with these basic terms. Zhixu is the reusable rulebook, Order is the runtime instance, and the remaining objects serve compilation, authorization, endorsement, execution, and display:
 
 | Subpage | Description |
 | --- | --- |

@@ -7,12 +7,12 @@
 | 术语 | 普通解释 | 代码或链上对应物 |
 | --- | --- | --- |
 | UVP / 通用价值协议 | Universal Value Protocol，一套协作协议和产品语言，用来记录被授权的业务信号，以及这些信号带来的状态后果。 | `uvp-eth` 是 EVM/Web3 实现轨道。 |
-| 秩序 / Zhixu | 描述“一类订单应该怎么运行”的静态协作定义。 | `ZhixuDefinition`、`kind: "Zhixu"`、compiler input。 |
+| 秩序 / Zhixu | 描述“一类订单应该怎么运行”的可复用协作规则书。 | `ZhixuDefinition`、`kind: "Zhixu"`、compiler input。 |
 | Plan / 秩序版本 | 某个 Zhixu 编译后的确定性版本，再降到具体链目标。 | `HookPlanArtifact`、`EvmHookPlanArtifact`、`OnchainHookPlanArtifact`、`registerPlan()`、`PlanRegistered`。 |
 | Order / 订单 | 某个 Plan 的一次具体运行。 | `UVPStateMachine.Order`、`registerOrder()`、`OrderRegistered`。 |
-| 凝结核 / Nucleation | 发起、设计并维护某类 Zhixu 的组织主体。例如采购团队可以拥有跨境采购 Zhixu。 | `spec.nucleation.id`、Store 凝结核工作台。 |
+| 凝结核 / Nucleation | 发起、设计并维护某类 Zhixu 的组织主体。它可以是团队、组织、项目 owner 或 workflow owner，取决于业务语境。 | `spec.nucleation.id`、Store 凝结核工作台。 |
 | Stage / 阶段 | task pattern 里的一个步骤或执行段。 | `taskPatterns[].stages[]`、`stageIdentifier`、`stageId`。 |
-| Task Pattern | Zhixu 里一组可复用阶段。 | `taskPatterns[].name`。 |
+| Task Pattern | Zhixu 里一组可复用阶段。很多例子用 `master` 表示主 task pattern。 | `taskPatterns[].name`。 |
 | Supplier | 具备现实履约能力的主体，可以被 Store 组织并被 trust domain 背书。 | `SupplierDefinition`、`SupplierAttested`、`SupplierRevoked`。 |
 | Executor | 当前 Order 某个阶段的实际处理者，或提交该阶段 signal 的主体。 | order authorization、stage executor overlay、EIP-712 submitter。 |
 | Source | signal 所属的因果命名空间，回答“这个动作进入哪条业务推进线”。 | `source`、`sourceId`、`signalKey`。 |
@@ -49,7 +49,7 @@
 | Proof | 一条声明如何对应链事件、签名或 hash 的可追踪记录。Product proof row 应包含 tx、block、log、contract、chain id、event 和 payload context。 | Product proof row、event provenance。 |
 | Projection / 投影 | 从链事件重建出来、用于展示的读模型。 | chain-services indexer、Product DTO。 |
 | Product DTO | 把链上事实翻译成普通用户能读懂的订单、任务、proof 和 trust 视图的数据格式。 | `ZhixuDetailDTO`、`ProductOrderDTO`、`ProductTaskDTO`。 |
-| Product BFF | 处理 draft、invite、participant confirmation、authorization building 和 order registration 的产品工作流服务。 | `uvp-chain-services/service/src/product/bff/`。 |
+| Product BFF | Product Backend-for-Frontend，处理 draft、invite、participant confirmation、authorization building 和 order registration 的产品工作流服务。 | `uvp-chain-services/service/src/product/bff/`。 |
 | Signal Container | Product 层对 task、evidence、typed data、signature、submission 和 proof 的包装。 | Product API prepare/submit/proof flow。 |
 | Store | 面向凝结核、Supplier、trust domain、operator 和 proof 视图的产品工作台。 | `zhixu-store/app`、Store Console API。 |
 | Chain Services | 可重建服务层，负责 indexing、projection、proof、relaying、Product API 和 Store API。 | `@uvp-eth/chain-services`。 |

@@ -1,6 +1,6 @@
 # Core Concepts
 
-The core of `uvp-eth` is a state machine protocol that brings Zhixu coordination definitions onto the EVM chain. Contracts and chain events are the source of truth; services, Store, Order App, and executor-kit compile, index, display, sign, and submit around that source of truth.
+The core of `uvp-eth` is a state machine protocol that brings Zhixu coordination rulebooks onto the EVM chain. Contracts and chain events are the source of truth; services, Store, Order App, and executor-kit compile, index, display, sign, and submit around that source of truth.
 
 The shortest path is:
 
@@ -19,7 +19,7 @@ Zhixu definition
 
 ## Reading Order
 
-Start with these foundational terms. Zhixu is the static definition, Order is the runtime instance, and the other objects serve compilation, authorization, endorsement, execution, and display:
+Start with these foundational terms. Zhixu is the reusable rulebook, Order is the runtime instance, and the other objects serve compilation, authorization, endorsement, execution, and display:
 
 | Subpage | Description |
 | --- | --- |

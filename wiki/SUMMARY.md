@@ -116,8 +116,6 @@
 - [Product API](reference/product-api.md)
 - [CLI 与配置](reference/cli-and-config.md)
 - [项目状态](status/README.md)
-- [阅读门槛审计](status/readability-audit-2026-05-03.md)
-- [当前阅读门槛记录](status/current-readability-notes-2026-05-03.md)
 
 ## 贡献
 

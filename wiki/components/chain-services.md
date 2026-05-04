@@ -1,6 +1,6 @@
 # 可重建服务层：Chain Services
 
-`uvp-chain-services/service` 是 UVP EVM 轨道的可重建服务层。协议笔记里它也可能叫 `non-trusted execution layer`，意思是合约和链事件是协议事实源，Chain Services 提供可重建的 replay、projection、relaying、verification 和产品接口。它和 [语义、Hook Core 与 Compiler](semantics-and-compiler.md)、[链上执行、State Machine 与 Replay](onchain-runtime.md) 平级：compiler 负责把 Zhixu 变成确定性产物，state machine 负责链上事实，Chain Services 负责链下产品表面。
+`uvp-chain-services/service` 是 UVP EVM 轨道的可重建服务层。它不是协议事实源；合约和链事件才是协议事实源，Chain Services 提供可重建的 replay、projection、relaying、verification 和产品接口。较早的协议笔记可能把它叫作 `non-trusted execution layer`，但读者文档应优先使用“可重建服务层”。它和 [语义、Hook Core 与 Compiler](semantics-and-compiler.md)、[链上执行、State Machine 与 Replay](onchain-runtime.md) 平级：compiler 负责把 Zhixu 变成确定性产物，state machine 负责链上事实，Chain Services 负责链下产品表面。
 
 它是可 fork 的链下服务包。任何参与者、凝结核、供应商、审计方或第三方集成都可以下载、fork、编译并运行自己的实例；只要遵守 ABI、event、EIP-712、canonical hash、Product DTO 和 Store/Product API 边界，不同实例可以从同一组链事件重建同一类事实视图。
 
@@ -52,7 +52,7 @@ fork 或自部署时必须守住这些兼容点：
 | [Submissions 与 Stage Patch](chain-services-submissions-stage-patch.md) | `src/submissions/`、`src/stage-patches/` | participant/selector signed payload、submission tracking、executor/resource patch。 |
 | [Evidence、Proof 与 File Resource](chain-services-evidence-proof.md) | `src/evidence/`、`src/proof-verifier/` | evidence hash、metadata hash、object handle、proof mismatch report。 |
 | [Product API](chain-services-product-api.md) | `src/product/`、`src/api/routes/product-read.ts` | ordinary user order/task/timeline/proof DTO 和 Product staging readiness。 |
-| [Product BFF](../concepts/architecture/components/chain-services-bff.md) | `src/product/bff/` | order draft、invite、participant confirmation、authorization 和 registration workflow。 |
+| [Product BFF](../concepts/architecture/components/chain-services-bff.md) | `src/product/bff/` | Backend-for-Frontend workflow，处理 order draft、invite、participant confirmation、authorization 和 registration。 |
 | [Store Console、Supplier 与 Governance API](chain-services-store-api.md) | `src/store-console/`、`src/store-suppliers/`、`src/governance/` | 凝结核工作台、supplier directory、review、attestation/revocation request。 |
 | [Notifications 与 Reconcile](chain-services-notifications-reconcile.md) | `src/notifications/`、`src/reconcile/` | delivery intent、retry/dead-letter、submission/projection reconciliation。 |
 | [Storage、Migration 与 Runtime Profile](chain-services-storage-runtime.md) | `src/storage/`、`src/config/`、`migrations/` | memory/SQLite/PostgreSQL、migration、testnet fail-closed profile。 |
@@ -68,7 +68,7 @@ fork 或自部署时必须守住这些兼容点：
 | Stage patches | selector-signed executor/resource patch typed data。 | active executor patch、resource manifest patch submit path。 |
 | Proof verifier | metadata hash、evidence hash、Zhixu hash、object handle。 | proof mismatch report、evidence metadata、object storage adapter。 |
 | Product projection | chain projection、trust projection、evidence metadata。 | Product order/task/timeline/proof DTO、staging readiness。 |
-| Product BFF | order draft、invite、participant wallet、plan trust。 | registration draft、authorization table、order submit workflow。 |
+| Product BFF | order draft、invite、participant wallet、plan trust。 | Backend-for-Frontend registration draft、authorization table 和 order submit workflow。 |
 | Store Console | Store draft、version、docking、audit、runtime metadata。 | 凝结核工作台、Zhixu catalog、review material、docking session。 |
 | Store Supplier | supplier metadata、capability tags、contact material。 | supplier directory、review request、attestation/revocation workflow input。 |
 | Governance workflow | Store review material、admin action、trust request。 | governance tx intent、hashing、review/attestation/revocation records。 |

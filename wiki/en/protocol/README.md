@@ -2,7 +2,7 @@
 
 This page is the leftover protocol mainline entry from the previous navigation. The new main navigation has already split the content into [Core Concepts](../core/README.md), [Core Components](../components/README.md), [Store](../store/README.md), and [Executors and Integrations](../execution/README.md). It stays here as a short-path index from DSL to the on-chain state machine.
 
-The protocol mainline answers one question: how does a Zhixu coordination definition become a verifiable, replayable, and authorizable on-chain state machine?
+The protocol mainline answers one question: how does a Zhixu coordination rulebook become a verifiable, replayable, and authorizable on-chain state machine?
 
 ```text
 Zhixu DSL

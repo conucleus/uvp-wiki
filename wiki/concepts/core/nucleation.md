@@ -1,6 +1,8 @@
 # Nucleation / 凝结核
 
-凝结核是秩序 (Zhixu) 的发起核、设计者和秩序组织者。它对应 DSL 里的 `spec.nucleation.id`，用于标识“谁发起并维护这类秩序设计”。订单里的 executor、Store admin、trust domain 分别承担运行时执行、平台 workflow 和外部背书。
+凝结核是秩序 (Zhixu) 的发起、设计和维护主体。先把它理解成可复用运营模型的 owner：采购运营团队、行业项目组织者、平台侧 workflow 设计者，或其他能长期维护这份规则书的组织。它对应 DSL 里的 `spec.nucleation.id`，用于标识“谁发起并维护这类秩序设计”。订单里的 executor、Store admin、trust domain 分别承担运行时执行、平台 workflow 和外部背书。
+
+凝结核不自动等同于 Store operator、trust domain、registrar 或 submitter wallet。它可以出现在 workflow 材料和 Store 记录里，但链上权威仍然来自 plan attestation、publisher/registrar 权限、订单级 authorization 和参与方签名。
 
 ```yaml
 spec:
@@ -41,7 +43,7 @@ Nucleation / 凝结核
   -> 通过 proof 和 supplier network 维护秩序运转
 ```
 
-秩序 (Zhixu) 是凝结核设计出的静态定义。Plan 是某个秩序版本的链目标产物。Order 是某个 Plan 的一次运行实例。凝结核可以维护多个秩序或多个版本；运行时仍经过 plan attestation、order registration、signal authorization 和 chain proof。
+秩序 (Zhixu) 是凝结核设计出的可复用规则书。Plan 是某个秩序版本的链目标产物。Order 是某个 Plan 的一次运行实例。凝结核可以维护多个秩序或多个版本；运行时仍经过 plan attestation、order registration、signal authorization 和 chain proof。
 
 ## 和 Store 的关系
 

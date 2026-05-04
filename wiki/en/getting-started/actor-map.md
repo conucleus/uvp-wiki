@@ -2,6 +2,18 @@
 
 This page maps real roles in a cross-border PV project to UVP roles. Keep the main split in mind: real-world subjects do the work and accept responsibility; UVP records authorized signals, signatures, evidence fingerprints, and chain consequences.
 
+Read the map in this order:
+
+```text
+Nucleation designs the reusable rulebook
+  -> Trust Domain endorses the Plan or Supplier
+  -> Publisher registers the Plan
+  -> Registrar registers one Order and its signal permissions
+  -> Submitter signs a business Signal
+  -> Relayer may broadcast the transaction
+  -> Chain Services displays the rebuilt Product / Store view
+```
+
 ## From Real Roles to UVP Roles
 
 | Real role | What they do in the PV project | UVP role | What proves it |
@@ -19,6 +31,17 @@ This page maps real roles in a cross-border PV project to UVP roles. Keep the ma
 | Registrar | Creates a concrete Order against an endorsed Plan and writes initial signal permissions. | Registrar. | `OrderRegistered`, `SignalSubmitterAuthorized`. |
 | Relayer | Broadcasts participant-signed transactions and may pay gas. | Relayer. | transaction hash and chain event; business responsibility comes from submitter signature. |
 | Chain Services | Rebuilds order, task, timeline, proof, and trust views from chain events. | Rebuildable Service Layer. | projection row with tx, block, log, contract, chain id, and event provenance. |
+
+## Supplier and Executor in One Concrete Stage
+
+For a customs-release stage:
+
+| Layer | Example |
+| --- | --- |
+| Supplier | The customs broker company that has the capability and may receive trust-domain endorsement. |
+| Executor | The broker's operations wallet, employee wallet, API wallet, or adapter that is authorized for this Order stage. |
+| Authorization | `SignalSubmitterAuthorized` binds that submitter wallet to the customs source/signal for this Order. |
+| Proof | `SignalSubmitted` plus payload hash and transaction provenance proves what was submitted. |
 
 ## Authority Sources in One Order
 

@@ -27,7 +27,7 @@ ABI / EIP-712 / calldata helpers
 | --- | --- |
 | [公共接口](../reference/public-interfaces.md) | ABI、event、EIP-712、canonical hash、DTO、API、release evidence 的 drift checklist。 |
 | [可重建服务层：Chain Services](chain-services.md) | `uvp-chain-services/service` 的 indexer、relayer、proof verifier、Product API、Store API 和 runtime profile 总览。 |
-| [Product BFF](../concepts/architecture/components/chain-services-bff.md) | order draft、invite、participant confirmation、authorization 和 registration workflow。 |
+| [Product BFF](../concepts/architecture/components/chain-services-bff.md) | Backend-for-Frontend workflow，处理 order draft、invite、participant confirmation、authorization 和 registration。 |
 | [Product DTO](../concepts/product/dto.md) | 普通用户可读的 order/task/proof/trust DTO。 |
 | [Product API](../reference/product-api.md) | Product 和 Store route 参考。 |
 | [CLI 与配置](../reference/cli-and-config.md) | executor-kit、chain-services、frontend config 和 root scripts。 |

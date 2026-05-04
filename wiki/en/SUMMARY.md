@@ -116,8 +116,6 @@
 - [Product API](reference/product-api.md)
 - [CLI and Config](reference/cli-and-config.md)
 - [Project Status](status/README.md)
-- [Readability Audit](status/readability-audit-2026-05-03.md)
-- [Current Readability Notes](status/current-readability-notes-2026-05-03.md)
 
 ## Contribution
 

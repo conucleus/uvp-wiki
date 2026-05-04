@@ -1,6 +1,6 @@
 # 核心概念
 
-核心概念回答“协议对象是什么”。这些对象是 Store、Product API、Order App、executor-kit 和 periphery adapter 共同消费的语言层。`Zhixu` 是“秩序”的拼音，表示静态秩序定义；`Order` 是“订单”，表示某个 Plan 的一次运行。
+核心概念回答“协议对象是什么”。这些对象是 Store、Product API、Order App、executor-kit 和 periphery adapter 共同消费的语言层。`Zhixu` 是“秩序”的拼音，表示可复用协作规则书；`Order` 是“订单”，表示某个 Plan 的一次运行。
 
 ```text
 秩序 (Zhixu) 定义
@@ -24,7 +24,7 @@
 | Source | [Source 因果链](../concepts/core/source.md) | signal 所在的因果语境如何串联、分叉和交汇。 |
 | Signal | [Signal](../concepts/core/signal.md) | 状态机接受的最小业务输入如何签名、去重和授权。 |
 | Hook | [Hook](../concepts/core/hook.md) | readiness 和状态变化如何从 signal 条件求出。 |
-| Trigger | [Trigger](../concepts/core/trigger.md) | 哪个 hook Ready 后正式打开执行入口并发出 `HookReady`。 |
+| Trigger | [Trigger](../concepts/core/trigger.md) | 哪个 hook Ready 后打开可处理任务并发出 `HookReady`。 |
 | File Resources | [File Resources](../concepts/core/file-resources.md) | stage 资源句柄如何指向链下协议、证据模板或资源 manifest。 |
 | Plan | [Plan](../concepts/core/plan.md) | 静态、可认证、可注册的编译产物。 |
 | Order | [Order](../concepts/core/order.md) | 某个 Plan 的动态运行实例和可重放事件流。 |
@@ -49,7 +49,7 @@ Executor 是订单运行时的执行绑定：静态秩序可以声明默认 exec
 - Supplier trust 和订单 signal 授权分层展示。
 - Executor patch 只影响单个 Order，Plan 保持静态版本。
 - `supplierType=zhixu` 通过 proof 校验、docking link 和授权 signal 映射推动 local order。
-- Trigger 打开执行入口；链上订单身份由 `registerOrder()` 绑定。
+- Trigger 打开可处理任务；链上订单身份由 `registerOrder()` 绑定。
 - `fileResources` 是资源句柄，业务文件明文留在链下。
 - Store metadata 组织对象；plan/supplier trust 来自 registry events。
 - Store admin 负责平台 workflow；凝结核负责秩序内部治理；trust domain 负责外部背书。

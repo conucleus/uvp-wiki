@@ -1,6 +1,8 @@
 # Nucleation
 
-Nucleation is the originating nucleus, designer, and organizer of a Zhixu. It corresponds to `spec.nucleation.id` in the DSL and identifies “who originated and maintains this kind of coordination design.” In an Order, the executor, Store admin, and trust domain respectively take responsibility for runtime execution, platform workflow, and external endorsement.
+Nucleation is the subject that originates, designs, and maintains a Zhixu. Read it first as the owner of the reusable operating model: a procurement operations team, an industry program owner, a platform-side workflow designer, or another organization that can maintain the rulebook over time. It corresponds to `spec.nucleation.id` in the DSL and identifies “who originated and maintains this kind of coordination design.” In an Order, the executor, Store admin, and trust domain respectively take responsibility for runtime execution, platform workflow, and external endorsement.
+
+Nucleation is not automatically the same as a Store operator, trust domain, registrar, or submitter wallet. It may appear in workflow materials and Store records, but on-chain authority still comes from plan attestation, publisher/registrar permissions, order-level authorization, and participant signatures.
 
 ```yaml
 spec:
@@ -41,7 +43,7 @@ Nucleation
   -> maintains Zhixu operation through proof and supplier network
 ```
 
-Zhixu is the static definition designed by Nucleation. Plan is the chain-targeted artifact for one version of that Zhixu. Order is one runtime instance of a Plan. Nucleation can maintain multiple Zhixu definitions or multiple versions; runtime still goes through plan attestation, order registration, signal authorization, and chain proof.
+Zhixu is the reusable rulebook designed by Nucleation. Plan is the chain-targeted artifact for one version of that Zhixu. Order is one runtime instance of a Plan. Nucleation can maintain multiple Zhixu definitions or multiple versions; runtime still goes through plan attestation, order registration, signal authorization, and chain proof.
 
 ## Relation to Store
 

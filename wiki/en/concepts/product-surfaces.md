@@ -2,6 +2,18 @@
 
 Product surfaces translate on-chain facts into order, task, proof, and trust information that people can actually use. They project events from `UVPStateMachine` and `ZhixuTrustRegistry` into DTOs consumed by the Product API, Store, and Order App; protocol state is still decided by on-chain events.
 
+The most important translation is from DSL stage to Product task:
+
+```text
+stage.receiveSignals
+  -> compiled Hook
+  -> trigger=true
+  -> HookReady
+  -> ProductTaskDTO
+  -> user or executor submits a Signal
+  -> Product proof row
+```
+
 ## Subpages
 
 | Subpage | Description |

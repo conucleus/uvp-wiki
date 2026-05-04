@@ -1,6 +1,6 @@
 # Rebuildable Service Layer: Chain Services
 
-`uvp-chain-services/service` is the rebuildable service layer for the UVP EVM track. In protocol notes it may also be called the non-trusted execution layer. The phrase means contracts and chain events are the protocol fact source, while Chain Services provides rebuildable replay, projection, relaying, verification, and product-facing interfaces. It sits at the same level as [Semantics, Hook Core, and Compiler](semantics-and-compiler.md) and [On-chain Execution, State Machine, and Replay](onchain-runtime.md): the compiler turns Zhixu into deterministic artifacts, the state machine handles on-chain facts, and Chain Services handles off-chain product surfaces.
+`uvp-chain-services/service` is the rebuildable service layer for the UVP EVM track. It is non-authoritative: contracts and chain events are the protocol fact source, while Chain Services provides rebuildable replay, projection, relaying, verification, and product-facing interfaces. Older protocol notes may call this the non-trusted execution layer, but reader-facing documentation should use rebuildable service layer as the primary name. It sits at the same level as [Semantics, Hook Core, and Compiler](semantics-and-compiler.md) and [On-chain Execution, State Machine, and Replay](onchain-runtime.md): the compiler turns Zhixu into deterministic artifacts, the state machine handles on-chain facts, and Chain Services handles off-chain product surfaces.
 
 It is a forkable off-chain service package. Any participant, nucleation kernel, supplier, auditor, or third-party integration can download, fork, compile, and run its own instance; as long as ABI, event, EIP-712, canonical hash, Product DTO, and Store/Product API boundaries are respected, different instances can rebuild the same kind of fact view from the same chain events.
 
@@ -52,7 +52,7 @@ When forking or self-hosting, these compatibility points must be preserved:
 | [Submissions and Stage Patch](chain-services-submissions-stage-patch.md) | `src/submissions/`, `src/stage-patches/` | participant/selector signed payloads, submission tracking, executor/resource patch. |
 | [Evidence, Proof, and File Resource](chain-services-evidence-proof.md) | `src/evidence/`, `src/proof-verifier/` | evidence hash, metadata hash, object handle, proof mismatch report. |
 | [Product API](chain-services-product-api.md) | `src/product/`, `src/api/routes/product-read.ts` | ordinary user order/task/timeline/proof DTO and Product staging readiness. |
-| [Product BFF](../concepts/architecture/components/chain-services-bff.md) | `src/product/bff/` | order draft, invite, participant confirmation, authorization, and registration workflow. |
+| [Product BFF](../concepts/architecture/components/chain-services-bff.md) | `src/product/bff/` | Backend-for-Frontend workflow for order draft, invite, participant confirmation, authorization, and registration. |
 | [Store Console, Supplier, and Governance API](chain-services-store-api.md) | `src/store-console/`, `src/store-suppliers/`, `src/governance/` | nucleation workbench, supplier directory, review, attestation/revocation request. |
 | [Notifications and Reconcile](chain-services-notifications-reconcile.md) | `src/notifications/`, `src/reconcile/` | delivery intent, retry/dead-letter, submission/projection reconciliation. |
 | [Storage, Migration, and Runtime Profile](chain-services-storage-runtime.md) | `src/storage/`, `src/config/`, `migrations/` | memory/SQLite/PostgreSQL, migrations, testnet fail-closed profile. |
@@ -68,7 +68,7 @@ When forking or self-hosting, these compatibility points must be preserved:
 | Stage patches | selector-signed executor/resource patch typed data. | active executor patch, resource manifest patch submit path. |
 | Proof verifier | metadata hash, evidence hash, Zhixu hash, object handle. | proof mismatch report, evidence metadata, object storage adapter. |
 | Product projection | chain projection, trust projection, evidence metadata. | Product order/task/timeline/proof DTO, staging readiness. |
-| Product BFF | order draft, invite, participant wallet, plan trust. | registration draft, authorization table, order submit workflow. |
+| Product BFF | order draft, invite, participant wallet, plan trust. | Backend-for-Frontend registration draft, authorization table, and order submit workflow. |
 | Store Console | Store draft, version, docking, audit, runtime metadata. | nucleation workbench, Zhixu catalog, review material, docking session. |
 | Store Supplier | supplier metadata, capability tags, contact material. | supplier directory, review request, attestation/revocation workflow input. |
 | Governance workflow | Store review material, admin action, trust request. | governance tx intent, hashing, review/attestation/revocation records. |

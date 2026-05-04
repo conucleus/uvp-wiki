@@ -4,6 +4,32 @@ A cross-organization coordination protocol for the AI era: UVP, the Universal Va
 
 UVP Wiki is the public reading entry for the Universal Value Protocol. The current runnable implementation track is EVM/Web3: reusable cross-organization coordination designs become endorsed on-chain Plans, concrete Orders, wallet-signed business Signals, and replayable proof. UVP is chain-targetable as a protocol; the EVM track is working today, and Solana boundaries are reserved as explicit TODO surfaces.
 
+## Five-Minute Mental Model
+
+Start with one order, not with the whole protocol vocabulary:
+
+| Object | Plain reading |
+| --- | --- |
+| `Zhixu` | A reusable coordination rulebook for one kind of cross-organization work. |
+| Plan | The compiled, versioned, and attestable form of that rulebook. |
+| Order | One concrete run under a specific Plan. |
+| Signal | A signed business statement from an authorized wallet. |
+| `HookReady` | The chain event that says a next task can open. |
+| Proof | The trace from evidence hash, signature, transaction, event, and projection to what the product shows. |
+
+The first-pass path is:
+
+```text
+Zhixu rulebook
+  -> endorsed Plan
+  -> concrete Order
+  -> authorized Signal
+  -> HookReady opens the next task
+  -> Product proof shows the event trail
+```
+
+You can skip artifact names, ABI, gas, EIP-712 details, `sourceId`, `signalId`, Stage Patch, Docked Zhixu, `signalMap`, and `::OUTSIDE` on a first read. Those are engineering or advanced-modeling details after the order story is clear.
+
 ## In the AI Era, Transaction Costs Remain
 
 In the AI era, the cost of getting work done is dropping quickly, but transaction costs do not disappear on their own. Knowing who should transact with whom, what has been agreed, who should take the next step, who is allowed to confirm, and which consequence follows after confirmation remains one of the most expensive parts of cross-organization coordination.
@@ -16,7 +42,7 @@ If you are searching for how collaboration works in the AI era, how to orchestra
 
 UVP records protocol facts: a subject authorized by a specific Zhixu declares, under a specific Order, stage, and evidence fingerprint, that a business Signal has been emitted and that the subject is accountable for that declaration. Real-world truth, qualification review, guarantee, insurance, dispute resolution, and regulatory conclusions can be expressed by the relevant trust domain, supplier, funder, auditor, or adapter as its own signal.
 
-UVP compresses complex production relationships into an order language that computers can interpret and chains can record. `Zhixu` is the transliteration of the underlying Chinese coordination term; in UVP it means a static coordination definition: who starts, who takes the next step, which supplier may take over, what evidence counts as completion, and where the process goes on failure. An Order is one runtime of a specific Zhixu version.
+UVP compresses complex production relationships into an order language that computers can interpret and chains can record. `Zhixu` is the transliteration of the underlying Chinese coordination term; in UVP it means a reusable coordination rulebook: who starts, who takes the next step, which supplier may take over, what evidence counts as completion, and where the process goes on failure. An Order is one runtime of a specific Zhixu version.
 
 The Zhixu DSL is a low-cost way to define transaction agreements; blockchains and smart contracts are high-forgery-cost recording systems. The EVM implementation connects the two, so strangers, enterprise systems, AI agents, suppliers, trust domains, and ordinary participants can organize production around the same signal boundary.
 
@@ -52,9 +78,23 @@ Nucleation designs a Zhixu
   -> Chain Services rebuilds Product and Store views from events
 ```
 
-Chain Services is the rebuildable service layer: it indexes, projects, verifies, relays, and exposes Product / Store APIs. In protocol discussions this layer is also called the non-trusted execution layer. The phrase means contracts and chain events are the protocol fact source, while Chain Services is a rebuildable projection and relay layer.
+Chain Services is the rebuildable service layer: it indexes, projects, verifies, relays, and exposes Product / Store APIs. It is non-authoritative: contracts and chain events are the protocol fact source, while Chain Services is a rebuildable projection and relay layer. Some protocol notes may call this the non-trusted execution layer, but reader-facing pages should treat "rebuildable service layer" as the primary name.
 
 Funding, USDC, escrow, guarantee, and settlement can be built around this path, but they stay in periphery adapters. The core protocol boundary is the coordination state machine: Plans, Orders, authorizations, Signals, hooks, attestations, and replayable events.
+
+## Authority Map
+
+UVP separates design, endorsement, registration, submission, broadcasting, and display:
+
+| Question | Responsible actor | Protocol fact |
+| --- | --- | --- |
+| Who designs the reusable rulebook? | Nucleation, such as a procurement team or workflow owner. | Zhixu definition and compiled Plan materials. |
+| Who endorses a Plan or Supplier? | Trust Domain. | `PlanAttested`, `SupplierAttested`, and revocation events. |
+| Who registers a Plan? | Authorized Publisher. | `PlanRegistered`. |
+| Who registers an Order and initial permissions? | Authorized Registrar. | `OrderRegistered` and `SignalSubmitterAuthorized`. |
+| Who makes a business statement? | Authorized Submitter wallet. | EIP-712 signature and `SignalSubmitted`. |
+| Who broadcasts a transaction? | Relayer, participant wallet, or integration service. | Transaction hash and event provenance. |
+| Who displays readable order/task/proof state? | Chain Services, Product API, Store, Order App, executor-kit. | Rebuildable projections from chain events. |
 
 ## Public Implementation Repositories
 
@@ -102,6 +142,8 @@ If you are new to UVP, use this order:
 3. [Evidence and Proof Path](getting-started/evidence-proof-path.md): understand how private business files become hashes, signed signals, events, and Product proof rows.
 4. [Glossary](reference/glossary.md): keep the project terms and "do not confuse" pairs nearby.
 5. [Core Concepts](core/README.md): read the protocol objects after the story is clear.
+
+For a first pass, avoid [Advanced Composition](SUMMARY.md#advanced-composition) until you need dynamic executor/resource changes, nested workflows, or adapter integration.
 
 ## Choose Your Path
 

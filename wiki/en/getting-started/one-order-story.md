@@ -71,7 +71,7 @@ UVP records protocol facts: an authorized subject signs a statement that a busin
 
 ## 4. Zhixu DSL Writes Production Relationships as Code
 
-The first core move in UVP is to write "production relationship + signal boundary" as computer-readable order language. That order is called `Zhixu`. It is a coordination DSL, with a practical shape close to a YAML agreement.
+The first core move in UVP is to write "production relationship + signal boundary" as a computer-readable rulebook. That rulebook is called `Zhixu`. It is a coordination DSL, with a practical shape close to a YAML agreement.
 
 A PV delivery Zhixu can describe:
 
@@ -94,7 +94,7 @@ Read this part as four actions.
 
 ### 5.1 Write How This Kind of Project Coordinates
 
-The Nucleation first writes the reusable coordination method for PV project delivery as a Zhixu. It answers ordinary business questions: who starts first, what EPC waits for, when OEM can ship, who is notified after customs release, who can accept after site receipt, and which path handles failure or timeout.
+The Nucleation first writes the reusable coordination method for PV project delivery as a Zhixu. In this story, Nucleation can be read as the team or organization that owns this reusable operating model, such as a procurement operations team, industry program owner, or platform-side workflow designer. It answers ordinary business questions: who starts first, what EPC waits for, when OEM can ship, who is notified after customs release, who can accept after site receipt, and which path handles failure or timeout.
 
 This step is like writing an operating manual in machine-readable YAML. It is not one specific project yet. It is the operating rule for a class of projects.
 
@@ -141,6 +141,28 @@ instruction
 ```
 
 A complex production relationship becomes a readable path: who was authorized, what was done, what evidence fingerprint was submitted, who signed, which chain event exists, and why the next step can begin.
+
+One concrete distinction matters:
+
+- Supplier is the capability and trust subject. For example, a customs broker company can be endorsed as a customs Supplier.
+- Executor is the runtime submitter or handler for this Order stage. For example, that broker's operations wallet or API wallet can be authorized to submit the customs-release signal for this Order.
+
+## 7. How a DSL Stage Becomes a Product Task
+
+The DSL and the product UI use different words for the same path:
+
+```text
+Zhixu stage.receiveSignals
+  -> compiled Hook condition
+  -> trigger=true
+  -> HookReady event
+  -> Product task opens
+  -> participant submits evidence fingerprint and signature
+  -> SignalSubmitted
+  -> proof row appears in Product / Store / Order App
+```
+
+This means `HookReady` says "a task is ready to handle." It does not mean the business work is already complete. Completion is proven later by an authorized signal and its evidence fingerprint.
 
 ## Read Next
 
