@@ -26,7 +26,7 @@ The docs should now move from "complete explanation" toward "guided comprehensio
 
 2. `Nucleation` is still the hardest role to imagine in the real world.
 
-   The definition says "originating nucleus, designer, and organizer", but I still do not know whether it is normally a company, a team, a workspace, a wallet, a product owner, a protocol governance body, or a marketplace operator. The Store docs repeatedly say Nucleation owns internal governance, but the product shape is still abstract.
+   The definition says "originating nucleus, designer, and organizer". I still do not know whether it is normally a company, a team, a workspace, a wallet, a product owner, a protocol governance body, or a marketplace operator. The Store docs repeatedly say Nucleation owns internal governance; the product shape is still abstract.
 
    Recommended fix: add one concrete identity example: "ACME Procurement Team is the Nucleation for the cross-border procurement Zhixu; it owns `spec.nucleation.id`, maintains versions, organizes supplier slots, and uses Store as its workbench."
 

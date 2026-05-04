@@ -2,7 +2,7 @@
 
 Date: 2026-05-03
 
-Scope: I only read the Markdown documents and navigation structure under `uvp-wiki/`. I did not read implementation code in `uvp-protocol`, `uvp-chain-services`, `zhixu-store`, `uvp-order-app`, `uvp-executor-kit`, or `uvp-periphery`. This note records the issues from the perspective of a reader with strong common sense, general software and business-collaboration knowledge, but no prior exposure to UVP.
+Scope: I only read the Markdown documents and navigation structure under `uvp-wiki/`. I did not read implementation code in `uvp-protocol`, `uvp-chain-services`, `zhixu-store`, `uvp-order-app`, `uvp-executor-kit`, or `uvp-periphery`. This note records the issues from the perspective of a reader with strong common sense, general software and business-collaboration knowledge, and no prior exposure to UVP.
 
 Note: This is a pre-remediation audit record, so it preserves the high-barrier wording and question patterns that were visible at the time. The body docs have since added [One Order Story](../getting-started/one-order-story.md) and [Glossary](../reference/glossary.md), and have been rewritten to follow the rule of "explain what it is first, then explain the boundary".
 
