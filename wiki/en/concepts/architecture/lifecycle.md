@@ -12,7 +12,6 @@ Store or a developer prepares a Zhixu definition. The definition describes task 
 
 | Artifact | Purpose |
 | --- | --- |
-| `HookPlanArtifact` | For review, Store, tests, and human reading. |
 | `OnchainHookPlanArtifact` | For EVM registration and hash attestation. |
 | `registerPlan` args | For `UVPStateMachine.registerPlan()`. |
 
@@ -20,10 +19,10 @@ The compiler also performs structural validation, such as signal references, exe
 
 ## 3. Attest the Plan
 
-The owner of the official trust domain attests the following in `ZhixuTrustRegistry`:
+The owner of the configured trust registry attests the following in `ZhixuTrustRegistry`:
 
 ```text
-domainId + planId + planHash
+registryAddress + planId + planHash
 ```
 
 If the plan has not been attested, or has already been revoked, `UVPStateMachine` should not accept it as a valid plan.
@@ -32,9 +31,9 @@ If the plan has not been attested, or has already been revoked, `UVPStateMachine
 
 An authorized publisher calls `registerPlan()`. The contract stores compact hooks, dependency indexes, and selector bindings, then emits `PlanRegistered`.
 
-## 5. Register the Order and Authorization
+## 5. Trigger-Create the Order and Authorization
 
-An authorized registrar calls `registerOrder()`, binding a specific `planId` and writing order-level signal authorization at the same time. Each authorization states which submitter can submit which source/signal for that order.
+An authorized registrar or relayer broadcasts `triggerOrderFromOutsideFor` or `triggerOrderFromSignalFor`. The business submitter must sign the trigger typed data; the contract binds the `planId`, writes order-level signal authorization, records the trigger fact, and materializes the ready trigger stage in the same transaction. Each authorization states which submitter can submit which source/signal for that order.
 
 ## 6. Submit Business Actions
 

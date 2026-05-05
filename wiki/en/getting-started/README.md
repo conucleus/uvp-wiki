@@ -5,10 +5,9 @@ This section is the learning path after the homepage. It is for readers who alre
 ## Recommended First Pass
 
 1. [One Order Story](one-order-story.md): one concrete cross-border order from Zhixu design to chain proof.
-2. [Actor Map](actor-map.md): who acts, where they act, and which event proves each fact.
-3. [Evidence and Proof Path](evidence-proof-path.md): how private evidence becomes hashes, signed signals, and proof rows.
+2. [One Order Through UVP Components](order-through-components.md): the same order crossing Store, compiler, trust registry, state machine, Chain Services, Order App, and executor-kit.
+3. [Core Concepts](../core/README.md): the protocol objects after the story and component path are clear.
 4. [Glossary](../reference/glossary.md): terms and "do not confuse" pairs.
-5. [Core Concepts](../core/README.md): the protocol objects after the story is clear.
 
 ## Engineering First Pass
 

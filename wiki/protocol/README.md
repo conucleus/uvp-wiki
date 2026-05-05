@@ -10,7 +10,7 @@
 Zhixu DSL
   -> nucleation id and design boundary
   -> deterministic HookPlan / OnchainHookPlan artifacts
-  -> trust domain plan attestation
+  -> trust registry plan attestation
   -> UVPStateMachine plan/order registration
   -> order-level signal authorization
   -> wallet-bound signal submission
@@ -18,7 +18,7 @@ Zhixu DSL
   -> replayable Product projection
 ```
 
-## 先读这些
+## 阅读路径
 
 | 页面 | 作用 |
 | --- | --- |

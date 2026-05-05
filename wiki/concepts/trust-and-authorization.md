@@ -1,6 +1,6 @@
 # 信任与授权
 
-`uvp-eth` 把“谁认可计划”和“谁能提交某个订单动作”分开处理。计划可信度来自 `ZhixuTrustRegistry` 的 trust domain 认证；订单动作权限来自 `UVPStateMachine` 的订单级 signal 授权和参与方 EIP-712 签名。
+`uvp-eth` 把“谁认可计划”和“谁能提交某个订单动作”分开处理。计划可信度来自 `ZhixuTrustRegistry` 的 trust registry 认证；订单动作权限来自 `UVPStateMachine` 的订单级 signal 授权和参与方 EIP-712 签名。
 
 ## 本篇子项
 
@@ -15,7 +15,7 @@
 
 | 层 | 解决的问题 |
 | --- | --- |
-| Trust domain | 这个 plan 或 supplier 是否被某个信任域认可。 |
+| Trust registry | 这个 plan 或 supplier 是否被某个信任域认可。 |
 | Publisher / registrar allowlist | 谁可以注册计划、谁可以注册订单。 |
 | Order-level signal authorization | 某个订单里，哪个钱包可以提交哪个 source/signal。 |
 
@@ -23,7 +23,7 @@
 
 ## Supplier Trust 和 Signal 授权
 
-Supplier trust 说明某个 trust domain 背书了某个 supplier subject。它可以影响 Store 推荐、Product 警告、BFF 创建授权时的准入判断、executor-kit 是否 fail closed。`submitSignal()` 权限仍落在订单级授权。
+Supplier trust 说明某个 trust registry 背书了某个 supplier subject。它可以影响 Store 推荐、Product 警告、BFF 创建授权时的准入判断、executor-kit 是否 fail closed。`submitSignal()` 权限仍落在订单级授权。
 
 真正的提交权限永远落在订单级：
 

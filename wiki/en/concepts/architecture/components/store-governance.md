@@ -29,7 +29,7 @@ Store may use its own platform authority for catalog tagging, material review, a
 
 ## Governance Handoff
 
-Store governance actions should be delegated to an existing governance service or administrator workflow. Store does not hold private keys directly, does not bypass admin headers, does not describe review approval as chain attestation, and does not turn a Store reviewer into a trust domain.
+Store governance actions should be delegated to an existing governance service or administrator workflow. Store does not hold private keys directly, does not bypass admin headers, does not describe review approval as chain attestation, and does not turn a Store reviewer into a trust registry.
 
 ## Why Store Is a Necessary Centralized Component
 

@@ -5,10 +5,9 @@
 ## 推荐第一遍阅读
 
 1. [一个订单故事](one-order-story.md)：用一条跨境订单理解从 Zhixu 设计到链上 proof 的路径。
-2. [角色地图](actor-map.md)：谁在行动、在哪里行动、哪条事件证明这个事实。
-3. [证据与 Proof 路径](evidence-proof-path.md)：私有证据如何变成 hash、签名 signal 和 proof row。
+2. [一个订单穿过 UVP 组件](order-through-components.md)：再用同一条订单看 Store、compiler、trust registry、state machine、Chain Services、Order App 和 executor-kit 的位置。
+3. [核心概念](../core/README.md)：故事和组件位置清楚之后，再读协议对象总览。
 4. [核心术语表](../reference/glossary.md)：项目术语和“不要混淆”的概念对。
-5. [核心概念](../core/README.md)：故事清楚之后再读协议对象。
 
 ## 工程第一遍
 

@@ -63,11 +63,13 @@ A production relationship runs because participants keep emitting signals:
 
 A signal answers three questions: who completed what, whether the next step can begin, and who accepts responsibility for the statement.
 
+In role terms, these production organizations are Suppliers first. When one of them is selected or elected to handle a concrete Order stage, it becomes the Executor or submitter for that stage. A government, regulator, funder, insurer, auditor, broker, EPC, or OEM does not become a special UVP role just because of its industry name.
+
 ## 3. Why Signals Have Force
 
 Signals have force because the real world gives them consequences. A payment certificate lets a supplier continue production. A regulatory permit lets a project move to the next stage. Customs documents let cargo be released. Acceptance confirmation starts payment or warranty responsibility. Insurance and audit records make risk computable.
 
-UVP records protocol facts: an authorized subject signs a statement that a business signal has been emitted for a specific Order, stage, and evidence fingerprint. Real-world truth is declared by the responsible person, enterprise, trust domain, auditor, funder, regulator, or adapter through its own signal and accountability. Off-chain facts are declared by real-world responsible parties; the chain records those declarations, signatures, evidence fingerprints, and state consequences.
+UVP records protocol facts: an authorized subject signs a statement that a business signal has been emitted for a specific Order, stage, and evidence fingerprint. Real-world truth is declared by the responsible Supplier or selected Executor through its own signal and accountability. A Trust Domain is separate endorsement infrastructure when explicitly configured; it is not automatically the government, regulator, funder, insurer, or auditor. Off-chain facts are declared by real-world responsible parties; the chain records those declarations, signatures, evidence fingerprints, and state consequences.
 
 ## 4. Zhixu DSL Writes Production Relationships as Code
 
@@ -106,18 +108,18 @@ A Plan has a `planHash`. You can read it as the fingerprint of this rule set. Th
 
 ### 5.3 A Trust Domain Endorses That Version
 
-A trust domain is a responsible subject willing to endorse a kind of judgment. It can review the Plan materials, evidence requirements, supplier requirements, applicability, and `planHash`. After approval, it emits `PlanAttested` on chain.
+A trust registry is a responsible subject willing to endorse a kind of judgment. It can review the Plan materials, evidence requirements, supplier requirements, applicability, and `planHash`. After approval, it emits `PlanAttested` on chain.
 
-`PlanAttested` means this trust domain recognizes this Plan version under its endorsement policy. It gives Store displays, Order creation, and partner review a verifiable basis.
+`PlanAttested` means this trust registry recognizes this Plan version under its endorsement policy. It gives Store displays, Order creation, and partner review a verifiable basis.
 
 ### 5.4 Create This Concrete Run
 
-An Order is one concrete execution of a Plan. For example, when a Mongolia PV project actually procures a batch of modules and delivers them to site, the registrar creates an Order and records who may submit which signals for this Order.
+An Order is one concrete execution of a Plan. For example, when a Mongolia PV project actually procures a batch of modules and delivers them to site, an authorized registrar mechanism or account records the Order and writes who may submit which signals for this Order.
 
 ```text
 Zhixu DSL: how this class of PV project coordinates
   -> Plan / planHash: stable version and fingerprint of the rule set
-  -> PlanAttested: a trust domain endorses this version
+  -> PlanAttested: a trust registry endorses this version
   -> OrderRegistered: one project starts running under this version
   -> SignalSubmitterAuthorized: who may emit which signal in this Order
 ```
@@ -166,6 +168,6 @@ This means `HookReady` says "a task is ready to handle." It does not mean the bu
 
 ## Read Next
 
-- [Actor Map](actor-map.md): map real PV-project roles to UVP roles.
-- [Evidence and Proof Path](evidence-proof-path.md): see how business files become hashes, signed signals, chain events, and Product proof rows.
+- [One Order Through UVP Components](order-through-components.md): use the same order to locate Store, compiler, trust registry, state machine, Chain Services, Order App, and executor-kit.
+- [Core Object Overview](../core/README.md): read the protocol objects after the story is clear.
 - [Glossary](../reference/glossary.md): keep Zhixu, Order, Signal, Hook, Trigger, Supplier, and Executor nearby.

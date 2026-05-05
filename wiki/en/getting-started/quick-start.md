@@ -8,9 +8,10 @@ pnpm check
 pnpm test
 pnpm build
 pnpm verify:protocol-freeze
+pnpm verify:product-signal-map
 ```
 
-These commands cover TypeScript package typecheck/test/build, plus drift checks for the current protocol ABI/hash fixtures and the EIP-712 domain. They do not spend gas and do not require private keys.
+These commands cover TypeScript package typecheck/test/build, drift checks for the current protocol ABI/hash fixtures and the EIP-712 domain, and the Product signal map gate. They do not spend gas and do not require private keys.
 
 ## Local Contract Checks
 
@@ -41,7 +42,8 @@ This script deploys the contracts, compiles Zhixu, registers plans and orders, s
 | `pnpm test` | Test all packages. |
 | `pnpm build` | Build all packages. |
 | `pnpm lint` | Run lint for packages that provide a lint script. |
-| `pnpm verify:protocol-freeze` | Verify the `UVPStateMachine`, `ZhixuTrustRegistry`, `UVPDeploymentRegistry`, and Base Sepolia EIP-712 `0.2` domain fixtures. |
+| `pnpm verify:protocol-freeze` | Verify the v0.4 `UVPStateMachine`, `ZhixuTrustRegistry`, `UVPDeploymentRegistry`, and EIP-712 domain fixtures. |
+| `pnpm verify:product-signal-map` | Verify that Product UI actions, permission rows, compiled signal ids, BFF authorizations, and contract authorization pairs converge. |
 | `pnpm release:baseline:dry-run` | Dry-run the local release baseline. |
 | `pnpm staging:preflight` | Non-spending preflight for Base Sepolia staging. |
 

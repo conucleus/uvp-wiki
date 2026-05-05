@@ -18,6 +18,7 @@ spec:
   platform:
     type: blockchain
     provider: eth
+    network: base
     version: 0.1.3
   nucleation:
     id: procurement-nucleus
@@ -26,7 +27,7 @@ spec:
       stages:
         - name: supplier_sourcing
           source: supply
-          trigger: [SCOPE_READY]
+          trigger: ["SCOPE_READY"]
           receiveSignals:
             SCOPE_READY: solution::master.technical_scope.cmp
           sendSignals: [str, cmp, err]
@@ -52,7 +53,7 @@ This says: the local Zhixu stage `master.supplier_sourcing` is triggered by `sol
 | `metadata.uid` | Stable Zhixu ID. Falls back to the name when absent. |
 | `metadata.labels` | Business category, industry, and demo labels. On-chain authorization is controlled by order authorization and overlays. |
 | `metadata.annotations.version` | Plan version. Version changes flow into `planId`. |
-| `spec.platform` | Target platform. The EVM track uses `type=blockchain` and `provider=eth`. |
+| `spec.platform` | Target platform. The EVM track uses `type=blockchain`, `provider=eth`, and may set `network=base`. If `network` is absent, the current mainnet/default path is preserved. |
 | `spec.nucleation.id` | Identifier for the originating nucleus, designer, or organizing domain of the Zhixu. See [Nucleation](nucleation.md). |
 | `spec.taskPatterns` | List of task patterns, each of which contains stages. |
 

@@ -1,6 +1,6 @@
 # 秩序商店
 
-秩序商店是凝结核、供应商、trust domain、operator 和普通执行界面之间的产品工作台。它提供目录、编译预览、资源和供应商组织、proof 视图、联系通知、发布 workflow、attestation request 和 audit。凝结核负责秩序内部设计，trust domain 负责外部背书，`UVPStateMachine` 和 `ZhixuTrustRegistry` 负责链上事实。
+秩序商店是凝结核、供应商、trust registry、operator 和普通执行界面之间的产品工作台。它提供目录、编译预览、资源和供应商组织、proof 视图、联系通知、发布 workflow、attestation request 和 audit。凝结核负责秩序内部设计，trust registry 负责外部背书，`UVPStateMachine` 和 `ZhixuTrustRegistry` 负责链上事实。
 
 ```text
 Nucleation / 凝结核
@@ -13,7 +13,7 @@ Nucleation / 凝结核
 
 ## Store 的一天
 
-普通 Store workflow 应该读起来像这样：
+普通 Store workflow 的主线如下：
 
 ```text
 凝结核导入 Zhixu draft
@@ -21,7 +21,7 @@ Nucleation / 凝结核
   -> 凝结核组织 supplier slots、resources 和 fairness notes
   -> Store operator 审核发布材料
   -> governance admin 请求 plan 或 supplier attestation
-  -> trust domain 发出 PlanAttested / SupplierAttested
+  -> trust registry 发出 PlanAttested / SupplierAttested
   -> Store 把 trusted version 展示为 order-creatable
   -> operator 或参与者定位一个 Order 并检查 proof rows
 ```
@@ -43,7 +43,7 @@ Store 可以组织材料、workflow、搜索、review、contact 和 audit trail�
 | --- | --- | --- | --- |
 | 凝结核内部治理 | Zhixu 设计者和秩序组织者 | 提供设计、组织、版本、供应商和 proof 工作台。 | 内部规则要进入 Zhixu/Plan/Order/proof 才可验证。 |
 | Store 平台 workflow | Store operator/reviewer/admin | 做目录打标、材料审核、发布流程、attestation request、audit。 | Store metadata/review/audit 是平台 workflow 证据。 |
-| Trust domain 外部背书 | trust domain owner/reviewer | Store 展示结果和请求状态。 | `PlanAttested`、`SupplierAttested` 等 registry 事件才是背书事实。 |
+| Trust registry 外部背书 | trust registry owner/reviewer | Store 展示结果和请求状态。 | `PlanAttested`、`SupplierAttested` 等 registry 事件才是背书事实。 |
 
 所以 Store 页面里写“治理”时，指的是平台 workflow 和证据组织；秩序环节、内部公平和供应商组织原则仍由凝结核维护。
 
@@ -53,7 +53,7 @@ Store 可以组织材料、workflow、搜索、review、contact 和 audit trail�
 
 | 问题 | 权威来源 | Store 可以做什么 |
 | --- | --- | --- |
-| Zhixu 设计是否合理 | 凝结核的设计材料 + trust domain 外部审查。 | 展示设计、编译预览、资源要求、supplier slots、公平性说明。 |
+| Zhixu 设计是否合理 | 凝结核的设计材料 + trust registry 外部审查。 | 展示设计、编译预览、资源要求、supplier slots、公平性说明。 |
 | Plan 是否官方可信 | `ZhixuTrustRegistry.PlanAttested` / `PlanRevoked`。 | 发起/跟踪 attestation request，展示 trust projection。 |
 | Supplier 是否被背书 | `SupplierAttested` / `SupplierRevoked`。 | 组织 profile、能力标签、联系、履约 proof 和背书材料。 |
 | Order 是否注册 | `UVPStateMachine.OrderRegistered`。 | 搜索、定位、展示状态和 proof。 |
@@ -79,7 +79,7 @@ Store metadata、平台标签、联系信息、通知状态、review、audit、�
 
 详见 [Zhixu Catalog、配置与发布](zhixu-management.md)。
 
-Store 里的 Zhixu 页面应该帮助凝结核把秩序设计变成可审查、可背书、可创建订单的版本：
+Store 里的 Zhixu 页面把秩序设计推进成可审查、可背书、可创建订单的版本：
 
 ```text
 凝结核导入 Zhixu

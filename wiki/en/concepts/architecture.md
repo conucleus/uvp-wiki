@@ -5,7 +5,6 @@
 ```mermaid
 flowchart TD
   Z["Zhixu definition"] --> C["compiler"]
-  C --> HP["HookPlanArtifact"]
   C --> OHP["OnchainHookPlanArtifact"]
   OHP --> SM["UVPStateMachine"]
   TR["ZhixuTrustRegistry"] --> SM

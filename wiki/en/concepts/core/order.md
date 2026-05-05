@@ -2,21 +2,24 @@
 
 An Order is one runtime instance of a Plan. It records which signals were accepted, which hooks became ready or cancelled, which executor and resource overlays were applied, and which on-chain proofs correspond to those facts.
 
-## Order Registration
+## Order Creation
 
-An Order is registered against a previously registered Plan:
+An Order is created against a previously registered Plan through a trigger-order entrypoint:
 
 ```text
-registerOrder(orderId, planId, creator, authorizations)
+triggerOrderFromOutsideFor(trigger, authorizations, signature)
+triggerOrderFromSignalFor(trigger, authorizations, signature)
 ```
 
-During registration, the contract:
+During creation, the contract:
 
-- checks that the registrar is allowed;
-- checks that the plan exists and is still endorsed by the official domain;
-- initializes the runtime for each hook;
+- checks that the registrar transaction sender is allowed;
+- verifies the trigger typed-data signature and recovers the business submitter;
+- checks that the plan exists;
 - writes order-level signal authorization;
-- emits `OrderRegistered` and `SignalSubmitterAuthorized`.
+- records the trigger fact or parent link;
+- materializes the ready trigger stage;
+- emits `OrderRegistered`, `OrderTriggered`, `OrderMaterialized`, `StageMaterialized`, and `SignalSubmitterAuthorized`.
 
 ## Dynamic State Inside an Order
 

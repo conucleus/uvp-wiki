@@ -4,7 +4,7 @@ Order-level signal authorization answers one very specific question: for this or
 
 ## Contract Authorization Structure
 
-When registering an order, `SignalAuthorization[]` can be passed in:
+When an order is triggered, `SignalAuthorization[]` is carried by the signed trigger-order request:
 
 ```solidity
 struct SignalAuthorization {

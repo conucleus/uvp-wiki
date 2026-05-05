@@ -15,7 +15,7 @@ Order App and executor-kit are both entry points for signal producers, but they 
 - Proof rows.
 - Readiness and blocked reasons.
 
-It should not expose ordinary users to HookPlan, `sourceId`, `signalId`, ABI, calldata, or gas details.
+The ordinary user interface does not expose HookPlan, `sourceId`, `signalId`, ABI, calldata, or gas details.
 
 ## Executor Kit
 
@@ -26,7 +26,7 @@ It should not expose ordinary users to HookPlan, `sourceId`, `signalId`, ABI, ca
 | Chain mode | Watch `HookReady` directly and submit low-level signals, suitable for advanced chain-native integrations. |
 | Product API mode | Read Product API tasks / signal containers, prepare evidence, signing, submission, and proof, suitable for most integrations. |
 
-It is an executor integration surface. Most executors should use Product API mode. Only advanced integrations that need to listen to `HookReady` directly, manage their own handlers, and send direct contract transactions should use chain mode.
+It is an executor integration surface. Most executors use Product API mode. Only advanced integrations that need to listen to `HookReady` directly, manage their own handlers, and send direct contract transactions use chain mode.
 
 ## Shared Boundary
 

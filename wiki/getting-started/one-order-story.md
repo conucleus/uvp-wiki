@@ -63,11 +63,13 @@ flowchart LR
 
 信号回答三个问题：谁完成了什么，下一步能不能开始，谁愿意为这个声明承担后果。
 
+按角色读，这些生产组织首先都是 Supplier。某个 Supplier 在具体 Order 阶段被选中或当选后，才是这个阶段的 Executor 或 submitter。政府、监管、资金方、保险方、审计方、报关行、EPC、OEM 不会因为行业名字就自动变成特殊 UVP 角色。
+
 ## 3. 信号为什么有用
 
 信号有用，是因为现实社会给它后果。付款凭证让供应商继续排产，监管许可让项目进入下一步，报关材料让货物可以放行，验收确认让付款或质保责任开始，保险和审计记录让风险可以被计算。
 
-UVP 记录协议事实：被授权的主体，在某个订单、某个阶段、某个证据指纹下，签名声明某个业务信号已经发出。现实真实性由对应的人、企业、trust domain、审计方、资金方、监管方或 adapter 发出自己的信号并承担责任。链下事实由现实责任主体声明，链上记录这些声明、签名、证据指纹和状态后果。
+UVP 记录协议事实：被授权的主体，在某个订单、某个阶段、某个证据指纹下，签名声明某个业务信号已经发出。现实真实性由负责的 Supplier，或被选中、当选来处理该阶段的 Executor 发出自己的信号并承担责任。Trust Domain 是被明确配置时才存在的背书基础设施，不自动等于政府、监管、资金方、保险方或审计方。链下事实由现实责任主体声明，链上记录这些声明、签名、证据指纹和状态后果。
 
 ## 4. Zhixu DSL 把生产关系写成代码
 
@@ -104,20 +106,20 @@ compiler 的工作可以理解成“检查和打包”。它读取 Zhixu，检�
 
 Plan 有一个 `planHash`，可以把它理解成这份规则的指纹。同一份规则会得到同一个指纹；影响协作语义的改动会得到新的指纹。这样后面审查、注册订单、追责时，大家讨论的是同一个版本。
 
-### 5.3 Trust domain 背书这个版本
+### 5.3 Trust registry 背书这个版本
 
-trust domain 是愿意为某类判断提供背书的责任主体。它可以审查 Plan 对应的材料、证据要求、supplier 要求、适用范围和 `planHash`。审查通过后，它在链上发出 `PlanAttested`。
+trust registry 是愿意为某类判断提供背书的责任主体。它可以审查 Plan 对应的材料、证据要求、supplier 要求、适用范围和 `planHash`。审查通过后，它在链上发出 `PlanAttested`。
 
-`PlanAttested` 的含义是：这个 trust domain 承认这个 Plan 版本符合它的背书口径。它给后续 Store 展示、订单创建和合作方判断提供可验证依据。
+`PlanAttested` 的含义是：这个 trust registry 承认这个 Plan 版本符合它的背书口径。它给后续 Store 展示、订单创建和合作方判断提供可验证依据。
 
 ### 5.4 最后创建这一次执行
 
-Order 是某个 Plan 的一次具体执行。比如某个蒙古光伏项目真的要采购一批组件并交付到现场，registrar 创建一个 Order，并写入本订单里谁能提交哪些 signal。
+Order 是某个 Plan 的一次具体执行。比如某个蒙古光伏项目真的要采购一批组件并交付到现场，被授权的 registrar 机制或账户记录这笔 Order，并写入本订单里谁能提交哪些 signal。
 
 ```text
 Zhixu DSL: 这类光伏项目怎么协作
   -> Plan / planHash: 这套规则的稳定版本和指纹
-  -> PlanAttested: 某个 trust domain 背书这个版本
+  -> PlanAttested: 某个 trust registry 背书这个版本
   -> OrderRegistered: 某个项目开始按这个版本执行
   -> SignalSubmitterAuthorized: 本订单里谁能发什么 signal
 ```
@@ -166,6 +168,6 @@ Zhixu stage.receiveSignals
 
 ## 接着读
 
-- [角色地图](actor-map.md)：把光伏项目里的现实角色映射到 UVP 角色。
-- [证据与 Proof 路径](evidence-proof-path.md)：看业务文件如何变成 hash、签名 signal、链事件和 Product proof row。
+- [一个订单穿过 UVP 组件](order-through-components.md)：用同一条订单看代码模块和产品表面的分工。
+- [核心概念](../core/README.md)：在故事清楚之后，再读 Zhixu、Plan、Order、Signal、Hook、Trigger 等协议对象。
 - [核心术语表](../reference/glossary.md)：遇到 Zhixu、Order、Signal、Hook、Trigger、Supplier、Executor 时随时查。

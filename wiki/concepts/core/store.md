@@ -1,8 +1,8 @@
 # 秩序商店
 
-本页是为旧链接保留的核心概念侧视图。中文站的 canonical Store 产品入口是 [秩序商店](../../store/README.md)，那里按 Store 工作流、权威边界和 operator 任务组织。
+这里是 Store 的核心概念侧视图。完整产品入口见 [秩序商店](../../store/README.md)，那里按 Store 工作流、权威边界和 operator 任务组织。
 
-秩序商店是中心化产品与平台 workflow 工作台。它负责把凝结核、秩序、supplier、订单、证明和背书请求组织成人能理解的界面。它给凝结核提供舞台，给对象打平台标签，展示 proof，发起 governance request，保留 audit；凝结核、trust domain 和链上事件分别保留自己的权威来源。
+秩序商店是中心化产品与平台 workflow 工作台。它负责把凝结核、秩序、supplier、订单、证明和背书请求组织成人能理解的界面。它给凝结核提供舞台，给对象打平台标签，展示 proof，发起 governance request，保留 audit；凝结核、trust registry 和链上事件分别保留自己的权威来源。
 
 ## 它的权威来自哪里
 
@@ -19,11 +19,11 @@ Store 的权威是组织权威和平台 workflow 权威。它可以说：
 - plan 已经链上 attested。
 - order 已经注册。
 - signal 已经提交。
-- supplier 已经被 trust domain 背书。
+- supplier 已经被 trust registry 背书。
 - 某个 Zhixu 已经公平可信。
 - 某个 executor 已经成为 active executor。
 
-这些都必须来自 trust domain 判定或合约事件。
+这些都必须来自 trust registry 判定或合约事件。
 
 ## Store 管什么
 
@@ -34,7 +34,7 @@ Store 的权威是组织权威和平台 workflow 权威。它可以说：
 | Supplier | 注册 profile、平台标签、联系、proof、背书材料。 | 标签、链上 trust 和订单授权分层展示。 |
 | Order | 搜索、定位、查看投影、查看 proof。 | 不创建链上运行事实。 |
 | Governance workflow | 帮 operator/admin 发起计划或供应商背书请求。 | 不让 audit row 替代 registry event。 |
-| Metadata | 业务说明、风险标签、能力标签、资源说明、审计材料 URI。 | metadata 写成 workflow/material；协议事实写成 event/proof。 |
+| Metadata | 业务说明、风险标签、能力标签、资源说明、审计材料 URI。 | metadata 属于 workflow/material；协议事实来自 event/proof。 |
 
 ## 中心化和去中心化的分工
 

@@ -4,7 +4,7 @@ Supplier 是能力主体。它可以是个人、公司、报关行、物流商�
 
 ## Supplier 从哪里来
 
-在产品路径里，supplier 通常先被凝结核组织进某条秩序的供应商网络，再进入秩序商店的 supplier registry。Store 作为平台工作台，维护 supplier profile、平台能力标签、支持的 role/stage、钱包、审核状态、联系信息和 metadata。trust domain 再通过 `ZhixuTrustRegistry.SupplierAttested` 给 supplier subject 做链上背书。
+在产品路径里，supplier 通常先被凝结核组织进某条秩序的供应商网络，再进入秩序商店的 supplier registry。Store 作为平台工作台，维护 supplier profile、平台能力标签、支持的 role/stage、钱包、审核状态、联系信息和 metadata。trust registry 再通过 `ZhixuTrustRegistry.SupplierAttested` 给 supplier subject 做链上背书。
 
 最小关系：
 
@@ -16,7 +16,7 @@ Store supplier metadata
   -> Supplier capability passport
 ```
 
-标签要分层：凝结核可以把 supplier 标成某条秩序内部的 role/stage 候选；Store 可以用平台目录标签标注 customs / logistics / inspection / payment 等能力；trust domain 可以对 supplier subject 做外部背书。去中心化部分负责保存背书事件、撤销事件、订单授权和 signal proof。
+标签要分层：凝结核可以把 supplier 标成某条秩序内部的 role/stage 候选；Store 可以用平台目录标签标注 customs / logistics / inspection / payment 等能力；trust registry 可以对 supplier subject 做外部背书。去中心化部分负责保存背书事件、撤销事件、订单授权和 signal proof。
 
 ## SupplierDefinition
 
@@ -33,7 +33,6 @@ spec
   supplierName
   handlerName
   authorityID
-  trustDomain
   capabilityClaims
   attestationRefs
   status
@@ -61,7 +60,7 @@ Product DTO 里当前支持的 supplier capability tags 包括：
 
 ## Supplier Trust
 
-`SupplierAttested` 表示某个 trust domain 认可某个 supplier subject。`SupplierRevoked` 表示撤销。Product BFF 在创建未来订单授权时会拒绝或警告 revoked supplier wallet。
+`SupplierAttested` 表示某个 trust registry 认可某个 supplier subject。`SupplierRevoked` 表示撤销。Product BFF 在创建未来订单授权时会拒绝或警告 revoked supplier wallet。
 
 这层 trust 解决“这个主体是否被某个权威背书”。当前订单能否提交当前 signal，由订单级授权解决。
 

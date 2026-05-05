@@ -6,7 +6,7 @@
 
 | 合约 | 作用 |
 | --- | --- |
-| `ZhixuTrustRegistry` | trust domain、plan attestation、supplier attestation、revocation。 |
+| `ZhixuTrustRegistry` | trust registry、plan attestation、supplier attestation、revocation。 |
 | `UVPStateMachine` | plan/order/signal/hook/timer/stage overlay runtime。 |
 | `UVPDeploymentRegistry` | versioned state-machine deployment cutover ledger。 |
 | `ECDSA` | minimal signature recovery helper。 |
@@ -19,7 +19,7 @@
 - constructor args；
 - publisher/registrar governance；
 - `registerPlan`；
-- authorization-bearing `registerOrder` overloads；
+- signed `triggerOrderFromOutsideFor` / `triggerOrderFromSignalFor`；
 - `submitSignal`；
 - `submitSignalFor`；
 - `linkDockedOrder` / `linkDockedOrderFor`；
@@ -40,9 +40,9 @@
 Indexer 和 replay tooling 应把这些 event name 当作 public interface：
 
 ```text
-DomainRegistered
-DomainUpdated
-DomainOwnerTransferred
+OwnershipTransferred
+OwnershipTransferred
+OwnershipTransferred
 PlanAttested
 PlanRevoked
 SupplierAttested
@@ -55,6 +55,8 @@ OrderRegistrarRecorded
 SignalSubmitterAuthorized
 PlanRegistered
 OrderRegistered
+OrderTriggered
+OrderLinked
 SignalSubmitted
 DockedOrderLinked
 DockedSignalMapped

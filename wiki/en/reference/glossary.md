@@ -8,31 +8,30 @@ This page explains project terms in plain language first, then points to code or
 | --- | --- | --- |
 | UVP / Universal Value Protocol | A coordination protocol and product vocabulary for recording authorized business signals and their consequences. In Chinese, UVP is 通用价值协议. | `uvp-eth` is the EVM/Web3 implementation track. |
 | Zhixu | A reusable coordination rulebook that describes how a class of Orders should run. | `ZhixuDefinition`, `kind: "Zhixu"`, compiler input. |
-| Plan / Zhixu version | A deterministic version compiled from a Zhixu, then lowered to a chain target. | `HookPlanArtifact`, `EvmHookPlanArtifact`, `OnchainHookPlanArtifact`, `registerPlan()`, `PlanRegistered`. |
-| Order | One runtime instance of a Plan. | `UVPStateMachine.Order`, `registerOrder()`, `OrderRegistered`. |
+| Plan / Zhixu version | A deterministic on-chain version compiled from a Zhixu. | `OnchainHookPlanArtifact`, `registerPlan()`, `PlanRegistered`. |
+| Order | One runtime instance of a Plan. | `UVPStateMachine.Order`, `triggerOrderFromOutsideFor()` / `triggerOrderFromSignalFor()`, `OrderRegistered`, `OrderTriggered`. |
 | Nucleation | The organizing subject that originates, designs, and maintains a kind of Zhixu. It can be a team, organization, program owner, or workflow owner, depending on the business context. | `spec.nucleation.id`, Store Nucleation workbench. |
 | Stage | A step or execution segment inside a task pattern. | `taskPatterns[].stages[]`, `stageIdentifier`, `stageId`. |
 | Task Pattern | A reusable grouping of stages inside a Zhixu. Many examples use `master` as the main task pattern. | `taskPatterns[].name`. |
-| Supplier | A subject with real-world fulfillment capability that can be organized by Store and endorsed by a trust domain. | `SupplierDefinition`, `SupplierAttested`, `SupplierRevoked`. |
-| Executor | The subject that actually handles the current Order stage or submits its signal. | order authorization, stage executor overlay, EIP-712 submitter. |
+| Supplier | An ordinary project-work capability subject that can be organized by Store and endorsed when needed. | `SupplierDefinition`, `SupplierAttested`, `SupplierRevoked`. |
+| Executor | The Supplier or submitter selected or elected to handle the current Order stage or submit its signal. | order authorization, stage executor overlay, EIP-712 submitter. |
 | Source | The causal namespace a signal belongs to. | `source`, `sourceId`, `signalKey`. |
 | Signal | The smallest business fact accepted by the state machine for an Order. | `submitSignal()`, `SignalSubmitted`, `SignalRecord`. |
 | Hook | A state-machine condition; not an HTTP webhook or callback. | `CompiledHook`, `HookStatusChanged`. |
 | Trigger | A hook mark that opens an executable task by emitting `HookReady`. | stage `trigger`, `HookReady`. |
 | File Resource | A handle for off-chain materials such as stage protocols, evidence templates, and resource manifests. It is not plaintext file storage. | `fileResources`, resource patch, metadata URI/hash. |
-| HookPlan | Human-readable compiled artifact containing hooks, dependencies, routes, and audit labels. | `HookPlanArtifact`. |
-| OnchainHookPlan | Legacy name for the compact EVM-facing artifact used for registration and attestation. | `EvmHookPlanArtifact`, `OnchainHookPlanArtifact`, compact hooks, dependency indexes. |
-| Solana target | Reserved future chain target boundary. It is not runnable until Solana programs, adapters, signer support, and release evidence exist. | `SolanaHookPlanArtifact`, `chainTarget: "solana"`, TODO errors. |
+| OnchainHookPlan | Compact EVM-facing artifact used for registration and attestation. | `OnchainHookPlanArtifact`, compact hooks, dependency indexes, selector bindings. |
+| HookPlan IR | Compiler-internal intermediate shape; no longer a public Store/import/deploy flow. | Used inside `compileZhixuOnchainHookPlan()`. |
 
 ## Actions and Events
 
 | Term | Plain meaning | Code or on-chain counterpart |
 | --- | --- | --- |
-| Attestation | A trust-domain endorsement. It says a plan or supplier is trusted by that domain. | `PlanAttested`, `SupplierAttested`. |
+| Attestation | A trust-registry endorsement. It says a plan or supplier is trusted by that registry address. | `PlanAttested`, `SupplierAttested`. |
 | Authorization | Permission for a wallet to submit a specific source/signal for a specific Order, or to perform a controlled stage patch. | `SignalSubmitterAuthorized`, stage patch authorization. |
-| Publisher | The allowed subject that registers Plans. | plan publisher allowlist, `registerPlan()`. |
-| Registrar | The allowed subject that registers Orders and writes initial signal authorization. | order registrar allowlist, `registerOrder()`. |
-| Official Domain | The trust domain configured for plan registration checks. Other domains may be displayed, but this one gates `registerPlan()`. | `officialDomainId`, `ZhixuTrustRegistry`. |
+| Publisher | The allowed registration account or mechanism that registers Plans. | plan publisher allowlist, `registerPlan()`. |
+| Registrar | The allowed account or mechanism that broadcasts trigger-order creation and writes initial signal authorization; the business action is still signed by the submitter. | order registrar allowlist, `triggerOrderFromOutsideFor()` / `triggerOrderFromSignalFor()`. |
+| Registry Boundary | A `ZhixuTrustRegistry` contract address is one trust boundary. Product/Store may configure which registry they trust, but `UVPStateMachine.registerPlan()` does not read a registry. | `registryAddress`, `ZhixuTrustRegistry.owner()`. |
 | HookReady | The event that says a trigger hook became ready and a Product task can open. | `HookReady(orderId, hookId, stageId, hookName)`. |
 | Stage Overlay | Order-level runtime change that assigns executor or resources without changing the Plan. | executor/resource patch events. |
 | Stage Patch | A controlled order action that applies an executor or resource overlay. "Patch" here is not a code patch. | `StageExecutorPatchApplied`, `StageResourcePatchApplied`. |
@@ -51,7 +50,7 @@ This page explains project terms in plain language first, then points to code or
 | Product DTO | Data format translating chain facts into orders, tasks, proof, and trust views ordinary users can read. | `ZhixuDetailDTO`, `ProductOrderDTO`, `ProductTaskDTO`. |
 | Product BFF | Product Backend-for-Frontend workflow service that handles drafts, invites, participant confirmation, authorization building, and order registration. | `uvp-chain-services/service/src/product/bff/`. |
 | Signal Container | Product wrapper for task, evidence, typed data, signature, submission, and proof. | prepare/submit/proof Product API flow. |
-| Store | Product workbench for Nucleation, Suppliers, trust domains, operators, and proof views. | `zhixu-store/app`, Store Console API. |
+| Store | Product workbench for Nucleation, Suppliers, trust registries, operators, and proof views. | `zhixu-store/app`, Store Console API. |
 | Chain Services | Rebuildable service layer for indexing, projection, proof, relaying, Product API, and Store API. | `@uvp-eth/chain-services`. |
 
 ## Advanced and Environment Terms

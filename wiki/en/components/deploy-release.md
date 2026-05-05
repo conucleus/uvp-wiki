@@ -2,7 +2,7 @@
 
 The deployment and evidence components organize local closed-loop runs, Base Sepolia rehearsals, address manifests, release records, and staging gates into auditable engineering evidence.
 
-## Read These First
+## Reading Path
 
 | Page | Purpose |
 | --- | --- |

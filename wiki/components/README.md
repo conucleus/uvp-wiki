@@ -1,11 +1,11 @@
 # 核心组件
 
-核心组件回答“系统怎么实现”。它们把核心概念从 Zhixu 文本变成 deterministic artifact、链上状态、可重放事件、Product DTO 和 release evidence。
+核心组件说明 UVP 如何实现：从 Zhixu 文本到 deterministic artifact、链上状态、可重放事件、Product DTO 和 release evidence。
 
 ```text
 hook-core
   -> compiler
-  -> HookPlanArtifact / OnchainHookPlanArtifact
+  -> OnchainHookPlanArtifact / registerPlan args
   -> protocol-bindings
   -> UVP contracts / registries
   -> statemachine replay
@@ -14,29 +14,29 @@ hook-core
   -> uvp-deploy release evidence
 ```
 
-## 文档质量基准
+## 组件页结构
 
-本目录里的每个核心组件页面都应该达到同一条基准：
+核心组件页围绕四件事组织：
 
-- 说明它在组件链路中的上游和下游。
-- 说明它拥有的 public interface，例如 ABI、EIP-712、hash、DTO、CLI 或 release manifest。
-- 说明它的职责边界，避免把 Store metadata、Product DB、periphery adapter 或 relayer 写成事实源。
-- 给出读代码的入口，让工程师能从文档走到具体模块。
+- 上游和下游。
+- public interface，例如 ABI、EIP-712、hash、DTO、CLI 或 release manifest。
+- 职责边界，尤其是 Store metadata、Product DB、periphery adapter 和 relayer 不能成为事实源。
+- 代码入口。
 
 ## 组件链路
 
 | 组件组 | 先读 | 覆盖范围 |
 | --- | --- | --- |
-| 组件链路与模块边界 | [组件链路与模块边界](architecture.md) | 模块边界、依赖方向、事实源、从本地到链上路径。 |
-| 语义、Hook Core 与 Compiler | [语义、Hook Core 与 Compiler](semantics-and-compiler.md) | hook-core、compiler、HookPlan、OnchainHookPlan、canonical hash、registerPlan args。 |
+| 订单组件路径 | [一个订单穿过 UVP 组件](../getting-started/order-through-components.md) | 用一条订单串起 Store、compiler、trust registry、state machine、Chain Services、Order App 和 executor-kit。 |
+| 语义、Hook Core 与 Compiler | [语义、Hook Core 与 Compiler](semantics-and-compiler.md) | hook-core、compiler、OnchainHookPlan、canonical hash、registerPlan args。 |
 | 链上执行、State Machine 与 Replay | [链上执行、State Machine 与 Replay](onchain-runtime.md) | contracts、registries、state machine、stage overlay、timer、event replay。 |
 | 可重建服务层 | [可重建服务层：Chain Services](chain-services.md) | 可 fork 的链下执行软件：indexer、projection、relayer boundary、proof verifier、Product/Store API、notifications、storage/runtime profile。 |
-| 服务与接口 | [服务与接口](services-and-interfaces.md) | protocol-bindings、Product DTO、Product API、Store API、executor-kit consumption 和 public interface drift。 |
+| Protocol Bindings 与公共接口 | [Protocol Bindings 与公共接口](services-and-interfaces.md) | protocol-bindings、Product DTO、Product API、Store API、executor-kit consumption 和 public interface drift。 |
 | 部署与证据 | [部署与证据](deploy-release.md) | uvp-deploy、Anvil/Base Sepolia、manifests、release evidence、staging gates。 |
 
 ## 为什么还有其他核心组件
 
-`UVPStateMachine` 是链上事实源的核心，但核心组件还包括 compiler、protocol-bindings、replay oracle、chain-services 和 deploy/release evidence。compiler 让 trust domain 背书的 plan hash 可复现；protocol-bindings 固定 Product submit 和 stage patch typed data；replay oracle 证明投影可重建；deploy/release evidence 支撑 Base Sepolia claim。因此状态机放在“核心组件 / 链上执行与 Replay”下，核心概念页只解释 Signal、Hook、Order 等对象。
+`UVPStateMachine` 是链上事实源的核心，但核心组件还包括 compiler、protocol-bindings、replay oracle、chain-services 和 deploy/release evidence。compiler 让 trust registry 背书的 plan hash 可复现；protocol-bindings 固定 Product submit 和 stage patch typed data；replay oracle 证明投影可重建；deploy/release evidence 支撑 Base Sepolia claim。因此状态机放在“核心组件 / 链上执行与 Replay”下，核心概念页只解释 Signal、Hook、Order 等对象。
 
 ## 改动影响面
 

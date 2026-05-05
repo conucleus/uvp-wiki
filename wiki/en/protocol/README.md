@@ -8,7 +8,7 @@ The protocol mainline answers one question: how does a Zhixu coordination rulebo
 Zhixu DSL
   -> nucleation id and design boundary
   -> deterministic HookPlan / OnchainHookPlan artifacts
-  -> trust domain plan attestation
+  -> trust registry plan attestation
   -> UVPStateMachine plan/order registration
   -> order-level signal authorization
   -> wallet-bound signal submission
@@ -16,7 +16,7 @@ Zhixu DSL
   -> replayable Product projection
 ```
 
-## Read These First
+## Reading Path
 
 | Page | Purpose |
 | --- | --- |
@@ -35,7 +35,7 @@ Zhixu DSL
 
 | Main line | Pages |
 | --- | --- |
-| Runtime semantics | [State Machine](../concepts/state-machine.md), [Hook Evaluation](../concepts/state-machine/evaluation.md), [Timers and Status](../concepts/state-machine/timers-and-status.md), [Stage Overlay](../concepts/state-machine/stage-overlay.md), [Event Replay](../concepts/state-machine/replay.md) |
+| Runtime semantics | [State Machine](../concepts/state-machine.md), [Hook Evaluation](../concepts/state-machine/evaluation.md), [Timers and Status](../concepts/state-machine/timers-and-status.md), [Stage Overlay](../concepts/state-machine/stage-overlay.md), [Docked Zhixu Runtime](../concepts/state-machine/docking.md), [Event Replay](../concepts/state-machine/replay.md) |
 | Deterministic artifacts | [Artifacts and Hashes](../concepts/artifacts-and-hashes.md), [Compiler Input](../concepts/artifacts/compiler-input.md), [Canonical Hash](../concepts/artifacts/canonical-hashes.md), [Solidity Registration Arguments](../concepts/artifacts/solidity-registration.md) |
 | Trust and authorization | [Trust and Authorization](../concepts/trust-and-authorization.md), [Trust Domain](../concepts/trust/domains.md), [Signal Authorization](../concepts/trust/signal-authorization.md), [EIP-712 and Relayer](../concepts/trust/eip712-relayer.md), [Stage Patch Authorization](../concepts/trust/stage-patch.md) |
 

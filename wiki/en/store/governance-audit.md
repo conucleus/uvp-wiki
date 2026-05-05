@@ -42,7 +42,7 @@ The Store should distinguish capabilities such as read, nucleation_operator, ope
 | --- | --- |
 | A Store principal started, approved, or confirmed a workflow action. | The plan is already attested. |
 | A metadata field, platform tag, or contact was changed. | The supplier is already trusted. |
-| A Nucleation submitted design materials or publishing materials. | The trust domain has accepted its fairness. |
+| A Nucleation submitted design materials or publishing materials. | The trust registry has accepted its fairness. |
 | A governance request was created or a broadcast was attempted. | The tx has already been accepted and indexed. |
 | A docking session was saved or reviewed. | The linked order proof has already been mapped back to the local order. |
 

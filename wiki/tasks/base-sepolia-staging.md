@@ -21,7 +21,7 @@ set +a
 - `BASE_SEPOLIA_RPC_URL`、`UVP_STAGING_RPC_URL`、`UVP_RPC_URL` 默认使用
   `https://sepolia.base.org`，除非已验证更快 RPC。
 - Base Sepolia chain id 是 `84532`，不是 Ethereum Sepolia 的 `11155111`。
-- Staging 使用当前 `UVPStateMachine` EIP-712 domain version `0.2`。
+- Staging 当前头部应使用 `UVPStateMachine` EIP-712 domain version `0.4`；历史 `0.2` 记录只作为 audit evidence。
 
 ## 非花费 Preflight
 

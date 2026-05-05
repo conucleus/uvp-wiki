@@ -29,7 +29,7 @@ Store 可以用自身平台权威做目录打标、材料审核和 workflow 管�
 
 ## Governance Handoff
 
-Store 的治理动作应委托给已有 governance service 或管理员流程。它不直接持有私钥，不绕过 admin header，不把 review approval 说成 chain attestation，也不把 Store reviewer 写成 trust domain。
+Store 的治理动作应委托给已有 governance service 或管理员流程。它不直接持有私钥，不绕过 admin header，不把 review approval 说成 chain attestation，也不把 Store reviewer 写成 trust registry。
 
 ## 为什么 Store 是中心化必要组件
 

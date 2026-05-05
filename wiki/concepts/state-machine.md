@@ -16,7 +16,8 @@ SignalSubmitted(orderId, sourceId, signalId)
 | --- | --- |
 | [Hook 求值](state-machine/evaluation.md) | `SIGNAL`、`NOT`、`AND`、`OR`、`DELAY` 如何在合约里求值。 |
 | [计时器与状态](state-machine/timers-and-status.md) | hook 状态、`dueAt`、`pokeTimer()` 和一次性 `HookReady`。 |
-| [Stage Overlay](state-machine/stage-overlay.md) | executor/resource patch 如何在订单级覆盖计划。 |
+| [Stage Overlay：Executor Patch 与 Resource Patch](state-machine/stage-overlay.md) | executor patch、resource patch 如何在订单级覆盖计划。 |
+| [Docked Zhixu Runtime](state-machine/docking.md) | local order、linked order、docking link 和 mapped signal 如何落到状态机事件。 |
 | [事件 Replay](state-machine/replay.md) | reference reducer 如何用链事件复算状态并校验合约输出。 |
 
 ## 合约保存什么
@@ -29,6 +30,7 @@ SignalSubmitted(orderId, sourceId, signalId)
 | `StoredSignalAuthorization` | 某个订单允许哪个地址提交哪个 source/signal。 |
 | `HookRuntime` | hook 当前状态、等待到期时间、是否已经发出 `HookReady`。 |
 | stage overlay | 订单级 executor/resource patch，不改计划本身。 |
+| docking link | local order 与 linked order 的对接关系、signal binding 和 mapped signal proof。 |
 
 ## 状态机边界
 

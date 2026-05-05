@@ -62,16 +62,15 @@ Only hooks with `trigger=true` emit `HookReady` the first time they become `Read
 
 See [Trigger](trigger.md) for the detailed semantics.
 
-## Relationship Between Hook and HookPlan
+## Relationship Between Hook and On-Chain Plan
 
-A Hook is one condition; a HookPlan is the full collection of hooks, dependency indexes, executor routes, and selector bindings after a Zhixu is compiled.
+A Hook is one condition; the on-chain plan artifact is the full collection of hooks, dependency indexes, executor routes, and selector bindings after a Zhixu is compiled.
 
 ```text
 Zhixu stage.receiveSignals
   -> Hook
-  -> HookPlanArtifact
   -> OnchainHookPlanArtifact
   -> UVPStateMachine.StoredHook
 ```
 
-Ordinary users should not read HookPlan directly. HookPlan is engineering and audit material; Product DTOs should translate it into “when tasks appear, who can submit, what evidence is required, and where the proof lives.”
+Ordinary users do not read the on-chain artifact directly. Product DTOs translate it into “when tasks appear, who can submit, what evidence is required, and where the proof lives.”

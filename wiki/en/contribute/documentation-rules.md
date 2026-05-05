@@ -10,14 +10,14 @@ The goal of the Wiki is to help people understand the project, and to organize s
 - Prefer direct definitions as the main explanatory structure; when a hard boundary is necessary, put it under "boundary checks" or a checklist.
 - Distinguish implemented, fixture/local demo, staging evidence, and planned PRD.
 - PRD plans should use planned/prototype language; implemented features need code, tests, or release evidence.
-- Write Store metadata, database rows, and relayer queues as read-model or workflow state; write protocol facts as registry/state-machine events.
+- Mark Store metadata, database rows, and relayer queues as read-model or workflow state; mark protocol facts as registry/state-machine events.
 - Put funding, USDC, escrow, and guarantee inside the adapter/periphery boundary.
 - Private keys, RPC secrets, JWT secrets, and object-storage credentials must only appear in redacted form.
 
 ## Information Architecture Rules
 
 - `SUMMARY.md` is the only navigation source of truth. After adding a page, place it in the appropriate top-level section.
-- Top-level sections should first follow engineering-reader paths: getting started, core concepts, core components, Store, execution and integration, product language and DTO/API, local/staging/release, reference and evidence, and contribution rules.
+- Top-level sections should first follow engineering-reader paths: getting started, core concepts, core components, Store, execution and integration, Product DTO and user surfaces, local/staging/release, reference and evidence, and contribution rules.
 - `core` is for "what the object is"; `components` is for "how the system is implemented"; `store` is for "how the Store organizes and validates real-world objects"; `execution` is for "how executors, adapters, AI/MCP, and docked Zhixu submit signals".
 - A single Markdown file should be attached to only one top-level section in `SUMMARY.md`. If different sections need different views of the same topic, add a separate side-view page; older pages can be referenced from the body.
 - `store` pages describe Store platform workflow and nucleation workbench; the Store admin is a platform workflow role, and the nucleation is the internal governor of the Zhixu.
@@ -35,7 +35,7 @@ The goal of the Wiki is to help people understand the project, and to organize s
 | Store entry | `wiki/store/` |
 | Nucleation workbench | `wiki/store/nucleation-workbench.md` |
 | Execution and integration entry | `wiki/execution/` |
-| Product language and DTO/API entry | `wiki/product/` |
+| Product DTO and user surfaces entry | `wiki/product/` |
 | Status summary | `wiki/status/` |
 | Concept and architecture side pages | `wiki/concepts/` |
 | End-to-end tutorials | `wiki/tutorials/` |
@@ -59,7 +59,7 @@ When changing a protocol public interface:
 When changing the Product API:
 
 - update [Product API Reference](../reference/product-api.md);
-- update [Product Language and DTO/API](../product/README.md);
+- update [Product DTO and User Surfaces](../product/README.md);
 - update the Store/Order App/Executor Kit task docs;
 - note whether the old route is only a compatibility alias.
 
@@ -89,4 +89,4 @@ When adding a periphery adapter:
 
 - explain which core interfaces it consumes;
 - explain which facts it does not own;
-- write adapter events as adapter-side facts, and reference the corresponding core interface or periphery contract for order/trust/funding source of truth.
+- mark adapter events as adapter-side facts, and reference the corresponding core interface or periphery contract for order/trust/funding source of truth.

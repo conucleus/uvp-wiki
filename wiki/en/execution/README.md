@@ -1,6 +1,6 @@
 # Executors and Integrations
 
-The Executors and Integrations catalog answers "who executes, how they connect, and how they submit signals." It connects the core concept of [Executor](../concepts/core/executor.md), the signal container exposed by [Product Language and DTO/API](../product/README.md), executor-kit, Order App, periphery adapters, and docked Zhixu.
+The Executors and Integrations catalog explains who executes, how they connect, and how they submit signals. It connects the core concept of [Executor](../concepts/core/executor.md), the signal container exposed by [Product DTO and User Surfaces](../product/README.md), executor-kit, Order App, periphery adapters, and docked Zhixu.
 
 ```text
 HookReady / Product task
@@ -15,13 +15,13 @@ HookReady / Product task
 
 | Page | What it solves |
 | --- | --- |
+| [Order App](order-app.md) | How ordinary participants see todos, evidence fingerprints, wallet signatures, proof, and blocked reasons. |
 | [Executor Kit](executor-kit.md) | How the CLI/SDK listens for tasks, prepares the signal container, signs, submits, and reads proof. |
 | [Zhixu as Executor](zhixu-as-executor.md) | How one Zhixu docks into another and how local/linked orders connect through signalMap and proof. |
 | [Executor Core Concept](../concepts/core/executor.md) | The object boundaries of Supplier, Executor, active executor, selector patch, and signal submitter. |
 | [Order App and Executor Kit](../concepts/architecture/components/order-app-executor-kit.md) | The division of labor between the ordinary participant UI and the automation executor tools. |
-| [Periphery and Adapter](../concepts/architecture/components/periphery-deploy.md) | How funding, guarantee, payment, and agent adapters extend around the core protocol. |
 | [CLI and Configuration](../reference/cli-and-config.md) | The current executor-kit commands, chain-services configuration, and frontend config. |
-| [Chain Services](../components/chain-services.md) | The untrusted service layer used by Product API mode, relayer boundaries, and proof/status queries. |
+| [Chain Services](../components/chain-services.md) | The non-authoritative service layer used by Product API mode, relayer boundaries, and proof/status queries. |
 
 ## Fact Boundary on the Execution Side
 
@@ -39,7 +39,7 @@ Relayers can pay gas or forward transactions; business signatures come from the 
 
 | Layer | Responsibility |
 | --- | --- |
-| Product language and DTO/API | Project chain events into orders, tasks, proof, trust status, and signal containers. |
+| Product DTO and user surfaces | Project chain events into orders, tasks, proof, trust status, and signal containers. |
 | Executors and integrations | Consume tasks and signal containers, prepare evidence, produce EIP-712 signatures, submit, and read proof back. |
 | Store | Manage Zhixu/Supplier, docking sessions, operator review, and platform workflow. |
 

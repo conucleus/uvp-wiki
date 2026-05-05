@@ -20,12 +20,12 @@ It does not store plaintext business documents, call executors, custody funds, o
 
 The trust registry is responsible for:
 
-- Registering trust domains.
+- Registering trust registries.
 - Attesting or revoking plans.
 - Attesting or revoking suppliers.
 - Providing trust proofs for Product projections.
 
-`UVPStateMachine.registerPlan()` checks whether `(planId, planHash)` is active in the official domain.
+`UVPStateMachine.registerPlan()` checks publisher permission and plan uniqueness. Plan trust is projected from configured registry events by Product/Store, not enforced by the state machine.
 
 ## UVPDeploymentRegistry
 

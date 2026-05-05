@@ -23,7 +23,7 @@ Store’s centralized authority can influence recommendations, review, tagging, 
 
 ## Order App
 
-`uvp-order-app/app` is for ordinary participants. It should use plain language to show:
+`uvp-order-app/app` is for ordinary participants and uses plain language to show:
 
 - Pending tasks.
 - Submission confirmation.
@@ -33,7 +33,7 @@ Store’s centralized authority can influence recommendations, review, tagging, 
 - Resource requirements.
 - Readiness checks.
 
-The ordinary task UI should not require users to understand `HookPlan`, `sourceId`, `signalId`, ABI, or gas details. Advanced proof / debug views can show those fields.
+The ordinary task UI does not require users to understand `HookPlan`, `sourceId`, `signalId`, ABI, or gas details. Advanced proof / debug views can show those fields.
 
 ## Executor Kit
 

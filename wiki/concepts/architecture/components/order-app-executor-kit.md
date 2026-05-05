@@ -4,7 +4,7 @@ Order App 和 executor-kit 都是 signal producer 的入口，但用户不同。
 
 ## Order App
 
-`uvp-order-app/app` 面向普通参与者。它应该展示：
+`uvp-order-app/app` 面向普通参与者，展示：
 
 - 邀请和 onboarding。
 - 任务 inbox。
@@ -15,7 +15,7 @@ Order App 和 executor-kit 都是 signal producer 的入口，但用户不同。
 - proof rows。
 - readiness 和 blocked reason。
 
-它不应该把普通用户暴露在 HookPlan、sourceId、signalId、ABI、calldata 或 gas 细节里。
+普通用户界面不暴露 HookPlan、sourceId、signalId、ABI、calldata 或 gas 细节。
 
 ## Executor Kit
 
@@ -26,7 +26,7 @@ Order App 和 executor-kit 都是 signal producer 的入口，但用户不同。
 | Chain mode | 直接 watch `HookReady`，提交低层 signal，适合高级链原生集成。 |
 | Product API mode | 读取 Product API task/signal container，准备证据、签名、提交和证明，适合大多数集成。 |
 
-它的位置是执行者集成面。多数执行者应该走 Product API mode；只有需要直接监听 `HookReady`、自管 handler 和直接合约交易的高级集成才走 chain mode。
+它的位置是执行者集成面。多数执行者走 Product API mode；只有需要直接监听 `HookReady`、自管 handler 和直接合约交易的高级集成才走 chain mode。
 
 ## 共同边界
 

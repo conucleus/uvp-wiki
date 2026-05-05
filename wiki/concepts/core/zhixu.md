@@ -18,6 +18,7 @@ spec:
   platform:
     type: blockchain
     provider: eth
+    network: base
     version: 0.1.3
   nucleation:
     id: procurement-nucleus
@@ -26,7 +27,7 @@ spec:
       stages:
         - name: supplier_sourcing
           source: supply
-          trigger: [SCOPE_READY]
+          trigger: ["SCOPE_READY"]
           receiveSignals:
             SCOPE_READY: solution::master.technical_scope.cmp
           sendSignals: [str, cmp, err]
@@ -52,7 +53,7 @@ spec:
 | `metadata.uid` | 稳定 Zhixu ID。没有时会回退到名称。 |
 | `metadata.labels` | 业务分类、行业、demo 标签。链上权限由 order authorization 和 overlay 决定。 |
 | `metadata.annotations.version` | 计划版本。版本变化会进入 `planId`。 |
-| `spec.platform` | 目标平台。EVM track 使用 `type=blockchain`、`provider=eth`。 |
+| `spec.platform` | 目标平台。EVM track 使用 `type=blockchain`、`provider=eth`，可显式写 `network=base`。不写 `network` 时保持当前主网默认路径。 |
 | `spec.nucleation.id` | 秩序的发起核、设计者或组织域标识。详见 [Nucleation / 凝结核](nucleation.md)。 |
 | `spec.taskPatterns` | 任务模式列表，里面包含 stages。 |
 

@@ -3,7 +3,7 @@
 这个教程验证最小链上语义闭环：
 
 ```text
-Zhixu -> HookPlan -> OnchainHookPlan -> registerPlan/registerOrder
+Zhixu -> HookPlan -> OnchainHookPlan -> registerPlan/triggerOrderFromOutsideFor
   -> submitSignal/pokeTimer -> HookReady/HookStatusChanged
   -> statemachine chain replay oracle
 ```
@@ -26,8 +26,8 @@ uvp-deploy/deploy/scripts/bootstrap-local-anvil.sh --self-update
 2. 构建 workspace 和合约。
 3. 部署 `UVPDeploymentRegistry`、`ZhixuTrustRegistry`、`UVPStateMachine`。
 4. 编译 UVP update Zhixu YAML，目标为 `platform.type=blockchain`、
-   `platform.provider=eth`。
-5. 注册 official trust domain。
+   `platform.provider=eth`、`platform.network=base`。
+5. 部署 configured trust registry，并用 registry owner 背书计划。
 6. attests 当前 plan。
 7. allowlist plan publisher 和 order registrar。
 8. register plan 和 order，并写入 signal submitter authorizations。

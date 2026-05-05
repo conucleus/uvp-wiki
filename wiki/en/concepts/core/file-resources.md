@@ -73,7 +73,7 @@ Store can organize the resource handles into:
 - manifest hash, metadata URI, content hash, ciphertext hash;
 - whether resources are missing, expired, or need operator review.
 
-Order App and executor-kit should translate this into “what evidence needs to be uploaded, what the hash is, and where the proof lives.” Ordinary participants should not see bucket secrets, storage credentials, presigned URLs, or internal object paths.
+Order App and executor-kit translate this into “what evidence needs to be uploaded, what the hash is, and where the proof lives.” Ordinary participant interfaces do not show bucket secrets, storage credentials, presigned URLs, or internal object paths.
 
 ## Disallowed Uses
 

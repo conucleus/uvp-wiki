@@ -1,8 +1,8 @@
 # Nucleation
 
-Nucleation is the subject that originates, designs, and maintains a Zhixu. Read it first as the owner of the reusable operating model: a procurement operations team, an industry program owner, a platform-side workflow designer, or another organization that can maintain the rulebook over time. It corresponds to `spec.nucleation.id` in the DSL and identifies “who originated and maintains this kind of coordination design.” In an Order, the executor, Store admin, and trust domain respectively take responsibility for runtime execution, platform workflow, and external endorsement.
+Nucleation is the subject that originates, designs, and maintains a Zhixu. Read it first as the owner of the reusable operating model: a procurement operations team, an industry program owner, a platform-side workflow designer, or another organization that can maintain the rulebook over time. It corresponds to `spec.nucleation.id` in the DSL and identifies “who originated and maintains this kind of coordination design.” In an Order, the executor, Store admin, and trust registry respectively take responsibility for runtime execution, platform workflow, and external endorsement.
 
-Nucleation is not automatically the same as a Store operator, trust domain, registrar, or submitter wallet. It may appear in workflow materials and Store records, but on-chain authority still comes from plan attestation, publisher/registrar permissions, order-level authorization, and participant signatures.
+Nucleation is not automatically the same as a Store operator, trust registry, registrar, or submitter wallet. It may appear in workflow materials and Store records, but on-chain authority still comes from plan attestation, publisher/registrar permissions, order-level authorization, and participant signatures.
 
 ```yaml
 spec:
@@ -20,14 +20,14 @@ Nucleation is responsible for the internal design and operating principles of a 
 - organize the supplier network and maintain internal coordination, fairness, and operation;
 - decide when to publish a new version and when to retire an old one.
 
-These responsibilities first appear in the Zhixu DSL, resource handles, Product schema, supplier requirements, and release materials. After compilation, they enter the Plan artifact, plan hash, and version boundary that can be reviewed by a trust domain.
+These responsibilities first appear in the Zhixu DSL, resource handles, Product schema, supplier requirements, and release materials. After compilation, they enter the Plan artifact, plan hash, and version boundary that can be reviewed by a trust registry.
 
 ## Responsibility Boundary
 
 | Adjacent role | Division of labor |
 | --- | --- |
 | Store admin | Provides the platform workbench, review materials, catalog, and release flow. |
-| Trust domain | External arbiter responsible for endorsing whether a plan or supplier is trustworthy, fair, and usable. |
+| Trust registry | External arbiter responsible for endorsing whether a plan or supplier is trustworthy, fair, and usable. |
 | Supplier | Capability subject that may be organized by Nucleation into a Zhixu. |
 | Executor | Runtime executor or submitter for a given Order. |
 | Registrar | Authorized subject that registers Orders. |
@@ -38,7 +38,7 @@ These responsibilities first appear in the Zhixu DSL, resource handles, Product 
 Nucleation
   -> designs Zhixu
   -> compiles into Plan
-  -> requests trust domain endorsement
+  -> requests trust registry endorsement
   -> creates or allows creation of Order
   -> maintains Zhixu operation through proof and supplier network
 ```

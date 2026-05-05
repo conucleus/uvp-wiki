@@ -1,6 +1,6 @@
 # Supplier Registry、能力与联系
 
-Supplier Registry 是凝结核组织供应商网络的工作台，也是 Store 平台维护 supplier 目录、联系信息、履约 proof 和背书请求材料的地方。Supplier 的协议对象定义见核心概念里的 Supplier；本页只讲 Store 侧面。
+Supplier Registry 是凝结核组织供应商网络的工作台，也是 Store 平台维护 supplier 目录、联系信息、履约 proof 和背书请求材料的地方。Supplier 的协议对象定义见核心概念里的 Supplier；Store 负责把 supplier profile、能力材料、联系渠道和 trust projection 组织成可检索的工作台。
 
 ## 两类标签
 
@@ -8,9 +8,9 @@ Supplier Registry 是凝结核组织供应商网络的工作台，也是 Store �
 | --- | --- | --- | --- |
 | 凝结核内部标签 | 凝结核 / 秩序组织者 | 某 supplier 适合某 stage、role slot、resource/evidence 类型。 | trust 和 signal authorization 另行产生。 |
 | Store 平台标签 | Store operator | catalog 分类、搜索、行业、风险、运营可见性。 | trust-domain 背书看 `SupplierAttested`。 |
-| Trust attestation | trust domain | supplier subject 是否被背书。 | 当前订单提交权限看 signal authorization。 |
+| Trust attestation | trust registry | supplier subject 是否被背书。 | 当前订单提交权限看 signal authorization。 |
 
-文档里写 supplier “打标”时必须说明是哪一层标签。Store 平台标签、凝结核内部标签、trust-domain 背书和订单授权分别展示。
+Supplier “打标”分成不同层。Store 平台标签、凝结核内部标签、trust-domain 背书和订单授权分别展示。
 
 ## Supplier 信息层
 
@@ -37,18 +37,18 @@ Supplier Registry 是凝结核组织供应商网络的工作台，也是 Store �
   -> 履约 proof 反哺 supplier passport
 ```
 
-这里的每一步权威不同。凝结核可以组织供应商网络；Store 可以维护平台目录和 audit；trust domain 可以背书 supplier subject；当前订单是否可提交 signal 仍由 `UVPStateMachine` 授权决定。
+这里的每一步权威不同。凝结核可以组织供应商网络；Store 可以维护平台目录和 audit；trust registry 可以背书 supplier subject；当前订单是否可提交 signal 仍由 `UVPStateMachine` 授权决定。
 
 ## Capability Passport
 
-Supplier 页面应该像 capability passport：先展示能力、背书、可用阶段和 proof，再展示联系人和通知配置。
+Capability passport 先展示能力、背书、可用阶段和 proof，再展示联系人和通知配置。
 
 | 区块 | 内容 |
 | --- | --- |
 | Identity | subject id、wallet、display name、legal/organization notes、metadata URI。 |
 | Nucleation usage | 被哪些凝结核组织进哪些 Zhixu、stage、role slot。 |
 | Capability | 可承接 stage、resource/evidence 类型、支持的 Product task intent、是否可做 selector。 |
-| Trust | trust domain、attestation status、revocation reason、proof rows。 |
+| Trust | trust registry、attestation status、revocation reason、proof rows。 |
 | Operations | 联系人、通知渠道、SLA、可用区域、工作时间、升级路径。 |
 | Runtime | open tasks、recent orders、failure/timeout history、active executor records。 |
 | Docking | 如果 supplierType 是 `zhixu`，展示 peer Zhixu plan trust、signalMap 模板、docking sandbox 历史。 |
@@ -56,7 +56,7 @@ Supplier 页面应该像 capability passport：先展示能力、背书、可用
 ## Store admin 展示口径
 
 - 凝结核决定某个 supplier 如何进入内部环节。
-- Trust domain 判定 supplier 是否可信。
+- Trust registry 判定 supplier 是否可信。
 - 平台 capability tag 用作目录和搜索；`SupplierAttested` 用作外部背书。
 - 联系人或通知成功用作 operational workflow；履约完成看 signal/proof。
 - supplier profile 用作能力材料；当前订单提交权限看 signal authorization。

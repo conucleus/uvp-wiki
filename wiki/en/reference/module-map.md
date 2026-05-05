@@ -15,11 +15,10 @@
 | Path | Package | Responsible for | Not responsible for |
 | --- | --- | --- | --- |
 | `uvp-protocol/packages/hook-core` | `@uvp-eth/hook-core` | Hook DSL parser/evaluator, dependency extraction | DB, Solidity, escrow, runtime service |
-| `uvp-protocol/packages/compiler` | `@uvp-eth/compiler` | Zhixu compiler, HookPlan, OnchainHookPlan, `registerPlan` args | hook runtime execution |
-| `uvp-protocol/packages/statemachine` | `@uvp-eth/statemachine` | reference reducer, chain event replay oracle | contract authorization, HTTP dispatch |
+| `uvp-protocol/packages/compiler` | `@uvp-eth/compiler` | Zhixu compiler, OnchainHookPlan, `registerPlan` args | hook runtime execution |
+| `uvp-protocol/packages/statemachine` | `@uvp-eth/statemachine` | offline chain event replay oracle | contract authorization, HTTP dispatch |
 | `uvp-protocol/packages/protocol-bindings` | `@uvp-eth/protocol-bindings` | ABI, EIP-712, calldata, hash helpers | private keys, env, watcher, tx submit |
 | `uvp-protocol/contracts/uvp-contracts` | Foundry project | Solidity contracts, ABI fixture, contract tests | backend service code |
-| `uvp-protocol/tools/runtime-host` | `@uvp-eth/runtime-host` | off-chain reference harness | ETH runtime source of truth |
 | `uvp-protocol/packages/product-dto` | `@uvp-eth/product-dto` | product-facing DTO contracts | React, wallet, storage, chain client |
 | `uvp-chain-services/service` | `@uvp-eth/chain-services` | indexer, relayer, proof verifier, Product/Store APIs; see [Chain Services](../components/chain-services.md) | protocol source of truth |
 | `zhixu-store/app` | `@uvp-eth/zhixu-store-web` | Store/workbench frontend | old Go-coupled Store BFF |

@@ -39,7 +39,7 @@ file resource handle
 Proof verifier 的边界：
 
 - 货物是否真的送达由业务参与方、证据和争议/审查体系判断。
-- 供应商可信由 trust domain attestation 表达。
+- 供应商可信由 trust registry attestation 表达。
 - object handle 可访问性不能生成 `SignalSubmitted`。
 - hash 对齐是证明条件；hook ready 来自状态机事件。
 

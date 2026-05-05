@@ -58,20 +58,19 @@ Hook 表达式里的 `~A` 是存在逻辑里的缺席判断。它表示“当前
 
 ## Trigger 的含义
 
-只有 `trigger=true` 的 hook 在合约里第一次变成 `Ready` 时会发出 `HookReady`。Product 任务创建、Store 通知和 executor-kit watcher 都应该跟随 `HookReady`，UI 草稿或后端临时状态只用于辅助展示。
+只有 `trigger=true` 的 hook 在合约里第一次变成 `Ready` 时会发出 `HookReady`。Product 任务创建、Store 通知和 executor-kit watcher 都跟随 `HookReady`，UI 草稿或后端临时状态只用于辅助展示。
 
 详细语义见 [Trigger](trigger.md)。
 
-## Hook 和 HookPlan 的关系
+## Hook 和链上计划的关系
 
-Hook 是单个条件；HookPlan 是某个 Zhixu 编译后所有 hook、依赖索引、executor routes 和 selector bindings 的集合。
+Hook 是单个条件；链上计划产物是某个 Zhixu 编译后所有 hook、依赖索引、executor routes 和 selector bindings 的集合。
 
 ```text
 Zhixu stage.receiveSignals
   -> Hook
-  -> HookPlanArtifact
   -> OnchainHookPlanArtifact
   -> UVPStateMachine.StoredHook
 ```
 
-普通用户不应该直接读 HookPlan。HookPlan 是工程和审计材料，Product DTO 应把它翻译成“任务何时出现、谁能提交、需要什么证据、 proof 在哪里”。
+普通用户不直接读链上 artifact。Product DTO 把它翻译成“任务何时出现、谁能提交、需要什么证据、 proof 在哪里”。

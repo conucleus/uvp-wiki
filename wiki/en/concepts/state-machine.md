@@ -16,7 +16,10 @@ SignalSubmitted(orderId, sourceId, signalId)
 | --- | --- |
 | [Hook Evaluation](state-machine/evaluation.md) | How `SIGNAL`, `NOT`, `AND`, `OR`, and `DELAY` are evaluated in the contract. |
 | [Timers and Status](state-machine/timers-and-status.md) | Hook status, `dueAt`, `pokeTimer()`, and one-time `HookReady`. |
-| [Stage Overlay](state-machine/stage-overlay.md) | How executor / resource patches overlay a plan at order level. |
+| [Stage Overlay: Executor Patch and Resource Patch](state-machine/stage-overlay.md) | How executor / resource patches overlay a plan at order level. |
+| [Executor Patch](state-machine/executor-patch.md) | How an order-level selector assigns or replaces a target stage executor. |
+| [Resource Patch](state-machine/resource-patch.md) | How a selector replaces or supplements a target stage resource manifest. |
+| [Docked Zhixu Runtime](state-machine/docking.md) | How local and linked orders connect through docking links and mapped signals. |
 | [Event Replay](state-machine/replay.md) | How the reference reducer recomputes state from chain events and checks the contract output. |
 
 ## What the Contract Stores

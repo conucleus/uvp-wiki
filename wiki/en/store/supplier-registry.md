@@ -8,7 +8,7 @@ The Supplier Registry is the workbench where Nucleation organizes supplier netwo
 | --- | --- | --- | --- |
 | Internal Nucleation tags | Nucleation / Zhixu organizers | A supplier is suitable for a certain stage, role slot, or resource/evidence type. | Trust and signal authorization are produced separately. |
 | Store platform tags | Store operator | Catalog classification, search, industry, risk, and operational visibility. | Trust-domain endorsement is reflected by `SupplierAttested`. |
-| Trust attestation | Trust domain | Whether the supplier subject has been endorsed. | Current order submission authority is determined by signal authorization. |
+| Trust attestation | Trust registry | Whether the supplier subject has been endorsed. | Current order submission authority is determined by signal authorization. |
 
 Whenever this document says a supplier is "tagged," it must say which layer the tag belongs to. Store platform tags, internal Nucleation tags, trust-domain endorsement, and order authorization are all shown separately.
 
@@ -37,7 +37,7 @@ Nucleation defines supplier requirements
   -> fulfillment proof feeds back into the supplier passport
 ```
 
-Each step above has a different authority. Nucleation can organize the supplier network; the Store can maintain the platform catalog and audit; the trust domain can endorse the supplier subject; and whether the current order can submit a signal is still decided by `UVPStateMachine` authorization.
+Each step above has a different authority. Nucleation can organize the supplier network; the Store can maintain the platform catalog and audit; the trust registry can endorse the supplier subject; and whether the current order can submit a signal is still decided by `UVPStateMachine` authorization.
 
 ## Capability Passport
 
@@ -48,7 +48,7 @@ The Supplier page should read like a capability passport: show capability, endor
 | Identity | subject id, wallet, display name, legal/organization notes, metadata URI. |
 | Nucleation usage | Which Nucleation uses it for which Zhixu, stage, and role slot. |
 | Capability | Stages and resource/evidence types that can be handled, supported Product task intents, and whether it can act as a selector. |
-| Trust | trust domain, attestation status, revocation reason, proof rows. |
+| Trust | trust registry, attestation status, revocation reason, proof rows. |
 | Operations | contacts, notification channels, SLA, service area, working hours, escalation path. |
 | Runtime | open tasks, recent orders, failure/timeout history, active executor records. |
 | Docking | If `supplierType` is `zhixu`, show peer Zhixu plan trust, signalMap template, and docking sandbox history. |
@@ -56,7 +56,7 @@ The Supplier page should read like a capability passport: show capability, endor
 ## Store Admin Display Language
 
 - Nucleation decides how a supplier enters internal workflows.
-- The trust domain decides whether the supplier is trustworthy.
+- The trust registry decides whether the supplier is trustworthy.
 - Platform capability tags are for catalog and search; `SupplierAttested` is for external endorsement.
 - Contacts and notification success are operational workflow; fulfillment completion is shown by signal/proof.
 - Supplier profile is capability material; current order submission authority is determined by signal authorization.

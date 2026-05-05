@@ -20,7 +20,6 @@ Hook Core output is still platform-neutral semantics, with no Solidity ABI attac
 
 - Loading YAML / JSON Zhixu.
 - Validating `stage`, `trigger`, `receiveSignals`, `selectedStages`, `executor` reachability.
-- Generating `HookPlanArtifact`.
 - Generating `OnchainHookPlanArtifact`.
 - Generating Solidity `registerPlan` parameters.
 - Computing `planId`, `planHash`, and hook / stage / source / signal / dependency / route IDs.
@@ -31,4 +30,4 @@ The compiler outputs deterministic plan artifacts and registration parameters. O
 
 ## Why It Is a Core Architectural Piece
 
-If the compiler is not deterministic, every later trust attestation loses meaning. The trust domain endorses the plan hash; the contract registers compact hooks; the Product DTO shows the tasks for the Plan. If any hash or schema is not reproducible, the whole chain becomes unauditable.
+If the compiler is not deterministic, every later trust attestation loses meaning. The trust registry endorses the plan hash; the contract registers compact hooks; the Product DTO shows the tasks for the Plan. If any hash or schema is not reproducible, the whole chain becomes unauditable.

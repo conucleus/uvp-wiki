@@ -6,7 +6,6 @@ A Plan is the deterministic artifact compiled from a Zhixu for a specific chain.
 
 ```text
 Zhixu DSL
-  -> HookPlanArtifact
   -> OnchainHookPlanArtifact
   -> registerPlan args
   -> planId / planHash
@@ -33,11 +32,11 @@ If the platform, version, compiler, stage, hook, source, signal, or selector bin
 - `fileResources` are handles and default descriptions; business files stay off chain.
 - USDC, escrow, and fiat bridge flows belong to adapters or periphery workflows that consume Plan/Order signals.
 
-## It Must Be Endorsed Before Registration
+## Registration And Endorsement Are Separate
 
-`UVPStateMachine.registerPlan()` checks the official trust domain’s attestation on `(planId, planHash)`. Only a Plan that is still endorsed can be registered as a valid plan.
+`UVPStateMachine.registerPlan()` only checks publisher permission, that the plan is non-empty, and that it has not been registered before. `ZhixuTrustRegistry` endorsement for `(planId, planHash)` is projected by Product/Store using the configured registry address; it is not a state-machine precondition.
 
-This boundary matters for Store: `approved_for_broadcast` is only a Store workflow state; only a `PlanAttested` observed by the indexer can support the display of an officially trusted plan.
+This boundary matters for Store: `approved_for_broadcast` is only a Store workflow state; only a `PlanAttested` observed by the indexer can support official catalog trust display.
 
 ## A Plan Should Not Be Modified by an Order
 

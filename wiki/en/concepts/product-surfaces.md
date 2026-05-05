@@ -1,6 +1,6 @@
 # Product Surfaces
 
-Product surfaces translate on-chain facts into order, task, proof, and trust information that people can actually use. They project events from `UVPStateMachine` and `ZhixuTrustRegistry` into DTOs consumed by the Product API, Store, and Order App; protocol state is still decided by on-chain events.
+Product surfaces define the language ordinary users and product frontends see: orders, tasks, proof, participants, evidence, and trust status. Event rebuilding, indexing, and HTTP runtime belong to [Chain Services](../components/chain-services.md); product surfaces focus on how those projections become DTOs consumed by Store, Order App, and executor-kit.
 
 The most important translation is from DSL stage to Product task:
 
@@ -18,10 +18,9 @@ stage.receiveSignals
 
 | Subpage | Description |
 | --- | --- |
-| [Event Projection](product/projections.md) | How the indexer rebuilds order / task / timeline / proof from events. |
 | [Product DTO](product/dto.md) | How `ProductOrderDTO` and `ProductTaskDTO` hide hook and ABI details. |
 | [Signal Container](product/signal-container.md) | How a single authorized business action is wrapped into task, evidence, signing, submission, and proof. |
-| [Store and Order App](product/apps.md) | What Store, the ordinary participant app, and executor-kit should each display or submit. |
+| [Store and Order App](product/apps.md) | Display and submission boundaries for Store, the ordinary participant app, and executor-kit. |
 
 ## Product Language and Protocol Language
 
@@ -40,10 +39,9 @@ Ordinary users mainly see orders, tasks, participants, evidence, and proof. `sou
 The correct relation for product surfaces is:
 
 ```text
-chain events
-  -> rebuildable projections
+Chain Services projection
   -> Product DTOs
-  -> Store / Order App / executor-kit
+  -> Store / Order App / executor-kit / periphery adapter
 ```
 
-If the Product API returns a state that cannot be traced back to event provenance or to metadata explicitly marked by Store, it should be treated as a product read model or workflow state.
+If the Product API returns a state that cannot be traced back to event provenance or to metadata explicitly marked by Store, it belongs to a product read model or workflow state.
