@@ -2,7 +2,7 @@
 
 部署与证据组件负责把本地闭环、Base Sepolia rehearsal、address manifest、release record 和 staging gate 组织成可审计工程证据。
 
-## 先读这些
+## 阅读路径
 
 | 页面 | 作用 |
 | --- | --- |

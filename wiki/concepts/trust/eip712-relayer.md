@@ -8,7 +8,7 @@ Relayer 可以帮助广播交易，但不能替参与方做业务决定。业务
 
 ```text
 name = UVPStateMachine
-version = 0.2
+version = 0.4
 ```
 
 Signal 提交的 primary type 是：

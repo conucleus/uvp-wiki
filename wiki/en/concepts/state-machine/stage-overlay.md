@@ -13,6 +13,8 @@ An executor patch changes the execution constraint of a target stage. The contra
 
 After the patch becomes active, future business signals for the target stage require both the original signal authorization and the active executor.
 
+See [Executor Patch](executor-patch.md) for the dedicated page.
+
 ## Resource Patch
 
 A resource patch is used for order-level resource overrides, such as a file manifest, policy, or resource bundle hash required by a stage. The contract requires:
@@ -25,6 +27,8 @@ A resource patch is used for order-level resource overrides, such as a file mani
 
 The chain stores only hashes and URIs, not plaintext business files.
 
+See [Resource Patch](resource-patch.md) for the dedicated page.
+
 ## Why the Plan Is Not Modified
 
-The Plan is the workflow version attested by the trust domain. Runtime supplier selection, executor handoff, and resource replacement are all execution state for a specific order and should not feed back into plan semantics. Stage overlay gives the order flexibility while keeping the Plan auditable.
+The Plan is the workflow version attested by the trust registry. Runtime supplier selection, executor handoff, and resource replacement are all execution state for a specific order and should not feed back into plan semantics. Stage overlay gives the order flexibility while keeping the Plan auditable.

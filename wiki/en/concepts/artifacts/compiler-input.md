@@ -36,4 +36,4 @@ These errors must surface at compile time, not at contract registration or order
 
 ## Source Zhixu Also Participates in Hashing
 
-`HookPlanArtifact`’s `planHash` includes the canonicalized source Zhixu. That means a source definition change that affects protocol semantics changes the plan hash. The compiled artifact should not be handwritten JSON; it must be reproducibly generated from the source definition by script.
+`OnchainHookPlanArtifact`’s `planHash` includes the canonicalized source Zhixu. That means a source definition change that affects protocol semantics changes the plan hash. The compiled artifact should not be handwritten JSON; it must be reproducibly generated from the source definition by script.

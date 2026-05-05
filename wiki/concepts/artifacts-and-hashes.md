@@ -1,6 +1,6 @@
 # 产物与哈希
 
-编译器先把 Zhixu 定义变成平台中立的 `HookPlanArtifact`，再降到具体链目标产物。当前可运行目标是 EVM：`EvmHookPlanArtifact` 兼容旧的 `OnchainHookPlanArtifact` 名称，是合约能注册的产物。每一步都使用确定性编码和稳定哈希，避免“同一份流程在不同机器上得到不同计划”。
+编译器把 Zhixu 定义直接编译成 EVM `OnchainHookPlanArtifact` 与 `registerPlan` 参数。旧的平台中立 HookPlan 形状只作为编译器内部 IR。每一步都使用确定性编码和稳定哈希，避免“同一份流程在不同机器上得到不同计划”。
 
 ## 本篇子项
 
@@ -10,15 +10,14 @@
 | [Canonical Hash](artifacts/canonical-hashes.md) | `planId`、`planHash`、`hookId`、`signalKey` 等稳定哈希如何计算。 |
 | [链上注册参数](artifacts/solidity-registration.md) | on-chain artifact 如何压缩成 `registerPlan` 参数。 |
 
-## 两层产物
+## 公开产物
 
 | 产物 | 用途 |
 | --- | --- |
-| `HookPlanArtifact` | 平台中立，保留 stage 名称、hook 表达式、AST、依赖、route 和可读标签。 |
-| `EvmHookPlanArtifact` / `OnchainHookPlanArtifact` | 面向 EVM，使用 `bytes32` ID、stack instructions、dependency index 和 selector bindings。 |
-| `SolanaHookPlanArtifact` | 仅是预留 target 边界；在 Solana program 和 adapters 完成前不能运行。 |
+| `OnchainHookPlanArtifact` | 面向 EVM，使用 `bytes32` ID、stack instructions、dependency index 和 selector bindings。 |
+| `registerPlan` args | 从链上产物确定性压缩出的 Solidity 注册参数。 |
 
-合约最终检查的是链上计划哈希。`ZhixuTrustRegistry` 认证 `(domainId, planId, planHash)`，`UVPStateMachine.registerPlan()` 再检查该认证是否有效。
+合约最终检查的是链上计划哈希。`ZhixuTrustRegistry` 认证 `(registryAddress, planId, planHash)`，`UVPStateMachine.registerPlan()` 再检查该认证是否有效。
 
 ## 公共接口意识
 

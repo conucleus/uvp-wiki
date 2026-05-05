@@ -17,7 +17,7 @@ The Docking Sandbox lets Nucleation trial external Zhixu, supplier signal maps, 
 
 - Formal Zhixu publishing goes through [Zhixu Catalog, Configuration, and Publishing](zhixu-management.md).
 - Plan registration goes through trust attestation and the `registerPlan()` path.
-- Order creation goes through the Product/registrar `registerOrder()` path.
+- Order creation goes through the Product/registrar signed trigger-order path.
 - Signal authorization goes through the order-level authorization or stage overlay path.
 - Runtime peer-order integration goes through the `linkDockedOrder` / `submitDockedSignal` event path.
 - Sandbox validation produces review materials and risk hints; trust is still expressed by registry attestation.
@@ -30,7 +30,7 @@ The Docking page must keep reminding users:
 After trial pairing, you still have to publish, endorse, register the order, and submit on-chain proof.
 ```
 
-Formal publishing still has to go through Zhixu configuration and publishing, governance attestation, `registerPlan`/`registerOrder`, and the Product projection path.
+Formal publishing still has to go through Zhixu configuration and publishing, governance attestation, `registerPlan`, signed trigger-order creation, and the Product projection path.
 
 ## Suggested Docking Session Structure
 

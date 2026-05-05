@@ -44,7 +44,7 @@ uvp-deploy/deploy/scripts/bootstrap-local-anvil.sh --failure
 | `pnpm test` | 所有 package 的 test。 |
 | `pnpm build` | 所有 package 的 build。 |
 | `pnpm lint` | 有 lint 脚本的 package 执行 lint。 |
-| `pnpm verify:protocol-freeze` | 校验 `UVPStateMachine`、`ZhixuTrustRegistry`、`UVPDeploymentRegistry` 和 Base Sepolia EIP-712 `0.2` domain fixture。 |
+| `pnpm verify:protocol-freeze` | 校验 v0.4 `UVPStateMachine`、`ZhixuTrustRegistry`、`UVPDeploymentRegistry` 和 EIP-712 domain fixture。 |
 | `pnpm release:baseline:dry-run` | 本地 release baseline 预演。 |
 | `pnpm staging:preflight` | Base Sepolia staging 非花费 preflight。 |
 

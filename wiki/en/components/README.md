@@ -1,11 +1,11 @@
 # Core Components
 
-Core components answer the question “how the system is implemented.” They turn the core concepts from Zhixu text into deterministic artifacts, on-chain state, replayable events, Product DTOs, and release evidence.
+Core components explain how UVP is implemented. They turn core concepts from Zhixu text into deterministic artifacts, on-chain state, replayable events, Product DTOs, and release evidence.
 
 ```text
 hook-core
   -> compiler
-  -> HookPlanArtifact / OnchainHookPlanArtifact
+  -> OnchainHookPlanArtifact / registerPlan args
   -> protocol-bindings
   -> UVP contracts / registries
   -> statemachine replay
@@ -14,9 +14,9 @@ hook-core
   -> uvp-deploy release evidence
 ```
 
-## Documentation Quality Bar
+## Component Page Structure
 
-Every core component page in this directory should meet the same bar:
+Core component pages are organized around four things:
 
 - Explain its upstream and downstream position in the component chain.
 - Explain its public interfaces, such as ABI, EIP-712, hashes, DTOs, CLI, or release manifests.
@@ -28,10 +28,10 @@ Every core component page in this directory should meet the same bar:
 | Component group | Read first | Coverage |
 | --- | --- | --- |
 | Component chain and module boundaries | [Component Chain and Module Boundaries](architecture.md) | Module boundaries, dependency direction, source of truth, path from local to on-chain. |
-| Semantics, Hook Core, and Compiler | [Semantics, Hook Core, and Compiler](semantics-and-compiler.md) | hook-core, compiler, HookPlan, OnchainHookPlan, canonical hash, registerPlan args. |
+| Semantics, Hook Core, and Compiler | [Semantics, Hook Core, and Compiler](semantics-and-compiler.md) | hook-core, compiler, OnchainHookPlan, canonical hash, registerPlan args. |
 | On-chain execution, State Machine, and Replay | [On-chain Execution, State Machine, and Replay](onchain-runtime.md) | contracts, registries, state machine, stage overlay, timers, event replay. |
 | Rebuildable service layer | [Rebuildable Service Layer: Chain Services](chain-services.md) | Forkable off-chain execution software: indexer, projection, relayer boundary, proof verifier, Product/Store API, notifications, storage/runtime profile. |
-| Services and interfaces | [Services and Interfaces](services-and-interfaces.md) | protocol-bindings, Product DTO, Product API, Store API, executor-kit consumption, and public interface drift. |
+| Protocol bindings and public interfaces | [Protocol Bindings and Public Interfaces](services-and-interfaces.md) | protocol-bindings, Product DTO, Product API, Store API, executor-kit consumption, and public interface drift. |
 | Deployment and evidence | [Deployment and Evidence](deploy-release.md) | uvp-deploy, Anvil/Base Sepolia, manifests, release evidence, staging gates. |
 
 ## Why There Are Other Core Components

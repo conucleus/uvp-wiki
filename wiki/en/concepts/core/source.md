@@ -1,8 +1,12 @@
 # Source Causal Chain
 
-`source` is the causal namespace of a signal. It answers: "which line of business progress does this signal belong to?" Roles, Suppliers, and wallets say who acts; Source says which causal chain the action enters.
+`source` is the causal lane of a signal. It answers: "which line of business progress does this signal belong to?" Roles, Suppliers, and wallets say who acts; Source says which lane the action enters.
+
+Read it like lanes in one project: sales, solution, supply, payment, logistics, field, and buyer can move in parallel, then converge when one lane waits for proof from another lane. These sources are not departments. A single wallet may be authorized on more than one source, and one Supplier may appear in several sources.
 
 Hook expressions are written as `source::condition`, and the signals inside the condition are interpreted under that source by default.
+
+Engineering note:
 
 ```text
 sourceId = keccak256(source)
@@ -26,7 +30,7 @@ In a cross-border supply Order, several causal lanes may progress in parallel an
 | `field` | On-site delivery, installation, or commissioning. | `master.site_acceptance.cmp` | field executor or buyer representative. | Final acceptance can open. |
 | `buyer` | Buyer commitment and acceptance. | `master.acceptance.cmp` | buyer wallet. | Order closure or after-sales branch. |
 
-These sources are not departments. A single wallet may submit signals on different sources if authorized. The same Supplier may appear in multiple sources. The Source is the namespace used by hooks and signals so the state machine can replay the correct causal line.
+The Source is the namespace used by hooks and signals so the state machine can replay the correct causal line.
 
 ## Same-Source Chaining
 

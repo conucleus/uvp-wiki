@@ -1,6 +1,6 @@
 # Zhixu Catalog、配置与发布
 
-Store 中的 Zhixu Catalog 是凝结核把秩序设计发布出来、组织材料、接受平台 workflow、申请 trust-domain 背书的地方。秩序内部 stage、公平规则和供应商组织原则由凝结核维护；本页只讲 Store 侧面。DSL 对象本身见核心概念里的 [秩序 (Zhixu)](../concepts/core/zhixu.md)。
+Store 中的 Zhixu Catalog 是凝结核把秩序设计发布出来、组织材料、接受平台 workflow、申请 trust-domain 背书的地方。秩序内部 stage、公平规则和供应商组织原则由凝结核维护；Store 负责把这些材料组织成可审查、可发布、可追踪的工作台。DSL 对象本身见核心概念里的 [秩序 (Zhixu)](../concepts/core/zhixu.md)。
 
 ## 页面目标
 
@@ -22,7 +22,7 @@ Zhixu Catalog 要让凝结核、Store operator 和 trust reviewer 分别看清�
 | 供应商组织和公平规则 | 凝结核 | 展示 supplier requirements、resource/evidence checklist 和说明材料。 |
 | 平台目录打标 | Store operator | 给 catalog、行业、风险、可见性、推荐版本打平台标签。 |
 | 发布材料审核 | Store reviewer | 确认材料完整、可编译、可审查；不直接判定公平可信。 |
-| 外部可信背书 | Trust domain | 通过 registry attestation/revocation 表达。 |
+| 外部可信背书 | Trust registry | 通过 registry attestation/revocation 表达。 |
 | 订单运行事实 | `UVPStateMachine` | Store 只展示 projection 和 proof。 |
 
 ## 发布路径
@@ -54,14 +54,14 @@ Zhixu Catalog 要让凝结核、Store operator 和 trust reviewer 分别看清�
 ## Store 展示口径
 
 - Store review approved：平台 workflow 已通过，可进入背书请求或发布操作。
-- 编译预览通过：artifact 可生成，链上注册仍看 `registerPlan()` 和 registry projection。
+- 编译预览通过：artifact 可生成；链上注册看 `registerPlan()`，官方展示看 registry projection。
 - active recommendation：Store 推荐某个版本作为新订单入口，已有订单仍绑定原 `planId`。
 - Store copy：解释材料和运营状态；`planId`、`planHash` 和 on-chain artifact 保持编译结果。
 - Store admin：维护平台 workflow，凝结核维护秩序内部 stage、公平规则和供应商组织原则。
 
-## Trust domain 看什么
+## Trust registry 看什么
 
-Trust domain 是 Store 页面里的外部背书来源。它应基于可审查材料判断一条秩序是否可背书，例如：
+Trust registry 是 Store 页面里的外部背书来源。它应基于可审查材料判断一条秩序是否可背书，例如：
 
 - stage、source、trigger 是否透明可解释；
 - supplier selection 和 selector 权限是否清楚；
@@ -78,7 +78,7 @@ Store 可以组织和展示这些材料；背书事实只能来自 `ZhixuTrustRe
 | --- | --- | --- |
 | DSL 是否可编译 | compile preview、artifact hash、validation errors。 | compiler 输出。 |
 | 凝结核是谁 | `spec.nucleation.id`、维护说明、版本历史。 | Zhixu metadata + Store workspace。 |
-| 公平性材料是否完整 | selector、supplier slot、异常处理、证据要求说明。 | 凝结核提交材料；trust domain 外部判定。 |
+| 公平性材料是否完整 | selector、supplier slot、异常处理、证据要求说明。 | 凝结核提交材料；trust registry 外部判定。 |
 | Plan 是否官方可信 | trusted/revoked/not found badge。 | `ZhixuTrustRegistry` projection。 |
 | Stage 是否有执行入口 | trigger hook、Product task preview。 | compiled HookPlan + state-machine events。 |
 | Supplier 能力是否匹配 | required capability vs supplier passport。 | 凝结核组织语义 + Store metadata；trust 另看 registry。 |

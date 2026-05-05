@@ -18,7 +18,7 @@ Rules:
 - `/product/zhixus` is the canonical route.
 - `/product/zhixu` is only a legacy singular alias.
 - `/product/flows` does not exist.
-- `zhixus` returns only active, non-revoked plans from the official domain by default.
+- `zhixus` returns active, non-revoked plans from the configured product registry projection by default.
 - If a bare `orderId` is not unique across state-machine deployments, the API should return ambiguous candidates.
 
 ## Tasks and Participant Scope

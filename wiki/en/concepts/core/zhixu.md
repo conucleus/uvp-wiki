@@ -1,8 +1,8 @@
 # Zhixu DSL
 
-`Zhixu` is the transliteration of the underlying Chinese coordination term. In this repository, Zhixu is the static coordination definition designed by Nucleation. It uses a DSL to declare a reusable production relationship: which task patterns exist, which stages each task has, which source causal chain each stage belongs to, what signals it receives, what signals it emits, who the default Supplier is, which stages can choose an executor for other stages, and which resources are required.
+`Zhixu` is the transliteration of the underlying Chinese coordination term. In this repository, Zhixu is the reusable coordination rulebook designed by Nucleation. It uses a DSL to declare a reusable production relationship: which task patterns exist, which stages each task has, which source causal chain each stage belongs to, what signals it receives, what signals it emits, who the default Supplier is, which stages can choose an executor for other stages, and which resources are required.
 
-The code entry point is `ZhixuDefinition` in `uvp-protocol/packages/compiler/src/types/index.ts`. An Order is one runtime instance of this static definition after compilation and registration.
+The code entry point is `ZhixuDefinition` in `uvp-protocol/packages/compiler/src/types/index.ts`. An Order is one runtime instance of this rulebook after compilation and registration.
 
 ## Minimal Skeleton
 
@@ -18,6 +18,7 @@ spec:
   platform:
     type: blockchain
     provider: eth
+    network: base
     version: 0.1.3
   nucleation:
     id: procurement-nucleus
@@ -26,7 +27,7 @@ spec:
       stages:
         - name: supplier_sourcing
           source: supply
-          trigger: [SCOPE_READY]
+          trigger: ["SCOPE_READY"]
           receiveSignals:
             SCOPE_READY: solution::master.technical_scope.cmp
           sendSignals: [str, cmp, err]
@@ -47,12 +48,12 @@ This says: the local Zhixu stage `master.supplier_sourcing` is triggered by `sol
 | Field | Meaning |
 | --- | --- |
 | `apiVersion` | DSL version, currently `uvp/v0`. |
-| `kind` | `Zhixu` for a coordination definition; `SupplierDefinition` is used for supplier identity and capability declarations. |
+| `kind` | `Zhixu` for a coordination rulebook; `SupplierDefinition` is used for supplier identity and capability declarations. |
 | `metadata.name` | Human-readable name, also part of the plan identity. |
 | `metadata.uid` | Stable Zhixu ID. Falls back to the name when absent. |
 | `metadata.labels` | Business category, industry, and demo labels. On-chain authorization is controlled by order authorization and overlays. |
 | `metadata.annotations.version` | Plan version. Version changes flow into `planId`. |
-| `spec.platform` | Target platform. The EVM track uses `type=blockchain` and `provider=eth`. |
+| `spec.platform` | Target platform. The EVM track uses `type=blockchain`, `provider=eth`, and may set `network=base`. If `network` is absent, the current mainnet/default path is preserved. |
 | `spec.nucleation.id` | Identifier for the originating nucleus, designer, or organizing domain of the Zhixu. See [Nucleation](nucleation.md). |
 | `spec.taskPatterns` | List of task patterns, each of which contains stages. |
 
@@ -132,7 +133,7 @@ These business files do not go on chain. On chain only records hashes, URIs, or 
 | Concept | Static / Dynamic | Meaning |
 | --- | --- | --- |
 | Nucleation | Organizing subject | The organizer that originates, designs, and maintains a Zhixu. |
-| Zhixu | Static DSL | A reusable coordination definition. |
+| Zhixu | Static DSL | A reusable coordination rulebook. |
 | Plan | Chain-targeted artifact | The artifact, hash, and registration parameters compiled from a Zhixu for EVM. |
 | Order | Dynamic instance | One runtime of a Plan, including signals, hook runtime, stage overlay, and proof. |
 

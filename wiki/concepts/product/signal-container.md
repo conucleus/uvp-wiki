@@ -1,6 +1,6 @@
 # Signal Container
 
-Signal container 是产品层对一个授权业务动作的包装。它把现有 task、evidence、typed data、business signature、submit、proof 组织成一个可重复的用户和集成模型；链上仍使用现有合约类型和事件。
+Signal container 是产品层对一个授权业务动作的包装。它是 product/API 概念，不是新的合约对象。它把现有 task、evidence、typed data、business signature、submit、proof 组织成一个可重复的用户和集成模型；链上仍使用现有合约类型和事件。
 
 ## 为什么需要这个概念
 

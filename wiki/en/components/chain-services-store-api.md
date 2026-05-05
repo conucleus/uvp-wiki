@@ -1,6 +1,6 @@
 # Store Console, Supplier, and Governance API
 
-The Store-related APIs are the workspace surfaces for the nucleation kernel, Store operators, reviewers, and governance admins. They organize Zhixu drafts, supplier profiles, docking sessions, review materials, attestation requests, and audit trails. Inside nucleation governance, the trust domain decides external endorsement, while the Store API handles platform workflow.
+The Store-related APIs are the workspace surfaces for the nucleation kernel, Store operators, reviewers, and governance admins. They organize Zhixu drafts, supplier profiles, docking sessions, review materials, attestation requests, and audit trails. Inside nucleation governance, the trust registry decides external endorsement, while the Store API handles platform workflow.
 
 ## Code Entry Points
 

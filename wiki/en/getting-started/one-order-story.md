@@ -63,15 +63,17 @@ A production relationship runs because participants keep emitting signals:
 
 A signal answers three questions: who completed what, whether the next step can begin, and who accepts responsibility for the statement.
 
+In role terms, these production organizations are Suppliers first. When one of them is selected or elected to handle a concrete Order stage, it becomes the Executor or submitter for that stage. A government, regulator, funder, insurer, auditor, broker, EPC, or OEM does not become a special UVP role just because of its industry name.
+
 ## 3. Why Signals Have Force
 
 Signals have force because the real world gives them consequences. A payment certificate lets a supplier continue production. A regulatory permit lets a project move to the next stage. Customs documents let cargo be released. Acceptance confirmation starts payment or warranty responsibility. Insurance and audit records make risk computable.
 
-UVP records protocol facts: an authorized subject signs a statement that a business signal has been emitted for a specific Order, stage, and evidence fingerprint. Real-world truth is declared by the responsible person, enterprise, trust domain, auditor, funder, regulator, or adapter through its own signal and accountability. Off-chain facts are declared by real-world responsible parties; the chain records those declarations, signatures, evidence fingerprints, and state consequences.
+UVP records protocol facts: an authorized subject signs a statement that a business signal has been emitted for a specific Order, stage, and evidence fingerprint. Real-world truth is declared by the responsible Supplier or selected Executor through its own signal and accountability. A Trust Domain is separate endorsement infrastructure when explicitly configured; it is not automatically the government, regulator, funder, insurer, or auditor. Off-chain facts are declared by real-world responsible parties; the chain records those declarations, signatures, evidence fingerprints, and state consequences.
 
 ## 4. Zhixu DSL Writes Production Relationships as Code
 
-The first core move in UVP is to write "production relationship + signal boundary" as computer-readable order language. That order is called `Zhixu`. It is a coordination DSL, with a practical shape close to a YAML agreement.
+The first core move in UVP is to write "production relationship + signal boundary" as a computer-readable rulebook. That rulebook is called `Zhixu`. It is a coordination DSL, with a practical shape close to a YAML agreement.
 
 A PV delivery Zhixu can describe:
 
@@ -94,7 +96,7 @@ Read this part as four actions.
 
 ### 5.1 Write How This Kind of Project Coordinates
 
-The Nucleation first writes the reusable coordination method for PV project delivery as a Zhixu. It answers ordinary business questions: who starts first, what EPC waits for, when OEM can ship, who is notified after customs release, who can accept after site receipt, and which path handles failure or timeout.
+The Nucleation first writes the reusable coordination method for PV project delivery as a Zhixu. In this story, Nucleation can be read as the team or organization that owns this reusable operating model, such as a procurement operations team, industry program owner, or platform-side workflow designer. It answers ordinary business questions: who starts first, what EPC waits for, when OEM can ship, who is notified after customs release, who can accept after site receipt, and which path handles failure or timeout.
 
 This step is like writing an operating manual in machine-readable YAML. It is not one specific project yet. It is the operating rule for a class of projects.
 
@@ -106,18 +108,18 @@ A Plan has a `planHash`. You can read it as the fingerprint of this rule set. Th
 
 ### 5.3 A Trust Domain Endorses That Version
 
-A trust domain is a responsible subject willing to endorse a kind of judgment. It can review the Plan materials, evidence requirements, supplier requirements, applicability, and `planHash`. After approval, it emits `PlanAttested` on chain.
+A trust registry is a responsible subject willing to endorse a kind of judgment. It can review the Plan materials, evidence requirements, supplier requirements, applicability, and `planHash`. After approval, it emits `PlanAttested` on chain.
 
-`PlanAttested` means this trust domain recognizes this Plan version under its endorsement policy. It gives Store displays, Order creation, and partner review a verifiable basis.
+`PlanAttested` means this trust registry recognizes this Plan version under its endorsement policy. It gives Store displays, Order creation, and partner review a verifiable basis.
 
 ### 5.4 Create This Concrete Run
 
-An Order is one concrete execution of a Plan. For example, when a Mongolia PV project actually procures a batch of modules and delivers them to site, the registrar creates an Order and records who may submit which signals for this Order.
+An Order is one concrete execution of a Plan. For example, when a Mongolia PV project actually procures a batch of modules and delivers them to site, an authorized registrar mechanism or account records the Order and writes who may submit which signals for this Order.
 
 ```text
 Zhixu DSL: how this class of PV project coordinates
   -> Plan / planHash: stable version and fingerprint of the rule set
-  -> PlanAttested: a trust domain endorses this version
+  -> PlanAttested: a trust registry endorses this version
   -> OrderRegistered: one project starts running under this version
   -> SignalSubmitterAuthorized: who may emit which signal in this Order
 ```
@@ -142,8 +144,30 @@ instruction
 
 A complex production relationship becomes a readable path: who was authorized, what was done, what evidence fingerprint was submitted, who signed, which chain event exists, and why the next step can begin.
 
+One concrete distinction matters:
+
+- Supplier is the capability and trust subject. For example, a customs broker company can be endorsed as a customs Supplier.
+- Executor is the runtime submitter or handler for this Order stage. For example, that broker's operations wallet or API wallet can be authorized to submit the customs-release signal for this Order.
+
+## 7. How a DSL Stage Becomes a Product Task
+
+The DSL and the product UI use different words for the same path:
+
+```text
+Zhixu stage.receiveSignals
+  -> compiled Hook condition
+  -> trigger=true
+  -> HookReady event
+  -> Product task opens
+  -> participant submits evidence fingerprint and signature
+  -> SignalSubmitted
+  -> proof row appears in Product / Store / Order App
+```
+
+This means `HookReady` says "a task is ready to handle." It does not mean the business work is already complete. Completion is proven later by an authorized signal and its evidence fingerprint.
+
 ## Read Next
 
-- [Actor Map](actor-map.md): map real PV-project roles to UVP roles.
-- [Evidence and Proof Path](evidence-proof-path.md): see how business files become hashes, signed signals, chain events, and Product proof rows.
+- [One Order Through UVP Components](order-through-components.md): use the same order to locate Store, compiler, trust registry, state machine, Chain Services, Order App, and executor-kit.
+- [Core Object Overview](../core/README.md): read the protocol objects after the story is clear.
 - [Glossary](../reference/glossary.md): keep Zhixu, Order, Signal, Hook, Trigger, Supplier, and Executor nearby.

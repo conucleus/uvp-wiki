@@ -1,6 +1,6 @@
 # Store Console、Supplier 与 Governance API
 
-Store 相关 API 是凝结核、Store operator、reviewer 和 governance admin 使用的工作台表面。它们组织 Zhixu draft、supplier profile、docking session、review material、attestation request 和 audit trail。凝结核治理秩序内部，trust domain 判定外部背书，Store API 负责平台 workflow。
+Store 相关 API 是凝结核、Store operator、reviewer 和 governance admin 使用的工作台表面。它们组织 Zhixu draft、supplier profile、docking session、review material、attestation request 和 audit trail。凝结核治理秩序内部，trust registry 判定外部背书，Store API 负责平台 workflow。
 
 ## 代码入口
 

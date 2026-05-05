@@ -10,7 +10,7 @@
 Zhixu DSL
   -> nucleation id and design boundary
   -> deterministic HookPlan / OnchainHookPlan artifacts
-  -> trust domain plan attestation
+  -> trust registry plan attestation
   -> UVPStateMachine plan/order registration
   -> order-level signal authorization
   -> wallet-bound signal submission
@@ -18,12 +18,12 @@ Zhixu DSL
   -> replayable Product projection
 ```
 
-## 先读这些
+## 阅读路径
 
 | 页面 | 作用 |
 | --- | --- |
 | [核心概念](../concepts/overview.md) | 系统词表和最短协议路径。 |
-| [Zhixu DSL](../concepts/core/zhixu.md) | 静态秩序定义和可编译字段。 |
+| [Zhixu DSL](../concepts/core/zhixu.md) | 可复用协作规则书和可编译字段。 |
 | [Nucleation / 凝结核](../concepts/core/nucleation.md) | Zhixu 的发起核、设计者和秩序组织者。 |
 | [Plan](../concepts/core/plan.md) | 静态、可认证、可注册的编译产物。 |
 | [Order](../concepts/core/order.md) | 某个 Plan 的动态运行实例和可重放事件流。 |

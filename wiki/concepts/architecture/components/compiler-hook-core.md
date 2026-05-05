@@ -20,7 +20,6 @@ Hook Core 的输出仍然是平台中立语义，不含 Solidity ABI。
 
 - 加载 YAML/JSON Zhixu。
 - 校验 stage、trigger、receiveSignals、selectedStages、executor reachability。
-- 生成 `HookPlanArtifact`。
 - 生成 `OnchainHookPlanArtifact`。
 - 生成 Solidity `registerPlan` 参数。
 - 计算 `planId`、`planHash`、hook/stage/source/signal/dependency/route id。
@@ -31,4 +30,4 @@ Compiler 的输出是确定性的计划产物和注册参数。订单参与者�
 
 ## 为什么它是架构核心
 
-如果 compiler 不确定，后面所有 trust attestation 都失去意义。Trust domain 背书的是 plan hash；合约注册的是 compact hooks；Product DTO 显示的是 Plan 对应的任务。任何一个哈希或 schema 不可复现，整条链路就不可审计。
+如果 compiler 不确定，后面所有 trust attestation 都失去意义。Trust registry 背书的是 plan hash；合约注册的是 compact hooks；Product DTO 显示的是 Plan 对应的任务。任何一个哈希或 schema 不可复现，整条链路就不可审计。

@@ -6,7 +6,7 @@ Executor 要和 Supplier 分开：
 
 | 对象 | 解决的问题 | 典型权威 |
 | --- | --- | --- |
-| Supplier | 谁具备某类现实履约能力，是否被 trust domain 背书。 | Store metadata + `ZhixuTrustRegistry` supplier attestation。 |
+| Supplier | 谁具备某类现实履约能力，是否被 trust registry 背书。 | Store metadata + `ZhixuTrustRegistry` supplier attestation。 |
 | Executor | 当前订单、当前阶段实际由谁执行或提交 signal。 | `UVPStateMachine` order authorization、stage executor overlay、EIP-712 签名。 |
 
 Supplier 是能力主体和 trust subject；Executor 是运行时绑定和 signal submitter。一个 Supplier 可以派出多个 executor 钱包；一个 Executor 也可能代表一个 supplier、一个 adapter，或一条可独立运行的 Zhixu。
@@ -18,7 +18,7 @@ Executor 的生效路径通常是：
 ```text
 Supplier 在秩序商店注册
   -> Store 维护 capability tags、联系方式、履约记录和 trust projection
-  -> Trust domain 对 supplier subject 做 attestation/revocation
+  -> Trust registry 对 supplier subject 做 attestation/revocation
   -> Zhixu stage 声明需要某类 executor 或 supplier
   -> Order 注册时写入 order-level signal authorization
   -> Control stage 可通过 executor patch 指定 active executor
@@ -110,7 +110,7 @@ local order 某个 trigger hook Ready
 
 这里可以出现两个编号体系：
 
-- 链上 local `orderId` 和 linked `orderId` 由各自的 `registerOrder()` 产生或绑定。
+- 链上 local `orderId` 和 linked `orderId` 由各自的 trigger order 入口创建。
 - Product task、Store docking session、adapter job 可以有自己的执行编号；运行态 proof 仍回到链上 order/signal/docking events。
 
 ## signalMap 的协议含义

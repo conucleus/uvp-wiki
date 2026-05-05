@@ -7,10 +7,9 @@
 ```text
 Zhixu YAML/JSON
   -> hook-core parses receiveSignals
-  -> compiler builds HookPlanArtifact
   -> compiler builds OnchainHookPlanArtifact
   -> compiler emits Solidity registerPlan args
-  -> trust domain attests planId / planHash
+  -> trust registry attests planId / planHash
 ```
 
 ## 组件职责
@@ -18,15 +17,15 @@ Zhixu YAML/JSON
 | 组件 | 负责什么 | 相邻边界 |
 | --- | --- | --- |
 | hook-core | `source::condition` 解析、AST、dependency extraction、正向锚点规则。 | Solidity ABI、钱包授权、Product task 语言由后续层处理。 |
-| compiler | 秩序 input schema、HookPlan、OnchainHookPlan、registerPlan args、canonical hash。 | 订单参与者选择、Supplier trust 判断、linked order 注册、支付/escrow 逻辑由产品、registry 或 periphery 处理。 |
+| compiler | 秩序 input schema、OnchainHookPlan、registerPlan args、canonical hash；HookPlan 仅为内部 IR。 | 订单参与者选择、Supplier trust 判断、linked order 注册、支付/escrow 逻辑由产品、registry 或 periphery 处理。 |
 | artifact/hash | `planId`、`planHash`、`hookId`、`sourceId`、`signalId`、`signalKey` 的稳定边界。 | Store draft 状态和 Product DB primary key 属于读模型。 |
 
-## 先读这些
+## 阅读路径
 
 | 页面 | 作用 |
 | --- | --- |
 | [Hook Core 与 Compiler](../concepts/architecture/components/compiler-hook-core.md) | hook-core 和 compiler 的职责边界。 |
-| [产物与哈希](../concepts/artifacts-and-hashes.md) | HookPlanArtifact、OnchainHookPlanArtifact 和 public hash boundary。 |
+| [产物与哈希](../concepts/artifacts-and-hashes.md) | OnchainHookPlanArtifact、registerPlan args 和 public hash boundary。 |
 | [编译输入](../concepts/artifacts/compiler-input.md) | 哪些 Zhixu 字段进入 deterministic artifact。 |
 | [Canonical Hash](../concepts/artifacts/canonical-hashes.md) | planId、planHash、hookId、signalKey 等稳定 ID。 |
 | [链上注册参数](../concepts/artifacts/solidity-registration.md) | compact hooks、dependency index、selector bindings 如何进入 `registerPlan`。 |

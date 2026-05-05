@@ -17,8 +17,7 @@ Periphery 可以消费 `UVPStateMachine`、`ZhixuTrustRegistry`、Product DTO �
 ## 场景适配原则
 
 Periphery 场景可以展示资金、担保、清关、物流、AI/MCP 或企业系统如何
-作为 executor、supplier 或 adapter 接入 UVP。场景材料不能把行业 demo 写成
-核心协议事实，也不能把支付、物流或企业系统状态纳入 core state machine。
+作为 executor、supplier 或 adapter 接入 UVP。行业 demo 不能成为核心协议事实，支付、物流或企业系统状态也不能纳入 core state machine。
 
 ## Deploy
 

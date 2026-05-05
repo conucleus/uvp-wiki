@@ -3,7 +3,7 @@
 This tutorial verifies the smallest on-chain semantic loop:
 
 ```text
-Zhixu -> HookPlan -> OnchainHookPlan -> registerPlan/registerOrder
+Zhixu -> HookPlan -> OnchainHookPlan -> registerPlan/triggerOrderFromOutsideFor
   -> submitSignal/pokeTimer -> HookReady/HookStatusChanged
   -> statemachine chain replay oracle
 ```
@@ -25,8 +25,8 @@ The script will:
 1. Start or connect to local Anvil.
 2. Build the workspace and contracts.
 3. Deploy `UVPDeploymentRegistry`, `ZhixuTrustRegistry`, and `UVPStateMachine`.
-4. Compile the UVP update Zhixu YAML, targeting `platform.type=blockchain` and `platform.provider=eth`.
-5. Register the official trust domain.
+4. Compile the UVP update Zhixu YAML, targeting `platform.type=blockchain`, `platform.provider=eth`, and `platform.network=base`.
+5. Deploy the configured trust registry and attest the plan with the registry owner.
 6. Attest the current plan.
 7. Allowlist the plan publisher and order registrar.
 8. Register the plan and order, and write signal submitter authorizations.

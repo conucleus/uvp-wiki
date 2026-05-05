@@ -5,7 +5,6 @@
 ```mermaid
 flowchart TD
   Z["Zhixu definition"] --> C["compiler"]
-  C --> HP["HookPlanArtifact"]
   C --> OHP["OnchainHookPlanArtifact"]
   OHP --> SM["UVPStateMachine"]
   TR["ZhixuTrustRegistry"] --> SM
@@ -47,7 +46,7 @@ flowchart TD
 ```text
 DSL and semantic layer: hook-core / compiler / statemachine reference
 On-chain fact layer: UVPStateMachine / ZhixuTrustRegistry / UVPDeploymentRegistry
-Non-trusted execution layer: chain-services indexer / relayer / proof verifier / Product BFF
+Rebuildable service layer: chain-services indexer / relayer / proof verifier / Product BFF
 Centralized governance product: zhixu-store / Store supplier registry / Store publishing workflow
 Participants and executors: uvp-order-app / uvp-executor-kit
 Periphery adapters: uvp-periphery / funding, guarantee, AI/MCP, demo adapters

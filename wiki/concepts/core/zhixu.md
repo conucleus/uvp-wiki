@@ -1,8 +1,8 @@
 # 秩序 (Zhixu) DSL
 
-`Zhixu` 是“秩序”的拼音。在本仓库里，秩序 (Zhixu) 是凝结核设计出的静态协作定义。它用 DSL 声明一类可复用的生产关系：有哪些任务模式、每个任务有哪些阶段、阶段在哪条 source 因果链上、接收什么 signal、发出什么 signal、默认 supplier 是谁、哪些阶段能为其他阶段选择 executor、需要哪些资源。
+`Zhixu` 是“秩序”的拼音。在本仓库里，秩序 (Zhixu) 是凝结核设计出的可复用协作规则书。它用 DSL 声明一类可复用的生产关系：有哪些任务模式、每个任务有哪些阶段、阶段在哪条 source 因果链上、接收什么 signal、发出什么 signal、默认 supplier 是谁、哪些阶段能为其他阶段选择 executor、需要哪些资源。
 
-代码入口是 `uvp-protocol/packages/compiler/src/types/index.ts` 的 `ZhixuDefinition`。订单 (Order) 是这份静态定义编译、注册之后的一次运行实例。
+代码入口是 `uvp-protocol/packages/compiler/src/types/index.ts` 的 `ZhixuDefinition`。订单 (Order) 是这份规则书编译、注册之后的一次运行实例。
 
 ## 最小骨架
 
@@ -18,6 +18,7 @@ spec:
   platform:
     type: blockchain
     provider: eth
+    network: base
     version: 0.1.3
   nucleation:
     id: procurement-nucleus
@@ -26,7 +27,7 @@ spec:
       stages:
         - name: supplier_sourcing
           source: supply
-          trigger: [SCOPE_READY]
+          trigger: ["SCOPE_READY"]
           receiveSignals:
             SCOPE_READY: solution::master.technical_scope.cmp
           sendSignals: [str, cmp, err]
@@ -47,12 +48,12 @@ spec:
 | 字段 | 解释 |
 | --- | --- |
 | `apiVersion` | DSL 版本，目前是 `uvp/v0`。 |
-| `kind` | 对秩序定义来说是 `Zhixu`；supplier 身份和能力声明使用 `SupplierDefinition`。 |
+| `kind` | 对协作规则书来说是 `Zhixu`；supplier 身份和能力声明使用 `SupplierDefinition`。 |
 | `metadata.name` | 可读名称，也会参与计划身份。 |
 | `metadata.uid` | 稳定 Zhixu ID。没有时会回退到名称。 |
 | `metadata.labels` | 业务分类、行业、demo 标签。链上权限由 order authorization 和 overlay 决定。 |
 | `metadata.annotations.version` | 计划版本。版本变化会进入 `planId`。 |
-| `spec.platform` | 目标平台。EVM track 使用 `type=blockchain`、`provider=eth`。 |
+| `spec.platform` | 目标平台。EVM track 使用 `type=blockchain`、`provider=eth`，可显式写 `network=base`。不写 `network` 时保持当前主网默认路径。 |
 | `spec.nucleation.id` | 秩序的发起核、设计者或组织域标识。详见 [Nucleation / 凝结核](nucleation.md)。 |
 | `spec.taskPatterns` | 任务模式列表，里面包含 stages。 |
 
@@ -132,7 +133,7 @@ fileResources:
 | 概念 | 静态/动态 | 解释 |
 | --- | --- | --- |
 | Nucleation / 凝结核 | 组织主体 | 发起、设计和维护 Zhixu 的秩序组织者。 |
-| 秩序 (Zhixu) | 静态 DSL | 可复用的秩序定义。 |
+| 秩序 (Zhixu) | 静态 DSL | 可复用协作规则书。 |
 | Plan | 链目标产物 | 某个 Zhixu 针对 EVM 编译出的 artifact、hash 和注册参数。 |
 | Order | 动态实例 | 某个 Plan 的一次运行，包含 signal、hook runtime、stage overlay 和 proof。 |
 

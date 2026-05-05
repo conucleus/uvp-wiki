@@ -12,7 +12,6 @@ Store 或开发者准备 Zhixu 定义。定义里描述 task pattern、stage、e
 
 | 产物 | 用途 |
 | --- | --- |
-| `HookPlanArtifact` | 给审计、Store、测试和人类阅读。 |
 | `OnchainHookPlanArtifact` | 给 EVM 注册和哈希认证。 |
 | `registerPlan` args | 给 `UVPStateMachine.registerPlan()`。 |
 
@@ -20,10 +19,10 @@ Store 或开发者准备 Zhixu 定义。定义里描述 task pattern、stage、e
 
 ## 3. 认证计划
 
-官方 trust domain 的 owner 在 `ZhixuTrustRegistry` 里认证：
+官方 trust registry 的 owner 在 `ZhixuTrustRegistry` 里认证：
 
 ```text
-domainId + planId + planHash
+registryAddress + planId + planHash
 ```
 
 如果计划没有被认证，或者已经被撤销，`UVPStateMachine` 不应接受它作为有效计划。
@@ -32,9 +31,9 @@ domainId + planId + planHash
 
 授权 publisher 调用 `registerPlan()`。合约保存紧凑 hook、依赖索引和 selector binding，并发出 `PlanRegistered`。
 
-## 5. 注册订单和授权
+## 5. Trigger 创建订单和授权
 
-授权 registrar 调用 `registerOrder()`，绑定某个 `planId`，同时写入订单级 signal 授权。每条授权说明某个 submitter 可以为该订单提交哪个 source/signal。
+授权 registrar/relayer 广播 `triggerOrderFromOutsideFor` 或 `triggerOrderFromSignalFor`。业务 submitter 必须签 trigger typed data；合约在同一笔交易里绑定 `planId`、写入订单级 signal 授权、记录 trigger fact，并 materialize ready 的 trigger stage。每条授权说明某个 submitter 可以为该订单提交哪个 source/signal。
 
 ## 6. 提交业务动作
 

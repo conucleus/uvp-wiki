@@ -1,41 +1,53 @@
-# 服务与接口
+# Protocol Bindings 与公共接口
 
-服务与接口组件回答“公开接口长什么样、谁消费谁”。真正承载 indexer、relayer、proof、Product/Store API runtime 的链下软件归到平级页面 [可重建服务层：Chain Services](chain-services.md)；本页只保留接口关系和 drift 边界。
+Protocol Bindings 是 UVP 代码链路中独立的一层。它把合约 ABI、EIP-712 typed data、calldata helpers、hash helpers 和 resource manifest helpers 固定成可复用接口，让 Chain Services、Order App、executor-kit、deploy scripts 和前端调试工具不需要各自手写协议细节。
 
-## 组件链路
+UVP 的实现可以拆成多个包、服务和前端，但它们必须共享同一组公共接口。公共接口一旦漂移，Store 看到的 Plan、合约接受的 typed data、Order App 准备的 signal、executor-kit 提交的 payload 和 Chain Services 投影出的 proof 就会变成不同事实。
+
+接口地图说明哪些接口需要稳定、由谁生成、谁消费。
+
+## 接口地图
 
 ```text
-ABI / EIP-712 / calldata helpers
-  -> rebuildable Chain Services projection
-  -> Product DTO / Product API
-  -> Store / Order App / executor-kit / adapters
+compiler artifacts / canonical hashes
+  -> protocol-bindings ABI and typed-data helpers
+  -> contracts and registry events
+  -> Chain Services projections and HTTP APIs
+  -> Product DTO
+  -> Store / Order App / executor-kit
 ```
 
-## 组件职责
+| 接口 | 主要代码入口 | 消费方 | 稳定性要求 |
+| --- | --- | --- | --- |
+| ABI 与事件 | `uvp-protocol/contracts/uvp-contracts/src/`、`uvp-protocol/packages/protocol-bindings/src/` | Chain Services、executor-kit、deploy scripts、前端调试工具。 | 事件名、字段、indexed 语义和合约地址上下文不能随意变。 |
+| EIP-712 typed data | `uvp-protocol/packages/protocol-bindings/src/`、`uvp-chain-services/service/src/submissions/`、`src/stage-patches/` | Order App、executor-kit、relayer、contracts。 | domain、type name、message 字段、deadline、nonce 和 signer recovery 必须一致。 |
+| Canonical hash | `uvp-protocol/packages/compiler/src/canonical.ts`、`hash.ts` | compiler、trust registry workflow、Store compile preview、release checks。 | 同一份 Zhixu/manifest 在同一版本下必须得到同一 hash。 |
+| Product DTO | `uvp-protocol/packages/product-dto/src/` | Chain Services、zhixu-store、uvp-order-app、executor-kit Product API mode。 | 普通用户语言稳定，低层 sourceId/signalId/ABI 细节不泄漏到普通界面。 |
+| Product / Store HTTP API | `uvp-chain-services/service/src/api/routes/` | Store、Order App、executor-kit、operator scripts。 | Route、错误码、proof rows、readiness 和 authz 语义需要和 DTO 同步。 |
+| CLI 与运行配置 | `uvp-executor-kit/package/src/cli.ts`、`uvp-deploy/deploy/scripts/`、`uvp-chain-services/service/src/config/` | executor、release owner、staging operator。 | 私钥只从显式 env 读取；staging/profile 配置必须 fail closed。 |
 
-| 组件 | 拥有的接口 | 职责边界 |
-| --- | --- | --- |
-| protocol-bindings | ABI、typed data、hash helpers、calldata helpers、ResourceManifest/StagePatch helpers。 | 网络请求、私钥、数据库、业务授权决策。 |
-| 可重建服务层 / chain-services | Product API、Store API、submission API、evidence/proof API、notification ops、runtime diagnostics。 | 事实源来自链事件，业务签名来自参与方。 |
-| product-dto | ordinary user language 的 order/task/proof/trust DTO。 | HookPlan 原文、低层 sourceId/signalId、gas/ABI 细节。 |
-| Store API | nucleation workspace、draft、review、supplier metadata、contact、audit、governance workflow。 | trust attestation、凝结核内部治理和业务完成分别由 registry、凝结核、state-machine proof 表达。 |
-| Executor Kit | signal producer CLI/SDK/MCP。 | 授权创建、默认私钥托管和业务签名分别由 Product/registrar、密钥系统和业务方钱包处理。 |
+## Protocol Bindings 的位置
 
-## 先读这些
+`@uvp-eth/protocol-bindings` 是浏览器安全的协议绑定包。它提供 ABI 常量、typed-data builders、calldata builders、地址/bytes32 校验、stage patch helpers 和 resource manifest hash helpers。
 
-| 页面 | 作用 |
+它不读环境变量，不保存私钥，不提交交易，也不做业务授权判断。Order App、executor-kit、Chain Services 和 deploy scripts 可以复用它来避免各自手写 ABI、typed data 或 calldata。
+
+## 代码入口
+
+| 文件 | 说明 |
 | --- | --- |
-| [公共接口](../reference/public-interfaces.md) | ABI、event、EIP-712、canonical hash、DTO、API、release evidence 的 drift checklist。 |
-| [可重建服务层：Chain Services](chain-services.md) | `uvp-chain-services/service` 的 indexer、relayer、proof verifier、Product API、Store API 和 runtime profile 总览。 |
-| [Product BFF](../concepts/architecture/components/chain-services-bff.md) | order draft、invite、participant confirmation、authorization 和 registration workflow。 |
-| [Product DTO](../concepts/product/dto.md) | 普通用户可读的 order/task/proof/trust DTO。 |
-| [Product API](../reference/product-api.md) | Product 和 Store route 参考。 |
-| [CLI 与配置](../reference/cli-and-config.md) | executor-kit、chain-services、frontend config 和 root scripts。 |
+| `uvp-protocol/packages/protocol-bindings/src/evm.ts` | EVM ABI、typed data、calldata 和 hash helpers。 |
+| `uvp-protocol/packages/protocol-bindings/src/index.ts` | 对外导出边界。 |
+| `uvp-protocol/packages/protocol-bindings/src/unsupported-chain-target.ts` | 非当前支持链目标的 fail-closed helper。 |
+| `uvp-protocol/packages/protocol-bindings/test/` | 绑定层的消费者兼容测试。 |
 
-## 服务边界
+## Drift 检查
 
-- Protocol bindings 只提供 browser-safe ABI、typed data、calldata、hash helpers，不读 env、不持有私钥、不提交交易。
-- Chain Services 可以索引、投影、验证、转发和记录 workflow 状态，但数据库必须可重建。
-- Product API 可以 prepare typed data、验证 participant signature、调用 relayer、返回 proof；order-level authorization 仍由合约检查。
-- Store API 可以管理 nucleation workspace、drafts、supplier metadata、audit 和 review；metadata 写成 workflow/material，trust truth 看 registry projection，内部秩序治理归凝结核。
-- Docking、contact、notification、resource availability 都是 workflow/projection；任何 public claim 必须回到 registry/state-machine events。
+改这些内容时，需要同时检查消费者：
+
+- 改合约 ABI、event 或 EIP-712 domain：同步 protocol-bindings、Chain Services、executor-kit、deploy scripts 和合约/接口 reference。
+- 改 compiler artifact 或 canonical hash：同步 compiler fixtures、trust registry attestation path、Store compile preview 和 release gate。
+- 改 Product DTO 或 Product API：同步 Chain Services route、Store、Order App、executor-kit Product API mode 和浏览器/API 测试。
+- 改 stage executor/resource patch：同步 contracts、protocol-bindings、Chain Services stage-patches、Product task action 和 Order App/Executor Kit 消费。
+
+公共接口的目标不是让所有代码在一个包里，而是让每个包围绕同一份链上事实、同一份签名语义和同一份产品 DTO 工作。

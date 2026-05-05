@@ -15,7 +15,7 @@
 
 | Layer | Problem It Solves |
 | --- | --- |
-| Trust domain | Whether a plan or supplier is endorsed by some trust domain. |
+| Trust registry | Whether a plan or supplier is endorsed by some trust registry. |
 | Publisher / registrar allowlist | Who can register plans, and who can register orders. |
 | Order-level signal authorization | For a given order, which wallet may submit which source / signal. |
 
@@ -23,7 +23,7 @@ These three layers check different questions: plan attestation solves plan / sup
 
 ## Supplier Trust and Signal Authorization
 
-Supplier trust states that a trust domain endorses a supplier subject. It can affect Store recommendations, Product warnings, admission checks during BFF authorization building, and whether executor-kit fails closed. `submitSignal()` permission still belongs to order-level authorization.
+Supplier trust states that a trust registry endorses a supplier subject. It can affect Store recommendations, Product warnings, admission checks during BFF authorization building, and whether executor-kit fails closed. `submitSignal()` permission still belongs to order-level authorization.
 
 The actual submission permission always lives at the order level:
 

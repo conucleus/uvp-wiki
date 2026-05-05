@@ -1,12 +1,11 @@
 # Plan
 
-Plan 是某个秩序 (Zhixu) 针对某条链编译出来的确定性产物。它把静态秩序定义变成链上可注册、可认证、可求值的 artifact，也就是“这个秩序版本在 EVM 上如何运行”。
+Plan 是某个秩序 (Zhixu) 针对某条链编译出来的确定性产物。它把可复用协作规则书变成链上可注册、可认证、可求值的 artifact，也就是“这个秩序版本在 EVM 上如何运行”。
 
 ## 从 Zhixu 到 Plan
 
 ```text
 秩序 (Zhixu) DSL
-  -> HookPlanArtifact
   -> OnchainHookPlanArtifact
   -> registerPlan args
   -> planId / planHash
@@ -33,11 +32,11 @@ Plan 是某个秩序 (Zhixu) 针对某条链编译出来的确定性产物。它
 - `fileResources` 是句柄和默认说明；业务文件明文留在链下。
 - USDC、escrow、fiat bridge 作为 adapter 或 periphery workflow 消费 Plan/Order signal。
 
-## 注册前要被背书
+## 注册与背书分层
 
-`UVPStateMachine.registerPlan()` 会检查 official trust domain 对 `(planId, planHash)` 的认证。只有当前仍被背书的 plan 才能作为有效计划注册。
+`UVPStateMachine.registerPlan()` 只检查 publisher 权限、plan 非空和未重复。`ZhixuTrustRegistry` 对 `(planId, planHash)` 的背书由 Product/Store 按配置的 registry 地址投影，不是状态机注册前置条件。
 
-这个边界对 Store 很重要：`approved_for_broadcast` 只是 Store workflow 状态；只有被 indexer 观察到的 `PlanAttested` 才能支撑 official trusted plan 的展示。
+这个边界对 Store 很重要：`approved_for_broadcast` 只是 Store workflow 状态；只有被 indexer 观察到的 `PlanAttested` 才能支撑官方产品目录里的 trusted plan 展示。
 
 ## Plan 不应被订单修改
 

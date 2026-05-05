@@ -65,7 +65,7 @@ StageResourcePatch
 
 这意味着资源更新和 executor 更新是两条独立 overlay。资源句柄可以变，但业务状态仍由 `UVPStateMachine` 事件和可重放 projection 决定。
 
-## Store 和 Product 应该怎么展示
+## Store 和 Product 展示边界
 
 Store 可以把资源句柄组织成：
 
@@ -74,7 +74,7 @@ Store 可以把资源句柄组织成：
 - manifest hash、metadata URI、content hash、ciphertext hash；
 - 是否缺资源、资源是否过期、是否需要 operator 审核。
 
-Order App 和 executor-kit 应把它翻译成“需要上传什么证据、hash 是什么、proof 在哪里”。普通参与者不应该看到 bucket secret、storage credential、presigned URL 或内部对象路径。
+Order App 和 executor-kit 把它翻译成“需要上传什么证据、hash 是什么、proof 在哪里”。普通参与者界面不展示 bucket secret、storage credential、presigned URL 或内部对象路径。
 
 ## 不允许的用法
 

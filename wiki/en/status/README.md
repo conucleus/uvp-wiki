@@ -7,7 +7,7 @@ This page is the Wiki status entry point. It only summarizes implementation, tes
 | Area | Status | Plain reading |
 | --- | --- | --- |
 | Core compiler and plan artifacts | verified | Zhixu can compile into deterministic HookPlan and EVM-facing artifacts. |
-| Contracts and event replay | verified | Plans, Orders, signal authorization, signal submission, hook status, timers, and `HookReady` are covered by tests or replay evidence. |
+| Contracts and event replay | verified | Plans, trigger-created Orders, signal authorization, signal submission, hook status, timers, and `HookReady` are covered by tests or replay evidence. |
 | Trust registry | verified | Plan and supplier attestation/revocation are event-backed and projectable. |
 | Product DTO / Chain Services projection | verified | Orders, tasks, proof, and trust views can be rebuilt from chain events. |
 | Store Console | prototype | Key slices exist, but full operator workflow and recovery acceptance are still incomplete. |
@@ -15,7 +15,7 @@ This page is the Wiki status entry point. It only summarizes implementation, tes
 | executor-kit live operator path | prototype | CLI/SDK and Product API signal producer are tested; production token policy and runbooks need more work. |
 | Staging release evidence | partial | Base Sepolia rehearsal evidence exists; production claims need separate release evidence. |
 
-The rest of this page gives engineering and release-evidence detail. New readers should first read [One Order Story](../getting-started/one-order-story.md), [Actor Map](../getting-started/actor-map.md), and [Glossary](../reference/glossary.md).
+The rest of this page gives engineering and release-evidence detail. New readers should first read [One Order Story](../getting-started/one-order-story.md), [One Order Through UVP Components](../getting-started/order-through-components.md), and [Glossary](../reference/glossary.md).
 
 ## Status Labels
 
@@ -31,13 +31,13 @@ Do not describe fixture-only, demo fallback, local-only, simulated adapter, or p
 ## Current Verified Mainline Details
 
 - Hook DSL parse/eval is centralized in `hook-core` and reused by compiler/statemachine.
-- Zhixu can compile into deterministic `HookPlanArtifact` and EVM-facing `OnchainHookPlanArtifact`.
+- Zhixu can compile directly into deterministic EVM-facing `OnchainHookPlanArtifact` and `registerPlan` arguments.
 - `ZhixuTrustRegistry` supports domain, plan attestation, supplier attestation, and revocation projection.
-- `UVPStateMachine` supports publisher/registrar governance, plan/order registration, order-level signal authorization, first-writer-wins signal handling, hook status, timer, and `HookReady`.
+- `UVPStateMachine` supports publisher/registrar governance, plan registration, signed trigger-order creation, order-level signal authorization, first-writer-wins signal handling, hook status, timer, and `HookReady`.
 - chain-services can rebuild Product order/task/proof/trust projections from state-machine, trust-registry, and deployment-registry events.
 - Product DTO translates chain projections into order/task/proof/trust objects that ordinary users can read.
 - Productization-boundary debt has been reduced: DTO/demo fixtures, route trees, frontend entries, Store metadata, and Order App ownership are now separated at the code level.
-- The Product/Store Base Sepolia `0.2` rehearsal has a 2026-05-01 managed Postgres/R2/JWT record.
+- The Product/Store Base Sepolia `0.2` rehearsal is historical evidence from 2026-05-01; current-head release claims need a fresh v0.4 run.
 - After the 2026-05-02 managed-provider quota block, a Base Sepolia Product/Store broadcast rehearsal was completed with local Docker Postgres, and a narrower release-candidate evidence set was retained.
 - Since 2026-05-02, the current head adds a no-spend guard: managed Postgres/R2 require explicit managed-spend consent, non-local Postgres indexer polling must be zero, and CI includes `no-spend-safety`.
 
@@ -49,14 +49,14 @@ Do not describe fixture-only, demo fallback, local-only, simulated adapter, or p
 | `uvp-order-app` | The participant app is independent and has onboarding, task inbox, evidence/proof, and a readiness gate, but it has not yet been fully proven by the same live Base Sepolia Product API task flow. |
 | executor-kit live operator path | watcher, callback tx helper, Product API signal producer, and thin MCP adapter are tested; production token policy, supplier attestation, and operator runbook are still incomplete. |
 | ops-console | redacted diagnostics and safe action prototypes exist, but the full recovery/action rehearsal is not verified. |
-| runtime-host | off-chain reference harness, not the ETH runtime authority. |
+| chain replay oracle | Offline test tool, not a second ETH runtime. |
 | Store governance broadcaster | env-key governance can be used for staging, but it is not production governance. |
 
 ## P0 / PRD100-106 Release Detail
 
 | PRD | Current status |
 | --- | --- |
-| PRD100 protocol 0.2 freeze | `pnpm verify:protocol-freeze` covers StateMachine, TrustRegistry, DeploymentRegistry, and the active Base Sepolia EIP-712 `0.2` domain fixture. |
+| PRD100 protocol 0.2 freeze | Superseded; current `pnpm verify:protocol-freeze` verifies the v0.4 StateMachine, TrustRegistry, DeploymentRegistry, and EIP-712 domain fixture. Historical Base Sepolia `0.2` is audit evidence only. |
 | PRD101 release evidence pack | evidence infra exists, with redacted cost-guard fields added; Order App real staging, Phase 2 full E2E, and human acceptance are still open. |
 | PRD102 Product API staging source | staging rehearsal manifest alias and supplier-trust readiness are supported; any new release claim still needs a guarded fresh run. |
 | PRD103 Store publishing loop | the draft-import to active/order-creatable catalog path has a UI loop; guarded managed staging Postgres is still the proof blocker. |

@@ -1,6 +1,6 @@
 # Core Concepts
 
-The core of `uvp-eth` is a state machine protocol that brings Zhixu coordination definitions onto the EVM chain. Contracts and chain events are the source of truth; services, Store, Order App, and executor-kit compile, index, display, sign, and submit around that source of truth.
+The core of `uvp-eth` is a state machine protocol that brings Zhixu coordination rulebooks onto the EVM chain. Contracts and chain events are the source of truth; services, Store, Order App, and executor-kit compile, index, display, sign, and submit around that source of truth.
 
 The shortest path is:
 
@@ -19,7 +19,7 @@ Zhixu definition
 
 ## Reading Order
 
-Start with these foundational terms. Zhixu is the static definition, Order is the runtime instance, and the other objects serve compilation, authorization, endorsement, execution, and display:
+Start with these foundational terms. Zhixu is the reusable rulebook, Order is the runtime instance, and the other objects serve compilation, authorization, endorsement, execution, and display:
 
 | Subpage | Description |
 | --- | --- |
@@ -42,7 +42,7 @@ Read the sibling chapters below as well:
 | [Architecture](architecture.md) | Module boundaries, dependency direction, source of truth, and data flow. |
 | [State Machine](state-machine.md) | How the contract stores signals, evaluates hooks, handles timers, and applies stage overlays; this belongs to the core component flow. |
 | [Artifacts and Hashes](artifacts-and-hashes.md) | Compiler artifacts, canonical hashes, stable IDs, and registration parameters. |
-| [Trust and Authorization](trust-and-authorization.md) | Trust domains, plan attestation, order-level signal authorization, EIP-712, and relayer boundaries. |
+| [Trust and Authorization](trust-and-authorization.md) | Trust registrys, plan attestation, order-level signal authorization, EIP-712, and relayer boundaries. |
 | [Product Surfaces](product-surfaces.md) | How chain-services project chain events into orders, tasks, and proofs that ordinary users can read. |
 | [Store](../store/README.md) | How Store gives Nucleation a workbench and organizes Zhixu/Supplier, trust checks, contact notifications, fulfillment records, and platform workflow. |
 | [Executors and Integrations](../execution/README.md) | Executor Kit, docked Zhixu, Order App, adapters, and MCP/AI execution entry points. |
@@ -54,6 +54,6 @@ Read the sibling chapters below as well:
 - A relayer may sponsor or forward transactions, but it cannot generate business signatures on behalf of participants.
 - Store, Order App, and Product API organize user language and metadata; submissions still go through on-chain authorization.
 - Store is a first-class trust/workflow system and is described separately from the ordinary product surfaces.
-- Store admin owns platform workflow; Nucleation owns internal Zhixu design; trust domains own external endorsement.
+- Store admin owns platform workflow; Nucleation owns internal Zhixu design; trust registries own external endorsement.
 - Executor Kit is the executor integration surface and works around the state machine and Product API.
 - USDC, escrow, guarantee, and AI agents belong to adapters or periphery, and they consume signals/proofs around the core interface.

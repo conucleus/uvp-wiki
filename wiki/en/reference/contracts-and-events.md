@@ -6,11 +6,30 @@ Contract source lives in `uvp-protocol/contracts/uvp-contracts/`.
 
 | Contract | Purpose |
 | --- | --- |
-| `ZhixuTrustRegistry` | trust domain, plan attestation, supplier attestation, revocation. |
+| `ZhixuTrustRegistry` | trust registry, plan attestation, supplier attestation, revocation. |
 | `UVPStateMachine` | plan/order/signal/hook/timer/stage overlay runtime. |
 | `UVPDeploymentRegistry` | versioned state-machine deployment cutover ledger. |
 | `ECDSA` | minimal signature recovery helper. |
 | `UVPSignatures` | shared signature structs for relayed state-machine signal submission. |
+
+## Reading Layers
+
+First read the state machine through the basic layer:
+
+- Plan: the compiled and attested version of a Zhixu rulebook.
+- Order: one concrete run against a specific Plan hash.
+- Signal: a signed business statement from an authorized wallet.
+- `HookReady`: the event that opens the next task.
+
+The advanced core layer adds executor overlay, resource overlay, and docked
+order composition:
+
+- `StageExecutorPatch` changes who may execute a target stage.
+- `StageResourcePatch` publishes resource manifest and policy hashes.
+- `DockedOrder` links a local order to another order and maps docked signals.
+
+These advanced surfaces are supported core protocol features, but they should
+not be the first concepts shown to ordinary Product users.
 
 ## Public Interface
 
@@ -19,7 +38,7 @@ Contract source lives in `uvp-protocol/contracts/uvp-contracts/`.
 - constructor args;
 - publisher/registrar governance;
 - `registerPlan`;
-- authorization-bearing `registerOrder` overloads;
+- signed `triggerOrderFromOutsideFor` / `triggerOrderFromSignalFor`;
 - `submitSignal`;
 - `submitSignalFor`;
 - `linkDockedOrder` / `linkDockedOrderFor`;
@@ -40,9 +59,9 @@ Any change here must update fixtures and be reviewed for adapter impact.
 Indexer and replay tooling should treat these event names as public interface:
 
 ```text
-DomainRegistered
-DomainUpdated
-DomainOwnerTransferred
+OwnershipTransferred
+OwnershipTransferred
+OwnershipTransferred
 PlanAttested
 PlanRevoked
 SupplierAttested
@@ -55,6 +74,8 @@ OrderRegistrarRecorded
 SignalSubmitterAuthorized
 PlanRegistered
 OrderRegistered
+OrderTriggered
+OrderLinked
 SignalSubmitted
 DockedOrderLinked
 DockedSignalMapped
@@ -78,7 +99,13 @@ From the repository root:
 
 ```bash
 pnpm verify:protocol-freeze
+pnpm verify:product-signal-map
 ```
+
+`verify:protocol-freeze` freezes ABI, events, hashes, and EIP-712 typed data.
+`verify:product-signal-map` blocks release when Product Schema permission rows,
+compiler signal ids, UI actions, Product BFF authorizations, and trigger-order
+authorization hashes disagree.
 
 From the contracts directory:
 

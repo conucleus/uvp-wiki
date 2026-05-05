@@ -2,21 +2,24 @@
 
 Order 是“订单”。在协议里，它是某个 Plan 的一次动态运行实例。它记录这个订单里哪些 signal 被接受、哪些 hook ready 或 cancelled、哪些 executor/resource overlay 被应用，以及这些事实对应的链上 proof。
 
-## Order 注册
+## Order 创建
 
-订单注册绑定一个已注册 Plan：
+订单通过 trigger order 入口绑定一个已注册 Plan：
 
 ```text
-registerOrder(orderId, planId, creator, authorizations)
+triggerOrderFromOutsideFor(trigger, authorizations, signature)
+triggerOrderFromSignalFor(trigger, authorizations, signature)
 ```
 
-注册时合约会：
+创建时合约会：
 
-- 检查 registrar 是否被允许。
+- 检查 registrar 交易发送者是否被允许。
+- 校验 trigger typed data 签名并恢复业务 submitter。
 - 检查 plan 是否存在且仍被官方域认可。
-- 初始化每个 hook 的 runtime。
 - 写入订单级 signal 授权。
-- 发出 `OrderRegistered` 和 `SignalSubmitterAuthorized`。
+- 记录 trigger fact 或 parent link。
+- materialize ready 的 trigger stage。
+- 发出 `OrderRegistered`、`OrderTriggered`、`OrderMaterialized`、`StageMaterialized` 和 `SignalSubmitterAuthorized`。
 
 ## Order 里的动态状态
 

@@ -7,10 +7,9 @@ The semantics and compiler components turn a Zhixu definition into a reproducibl
 ```text
 Zhixu YAML/JSON
   -> hook-core parses receiveSignals
-  -> compiler builds HookPlanArtifact
   -> compiler builds OnchainHookPlanArtifact
   -> compiler emits Solidity registerPlan args
-  -> trust domain attests planId / planHash
+  -> trust registry attests planId / planHash
 ```
 
 ## Component Responsibilities
@@ -18,15 +17,15 @@ Zhixu YAML/JSON
 | Component | What it owns | Adjacent boundary |
 | --- | --- | --- |
 | hook-core | `source::condition` parsing, AST, dependency extraction, positive anchor rules. | Solidity ABI, wallet authorization, and Product task language are handled by later layers. |
-| compiler | Zhixu input schema, HookPlan, OnchainHookPlan, registerPlan args, canonical hash. | Order participant selection, supplier trust judgment, linked order registration, and payment/escrow logic are handled by product, registry, or periphery. |
+| compiler | Zhixu input schema, OnchainHookPlan, registerPlan args, canonical hash; HookPlan is internal IR only. | Order participant selection, supplier trust judgment, linked order registration, and payment/escrow logic are handled by product, registry, or periphery. |
 | artifact/hash | stable boundaries for `planId`, `planHash`, `hookId`, `sourceId`, `signalId`, and `signalKey`. | Store draft state and Product DB primary keys belong to the read model. |
 
-## Read These First
+## Reading Path
 
 | Page | Purpose |
 | --- | --- |
 | [Hook Core and Compiler](../concepts/architecture/components/compiler-hook-core.md) | boundary between hook-core and compiler responsibilities. |
-| [Artifacts and Hashes](../concepts/artifacts-and-hashes.md) | HookPlanArtifact, OnchainHookPlanArtifact, and public hash boundaries. |
+| [Artifacts and Hashes](../concepts/artifacts-and-hashes.md) | OnchainHookPlanArtifact, registerPlan args, and public hash boundaries. |
 | [Compiler Input](../concepts/artifacts/compiler-input.md) | which Zhixu fields are included in the deterministic artifact. |
 | [Canonical Hash](../concepts/artifacts/canonical-hashes.md) | stable IDs such as planId, planHash, hookId, and signalKey. |
 | [Solidity Registration Arguments](../concepts/artifacts/solidity-registration.md) | how compact hooks, dependency indexes, and selector bindings enter `registerPlan`. |

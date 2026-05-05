@@ -36,4 +36,4 @@
 
 ## Source Zhixu 也参与哈希
 
-`HookPlanArtifact` 的 `planHash` 包含 canonicalized source Zhixu。也就是说，影响协议语义的源定义变化会改变计划哈希。编译产物不是手写 JSON，应由脚本从源定义可重复生成。
+`OnchainHookPlanArtifact` 的 `planHash` 包含 canonicalized source Zhixu。也就是说，影响协议语义的源定义变化会改变计划哈希。编译产物不是手写 JSON，应由脚本从源定义可重复生成。

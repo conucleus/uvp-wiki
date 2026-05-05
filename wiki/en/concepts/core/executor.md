@@ -6,7 +6,7 @@ Executor must be separated from Supplier:
 
 | Object | Problem it solves | Typical authority |
 | --- | --- | --- |
-| Supplier | Who has a certain real-world fulfillment capability, and whether that subject is endorsed by a trust domain. | Store metadata + `ZhixuTrustRegistry` supplier attestation. |
+| Supplier | Who has a certain real-world fulfillment capability, and whether that subject is endorsed by a trust registry. | Store metadata + `ZhixuTrustRegistry` supplier attestation. |
 | Executor | Who is actually executing or submitting the signal for the current Order and current stage. | `UVPStateMachine` order authorization, stage executor overlay, EIP-712 signature. |
 
 Supplier is the capability subject and trust subject; Executor is the runtime binding and signal submitter. One Supplier can send out multiple executor wallets, and one Executor can also represent a Supplier, an adapter, or a Zhixu that runs independently.
@@ -18,7 +18,7 @@ The usual path for an Executor to take effect is:
 ```text
 Supplier registers in the Store
   -> Store maintains capability tags, contacts, fulfillment records, and trust projection
-  -> Trust domain attests/revokes the supplier subject
+  -> Trust registry attests/revokes the supplier subject
   -> Zhixu stage declares the required executor or Supplier type
   -> Order registration writes order-level signal authorization
   -> Control stage may specify an active executor through executor patch
@@ -110,7 +110,7 @@ some trigger hook in the local Order becomes Ready
 
 Two numbering systems may appear here:
 
-- On chain, the local `orderId` and linked `orderId` are created or bound by their respective `registerOrder()`.
+- On chain, the local `orderId` and linked `orderId` are created by their respective trigger-order entrypoints.
 - Product task IDs, Store docking sessions, and adapter jobs may have their own execution numbers; runtime proof still returns to on-chain order/signal/docking events.
 
 ## Protocol Meaning of `signalMap`

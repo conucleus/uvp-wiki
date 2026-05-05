@@ -20,7 +20,7 @@
 
 Trust registry 负责：
 
-- 注册 trust domain。
+- 注册 trust registry。
 - 认证或撤销 plan。
 - 认证或撤销 supplier。
 - 为 Product projection 提供 trust proof。

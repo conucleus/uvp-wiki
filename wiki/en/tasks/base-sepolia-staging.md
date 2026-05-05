@@ -19,7 +19,7 @@ Rules:
 - Do not paste private key values into logs, docs, issues, PRs, or chat.
 - `BASE_SEPOLIA_RPC_URL`, `UVP_STAGING_RPC_URL`, and `UVP_RPC_URL` should default to `https://sepolia.base.org` unless a faster RPC has been verified.
 - The Base Sepolia chain id is `84532`, not Ethereum Sepolia’s `11155111`.
-- Staging uses the current `UVPStateMachine` EIP-712 domain version `0.2`.
+- Current-head staging should use `UVPStateMachine` EIP-712 domain version `0.4`; historical `0.2` records are audit evidence only.
 
 ## Non-Spend Preflight
 

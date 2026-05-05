@@ -40,8 +40,8 @@ It no longer creates orders directly through bootstrap; instead, it creates them
 2. `POST /product/orders/<draft-id>/invites`
 3. `POST /product/invites/<invite-id>/accept`
 4. `POST /product/order-drafts/<draft-id>/submit`
-5. `GET /product/order-registrations/<registration-id>`
-6. `POST /product/order-registrations/<registration-id>/start`
+5. `GET /product/order-triggers/<registration-id>`
+6. `POST /product/order-triggers/<registration-id>/start`
 7. `POST /product/evidence`
 8. `POST /product/tasks/<task-id>/prepare-submit`
 9. Local Anvil participant key produces an EIP-712 signature

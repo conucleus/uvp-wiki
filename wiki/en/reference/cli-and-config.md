@@ -8,6 +8,7 @@ pnpm test
 pnpm build
 pnpm lint
 pnpm verify:protocol-freeze
+pnpm verify:product-signal-map
 pnpm release:baseline:dry-run
 pnpm staging:preflight
 pnpm staging:rehearsal -- --allow-broadcast

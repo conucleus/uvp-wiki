@@ -1,6 +1,10 @@
-# Services and Interfaces
+# Protocol Bindings and Public Interfaces
 
-The services and interfaces component answers “what do the public interfaces look like, and who consumes what.” The off-chain software that actually carries the indexer, relayer, proof, and Product/Store API runtime is covered by the peer page [Rebuildable Service Layer: Chain Services](chain-services.md); this page only keeps the interface relationships and drift boundaries.
+Protocol Bindings is an independent layer in the UVP code path. It stabilizes contract ABI, EIP-712 typed data, calldata helpers, hash helpers, and resource-manifest helpers into reusable interfaces, so Chain Services, Order App, executor-kit, deploy scripts, and frontend debugging tools do not hand-roll protocol details.
+
+UVP can be split across packages, services, and frontends, but they must share the same public interfaces. If those interfaces drift, the Plan the Store sees, the typed data the contract accepts, the signal the Order App prepares, the payload executor-kit submits, and the proof Chain Services projects stop describing the same fact.
+
+This interface map shows which surfaces need to stay stable, who generates them, and who consumes them.
 
 ## Component Chain
 
@@ -21,7 +25,7 @@ ABI / EIP-712 / calldata helpers
 | Store API | nucleation workspace, drafts, review, supplier metadata, contact, audit, governance workflow. | trust attestation, nucleation-internal governance, and business completion are expressed by registry, nucleation, and state-machine proof respectively. |
 | Executor Kit | signal producer CLI/SDK/MCP. | authorization creation, default private-key custody, and business signatures are handled by Product/registrar, key management, and business-party wallets. |
 
-## Read These First
+## Reading Path
 
 | Page | Purpose |
 | --- | --- |

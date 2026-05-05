@@ -42,7 +42,7 @@ Store 应区分 read、nucleation_operator、operator、reviewer、governance_ad
 | --- | --- |
 | 某个 Store principal 发起、审批或确认了一个 workflow 动作。 | plan 已经 attested。 |
 | 某个 metadata 字段、platform tag 或 contact 被修改。 | supplier 已经 trusted。 |
-| 某个凝结核提交了设计材料或发布材料。 | trust domain 已认可其公平性。 |
+| 某个凝结核提交了设计材料或发布材料。 | trust registry 已认可其公平性。 |
 | 某个 governance request 被创建或广播尝试。 | tx 已经被链接受并 index。 |
 | 某个 docking session 被保存或 review。 | linked order proof 已经映射到 local order。 |
 

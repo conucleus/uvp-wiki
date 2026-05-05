@@ -4,7 +4,7 @@ Supplier is a capability subject. It can be an individual, a company, a customs 
 
 ## Where Supplier Comes From
 
-In the product path, a Supplier is usually first organized by Nucleation into a Zhixu’s supplier network, and then enters the supplier registry in Store. As a platform workbench, Store maintains the supplier profile, platform capability tags, supported roles/stages, wallet, review status, contact information, and metadata. The trust domain then endorses the supplier subject on chain through `ZhixuTrustRegistry.SupplierAttested`.
+In the product path, a Supplier is usually first organized by Nucleation into a Zhixu’s supplier network, and then enters the supplier registry in Store. As a platform workbench, Store maintains the supplier profile, platform capability tags, supported roles/stages, wallet, review status, contact information, and metadata. The trust registry then endorses the supplier subject on chain through `ZhixuTrustRegistry.SupplierAttested`.
 
 The minimal relationship is:
 
@@ -16,7 +16,7 @@ Store supplier metadata
   -> Supplier capability passport
 ```
 
-Tags should be layered: Nucleation can tag a Supplier as a role/stage candidate inside a specific Zhixu; Store can use platform catalog tags for customs / logistics / inspection / payment capabilities; the trust domain can endorse the supplier subject externally. The decentralized part is responsible for storing endorsement events, revocation events, order authorization, and signal proof.
+Tags should be layered: Nucleation can tag a Supplier as a role/stage candidate inside a specific Zhixu; Store can use platform catalog tags for customs / logistics / inspection / payment capabilities; the trust registry can endorse the supplier subject externally. The decentralized part is responsible for storing endorsement events, revocation events, order authorization, and signal proof.
 
 ## SupplierDefinition
 
@@ -33,7 +33,6 @@ spec
   supplierName
   handlerName
   authorityID
-  trustDomain
   capabilityClaims
   attestationRefs
   status
@@ -61,7 +60,7 @@ If the tag comes from Nucleation, it means “this role/stage is suitable in the
 
 ## Supplier Trust
 
-`SupplierAttested` means a trust domain recognizes a particular supplier subject. `SupplierRevoked` means the endorsement has been withdrawn. The Product BFF will reject or warn about revoked supplier wallets when creating future order authorizations.
+`SupplierAttested` means a trust registry recognizes a particular supplier subject. `SupplierRevoked` means the endorsement has been withdrawn. The Product BFF will reject or warn about revoked supplier wallets when creating future order authorizations.
 
 This layer of trust answers “is this subject endorsed by an authority.” Whether the current Order can submit the current signal is solved by order-level authorization.
 

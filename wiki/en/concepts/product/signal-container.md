@@ -1,6 +1,6 @@
 # Signal Container
 
-A signal container is the product-layer wrapper for one authorized business action. It organizes the existing task, evidence, typed data, business signature, submission, and proof into a repeatable user and integration model; the chain still uses the existing contract types and events.
+A signal container is the product-layer wrapper for one authorized business action. It is a product/API concept, not a new contract object. It organizes the existing task, evidence, typed data, business signature, submission, and proof into a repeatable user and integration model; the chain still uses the existing contract types and events.
 
 ## Why This Concept Is Needed
 

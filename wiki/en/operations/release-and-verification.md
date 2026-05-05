@@ -12,6 +12,7 @@ pnpm check
 pnpm test
 pnpm build
 pnpm verify:protocol-freeze
+pnpm verify:product-signal-map
 cd uvp-protocol/contracts/uvp-contracts && forge build && forge test
 uvp-deploy/deploy/scripts/bootstrap-local-anvil.sh --self-update
 uvp-deploy/deploy/scripts/bootstrap-local-anvil.sh --failure
@@ -27,6 +28,11 @@ pnpm --filter @uvp-eth/order-app readiness
 ```
 
 `fixture` only proves the UI fixture path. Only `full --require-full` can support a chain-backed Product claim.
+
+`pnpm verify:product-signal-map` is a release blocker for Product submit
+convergence. It checks that UI actions, Product Schema permission rows,
+compiled HookPlan signals, Product BFF authorizations, and contract
+authorization pairs all use the same `sourceId` / `signalId` mapping.
 
 ## Staging Gate
 

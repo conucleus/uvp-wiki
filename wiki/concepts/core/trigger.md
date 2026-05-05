@@ -1,8 +1,10 @@
 # Trigger
 
-Trigger 把一个 ready condition 变成可执行任务。它是一种特殊 hook 标记：某个 receive hook Ready 后，这个 stage 的执行入口正式打开，链上应发出 `HookReady`，Product/Store/executor-kit 才能把它投影成任务、通知或 adapter job。
+Trigger 把一个 ready condition 变成可执行任务。它是一种特殊 hook 标记：某个 receive hook Ready 后，这个 stage 的任务可以打开，链上应发出 `HookReady`，Product/Store/executor-kit 才能把它投影成任务、通知或 adapter job。
 
-Trigger 是 Hook 的一个编译标记，来自秩序 stage 的 `trigger` 数组：
+第一遍可以把 `HookReady` 理解成“这个任务可以处理了”。它不表示业务已经完成；业务完成要等后续授权 `SignalSubmitted` 事件和证据指纹来证明。
+
+Trigger 是 Hook 的一个编译标记，来自秩序 stage 的 `trigger` 数组。这个数组是纯 OR 唤醒集合：任意一个 key 到达都可以唤醒该 stage；每个 key 指向一个 `receiveSignals` hook。这个 hook 保持原来的 Hook DSL 完整语义，`~`、`&`、`|`、`+T` 都照旧，并继续由既有 Hook DSL parser/compiler 规则校验。
 
 ```yaml
 trigger:
@@ -19,7 +21,7 @@ HookReady(orderId, hookId, stageId, hookName)
 
 ## 为什么必须指定 Trigger
 
-一个 stage 可能有多个 hook：有的用于等待输入，有的用于 signalMap，有的用于失败路径或内部条件。Trigger 的作用是把“条件成立”提升为“这个执行环节正式开始”。
+一个 stage 可能有多个 hook：有的用于等待输入，有的用于 signalMap，有的用于失败路径或内部条件。Trigger 的作用是把“条件成立”提升为“这个任务可以打开或领取”。
 
 产品上可以把 Trigger 理解为：
 
@@ -28,7 +30,7 @@ HookReady(orderId, hookId, stageId, hookName)
 - executor-kit chain watcher 可以领取或路由 job。
 - adapter 可以分配外部执行编号、工单号或linked Zhixu启动请求。
 
-编号边界：链上 `orderId` 由 `registerOrder()` 绑定。Trigger 可以触发 Product task ID、Store docking session ID、外部工单号或 linked order 创建流程；这些都是工作流编号，local order 的身份和推进 proof 仍看链上 `orderId` 和 signal/docking events。
+编号边界：链上 `orderId` 由 `triggerOrderFromOutsideFor` 或 `triggerOrderFromSignalFor` 这类 trigger order 入口创建。Trigger 还可以触发 Product task ID、Store docking session ID、外部工单号或 linked order 创建流程；这些都是工作流编号，local order 的身份和推进 proof 仍看链上 `orderId`、trigger link 和 signal/docking events。
 
 ## 编译和合约语义
 
@@ -65,7 +67,7 @@ executor:
       err: peer::task.close.err
 ```
 
-这里的 `::OUTSIDE` 是空 source 上的外部入口 signal，用来打开本地 stage 的 docking workflow。它仍然需要订单级授权；常见提交方是 registrar 或被 Product workflow 授权的系统账户。`signalMap` 负责解释 linked order 输出，不会自己发出 `HookReady`。
+这里的 `::OUTSIDE` 是空 source 上的外部入口 signal，用来打开本地 stage 的 docking workflow。它必须由业务 submitter 签 trigger typed data；registrar/relayer 只负责广播。`signalMap` 负责解释 linked order 输出，不会自己发出 `HookReady`。
 
 ```text
 local stage trigger Ready
@@ -80,6 +82,6 @@ local stage trigger Ready
 ## 边界检查
 
 - Trigger 是编译到 HookPlan 和合约里的 hook 标记，不是 UI 手动按钮。
-- 链上 orderId 来自 `registerOrder()`。
-- Trigger Ready 通常表示执行开始或任务可领取，业务完成看后续 signal/proof。
+- 链上 orderId 来自 trigger order 入口。
+- Trigger Ready 通常表示任务可领取或可处理，业务完成看后续 signal/proof。
 - `signalMap` hook 当前不触发 `HookReady`；它用于 docked Zhixu 输出映射。

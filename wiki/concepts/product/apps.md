@@ -23,7 +23,7 @@ Store 的中心化权威可以影响推荐、审核、打标和治理入口，�
 
 ## Order App
 
-`uvp-order-app/app` 面向普通参与者。它应使用普通语言展示：
+`uvp-order-app/app` 面向普通参与者，使用普通语言展示：
 
 - 待处理任务。
 - 提交确认。
@@ -33,7 +33,7 @@ Store 的中心化权威可以影响推荐、审核、打标和治理入口，�
 - 资源需求。
 - readiness 检查。
 
-普通任务 UI 不应要求用户理解 `HookPlan`、`sourceId`、`signalId`、ABI 或 gas 细节。高级 proof/debug 视图可以展示这些字段。
+普通任务 UI 不要求用户理解 `HookPlan`、`sourceId`、`signalId`、ABI 或 gas 细节。高级 proof/debug 视图可以展示这些字段。
 
 ## executor-kit
 
@@ -48,4 +48,4 @@ Store 的中心化权威可以影响推荐、审核、打标和治理入口，�
 
 ## Periphery Adapter
 
-资金、担保、AI/MCP、demo executor 可以放在 `uvp-periphery`。它们应该消费 `UVPStateMachine`、`ZhixuTrustRegistry`、Product DTO 或 executor-kit，而不是定义新的核心订单真相。
+资金、担保、AI/MCP、demo executor 可以放在 `uvp-periphery`。它们消费 `UVPStateMachine`、`ZhixuTrustRegistry`、Product DTO 或 executor-kit，而不是定义新的核心订单真相。

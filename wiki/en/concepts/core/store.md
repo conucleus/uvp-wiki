@@ -2,7 +2,7 @@
 
 This is a core-concept side view kept for readers who enter from object pages. The canonical Store product entry is [Store](../../store/README.md).
 
-The Store is the centralized product and platform workflow workbench. It is responsible for organizing Nucleation, Zhixu, Supplier, Orders, proofs, and endorsement requests into a human-readable interface. It gives Nucleation a stage, tags objects with platform metadata, displays proof, initiates governance requests, and keeps audit records; Nucleation, trust domains, and chain events each keep their own authority source.
+The Store is the centralized product and platform workflow workbench. It is responsible for organizing Nucleation, Zhixu, Supplier, Orders, proofs, and endorsement requests into a human-readable interface. It gives Nucleation a stage, tags objects with platform metadata, displays proof, initiates governance requests, and keeps audit records; Nucleation, trust registries, and chain events each keep their own authority source.
 
 ## Where Its Authority Comes From
 
@@ -19,7 +19,7 @@ Protocol facts need on-chain event support:
 - the plan has already been attested on chain;
 - the Order has already been registered;
 - the signal has already been submitted;
-- the Supplier has already been endorsed by a trust domain;
+- the Supplier has already been endorsed by a trust registry;
 - a certain Zhixu is already trusted and fair;
 - a certain executor has already become the active executor.
 

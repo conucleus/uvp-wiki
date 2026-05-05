@@ -1,6 +1,6 @@
 # Store
 
-The Store is the product workbench between Nucleation, Suppliers, trust domains, operators, and ordinary execution interfaces. It provides a catalog, compile previews, resource and supplier organization, proof views, contact notifications, publish workflows, attestation requests, and audit. Nucleation handles internal Zhixu design, trust domains provide external endorsement, and `UVPStateMachine` plus `ZhixuTrustRegistry` provide on-chain facts.
+The Store is the product workbench between Nucleation, Suppliers, trust registries, operators, and ordinary execution interfaces. It provides a catalog, compile previews, resource and supplier organization, proof views, contact notifications, publish workflows, attestation requests, and audit. Nucleation handles internal Zhixu design, trust registries provide external endorsement, and `UVPStateMachine` plus `ZhixuTrustRegistry` provide on-chain facts.
 
 ```text
 Nucleation
@@ -21,7 +21,7 @@ Nucleation imports a Zhixu draft
   -> Nucleation organizes supplier slots, resources, and fairness notes
   -> Store operator reviews publishing materials
   -> governance admin requests plan or supplier attestation
-  -> trust domain emits PlanAttested / SupplierAttested
+  -> trust registry emits PlanAttested / SupplierAttested
   -> Store shows the trusted version as order-creatable
   -> operator or participant locates an Order and inspects proof rows
 ```

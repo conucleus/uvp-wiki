@@ -1,6 +1,6 @@
 # Product BFF
 
-The Product BFF lives in `uvp-chain-services/service/src/product/bff/`. It handles the workflow for order drafts, invitations, participant confirmation, authorization building, and order registration submission.
+Product BFF means Product Backend-for-Frontend. It lives in `uvp-chain-services/service/src/product/bff/`. It handles the workflow for order drafts, invitations, participant confirmation, authorization building, and order registration submission.
 
 ## Responsibilities
 
