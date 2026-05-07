@@ -2,12 +2,20 @@
 
 这一节是首页之后的学习路径。它面向已经理解 UVP 为什么重要、但还需要从故事、角色、术语一路走到本地验证的读者。
 
+这不是概念大全。第一遍只需要建立业务直觉：一类协作被写成秩序 (Zhixu)，某一次运行是订单 (Order)，实际处理某一步的是执行者 (Executor)，推动订单继续的是信号 (Signal)。
+
 ## 推荐第一遍阅读
 
 1. [一个订单故事](one-order-story.md)：用一条跨境订单理解从 Zhixu 设计到链上 proof 的路径。
-2. [一个订单穿过 UVP 组件](order-through-components.md)：再用同一条订单看 Store、compiler、trust registry、state machine、Chain Services、Order App 和 executor-kit 的位置。
-3. [核心概念](../core/README.md)：故事和组件位置清楚之后，再读协议对象总览。
-4. [核心术语表](../reference/glossary.md)：项目术语和“不要混淆”的概念对。
+2. [核心概念](../core/README.md)：故事清楚之后，再按层级读协议对象总览。
+3. [核心术语表](../reference/glossary.md)：项目术语和关键概念对。
+
+## 第二遍阅读
+
+完成第一遍之后，再进入工程路径：
+
+1. [一个订单穿过 UVP 组件](order-through-components.md)：用同一条订单看 Store、compiler、trust registry、state machine、Chain Services、Order App 和 executor-kit 的位置。
+2. [架构总览](../concepts/architecture.md)：看模块边界、依赖方向、事实源和数据流。
 
 ## 工程第一遍
 

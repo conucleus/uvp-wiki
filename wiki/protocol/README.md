@@ -24,7 +24,7 @@ Zhixu DSL
 | --- | --- |
 | [核心概念](../concepts/overview.md) | 系统词表和最短协议路径。 |
 | [Zhixu DSL](../concepts/core/zhixu.md) | 可复用协作规则书和可编译字段。 |
-| [Nucleation / 凝结核](../concepts/core/nucleation.md) | Zhixu 的发起核、设计者和秩序组织者。 |
+| [Nucleus / 凝结核](../concepts/core/nucleation.md) | Zhixu 的发起核、设计者和秩序组织者；`nucleation` 是字段和成核上下文。 |
 | [Plan](../concepts/core/plan.md) | 静态、可认证、可注册的编译产物。 |
 | [Order](../concepts/core/order.md) | 某个 Plan 的动态运行实例和可重放事件流。 |
 | [Source 因果链](../concepts/core/source.md) | signal 如何按因果语境分叉、串联和交汇。 |

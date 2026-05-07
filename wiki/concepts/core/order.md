@@ -17,7 +17,7 @@ triggerOrderFromSignalFor(trigger, authorizations, signature)
 - 校验 trigger typed data 签名并恢复业务 submitter。
 - 检查 plan 是否存在且仍被官方域认可。
 - 写入订单级 signal 授权。
-- 记录 trigger fact 或 parent link。
+- 记录 trigger fact 或 trigger-origin link。
 - materialize ready 的 trigger stage。
 - 发出 `OrderRegistered`、`OrderTriggered`、`OrderMaterialized`、`StageMaterialized` 和 `SignalSubmitterAuthorized`。
 

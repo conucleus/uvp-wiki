@@ -1,6 +1,6 @@
 # Zhixu DSL
 
-`Zhixu` is the transliteration of the underlying Chinese coordination term. In this repository, Zhixu is the reusable coordination rulebook designed by Nucleation. It uses a DSL to declare a reusable production relationship: which task patterns exist, which stages each task has, which source causal chain each stage belongs to, what signals it receives, what signals it emits, who the default Supplier is, which stages can choose an executor for other stages, and which resources are required.
+`Zhixu` is the transliteration of the underlying Chinese coordination term. In this repository, Zhixu is the reusable coordination rulebook designed by a Nucleus. It uses a DSL to declare a reusable production relationship: which task patterns exist, which stages each task has, which source causal chain each stage belongs to, what signals it receives, what signals it emits, who the default Supplier is, which stages can choose an executor for other stages, and which resources are required.
 
 The code entry point is `ZhixuDefinition` in `uvp-protocol/packages/compiler/src/types/index.ts`. An Order is one runtime instance of this rulebook after compilation and registration.
 
@@ -54,7 +54,7 @@ This says: the local Zhixu stage `master.supplier_sourcing` is triggered by `sol
 | `metadata.labels` | Business category, industry, and demo labels. On-chain authorization is controlled by order authorization and overlays. |
 | `metadata.annotations.version` | Plan version. Version changes flow into `planId`. |
 | `spec.platform` | Target platform. The EVM track uses `type=blockchain`, `provider=eth`, and may set `network=base`. If `network` is absent, the current mainnet/default path is preserved. |
-| `spec.nucleation.id` | Identifier for the originating nucleus, designer, or organizing domain of the Zhixu. See [Nucleation](nucleation.md). |
+| `spec.nucleation.id` | Identifier for the originating Nucleus, designer, or organizing domain of the Zhixu. See [Nucleus / Nucleation](nucleation.md). |
 | `spec.taskPatterns` | List of task patterns, each of which contains stages. |
 
 ## Stage Fields
@@ -132,7 +132,7 @@ These business files do not go on chain. On chain only records hashes, URIs, or 
 
 | Concept | Static / Dynamic | Meaning |
 | --- | --- | --- |
-| Nucleation | Organizing subject | The organizer that originates, designs, and maintains a Zhixu. |
+| Nucleus | Organizing subject | The organizer that originates, designs, and maintains a Zhixu; `nucleation` remains the field/context name. |
 | Zhixu | Static DSL | A reusable coordination rulebook. |
 | Plan | Chain-targeted artifact | The artifact, hash, and registration parameters compiled from a Zhixu for EVM. |
 | Order | Dynamic instance | One runtime of a Plan, including signals, hook runtime, stage overlay, and proof. |

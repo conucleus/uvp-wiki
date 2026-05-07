@@ -256,6 +256,23 @@ a:hover {
   margin: 0 0 16px;
 }
 
+.doc-content img {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 8px 22px rgba(28, 45, 67, 0.08);
+  display: block;
+  height: auto;
+  margin: 18px 0 8px;
+  max-width: 100%;
+}
+
+.doc-content p > em:only-child {
+  color: var(--muted);
+  display: block;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
 .doc-content ul,
 .doc-content ol {
   margin: 0 0 18px 24px;

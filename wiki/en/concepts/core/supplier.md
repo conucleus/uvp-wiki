@@ -1,22 +1,22 @@
 # Supplier
 
-Supplier is a capability subject. It can be an individual, a company, a customs broker, a logistics provider, a payment adapter, a guarantor, an AI service, an MCP agent, an enterprise system, or even a dockable Zhixu. Supplier answers “who has this kind of capability.” Nucleation designs the Zhixu; the executor performs the actual submission for the current Order and stage; the Supplier provides the capability and trust subject.
+Supplier is a capability subject. It can be an individual, a company, a customs broker, a logistics provider, a payment adapter, a guarantor, an AI service, an MCP agent, an enterprise system, or even a dockable Zhixu. Supplier answers “who has this kind of capability.” The Nucleus designs the Zhixu; the executor performs the actual submission for the current Order and stage; the Supplier provides the capability and trust subject.
 
 ## Where Supplier Comes From
 
-In the product path, a Supplier is usually first organized by Nucleation into a Zhixu’s supplier network, and then enters the supplier registry in Store. As a platform workbench, Store maintains the supplier profile, platform capability tags, supported roles/stages, wallet, review status, contact information, and metadata. The trust registry then endorses the supplier subject on chain through `ZhixuTrustRegistry.SupplierAttested`.
+In the product path, a Supplier is usually first organized by the Nucleus into a Zhixu’s supplier network, and then enters the supplier registry in Store. As a platform workbench, Store maintains the supplier profile, platform capability tags, supported roles/stages, wallet, review status, contact information, and metadata. The trust registry then endorses the supplier subject on chain through `ZhixuTrustRegistry.SupplierAttested`.
 
 The minimal relationship is:
 
 ```text
 Store supplier metadata
-  + Nucleation supplier requirements
+  + Nucleus supplier requirements
   + ZhixuTrustRegistry.SupplierAttested
   + Product projection
   -> Supplier capability passport
 ```
 
-Tags should be layered: Nucleation can tag a Supplier as a role/stage candidate inside a specific Zhixu; Store can use platform catalog tags for customs / logistics / inspection / payment capabilities; the trust registry can endorse the supplier subject externally. The decentralized part is responsible for storing endorsement events, revocation events, order authorization, and signal proof.
+Tags should be layered: the Nucleus can tag a Supplier as a role/stage candidate inside a specific Zhixu; Store can use platform catalog tags for customs / logistics / inspection / payment capabilities; the trust registry can endorse the supplier subject externally. The decentralized part is responsible for storing endorsement events, revocation events, order authorization, and signal proof.
 
 ## SupplierDefinition
 
@@ -56,7 +56,7 @@ The supplier capability tags currently supported in Product DTOs include:
 
 These tags help Store and the Product API recommend or validate execution networks, but the tags themselves do not create on-chain permissions.
 
-If the tag comes from Nucleation, it means “this role/stage is suitable in the internal design of this Zhixu.” If the tag comes from Store, it means platform catalog and search semantics. Trust-domain endorsement is expressed separately by `SupplierAttested`.
+If the tag comes from the Nucleus, it means “this role/stage is suitable in the internal design of this Zhixu.” If the tag comes from Store, it means platform catalog and search semantics. Trust-domain endorsement is expressed separately by `SupplierAttested`.
 
 ## Supplier Trust
 
@@ -68,7 +68,7 @@ This layer of trust answers “is this subject endorsed by an authority.” Whet
 
 | Concept | Meaning |
 | --- | --- |
-| Supplier | The capability and identity layer, usually organized by Nucleation and maintained in Store with profiles, platform tags, and endorsement materials. |
+| Supplier | The capability and identity layer, usually organized by the Nucleus and maintained in Store with profiles, platform tags, and endorsement materials. |
 | Executor | The wallet or executor actually bound to a specific Order stage at runtime. |
 
 A Supplier can send different executor wallets to different Orders; an executor wallet can also represent a Supplier subject. Documentation and UI must keep “supplier trustworthiness” separate from “order submission permission.”

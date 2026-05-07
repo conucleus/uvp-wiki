@@ -9,6 +9,18 @@ chain events
   -> Order App / Store / executor-kit
 ```
 
+## Runnable Surfaces
+
+Product DTOs land in real runnable product surfaces: the Order App lets ordinary participants handle tasks, while the Store Console lets the Nucleus and operators organize Zhixu entries, suppliers, docking, and review.
+
+![Order App task view](../../assets/screenshots/order-app.png)
+
+*Order App: participant-facing tasks, orders, proof, and submission entry.*
+
+![Store Console catalog view](../../assets/screenshots/store-console.png)
+
+*Store Console: Zhixu catalog, docking, suppliers, and review entry for the Nucleus and operators.*
+
 ## User Surfaces
 
 | Page | Purpose |
@@ -26,11 +38,11 @@ chain events
 | [Chain Services](../components/chain-services.md) | Rebuild projections from chain events and provide Product API, Store API, relayer, proof verifier, and runtime profile. |
 | Product DTO and user surfaces | Define how ordinary users and product frontends express order/task/proof/trust, and define the signal-container data contract. |
 | [Order App](../execution/order-app.md) / [Executor Kit](../execution/README.md) | Consume Product DTOs, prepare evidence, sign, submit, and read proof. |
-| [Zhixu Store](../store/README.md) | Consume Product/Store DTOs and organize nucleation workbench, suppliers, trust, operator workflow, and audit. |
+| [Zhixu Store](../store/README.md) | Consume Product/Store DTOs and organize the Nucleus workbench, suppliers, trust, operator workflow, and audit. |
 
 ## Boundaries
 
-- Store metadata, drafts, supplier profiles, audit, and JWT sessions belong to the [Store](../store/README.md) context and are part of the Nucleation workbench or platform workflow state.
+- Store metadata, drafts, supplier profiles, audit, and JWT sessions belong to the [Store](../store/README.md) context and are part of the Nucleus workbench or platform workflow state.
 - The Product API can prepare typed data, verify signatures, call the relayer, and return proof; `UVPStateMachine` authorization is still enforced by the contracts.
 - `uvp-order-app` is already an independent participant app boundary, but it has not yet been fully proven through the same Base Sepolia Product API task flow.
 - The Product API signal-producer side of executor-kit and the thin MCP adapter belong to [Executor Kit](../execution/README.md); production runtime, key governance, and live operator runbooks belong to execution and operations pages.

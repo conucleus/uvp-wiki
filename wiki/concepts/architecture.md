@@ -20,6 +20,44 @@ flowchart TD
   Exec --> CS
 ```
 
+## 实际部署拓扑
+
+概念流说明对象关系；实际运行时，浏览器、API、合约、事件、indexer 和数据库是下面这条回路：
+
+```mermaid
+flowchart LR
+  Browser["用户浏览器"]
+  OrderApp["Order App"]
+  Store["Store Console"]
+  Exec["executor-kit / 企业脚本"]
+  ProductAPI["Chain Services\nProduct API"]
+  StoreAPI["Chain Services\nStore API"]
+  Relayer["Relayer / RPC boundary"]
+  Contracts["UVPStateMachine\nZhixuTrustRegistry"]
+  Events["链上事件"]
+  Indexer["Indexer / replay worker"]
+  DB["Postgres projection"]
+  ObjectStore["对象存储\nmetadata URI / 加密文件"]
+
+  Browser --> OrderApp
+  Browser --> Store
+  OrderApp --> ProductAPI
+  Store --> StoreAPI
+  Exec --> ProductAPI
+  ProductAPI --> Relayer
+  StoreAPI --> Relayer
+  Relayer --> Contracts
+  Contracts --> Events
+  Events --> Indexer
+  Indexer --> DB
+  DB --> ProductAPI
+  DB --> StoreAPI
+  ProductAPI --> ObjectStore
+  StoreAPI --> ObjectStore
+```
+
+这张图里的 Postgres、对象存储和 API 都是产品运行层。它们可以缓存、检索、展示和中继，但协议事实仍以合约事件、签名、hash、URI 和可重放 event provenance 为准。
+
 ## 分层边界
 
 | 层 | 代码入口 | 负责什么 | 不能负责什么 |

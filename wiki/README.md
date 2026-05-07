@@ -12,6 +12,8 @@ UVP（通用价值协议，Universal Value Protocol）的切入点不是再做�
 
 UVP Wiki 是通用价值协议的公开阅读入口。当前可运行实现轨道是 EVM/Web3：可复用的跨组织协作设计会变成被背书的链上 Plan、具体 Order、钱包签名的业务 Signal，以及可重放的 proof。UVP 作为协议可以面向不同链目标；EVM 轨道当前可运行，Solana 边界已预留为明确的 TODO 接口。
 
+第一次阅读时，不需要把所有协议对象一次性记住。先建立一条直觉：秩序 (Zhixu) 是规则书，订单 (Order) 是这次运行，执行者 (Executor) 处理某一步，信号 (Signal) 是带责任的业务声明。Plan、Hook、Source、Product DTO、ABI 等概念会在第二遍和工程页面里展开。
+
 ## UVP 要解决什么
 
 UVP 记录协议事实：被某条秩序授权的主体，在某个订单、某个阶段、某个凭证指纹下，声明某个业务信号已经发出，并愿意为这个声明负责。现实真实性、资质审查、担保、保险、争议裁定和监管结论，可以由对应的 trust registry、供应商、资金方、审计方或 adapter 发出自己的信号。
@@ -19,6 +21,12 @@ UVP 记录协议事实：被某条秩序授权的主体，在某个订单、某�
 UVP 把复杂生产关系压缩成计算机能理解、链上能记录和追责的秩序语言。`Zhixu` 是“秩序”的拼音，在 UVP 中指一份可复用协作规则书：谁先开始，谁负责下一步，哪个供应商能承接，什么证据算完成，失败时走哪条路。订单 (Order) 是某个秩序版本的一次运行。
 
 秩序 DSL 是低成本的交易约定方式，区块链和智能合约是高伪造成本的记录方式。EVM 实现把两者接起来，让陌生人、企业系统、AI agent、供应商、trust registry 和普通参与者，可以围绕同一套信号边界组织生产。
+
+## 为什么不是只信平台
+
+在单一法域里，一个中心化平台可以成为可信记录方，因为用户对平台的信任通常来自监管机构、司法系统和本地合规责任。跨境协作时，这个前提会变弱：外国用户、银行、监管机构或合作方不天然信任由某一方运营的平台数据库，外国监管机构也未必能直接约束这个平台。
+
+反过来看，如果没有链上事件作为共同事实源，A 方和 B 方争议“谁先提交了某个 signal”时，只能依赖某个平台数据库的日志；而这个数据库可能由其中一方、或其中一方法域内的平台维护。UVP 把授权、签名、证据指纹、提交顺序和状态后果落成可重放链事件，让跨境参与方先拥有一份共同记录。现实真实性、赔付、监管结论和法律责任仍由合同、监管、仲裁、保险、审计或 trust registry 处理。
 
 ## 科斯定理的工程实践
 
@@ -38,6 +46,25 @@ UVP 定义 AI、企业、人和链上状态如何在同一套可追责边界里�
 ## 当前 EVM 实现
 
 当前 EVM 实现把秩序协作模型接到 EVM 兼容链上。它把秩序设计编译成 deterministic artifact，把计划和供应商背书交给 trust registry，把订单、signal、hook ready 和履约 proof 交给链上状态机。后端负责索引、投影、展示、转发和缓存；对象存储保存链下材料；链上保存 hash、URI、签名和事件。
+
+## 整体数据流
+
+先看全局，再进入细节：
+
+```mermaid
+flowchart LR
+  N["凝结核 / Store\n设计 Zhixu 和参与方材料"] --> C["Compiler\n检查并定版规则"]
+  C --> R["Trust Registry\n背书规则版本或能力主体"]
+  C --> S["UVPStateMachine\n注册 Order、授权和 Signal"]
+  R --> I["Chain Services\n从链事件重建视图"]
+  S --> I
+  P["Order App / Executor Kit\n执行者准备证据并签名"] --> S
+  I --> U["Product / Store / Proof View\n订单、任务、证明和信任状态"]
+```
+
+这张图只表达读者要先抓住的方向：Store 和工具组织规则，执行者提交带证据的 signal，合约记录事实，Chain Services 把事实重建成人能读的订单、任务和 proof。
+
+如果你想看浏览器、API、合约、事件、indexer 和数据库如何实际跑起来，读 [架构：实际部署拓扑](concepts/architecture.md#实际部署拓扑)。
 
 编译边界现在收敛为 Zhixu 到 EVM `OnchainHookPlanArtifact` 与 `registerPlan` 参数。旧的平台中立 HookPlan 形状仅作为编译器内部 IR；Solana target stub 已移除，未来链目标需要在 program、索引 adapter、钱包签名和 release evidence 完成后重新定义。
 
@@ -62,7 +89,7 @@ UVP 把设计、背书、注册、提交、广播和展示分开：
 
 | 问题 | 负责角色或机制 | 协议事实 |
 | --- | --- | --- |
-| 谁设计可复用规则书？ | 凝结核 / Nucleation，例如采购团队或 workflow owner。 | Zhixu 定义和编译后的 Plan 材料。 |
+| 谁设计可复用规则书？ | 凝结核 / Nucleus，例如采购团队或 workflow owner。 | Zhixu 定义和编译后的 Plan 材料；字段名仍是 `spec.nucleation.id`。 |
 | 谁背书 Plan 或 Supplier？ | Trust Domain。 | `PlanAttested`、`SupplierAttested` 和 revocation events。 |
 | 谁注册 Plan？ | 授权 publisher 机制或账户。 | `PlanRegistered`。 |
 | 谁注册 Order 和初始权限？ | 授权 registrar 机制或账户。 | `OrderRegistered` 和 `SignalSubmitterAuthorized`。 |
@@ -112,9 +139,9 @@ UVP Wiki 是协议和当前公开实现轨道的人类阅读入口。它把源�
 如果你第一次接触 UVP，按这个顺序读：
 
 1. [一个订单故事](getting-started/one-order-story.md)：用一条跨境货物订单理解从秩序设计到任务 proof 的路径。
-2. [一个订单穿过 UVP 组件](getting-started/order-through-components.md)：再用同一条订单看 Store、compiler、trust registry、state machine、Chain Services、Order App 和 executor-kit 的位置。
-3. [核心概念](core/README.md)：在故事和组件路径清楚之后再读协议对象。
-4. [核心术语表](reference/glossary.md)：随时查项目术语和“不要混淆”的概念对。
+2. [核心概念](core/README.md)：在故事清楚之后，按对象层级读 Zhixu、Order、Signal、Executor 和其他协议对象。
+3. [一个订单穿过 UVP 组件](getting-started/order-through-components.md)：第二遍再用同一条订单看 Store、compiler、trust registry、state machine、Chain Services、Order App 和 executor-kit 的位置。
+4. [核心术语表](reference/glossary.md)：随时查项目术语和关键概念对。
 
 ## 按目标选择路径
 

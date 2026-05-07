@@ -22,7 +22,7 @@ Zhixu DSL
 | --- | --- |
 | [Core Concepts](../concepts/overview.md) | system glossary and shortest protocol path. |
 | [Zhixu DSL](../concepts/core/zhixu.md) | static Zhixu definition and compilable fields. |
-| [Nucleation / Nucleation Kernel](../concepts/core/nucleation.md) | the initiating kernel, designer, and organizer of Zhixu. |
+| [Nucleus / Nucleation](../concepts/core/nucleation.md) | the initiating kernel, designer, and organizer of Zhixu; `nucleation` remains the field/context name. |
 | [Plan](../concepts/core/plan.md) | the static, attestable, registerable compilation artifact. |
 | [Order](../concepts/core/order.md) | the runtime instance of a Plan and its replayable event stream. |
 | [Source Causal Chain](../concepts/core/source.md) | how signals branch, chain, and intersect in causal context. |
@@ -47,4 +47,4 @@ Zhixu DSL
 - The relayer may submit transactions and pay gas, but it cannot generate the participant’s business signature.
 - Funding, USDC, escrow, guarantee, settlement, and AI/MCP agents all belong to adapter/periphery context, not to the state-machine core.
 - `supplierType=zhixu` is a composed execution mode; local and linked orders must always resolve back to their own state-machine events and proof.
-- Store platform workflow cannot replace internal nucleation governance, and it cannot replace trust-domain endorsement.
+- Store platform workflow cannot replace internal Nucleus governance, and it cannot replace trust-domain endorsement.

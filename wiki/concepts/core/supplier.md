@@ -10,7 +10,7 @@ Supplier 是能力主体。它可以是个人、公司、报关行、物流商�
 
 ```text
 Store supplier metadata
-  + Nucleation supplier requirements
+  + Nucleus supplier requirements
   + ZhixuTrustRegistry.SupplierAttested
   + Product projection
   -> Supplier capability passport

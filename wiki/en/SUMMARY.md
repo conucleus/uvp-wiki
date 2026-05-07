@@ -3,25 +3,28 @@
 ## Learn UVP
 
 - [Wiki Entry](README.md)
+- [Reader Entry](getting-started/README.md)
 - [One Order Story](getting-started/one-order-story.md)
 - [One Order Through UVP Components](getting-started/order-through-components.md)
-- [Reader Entry](getting-started/README.md)
 
-## Protocol Objects and Implementation Modules
+## Protocol Objects
 
 - [Core Object Overview](core/README.md)
   - [Core Object Relations](concepts/overview.md)
   - [Zhixu DSL](concepts/core/zhixu.md)
-  - [Plan](concepts/core/plan.md)
   - [Order](concepts/core/order.md)
-  - [Nucleation](concepts/core/nucleation.md)
-  - [Supplier](concepts/core/supplier.md)
-  - [Executor](concepts/core/executor.md)
-  - [Source Causal Chain](concepts/core/source.md)
   - [Signal](concepts/core/signal.md)
+  - [Executor](concepts/core/executor.md)
+  - [Plan](concepts/core/plan.md)
+  - [Nucleus / Nucleation](concepts/core/nucleation.md)
+  - [Supplier](concepts/core/supplier.md)
+  - [Source Causal Chain](concepts/core/source.md)
   - [Hook](concepts/core/hook.md)
   - [Trigger](concepts/core/trigger.md)
   - [File Resources](concepts/core/file-resources.md)
+
+## Implementation Modules
+
 - [From Zhixu to a Registrable Plan](components/semantics-and-compiler.md)
   - [Hook Core and Compiler](concepts/architecture/components/compiler-hook-core.md)
   - [Compiler Input](concepts/artifacts/compiler-input.md)
@@ -63,7 +66,7 @@
   - [Store and Order App](concepts/product/apps.md)
   - [Zhixu Store](store/README.md)
     - [Store Authority Boundary and Information Architecture](store/authority-and-ia.md)
-    - [Nucleation Workbench](store/nucleation-workbench.md)
+    - [Nucleus Workbench](store/nucleation-workbench.md)
     - [Zhixu Catalog, Configuration, and Release](store/zhixu-management.md)
     - [Supplier Registry, Capability, and Contact](store/supplier-registry.md)
     - [Fulfillment Status, Proof, and Trust Checks](store/runtime-proof.md)

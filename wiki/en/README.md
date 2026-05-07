@@ -12,6 +12,8 @@ If you care about coordination infrastructure for the AI era, about making agent
 
 UVP Wiki is the public entry point for the Universal Value Protocol. The runnable implementation track today is EVM/Web3: reusable cross-organization coordination designs become endorsed on-chain Plans, concrete Orders, wallet-signed business Signals, and replayable proof. UVP can target multiple chains as a protocol; the EVM track is working today, and Solana boundaries remain explicit TODO surfaces.
 
+On the first pass, readers do not need to memorize every protocol object. Start with one intuition: Zhixu is the reusable rulebook, Order is the concrete runtime, Executor is the subject that handles a step, and Signal is the accountable business declaration. Plan, Hook, Source, Product DTO, ABI, and related concepts are introduced in the second pass and engineering pages.
+
 ## What UVP Solves
 
 UVP records protocol facts: a subject authorized by a specific Zhixu declares, under a specific Order, stage, and evidence fingerprint, that a business Signal has been emitted and that the subject is accountable for that declaration. Real-world truth, qualification review, guarantee, insurance, dispute resolution, and regulatory conclusions can be expressed by the relevant trust registry, supplier, funder, auditor, or adapter as its own signal.
@@ -19,6 +21,12 @@ UVP records protocol facts: a subject authorized by a specific Zhixu declares, u
 UVP compresses complex production relationships into an order language that computers can interpret and chains can record. `Zhixu` is the transliteration of the underlying Chinese coordination term; in UVP it means a reusable coordination rulebook: who starts, who takes the next step, which supplier may take over, what evidence counts as completion, and where the process goes on failure. An Order is one runtime of a specific Zhixu version.
 
 The Zhixu DSL is a low-cost way to define transaction agreements; blockchains and smart contracts are high-forgery-cost recording systems. The EVM implementation connects the two, so strangers, enterprise systems, AI agents, suppliers, trust registries, and ordinary participants can organize production around the same signal boundary.
+
+## Why Not Just Trust the Platform
+
+Inside one legal jurisdiction, a centralized platform can often serve as the trusted record keeper because users can rely on local regulators, courts, and compliance duties. Cross-border coordination weakens that assumption: foreign users, banks, regulators, and counterparties do not automatically trust a database operated by one side, and a foreign regulator may not be able to directly discipline that platform.
+
+The counterfactual is simple: without chain events as a shared fact source, if party A and party B dispute who submitted a signal first, they must fall back to a platform database log; that database may be maintained by one party or by a platform inside one party's jurisdiction. UVP records authorization, signatures, evidence fingerprints, submission order, and state consequences as replayable chain events, so cross-border participants can start from a common record. Real-world truth, payment, regulatory conclusions, and legal liability still belong to contracts, regulators, arbitration, insurance, audit, or trust registries.
 
 ## Coase-Theorem Engineering Practice
 
@@ -39,10 +47,29 @@ UVP defines how AI agents, enterprises, humans, and on-chain state coordinate in
 
 The current EVM implementation connects the Zhixu coordination model to EVM-compatible chains. It compiles coordination designs into deterministic artifacts, puts plan and supplier endorsement into a trust registry, and puts Orders, Signals, HookReady events, and fulfillment proof into an on-chain state machine. Backend services index, project, display, relay, and cache; object storage keeps off-chain materials; the chain stores hashes, URIs, signatures, and events.
 
+## Overall Data Flow
+
+Read the whole system once before diving into details:
+
+```mermaid
+flowchart LR
+  N["Nucleus / Store\nDesign Zhixu and participant materials"] --> C["Compiler\nCheck and version the rule"]
+  C --> R["Trust Registry\nEndorse rule versions or capability subjects"]
+  C --> S["UVPStateMachine\nRegister Orders, authorizations, and Signals"]
+  R --> I["Chain Services\nRebuild views from chain events"]
+  S --> I
+  P["Order App / Executor Kit\nExecutors prepare evidence and sign"] --> S
+  I --> U["Product / Store / Proof View\nOrders, tasks, proof, and trust state"]
+```
+
+This diagram only shows the direction a first reader needs: Store and tools organize the rule, executors submit evidence-backed signals, contracts record facts, and Chain Services rebuilds those facts into readable orders, tasks, and proof.
+
+For the concrete browser, API, contract, event, indexer, and database deployment shape, read [Architecture: Runtime Topology](concepts/architecture.md#runtime-topology).
+
 The compiler boundary now converges Zhixu directly into EVM `OnchainHookPlanArtifact` and `registerPlan` arguments. The old platform-neutral HookPlan shape is compiler-internal IR; Solana target stubs have been removed and should be reintroduced only after a program, indexing adapter, wallet signer, and release-evidence path exist.
 
 ```text
-Nucleation designs a Zhixu
+Nucleus designs a Zhixu
   -> compiler creates deterministic Plan artifacts
   -> trust registry attests the plan hash
   -> publisher mechanism registers the Plan
@@ -62,7 +89,7 @@ UVP separates design, endorsement, registration, submission, broadcasting, and d
 
 | Question | Responsible role or mechanism | Protocol fact |
 | --- | --- | --- |
-| Who designs the reusable rulebook? | Nucleation, such as a procurement team or workflow owner. | Zhixu definition and compiled Plan materials. |
+| Who designs the reusable rulebook? | Nucleus, such as a procurement team or workflow owner. | Zhixu definition and compiled Plan materials; the field name remains `spec.nucleation.id`. |
 | Who endorses a Plan or Supplier? | Trust Domain. | `PlanAttested`, `SupplierAttested`, and revocation events. |
 | Who registers a Plan? | Authorized publisher mechanism or account. | `PlanRegistered`. |
 | Who registers an Order and initial permissions? | Authorized registrar mechanism or account. | `OrderRegistered` and `SignalSubmitterAuthorized`. |
@@ -112,9 +139,9 @@ UVP Wiki is the human-readable entry point for the protocol and its current publ
 If you are new to UVP, use this order:
 
 1. [One Order Story](getting-started/one-order-story.md): follow one cross-border cargo order from design to task proof.
-2. [One Order Through UVP Components](getting-started/order-through-components.md): use the same order to locate Store, compiler, trust registry, state machine, Chain Services, Order App, and executor-kit.
-3. [Core Concepts](core/README.md): read the protocol objects after the story and component path are clear.
-4. [Glossary](reference/glossary.md): keep the project terms and "do not confuse" pairs nearby.
+2. [Core Concepts](core/README.md): after the story is clear, read Zhixu, Order, Signal, Executor, and the rest of the protocol objects by layer.
+3. [One Order Through UVP Components](getting-started/order-through-components.md): on the second pass, use the same order to locate Store, compiler, trust registry, state machine, Chain Services, Order App, and executor-kit.
+4. [Glossary](reference/glossary.md): keep the project terms and key concept pairs nearby.
 
 ## Choose Your Path
 

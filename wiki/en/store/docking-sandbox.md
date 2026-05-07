@@ -1,6 +1,6 @@
 # Docking Sandbox
 
-The Docking Sandbox lets Nucleation trial external Zhixu, supplier signal maps, adapter workflows, or executor integrations. It handles configuration validation, proof checklists, and operator review materials; formal publishing and runtime integration still go through Zhixu publishing, trust attestation, order registration, signal authorization, and docking events.
+The Docking Sandbox lets the Nucleus trial external Zhixu, supplier signal maps, adapter workflows, or executor integrations. It handles configuration validation, proof checklists, and operator review materials; formal publishing and runtime integration still go through Zhixu publishing, trust attestation, order registration, signal authorization, and docking events.
 
 ## What It Can Do
 
@@ -37,7 +37,7 @@ Formal publishing still has to go through Zhixu configuration and publishing, go
 | Field | Description |
 | --- | --- |
 | localPlanId / localStage | The stage in the local Zhixu that will expose execution interfaces to the outside. |
-| nucleationId | The Nucleation that initiated this trial pairing. |
+| nucleationId | The Nucleus that initiated this trial pairing. |
 | executorType | `zhixu`, enterprise adapter, MCP agent, manual supplier. |
 | peerZhixu | The target Zhixu subject, active plan, and trust status. |
 | signalMap | `str/cmp/err` mapping and source validation result. |

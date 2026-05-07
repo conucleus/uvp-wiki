@@ -1,32 +1,44 @@
 # 核心概念
 
-核心概念定义 UVP 的协议对象。这些对象是 Store、Product API、Order App、executor-kit 和 periphery adapter 共同消费的语言层。`Zhixu` 是“秩序”的拼音，表示可复用协作规则书；`Order` 是“订单”，表示某个 Plan 的一次运行。
+核心概念定义 UVP 的协议对象。这些对象是 Store、Product API、Order App、executor-kit 和 periphery adapter 共同消费的语言层。
+
+本页是对象索引，不是第一篇教程。新读者可以先抓住四个基础对象：秩序 (Zhixu) 是可复用协作规则书，订单 (Order) 是一次运行，执行者 (Executor) 是运行时处理者，信号 (Signal) 是被授权提交的业务声明。其他对象用于解释版本、因果、任务打开、背书、资源和 proof。
 
 ```text
-秩序 (Zhixu) 定义
-  -> Plan
-  -> Order
-  -> Nucleation / Supplier / Executor
-  -> Source / Signal / Hook / Trigger
-  -> File Resources
-  -> Attestation / Authorization / Proof
+第一层：Zhixu -> Order -> Executor -> Signal
+第二层：Plan / Source / Hook / Trigger / File Resources
+治理层：Nucleus / Supplier / Attestation / Authorization
+展示层：Proof / Product DTO / Store / Order App / executor-kit
 ```
 
 ## 对象地图
 
+### 第一遍先读
+
 | 对象 | 先读 | 核心问题 |
 | --- | --- | --- |
-| 秩序 (Zhixu) | [Zhixu DSL](../concepts/core/zhixu.md) | 协作秩序如何被静态描述，并进入 deterministic compile boundary。 |
-| Plan | [Plan](../concepts/core/plan.md) | 静态、可认证、可注册的编译产物。 |
-| Order | [Order](../concepts/core/order.md) | 某个 Plan 的动态运行实例和可重放事件流。 |
-| Nucleation / 凝结核 | [Nucleation / 凝结核](../concepts/core/nucleation.md) | 谁发起、设计和维护一条 Zhixu 秩序。 |
-| Supplier | [Supplier](../concepts/core/supplier.md) | 注册供应商、能力主体、trust subject、capability passport 如何表达。 |
-| Executor | [Executor](../concepts/core/executor.md) | 订单运行时真正执行或提交 signal 的主体如何被选择、授权，以及 Zhixu 如何作为 executor dock 进另一个秩序。 |
+| 秩序 (Zhixu) | [Zhixu DSL](../concepts/core/zhixu.md) | 协作秩序如何被静态描述。 |
+| Order | [Order](../concepts/core/order.md) | 一次具体运行如何记录 signal、任务和 proof。 |
+| Signal | [Signal](../concepts/core/signal.md) | 被授权业务声明如何签名、去重和提交。 |
+| Executor | [Executor](../concepts/core/executor.md) | 当前订单、当前阶段真正执行或提交 signal 的主体是谁。 |
+
+### 需要解释规则内部时再读
+
+| 对象 | 先读 | 核心问题 |
+| --- | --- | --- |
+| Plan | [Plan](../concepts/core/plan.md) | Zhixu 如何变成静态、可认证、可注册的编译产物。 |
 | Source | [Source 因果链](../concepts/core/source.md) | signal 所在的因果语境如何串联、分叉和交汇。 |
-| Signal | [Signal](../concepts/core/signal.md) | 状态机接受的最小业务输入如何签名、去重和授权。 |
 | Hook | [Hook](../concepts/core/hook.md) | readiness 和状态变化如何从 signal 条件求出。 |
 | Trigger | [Trigger](../concepts/core/trigger.md) | 哪个 hook Ready 后打开可处理任务并发出 `HookReady`。 |
 | File Resources | [File Resources](../concepts/core/file-resources.md) | stage 资源句柄如何指向链下协议、证据模板或资源 manifest。 |
+
+### 需要解释组织和背书时再读
+
+| 对象 | 先读 | 核心问题 |
+| --- | --- | --- |
+| Nucleus / 凝结核 | [Nucleus / 凝结核](../concepts/core/nucleation.md) | 谁发起、设计和维护一条 Zhixu 秩序；`nucleation` 是 DSL 字段和成核上下文。 |
+| Supplier | [Supplier](../concepts/core/supplier.md) | 注册供应商、能力主体、trust subject、capability passport 如何表达。 |
+| Trust / Authorization | [信任与授权](../concepts/trust-and-authorization.md) | 谁被背书，谁能提交订单动作，这两件事如何分开。 |
 
 ## Supplier 和 Executor 的位置
 

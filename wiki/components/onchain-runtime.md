@@ -41,7 +41,7 @@ ZhixuTrustRegistry attests plan/supplier
 ## 运行时语义速查
 
 - `registerPlan()` 检查 publisher 权限、plan 非空、未重复；plan/supplier trust 由产品配置的 registry 投影表达，不是状态机前置条件。
-- `triggerOrderFromOutsideFor()` / `triggerOrderFromSignalFor()` 绑定 `orderId` 和 `planId`，记录 trigger fact 或 parent link，并可同时写入 order-level signal authorizations。
+- `triggerOrderFromOutsideFor()` / `triggerOrderFromSignalFor()` 绑定 `orderId` 和 `planId`，记录 trigger fact 或 trigger-origin link，并可同时写入 order-level signal authorizations。
 - `submitSignal()` 按 `(orderId, sourceId, signalId)` 去重，并检查授权 submitter 和 active executor overlay。
 - `HookReady` 只在 `trigger=true` 的 hook 第一次 Ready 时发出。
 - `StageExecutorPatchApplied` / `StageExecutorActivated` 只改变单个订单的 target stage executor，不改 Plan。

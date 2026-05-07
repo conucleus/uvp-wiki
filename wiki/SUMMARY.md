@@ -3,25 +3,28 @@
 ## 认识 UVP
 
 - [Wiki 入口](README.md)
+- [读者入口](getting-started/README.md)
 - [一个订单故事](getting-started/one-order-story.md)
 - [一个订单穿过 UVP 组件](getting-started/order-through-components.md)
-- [读者入口](getting-started/README.md)
 
-## 协议对象与实现模块
+## 协议对象
 
 - [核心对象总览](core/README.md)
   - [核心对象关系](concepts/overview.md)
   - [秩序 (Zhixu) DSL](concepts/core/zhixu.md)
-  - [Plan](concepts/core/plan.md)
   - [订单 (Order)](concepts/core/order.md)
-  - [Nucleation / 凝结核](concepts/core/nucleation.md)
-  - [Supplier](concepts/core/supplier.md)
-  - [Executor](concepts/core/executor.md)
-  - [Source 因果链](concepts/core/source.md)
   - [Signal](concepts/core/signal.md)
+  - [Executor](concepts/core/executor.md)
+  - [Plan](concepts/core/plan.md)
+  - [Nucleus / 凝结核](concepts/core/nucleation.md)
+  - [Supplier](concepts/core/supplier.md)
+  - [Source 因果链](concepts/core/source.md)
   - [Hook](concepts/core/hook.md)
   - [Trigger](concepts/core/trigger.md)
   - [File Resources](concepts/core/file-resources.md)
+
+## 实现模块
+
 - [从 Zhixu 到可注册 Plan](components/semantics-and-compiler.md)
   - [Hook Core 与 Compiler](concepts/architecture/components/compiler-hook-core.md)
   - [编译输入](concepts/artifacts/compiler-input.md)

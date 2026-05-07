@@ -2,7 +2,7 @@
 
 `uvp-chain-services/service` is the rebuildable service layer for the UVP EVM track. It is non-authoritative: contracts and chain events are the protocol fact source, while Chain Services provides rebuildable replay, projection, relaying, verification, and HTTP APIs. The compiler turns Zhixu into deterministic artifacts, the state machine handles on-chain facts, and Chain Services handles off-chain projections and service runtime.
 
-It is a forkable off-chain service package. Any participant, nucleation kernel, supplier, auditor, or third-party integration can download, fork, compile, and run its own instance; as long as ABI, event, EIP-712, canonical hash, Product DTO, and Store/Product API boundaries are respected, different instances can rebuild the same kind of fact view from the same chain events.
+It is a forkable off-chain service package. Any participant, Nucleus, supplier, auditor, or third-party integration can download, fork, compile, and run its own instance; as long as ABI, event, EIP-712, canonical hash, Product DTO, and Store/Product API boundaries are respected, different instances can rebuild the same kind of fact view from the same chain events.
 
 ```text
 UVPDeploymentRegistry / UVPStateMachine / ZhixuTrustRegistry events
@@ -51,7 +51,7 @@ When forking or self-hosting, these compatibility points must be preserved:
 | [Evidence, Proof, and File Resource](chain-services-evidence-proof.md) | `src/evidence/`, `src/proof-verifier/` | evidence hash, metadata hash, object handle, proof mismatch report. |
 | [Product API](chain-services-product-api.md) | `src/product/`, `src/api/routes/product-read.ts` | ordinary user order/task/timeline/proof DTO and Product staging readiness. |
 | [Relayer](chain-services-relayer.md) | `src/relayer/` | gas payer, broadcast, confirmation, retry; does not create business signatures. |
-| [Store Console, Supplier, and Governance API](chain-services-store-api.md) | `src/store-console/`, `src/store-suppliers/`, `src/governance/` | nucleation workbench, supplier directory, review, attestation/revocation request. |
+| [Store Console, Supplier, and Governance API](chain-services-store-api.md) | `src/store-console/`, `src/store-suppliers/`, `src/governance/` | Nucleus workbench, supplier directory, review, attestation/revocation request. |
 | [Notifications and Reconcile](chain-services-notifications-reconcile.md) | `src/notifications/`, `src/reconcile/` | delivery intent, retry/dead-letter, submission/projection reconciliation. |
 | [Storage, Migration, and Runtime Profile](chain-services-storage-runtime.md) | `src/storage/`, `src/config/`, `migrations/` | memory/SQLite/PostgreSQL, migrations, testnet fail-closed profile. |
 | [API Routes](chain-services-api-routes.md) | `src/api/routes/` | ownership of Product, Store, governance, notification, evidence, and diagnostics route modules. |
@@ -67,7 +67,7 @@ When forking or self-hosting, these compatibility points must be preserved:
 | Proof verifier | metadata hash, evidence hash, Zhixu hash, object handle. | proof mismatch report, evidence metadata, object storage adapter. |
 | Product projection | chain projection, trust projection, evidence metadata. | Product order/task/timeline/proof DTO, staging readiness. |
 | Product BFF | order draft, invite, participant wallet, plan trust. | Backend-for-Frontend registration draft, authorization table, and order submit workflow. |
-| Store Console | Store draft, version, docking, audit, runtime metadata. | nucleation workbench, Zhixu catalog, review material, docking session. |
+| Store Console | Store draft, version, docking, audit, runtime metadata. | Nucleus workbench, Zhixu catalog, review material, docking session. |
 | Store Supplier | supplier metadata, capability tags, contact material. | supplier directory, review request, attestation/revocation workflow input. |
 | Governance workflow | Store review material, admin action, trust request. | governance tx intent, hashing, review/attestation/revocation records. |
 | Notifications | `HookReady`, submitter authorization, supplier trust, profile. | delivery intents, retry/dead-letter operational state. |

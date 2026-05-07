@@ -2,35 +2,32 @@
 
 `uvp-eth` 的核心是一套把秩序 (Zhixu) 协作规则书落到 EVM 链上的状态机协议。合约和链事件是事实源；服务、Store、Order App、executor-kit 围绕这个事实源做编译、索引、展示、签名和提交。
 
-最短路径如下：
+最短对象关系先这样读：
 
 ```text
-秩序 (Zhixu) 定义
-  -> Nucleation / 凝结核
-  -> HookPlan
-  -> 链上注册参数
-  -> TrustRegistry 计划认证
-  -> UVPStateMachine 注册计划
-  -> 注册订单与 signal 授权
-  -> 参与方提交 signal
-  -> Hook 状态变化或 HookReady
-  -> 事件投影成 Product DTO
+秩序 (Zhixu): 这类协作怎么运行
+  -> 订单 (Order): 这一次协作正在运行
+  -> 执行者 (Executor): 这一步由谁处理
+  -> 信号 (Signal): 谁提交了什么声明和证据指纹
+  -> Proof / Product view: 这件事为什么可追踪
 ```
+
+工程实现会再把这条关系拆成编译产物、链上注册参数、trust registry、状态机求值、事件 replay 和 Product DTO。这些是第二层，不是第一次理解 UVP 的入口。
 
 ## 读法
 
-基础词从这里进入。秩序 (Zhixu) 是可复用规则书，订单 (Order) 是运行实例，其余对象分别服务编译、授权、背书、执行和展示：
+基础词从这里进入。秩序 (Zhixu) 是可复用规则书，订单 (Order) 是运行实例，Executor 和 Signal 解释谁实际推进订单，其余对象分别服务编译、授权、背书、执行和展示：
 
 | 子页 | 说明 |
 | --- | --- |
 | [Zhixu DSL](core/zhixu.md) | 秩序的代码名和 DSL 形态，描述 task、stage、source、signal、supplier 边界和选择权。 |
-| [Plan](core/plan.md) | 某个 Zhixu 针对某条链编译出的确定性产物。 |
 | [Order](core/order.md) | 某个 Plan 的动态运行实例，保存 signal、hook runtime 和 overlay。 |
-| [Nucleation / 凝结核](core/nucleation.md) | Zhixu 的发起核、设计者和秩序组织者。 |
-| [Supplier](core/supplier.md) | 被 Store 注册、标注、背书的能力主体和 trust subject。 |
 | [Executor](core/executor.md) | 某个订单里真正执行或提交 signal 的主体，包括 peer Zhixu 作为 executor。 |
-| [Source 因果链](core/source.md) | signal 所在的因果语境，同源串联、分叉、交汇都靠它表达。 |
 | [Signal](core/signal.md) | 状态机接受的最小业务输入，由授权钱包签名提交。 |
+| [Plan](core/plan.md) | 某个 Zhixu 针对某条链编译出的确定性产物。 |
+| [Nucleus / 凝结核](core/nucleation.md) | Zhixu 的发起核、设计者和秩序组织者；`nucleation` 是字段和成核上下文。 |
+| [Supplier](core/supplier.md) | 被 Store 注册、标注、背书的能力主体和 trust subject。 |
+| [Source 因果链](core/source.md) | signal 所在的因果语境，同源串联、分叉、交汇都靠它表达。 |
 | [Hook](core/hook.md) | 从 signal 条件求出阶段 readiness 的规则。 |
 | [Trigger](core/trigger.md) | 特殊 hook 标记，决定何时发出 `HookReady` 并打开可处理任务。 |
 | [File Resources](core/file-resources.md) | 阶段资源句柄，指向链下对象、协议文件或资源 manifest。 |

@@ -3,13 +3,15 @@
 秩序商店是凝结核、供应商、trust registry、operator 和普通执行界面之间的产品工作台。它提供目录、编译预览、资源和供应商组织、proof 视图、联系通知、发布 workflow、attestation request 和 audit。凝结核负责秩序内部设计，trust registry 负责外部背书，`UVPStateMachine` 和 `ZhixuTrustRegistry` 负责链上事实。
 
 ```text
-Nucleation / 凝结核
+Nucleus / 凝结核
   -> Store workspace and catalog
   -> compile preview / supplier organization / proof materials
   -> Store workflow review and audit
   -> trust-domain attestation request
   -> registry/state-machine projections
 ```
+
+本页使用 `Nucleus / 凝结核` 指主体，使用 `nucleation id` 指 DSL/API 字段。`spec.nucleation.id` 是现有 public interface，不表示英文里应该把 `Nucleation` 当成组织主体名称。
 
 ## Store 的一天
 
@@ -36,6 +38,8 @@ Store 可以组织材料、workflow、搜索、review、contact 和 audit trail�
 | Store Console | 面向 operator/admin 的 Store API 和 workflow surface。 |
 | Store Workbench | 面向凝结核的 draft、version、supplier、resource 和 proof 工作区。 |
 | `zhixu-store` | 实现包名 / app 名。 |
+| Nucleus / 凝结核 | 秩序的发起、设计和维护核心；不是 Store operator 或 trust registry。 |
+| `nucleation` | 成核上下文和字段名，例如 `spec.nucleation.id`。 |
 
 ## 三层治理
 
@@ -66,7 +70,7 @@ Store metadata、平台标签、联系信息、通知状态、review、audit、�
 
 | 区域 | 主要对象 | 先读 |
 | --- | --- | --- |
-| 凝结核工作台 | nucleation id、设计材料、版本、供应商组织、背书申请材料。 | [凝结核工作台](nucleation-workbench.md) |
+| 凝结核工作台 | Nucleus identity、`nucleation id`、设计材料、版本、供应商组织、背书申请材料。 | [凝结核工作台](nucleation-workbench.md) |
 | Zhixu Catalog | draft、compiled artifact、plan hash、fairness material、active recommendation、trust projection。 | [Zhixu Catalog、配置与发布](zhixu-management.md) |
 | Supplier Registry | supplier subject、capability、contact、participation、proof、attestation request。 | [Supplier Registry、能力与联系](supplier-registry.md) |
 | Trust / Proof | plan/supplier trust、order/task timeline、proof rows、revoked history。 | [履约状态、Proof 与 Trust 校验](runtime-proof.md) |

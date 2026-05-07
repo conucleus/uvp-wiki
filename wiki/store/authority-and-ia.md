@@ -6,7 +6,7 @@
 
 | Store 对象 | 主要负责人 | 链上事实 | Store 组织信息 |
 | --- | --- | --- | --- |
-| Nucleation / 凝结核 | Zhixu 设计者 / 秩序组织者 | 无独立合约状态；体现在 Zhixu/Plan/Order/proof 中。 | identity、维护说明、版本历史、设计材料、发布材料。 |
+| Nucleus / 凝结核 | Zhixu 设计者 / 秩序组织者 | 无独立合约状态；体现在 Zhixu/Plan/Order/proof 中。 | identity、维护说明、版本历史、设计材料、发布材料。 |
 | Zhixu draft/version | 凝结核设计，trust registry 背书 | `PlanAttested` / `PlanRevoked` 决定 official trust。 | draft、compile preview、fairness material、platform tags、active recommendation。 |
 | Supplier | 凝结核组织，trust registry 背书 | `SupplierAttested` / `SupplierRevoked` 决定 trust projection。 | profile、capability tags、联系人、通知渠道、审核状态、历史参与记录。 |
 | Order | registrar/participants/executors | `OrderRegistered` 和 state-machine events 决定运行状态。 | 搜索、排序、标签、operator note、proof summary。 |
@@ -17,7 +17,7 @@
 ## Store 首页信息架构
 
 - Search first：同一个查询可以命中凝结核、Zhixu、Order、Supplier、Governance object。
-- Nucleation visible：秩序版本要显示是谁设计和维护，同时显示 Store 状态。
+- Nucleus visible：秩序版本要显示是谁设计和维护，同时显示 Store 状态。
 - Trust visible：任何 plan/supplier trust 都要显示来自 registry projection 的状态。
 - Proof reachable：订单、任务、supplier participation 都应能进入 proof/timeline。
 - Store-only metadata labeled：draft、review、note、contact、notification、platform tag 必须标注为 Store/workflow 信息。
@@ -28,7 +28,7 @@
 
 ```text
 Store Home / Search
-  -> Nucleation Workbench
+  -> Nucleus Workbench
        -> identity / design material / supplier organization / publish material
   -> Zhixu Catalog
        -> draft / compile preview / fairness material / trust status / active version

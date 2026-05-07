@@ -25,7 +25,7 @@ Store 里的权限和 audit 约束平台 workflow。Audit 记录证明某个 Sto
 
 ## 权限和确认
 
-Store 应区分 read、nucleation_operator、operator、reviewer、governance_admin、auditor 等能力。敏感动作需要明确确认对象，例如 Nucleation ID、Draft ID、Plan ID、Plan Hash、Supplier subject、revocation reason。
+Store 应区分 read、nucleation_operator、operator、reviewer、governance_admin、auditor 等能力。敏感动作需要明确确认对象，例如 Nucleus ID / nucleation id、Draft ID、Plan ID、Plan Hash、Supplier subject、revocation reason。
 
 | 能力 | 可做什么 |
 | --- | --- |

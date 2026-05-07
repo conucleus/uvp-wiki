@@ -2,6 +2,8 @@
 
 凝结核工作台是秩序商店给秩序设计者和秩序组织者提供的舞台。核心用户是凝结核：它设计秩序、组织供应商、维护内部公平和运转；Store 提供工具、目录、proof、发布流程和申请背书的入口。
 
+命名上，凝结核对应英文 `Nucleus`；`nucleation` 只作为成核上下文或字段名出现，例如 `spec.nucleation.id`。工作台展示的是这个 Nucleus 的身份、维护材料、版本和组织网络，不把 Store operator 或 trust registry 混成凝结核。
+
 ## 三层治理
 
 | 层 | 谁负责 | 负责什么 | 权威边界 |
@@ -42,7 +44,7 @@ Store 提供的是舞台和工具：catalog、search、draft、compile preview�
 
 ## 工作台信息
 
-- 凝结核 identity：`spec.nucleation.id`、负责人、维护说明、版本历史；
+- 凝结核 identity：Nucleus display name、`spec.nucleation.id`、负责人、维护说明、版本历史；
 - Zhixu 设计材料：stage 图、source 关系、trigger、supplier slots、resource handles；
 - 供应商组织：候选 supplier、能力标签、联系渠道、历史 proof、是否已被 trust registry 背书；
 - 公平与透明材料：选择权规则、证据要求、异常处理、争议路径、版本变更说明；
