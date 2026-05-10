@@ -41,5 +41,5 @@ ABI / EIP-712 / calldata helpers
 - Protocol bindings only provide browser-safe ABI, typed data, calldata, and hash helpers; they do not read env, hold private keys, or submit transactions.
 - Chain Services may index, project, verify, relay, and record workflow state, but its databases must be rebuildable.
 - The Product API may prepare typed data, verify participant signatures, call the relayer, and return proof; order-level authorization is still checked by the contract.
-- The Store API may manage nucleation workspaces, drafts, supplier metadata, audit, and review; metadata is written as workflow/material, trust truth comes from the registry projection, and internal nucleation governance belongs to the nucleation kernel.
+- The Store API may manage Nucleus workspaces, drafts, supplier metadata, audit, and review; metadata is written as workflow/material, trust truth comes from the registry projection, and internal Zhixu governance belongs to the Nucleus.
 - Docking, contact, notification, and resource availability are all workflow/projection state; every public claim must trace back to registry/state-machine events.

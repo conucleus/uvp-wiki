@@ -54,7 +54,7 @@ spec:
 | `metadata.labels` | 业务分类、行业、demo 标签。链上权限由 order authorization 和 overlay 决定。 |
 | `metadata.annotations.version` | 计划版本。版本变化会进入 `planId`。 |
 | `spec.platform` | 目标平台。EVM track 使用 `type=blockchain`、`provider=eth`，可显式写 `network=base`。不写 `network` 时保持当前主网默认路径。 |
-| `spec.nucleation.id` | 秩序的发起核、设计者或组织域标识。详见 [Nucleation / 凝结核](nucleation.md)。 |
+| `spec.nucleation.id` | 秩序的发起核、设计者或组织域标识。详见 [Nucleus / 凝结核](nucleation.md)。 |
 | `spec.taskPatterns` | 任务模式列表，里面包含 stages。 |
 
 ## Stage 字段
@@ -132,7 +132,7 @@ fileResources:
 
 | 概念 | 静态/动态 | 解释 |
 | --- | --- | --- |
-| Nucleation / 凝结核 | 组织主体 | 发起、设计和维护 Zhixu 的秩序组织者。 |
+| Nucleus / 凝结核 | 组织主体 | 发起、设计和维护 Zhixu 的秩序组织者；`nucleation` 是字段和成核上下文。 |
 | 秩序 (Zhixu) | 静态 DSL | 可复用协作规则书。 |
 | Plan | 链目标产物 | 某个 Zhixu 针对 EVM 编译出的 artifact、hash 和注册参数。 |
 | Order | 动态实例 | 某个 Plan 的一次运行，包含 signal、hook runtime、stage overlay 和 proof。 |

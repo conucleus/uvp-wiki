@@ -20,7 +20,7 @@ Wiki 的目标是让人读懂项目，并把源码、测试、ABI fixture、PRD 
 - 一级栏目优先按工程读者路径划分：入门、核心概念、核心组件、秩序商店、执行者与集成、Product DTO 与用户表面、本地/预发/发布、参考与证据、贡献规则。
 - `core` 负责“对象是什么”；`components` 负责“系统怎么实现”；`store` 负责“秩序商店怎么组织和校验真实世界对象”；`execution` 负责“执行者、adapter、AI/MCP、docked Zhixu 怎么接入和提交 signal”。
 - 同一个 Markdown 文件只在 `SUMMARY.md` 里挂到一个一级目录。不同目录需要不同侧面时，新增侧面页；旧页可以通过正文链接引用。
-- `store` 页面写 Store 平台 workflow 和凝结核工作台；Store admin 是平台 workflow 角色，凝结核是秩序内部治理者。
+- `store` 页面写 Store 平台 workflow 和凝结核工作台；Store admin 是平台 workflow 角色，凝结核是秩序内部治理者。英文主体名用 `Nucleus`，`nucleation` 只用于 `spec.nucleation.id` 等字段或成核上下文。
 - Supplier、Executor、compiler、Store、Product API、Signal Container、release evidence 都是一级读者路径，按读者入口分布。
 - 重排时先保留旧细页和旧链接，等新结构稳定后再合并重复内容。
 - `wiki/site/` 是可重建静态输出，编辑源在 Markdown。

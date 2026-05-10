@@ -9,6 +9,18 @@ chain events
   -> Order App / Store / executor-kit
 ```
 
+## 可运行界面
+
+Product DTO 最终落在真实可跑的产品表面上：Order App 面向普通参与者处理待办，Store Console 面向凝结核和 operator 组织秩序、供应商、试拼和审查。
+
+![Order App 待办界面](../assets/screenshots/order-app.png)
+
+*Order App：普通参与者看到的待办、订单、证明和提交入口。*
+
+![Store Console 秩序目录界面](../assets/screenshots/store-console.png)
+
+*Store Console：凝结核和 operator 看到的秩序目录、试拼、供应商和审查入口。*
+
 ## 用户表面
 
 | 页面 | 作用 |

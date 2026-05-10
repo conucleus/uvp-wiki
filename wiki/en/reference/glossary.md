@@ -10,7 +10,8 @@ This page explains project terms in plain language first, then points to code or
 | Zhixu | A reusable coordination rulebook that describes how a class of Orders should run. | `ZhixuDefinition`, `kind: "Zhixu"`, compiler input. |
 | Plan / Zhixu version | A deterministic on-chain version compiled from a Zhixu. | `OnchainHookPlanArtifact`, `registerPlan()`, `PlanRegistered`. |
 | Order | One runtime instance of a Plan. | `UVPStateMachine.Order`, `triggerOrderFromOutsideFor()` / `triggerOrderFromSignalFor()`, `OrderRegistered`, `OrderTriggered`. |
-| Nucleation | The organizing subject that originates, designs, and maintains a kind of Zhixu. It can be a team, organization, program owner, or workflow owner, depending on the business context. | `spec.nucleation.id`, Store Nucleation workbench. |
+| Nucleus | The organizing core that originates, designs, and maintains a kind of Zhixu. It lets a class of coordination rules take shape, gain a boundary, and remain maintainable over time. | `spec.nucleation.id`, Store Nucleus workbench. |
+| nucleation | Process, context, or field name, not the subject name. Existing DSL/API names keep this spelling to avoid public-interface drift. | `spec.nucleation.id`, `nucleationId`. |
 | Stage | A step or execution segment inside a task pattern. | `taskPatterns[].stages[]`, `stageIdentifier`, `stageId`. |
 | Task Pattern | A reusable grouping of stages inside a Zhixu. Many examples use `master` as the main task pattern. | `taskPatterns[].name`. |
 | Supplier | An ordinary project-work capability subject that can be organized by Store and endorsed when needed. | `SupplierDefinition`, `SupplierAttested`, `SupplierRevoked`. |
@@ -50,7 +51,7 @@ This page explains project terms in plain language first, then points to code or
 | Product DTO | Data format translating chain facts into orders, tasks, proof, and trust views ordinary users can read. | `ZhixuDetailDTO`, `ProductOrderDTO`, `ProductTaskDTO`. |
 | Product BFF | Product Backend-for-Frontend workflow service that handles drafts, invites, participant confirmation, authorization building, and order registration. | `uvp-chain-services/service/src/product/bff/`. |
 | Signal Container | Product wrapper for task, evidence, typed data, signature, submission, and proof. | prepare/submit/proof Product API flow. |
-| Store | Product workbench for Nucleation, Suppliers, trust registries, operators, and proof views. | `zhixu-store/app`, Store Console API. |
+| Store | Product workbench for the Nucleus, Suppliers, trust registries, operators, and proof views. | `zhixu-store/app`, Store Console API. |
 | Chain Services | Rebuildable service layer for indexing, projection, proof, relaying, Product API, and Store API. | `@uvp-eth/chain-services`. |
 
 ## Advanced and Environment Terms
@@ -65,13 +66,13 @@ This page explains project terms in plain language first, then points to code or
 | Anvil | Local EVM chain used for development and protocol loops. | local Anvil scripts. |
 | Base Sepolia | Public EVM testnet target for staging/rehearsal claims. | chain id `84532`. |
 
-## Do Not Confuse
+## Key Concept Pairs
 
 | Pair | Correct reading |
 | --- | --- |
 | Zhixu / Order | Zhixu is the static design; Order is one runtime of that design. |
 | Plan / Order | Plan is an endorsed version; Order is a concrete run under that Plan. |
-| Nucleation / Store operator | Nucleation owns internal Zhixu design; Store operator manages platform workflow. |
+| Nucleus / Store operator | The Nucleus owns internal Zhixu design; Store operator manages platform workflow. |
 | Trust Domain / Authorization | Attestation is endorsement; authorization is permission to submit an order action. |
 | Supplier / Executor | Supplier is capability and trust identity; Executor is the runtime submitter or handler. |
 | Evidence / Proof | Evidence is off-chain material or metadata; proof is the trace from hash/signature/event to Product display. |

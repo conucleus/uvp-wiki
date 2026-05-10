@@ -1,6 +1,8 @@
-# Nucleation / 凝结核
+# Nucleus / 凝结核
 
-凝结核是秩序 (Zhixu) 的发起、设计和维护主体。先把它理解成可复用运营模型的 owner：采购运营团队、行业项目组织者、平台侧 workflow 设计者，或其他能长期维护这份规则书的组织。它对应 DSL 里的 `spec.nucleation.id`，用于标识“谁发起并维护这类秩序设计”。订单里的 executor、Store admin、trust registry 分别承担运行时执行、平台 workflow 和外部背书。
+凝结核 (Nucleus) 是秩序 (Zhixu) 的发起、设计和维护核心。它不是具体执行某个订单阶段的人，而是让一类协作规则开始成形、获得边界、持续维护的组织原点。先把它理解成可复用运营模型的 originating organizer：采购运营团队、行业项目组织者、平台侧 workflow 设计者，或其他能长期维护这份规则书的组织。
+
+`Nucleus` 是主体名；`nucleation` 是成核过程、成核上下文和现有 DSL/API 字段名。当前协议字段仍使用 `spec.nucleation.id`，用于标识“哪个凝结核发起并维护这类秩序设计”。订单里的 executor、Store admin、trust registry 分别承担运行时执行、平台 workflow 和外部背书。
 
 凝结核不自动等同于 Store operator、trust registry、registrar 或 submitter wallet。它可以出现在 workflow 材料和 Store 记录里，但链上权威仍然来自 plan attestation、publisher/registrar 权限、订单级 authorization 和参与方签名。
 
@@ -9,6 +11,16 @@ spec:
   nucleation:
     id: procurement-nucleus
 ```
+
+## 为什么叫凝结核
+
+“凝结核”强调的是形成秩序的核心，而不是调度、拥有、签名或执行。它适合表达三层含义：
+
+- 发起：某个主体先提出并维护一类协作规则；
+- 聚合：供应商、资源、证据要求、选择权和异常路径围绕这套规则组织起来；
+- 定界：哪些事情进入 Zhixu、哪些事情留给 Store workflow、trust registry 或外部业务系统。
+
+所以它不直接翻译成 `orchestrator`、`owner`、`creator` 或 `vow-maker`。这些词分别过度强调调度、所有权、一次性创建或主观意愿，都会压扁本项目里“成核并长期维护秩序”的含义。
 
 ## 凝结核负责什么
 
@@ -32,10 +44,20 @@ spec:
 | Executor | 某个订单里的运行时执行者或 submitter。 |
 | Registrar | 注册订单的授权主体。 |
 
+## 命名口径
+
+| 名称 | 用法 |
+| --- | --- |
+| 凝结核 / `Nucleus` | 主体。指发起、设计、组织并维护一类 Zhixu 的组织核心。 |
+| `nucleation` | 过程、上下文或字段名。当前 DSL/API 中保留 `spec.nucleation.id` 和 `nucleationId`。 |
+| 凝结核工作台 / Nucleus workbench | Store 中服务凝结核的产品工作区，管理 draft、版本、供应商、资源和背书材料。 |
+| Store operator | 平台 workflow 角色，不是凝结核。 |
+| Trust registry | 外部背书者，不是凝结核。 |
+
 ## 和 Zhixu、Plan、Order 的关系
 
 ```text
-Nucleation / 凝结核
+Nucleus / 凝结核
   -> 设计 Zhixu
   -> 编译成 Plan
   -> 请求 trust registry 背书

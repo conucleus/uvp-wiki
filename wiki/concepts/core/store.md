@@ -29,7 +29,7 @@ Store 的权威是组织权威和平台 workflow 权威。它可以说：
 
 | 对象 | Store 做的事 | Store 不做的事 |
 | --- | --- | --- |
-| Nucleation / 凝结核 | 提供设计、发布、供应商组织、proof 和 attestation request 工作台。 | 不替凝结核治理秩序内部。 |
+| Nucleus / 凝结核 | 提供设计、发布、供应商组织、proof 和 attestation request 工作台。 | 不替凝结核治理秩序内部。 |
 | Zhixu | 导入、编译预览、版本展示、发布材料审核、背书请求。 | 不直接判定公平可信。 |
 | Supplier | 注册 profile、平台标签、联系、proof、背书材料。 | 标签、链上 trust 和订单授权分层展示。 |
 | Order | 搜索、定位、查看投影、查看 proof。 | 不创建链上运行事实。 |

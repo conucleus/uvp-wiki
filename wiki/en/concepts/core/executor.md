@@ -25,7 +25,7 @@ Supplier registers in the Store
   -> only the active executor can submit the business signal for the target stage
 ```
 
-Store provides candidate networks, contactability, and proof materials for Nucleation and operators; on-chain stage binding, order-level authorization, active executor overlays, and EIP-712 signatures determine whether a given Order can accept the signals submitted by that subject.
+Store provides candidate networks, contactability, and proof materials for the Nucleus and operators; on-chain stage binding, order-level authorization, active executor overlays, and EIP-712 signatures determine whether a given Order can accept the signals submitted by that subject.
 
 ## Static Executor
 

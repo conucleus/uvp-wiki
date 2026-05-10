@@ -2,12 +2,20 @@
 
 This section is the learning path after the homepage. It is for readers who already know why UVP matters and now need a low-friction path from story, to actors, to terms, to local verification.
 
+This is not the concept encyclopedia. The first pass should build the business intuition: a reusable coordination rulebook is a Zhixu, one concrete runtime is an Order, the subject handling a step is an Executor, and the accountable business declaration that moves the order forward is a Signal.
+
 ## Recommended First Pass
 
 1. [One Order Story](one-order-story.md): one concrete cross-border order from Zhixu design to chain proof.
-2. [One Order Through UVP Components](order-through-components.md): the same order crossing Store, compiler, trust registry, state machine, Chain Services, Order App, and executor-kit.
-3. [Core Concepts](../core/README.md): the protocol objects after the story and component path are clear.
-4. [Glossary](../reference/glossary.md): terms and "do not confuse" pairs.
+2. [Core Concepts](../core/README.md): after the story is clear, read the protocol objects by layer.
+3. [Glossary](../reference/glossary.md): terms and key concept pairs.
+
+## Second Pass
+
+After the first pass, move into the engineering path:
+
+1. [One Order Through UVP Components](order-through-components.md): the same order crossing Store, compiler, trust registry, state machine, Chain Services, Order App, and executor-kit.
+2. [Architecture Overview](../concepts/architecture.md): module boundaries, dependency direction, source of truth, and data flow.
 
 ## Engineering First Pass
 

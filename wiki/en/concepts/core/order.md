@@ -17,7 +17,7 @@ During creation, the contract:
 - verifies the trigger typed-data signature and recovers the business submitter;
 - checks that the plan exists;
 - writes order-level signal authorization;
-- records the trigger fact or parent link;
+- records the trigger fact or trigger-origin link;
 - materializes the ready trigger stage;
 - emits `OrderRegistered`, `OrderTriggered`, `OrderMaterialized`, `StageMaterialized`, and `SignalSubmitterAuthorized`.
 

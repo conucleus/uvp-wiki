@@ -41,7 +41,7 @@ The state machine is a core component: it is part of the on-chain execution envi
 ## Runtime Semantics at a Glance
 
 - `registerPlan()` checks publisher permission, that the plan is non-empty, and that the plan is not duplicated. Plan/supplier trust is expressed by product-configured registry projections, not by a state-machine precondition.
-- `triggerOrderFromOutsideFor()` / `triggerOrderFromSignalFor()` bind `orderId` and `planId`, record the trigger fact or parent link, and can also write order-level signal authorizations.
+- `triggerOrderFromOutsideFor()` / `triggerOrderFromSignalFor()` bind `orderId` and `planId`, record the trigger fact or trigger-origin link, and can also write order-level signal authorizations.
 - `submitSignal()` deduplicates by `(orderId, sourceId, signalId)` and checks the authorized submitter and active executor overlay.
 - `HookReady` is emitted only when a `trigger=true` hook becomes Ready for the first time.
 - `StageExecutorPatchApplied` / `StageExecutorActivated` only change the target stage executor of a single order, not the Plan.

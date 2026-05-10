@@ -20,7 +20,7 @@ The goal of the Wiki is to help people understand the project, and to organize s
 - Top-level sections should first follow engineering-reader paths: getting started, core concepts, core components, Store, execution and integration, Product DTO and user surfaces, local/staging/release, reference and evidence, and contribution rules.
 - `core` is for "what the object is"; `components` is for "how the system is implemented"; `store` is for "how the Store organizes and validates real-world objects"; `execution` is for "how executors, adapters, AI/MCP, and docked Zhixu submit signals".
 - A single Markdown file should be attached to only one top-level section in `SUMMARY.md`. If different sections need different views of the same topic, add a separate side-view page; older pages can be referenced from the body.
-- `store` pages describe Store platform workflow and nucleation workbench; the Store admin is a platform workflow role, and the nucleation is the internal governor of the Zhixu.
+- `store` pages describe Store platform workflow and the Nucleus workbench; the Store admin is a platform workflow role, and the Nucleus is the internal governor of the Zhixu. Use `nucleation` only for field/context names such as `spec.nucleation.id`.
 - Supplier, Executor, compiler, Store, Product API, Signal Container, and release evidence are all first-class reading paths and should be distributed by reader entry point.
 - During restructuring, keep the old side pages and old links first, and merge duplicated content only after the new structure stabilizes.
 - `wiki/site/` is a rebuildable static output; the editable source is Markdown.
@@ -33,7 +33,7 @@ The goal of the Wiki is to help people understand the project, and to organize s
 | Core concepts entry | `wiki/core/` |
 | Core components entry | `wiki/components/` |
 | Store entry | `wiki/store/` |
-| Nucleation workbench | `wiki/store/nucleation-workbench.md` |
+| Nucleus workbench | `wiki/store/nucleation-workbench.md` |
 | Execution and integration entry | `wiki/execution/` |
 | Product DTO and user surfaces entry | `wiki/product/` |
 | Status summary | `wiki/status/` |
@@ -66,10 +66,10 @@ When changing the Product API:
 When changing the Store / Supplier / Zhixu management path:
 
 - update [Store](../store/README.md);
-- update [Nucleation Workbench](../store/nucleation-workbench.md);
+- update [Nucleus Workbench](../store/nucleation-workbench.md);
 - sync the object boundaries in [Core Concepts](../core/README.md);
 - state that Store metadata, platform labels, contact information, notification status, review status, and fulfillment record views belong to the read model or workflow, while chain events and trust-domain attestations are shown separately;
-- state the boundary between internal nucleation governance, Store platform workflow, and trust-domain external attestation.
+- state the boundary between internal Nucleus governance, Store platform workflow, and trust-domain external attestation.
 
 When changing the Executor / executor-kit / docked Zhixu path:
 

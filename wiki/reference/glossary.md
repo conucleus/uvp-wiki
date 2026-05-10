@@ -10,7 +10,8 @@
 | 秩序 / Zhixu | 描述“一类订单应该怎么运行”的可复用协作规则书。 | `ZhixuDefinition`、`kind: "Zhixu"`、compiler input。 |
 | Plan / 秩序版本 | 某个 Zhixu 编译后的确定性链上版本。 | `OnchainHookPlanArtifact`、`registerPlan()`、`PlanRegistered`。 |
 | Order / 订单 | 某个 Plan 的一次具体运行。 | `UVPStateMachine.Order`、`triggerOrderFromOutsideFor()` / `triggerOrderFromSignalFor()`、`OrderRegistered`、`OrderTriggered`。 |
-| 凝结核 / Nucleation | 发起、设计并维护某类 Zhixu 的组织主体。它可以是团队、组织、项目 owner 或 workflow owner，取决于业务语境。 | `spec.nucleation.id`、Store 凝结核工作台。 |
+| 凝结核 / Nucleus | 发起、设计并维护某类 Zhixu 的组织核心。它让一类协作规则成形、获得边界并持续维护；可以是团队、组织、项目 owner 或 workflow owner。 | `spec.nucleation.id`、Store 凝结核工作台。 |
+| nucleation / 成核上下文 | 成核过程、上下文或字段名，不是主体名。现有 DSL/API 保留这个拼写以避免 public interface 漂移。 | `spec.nucleation.id`、`nucleationId`。 |
 | Stage / 阶段 | task pattern 里的一个步骤或执行段。 | `taskPatterns[].stages[]`、`stageIdentifier`、`stageId`。 |
 | Task Pattern | Zhixu 里一组可复用阶段。很多例子用 `master` 表示主 task pattern。 | `taskPatterns[].name`。 |
 | Supplier | 具备现实项目能力的普通主体，可以被 Store 组织，也可以在需要时被背书。 | `SupplierDefinition`、`SupplierAttested`、`SupplierRevoked`。 |
@@ -65,13 +66,13 @@
 | Anvil | 本地开发和协议闭环使用的 EVM 链。 | local Anvil scripts。 |
 | Base Sepolia | 公共 EVM 测试网目标，用于 staging/rehearsal claim。 | chain id `84532`。 |
 
-## 不要混淆
+## 关键概念对
 
 | 概念对 | 正确读法 |
 | --- | --- |
 | Zhixu / Order | Zhixu 是静态设计；Order 是这份设计的一次运行。 |
 | Plan / Order | Plan 是被背书的版本；Order 是这个 Plan 下的具体运行。 |
-| Nucleation / Store operator | Nucleation 拥有内部 Zhixu 设计；Store operator 管平台 workflow。 |
+| Nucleus / Store operator | 凝结核拥有内部 Zhixu 设计；Store operator 管平台 workflow。 |
 | Trust Domain / Authorization | Attestation 是背书；authorization 是提交订单动作的权限。 |
 | Supplier / Executor | Supplier 是能力和 trust 身份；Executor 是运行时提交者或处理者。 |
 | Evidence / Proof | Evidence 是链下材料或 metadata；proof 是 hash、签名、事件到 Product 展示的追踪记录。 |

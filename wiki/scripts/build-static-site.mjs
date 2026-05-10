@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const wikiRoot = path.resolve(scriptDir, "..");
 const outputRoot = path.join(wikiRoot, "site");
-const assetSource = path.join(wikiRoot, "assets", "site.css");
+const assetsRoot = path.join(wikiRoot, "assets");
 const publicRoot = path.join(wikiRoot, "public");
 const defaultSiteUrl =
   process.env.GITHUB_REPOSITORY?.includes("/")
@@ -124,6 +124,11 @@ function inlineMarkdown(value) {
     const token = `\u0000CODE${codeSpans.length}\u0000`;
     codeSpans.push(`<code>${code}</code>`);
     return token;
+  });
+
+  text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, label, target) => {
+    const src = escapeHtml(rewriteMarkdownLink(target.trim()));
+    return `<img src="${src}" alt="${label}" loading="lazy">`;
   });
 
   text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, label, target) => {
@@ -555,8 +560,7 @@ function build() {
   const sitemapPages = [];
 
   fs.rmSync(outputRoot, { recursive: true, force: true });
-  fs.mkdirSync(path.join(outputRoot, "assets"), { recursive: true });
-  fs.copyFileSync(assetSource, path.join(outputRoot, "assets", "site.css"));
+  fs.cpSync(assetsRoot, path.join(outputRoot, "assets"), { recursive: true, force: true });
   copyPublicFiles();
 
   const navByLanguage = new Map();

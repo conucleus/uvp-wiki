@@ -19,6 +19,44 @@ flowchart TD
   Peri --> DTO
 ```
 
+## Runtime Topology
+
+The conceptual flow explains object relationships. At runtime, browsers, APIs, contracts, events, indexers, and databases form this loop:
+
+```mermaid
+flowchart LR
+  Browser["User browser"]
+  OrderApp["Order App"]
+  Store["Store Console"]
+  Exec["executor-kit / enterprise script"]
+  ProductAPI["Chain Services\nProduct API"]
+  StoreAPI["Chain Services\nStore API"]
+  Relayer["Relayer / RPC boundary"]
+  Contracts["UVPStateMachine\nZhixuTrustRegistry"]
+  Events["Chain events"]
+  Indexer["Indexer / replay worker"]
+  DB["Postgres projection"]
+  ObjectStore["Object storage\nmetadata URI / encrypted files"]
+
+  Browser --> OrderApp
+  Browser --> Store
+  OrderApp --> ProductAPI
+  Store --> StoreAPI
+  Exec --> ProductAPI
+  ProductAPI --> Relayer
+  StoreAPI --> Relayer
+  Relayer --> Contracts
+  Contracts --> Events
+  Events --> Indexer
+  Indexer --> DB
+  DB --> ProductAPI
+  DB --> StoreAPI
+  ProductAPI --> ObjectStore
+  StoreAPI --> ObjectStore
+```
+
+Postgres, object storage, and APIs in this diagram are product runtime layers. They can cache, search, display, and relay, but protocol facts still come from contract events, signatures, hashes, URIs, and replayable event provenance.
+
 ## Subpages
 
 | Subpage | Description |

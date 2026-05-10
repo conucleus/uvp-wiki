@@ -17,7 +17,7 @@ Supplier “打标”分成不同层。Store 平台标签、凝结核内部标�
 | 层 | 内容 | 权威 |
 | --- | --- | --- |
 | Profile | display name、subject id、wallet、组织说明、metadata URI。 | Store metadata。 |
-| Nucleation fit | 可服务的 Zhixu、stage、role slot、resource/evidence 类型。 | 凝结核组织语义。 |
+| Nucleus fit | 可服务的 Zhixu、stage、role slot、resource/evidence 类型。 | 凝结核组织语义。 |
 | Platform capability | logistics、customs、inspection、payment、dispute-review、document-verification 等 catalog tags。 | Store metadata + audit。 |
 | Contact | 联系人、通知渠道、负责人、可用时段、SLA、operational notes。 | Store metadata；不进链上明文。 |
 | Trust | attested/revoked/not_found、domains、proof rows。 | `ZhixuTrustRegistry` projection。 |
@@ -46,7 +46,7 @@ Capability passport 先展示能力、背书、可用阶段和 proof，再展示
 | 区块 | 内容 |
 | --- | --- |
 | Identity | subject id、wallet、display name、legal/organization notes、metadata URI。 |
-| Nucleation usage | 被哪些凝结核组织进哪些 Zhixu、stage、role slot。 |
+| Nucleus usage | 被哪些凝结核组织进哪些 Zhixu、stage、role slot。 |
 | Capability | 可承接 stage、resource/evidence 类型、支持的 Product task intent、是否可做 selector。 |
 | Trust | trust registry、attestation status、revocation reason、proof rows。 |
 | Operations | 联系人、通知渠道、SLA、可用区域、工作时间、升级路径。 |
