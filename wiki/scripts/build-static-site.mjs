@@ -22,7 +22,7 @@ const languageConfigs = {
     outputPrefix: "",
     summaryRel: "SUMMARY.md",
     homeLabel: "首页",
-    brandSubtitle: "EVM 原生 UVP 文档",
+    brandSubtitle: "区块链原生 UVP 文档",
     footer: "由 Markdown 生成。修改源文件后运行 <code>node wiki/scripts/build-static-site.mjs</code> 重新构建。",
   },
   en: {
@@ -32,7 +32,7 @@ const languageConfigs = {
     outputPrefix: "en/",
     summaryRel: "en/SUMMARY.md",
     homeLabel: "Home",
-    brandSubtitle: "EVM-native UVP docs",
+    brandSubtitle: "Blockchain-native UVP docs",
     footer: "Generated from Markdown. After editing source files, run <code>node wiki/scripts/build-static-site.mjs</code> to rebuild.",
   },
 };
@@ -328,6 +328,45 @@ function pageTitle(markdown, fallback) {
   return heading ? heading[1].trim() : fallback;
 }
 
+function cleanMarkdownText(value) {
+  return value
+    .replace(/!\[[^\]]*\]\([^)]+\)/g, "")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/\*([^*]+)\*/g, "$1")
+    .replace(/<[^>]+>/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function truncateDescription(value, maxLength = 180) {
+  if (value.length <= maxLength) return value;
+  return `${value.slice(0, maxLength - 1).trim()}…`;
+}
+
+function pageDescription(markdown, sourceRel, language) {
+  if (sourceRel === "README.md") {
+    return "UVP（通用价值协议）是一套面向 AI 时代跨组织协作的可证明协议，把授权、证据指纹、钱包签名和业务信号记录为可重放的链上 proof。";
+  }
+  if (sourceRel === "en/README.md") {
+    return "UVP, the Universal Value Protocol, is a verifiable coordination protocol for the AI era, recording authorized business signals as replayable on-chain proof.";
+  }
+
+  const withoutCodeBlocks = markdown.replace(/```[\s\S]*?```/g, "\n");
+  for (const rawLine of withoutCodeBlocks.split("\n")) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith("#") || line.startsWith("|") || line.startsWith(">")) continue;
+    if (line.startsWith("- ") || /^\d+\.\s+/.test(line)) continue;
+    const text = cleanMarkdownText(line);
+    if (text) return truncateDescription(text);
+  }
+
+  return language.code === "en"
+    ? "UVP Wiki documentation for the EVM-native Universal Value Protocol implementation."
+    : "UVP Wiki：EVM 原生通用价值协议文档。";
+}
+
 function languageForSourceRel(sourceRel) {
   return sourceRel.startsWith(languageConfigs.en.sourcePrefix) ? languageConfigs.en : languageConfigs.zh;
 }
@@ -445,8 +484,27 @@ function renderLanguageSwitch(language, rootRel, outputRel, altOutputRel) {
   ].join("");
 }
 
-function renderPage({ title, body, nav, rootRel, sourceRel, outputRel, altOutputRel, language }) {
+function renderSeoHead({ documentTitle, description, outputRel, altOutputRel, language }) {
+  const canonicalUrl = publicUrlForOutputRel(outputRel);
+  const altUrl = publicUrlForOutputRel(altOutputRel);
+  const currentHreflang = language.code === "en" ? "en" : "zh-CN";
+  const altHreflang = language.code === "en" ? "zh-CN" : "en";
+
+  return [
+    `  <meta name="description" content="${escapeHtml(description)}">`,
+    `  <link rel="canonical" href="${escapeHtml(canonicalUrl)}">`,
+    `  <link rel="alternate" hreflang="${currentHreflang}" href="${escapeHtml(canonicalUrl)}">`,
+    `  <link rel="alternate" hreflang="${altHreflang}" href="${escapeHtml(altUrl)}">`,
+    `  <meta property="og:title" content="${escapeHtml(documentTitle)}">`,
+    `  <meta property="og:description" content="${escapeHtml(description)}">`,
+    `  <meta property="og:type" content="article">`,
+    `  <meta property="og:url" content="${escapeHtml(canonicalUrl)}">`,
+  ].join("\n");
+}
+
+function renderPage({ title, description, body, nav, rootRel, sourceRel, outputRel, altOutputRel, language }) {
   const documentTitle = title === "UVP Wiki" ? "UVP Wiki" : `${title} · UVP Wiki`;
+  const seoHead = renderSeoHead({ documentTitle, description, outputRel, altOutputRel, language });
   const mermaidScript = body.includes('class="mermaid"')
     ? [
         '  <script type="module">',
@@ -467,6 +525,7 @@ function renderPage({ title, body, nav, rootRel, sourceRel, outputRel, altOutput
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${escapeHtml(documentTitle)}</title>
+${seoHead}
   <link rel="stylesheet" href="${rootRel}assets/site.css">
 </head>
 <body>
@@ -580,12 +639,13 @@ function build() {
     const rootRel = currentRootRel(outputRel);
     const body = markdownToHtml(markdown);
     const title = pageTitle(markdown, rel);
+    const description = pageDescription(markdown, rel, language);
     const navItems = navByLanguage.get(language.code) || navByLanguage.get(languageConfigs.zh.code) || [];
     const nav = renderNav(navItems, outputRel, rootRel);
     const altOutputRel = alternateOutputRel(rel, sourceSet);
     const outPath = path.join(outputRoot, outputRel);
     ensureDir(outPath);
-    fs.writeFileSync(outPath, renderPage({ title, body, nav, rootRel, sourceRel: rel, outputRel, altOutputRel, language }));
+    fs.writeFileSync(outPath, renderPage({ title, description, body, nav, rootRel, sourceRel: rel, outputRel, altOutputRel, language }));
     sitemapPages.push({
       outputRel,
       lastmod: fs.statSync(file).mtime.toISOString().slice(0, 10),

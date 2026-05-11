@@ -24,7 +24,7 @@
 | `zhixu-store/app` | `@uvp-eth/zhixu-store-web` | Store/workbench frontend | old Go-coupled Store BFF |
 | `uvp-order-app/app` | `@uvp-eth/order-app` | participant task/signal console | Store Console、escrow demo |
 | `uvp-executor-kit/package` | `@uvp-eth/executor-kit` | executor CLI/SDK/MCP、chain watcher、Product API signal producer | privileged backend truth |
-| `uvp-deploy/deploy` | `@uvp-eth/deploy` | deploy scripts、manifests、release records | sibling `/Users/uyhendu/project/uvp-deploy` |
+| `uvp-deploy/deploy` | `@uvp-eth/deploy` | deploy scripts、manifests、release records | external deploy repo（see `uvp-deploy` workspace） |
 | `uvp-deploy/apps/ops-console-web` | `@uvp-eth/ops-console-web` | operator console prototype | protocol runtime |
 | `uvp-periphery` | mixed | funding/payment/guarantee/agent adapters and demos | core protocol truth |
 
