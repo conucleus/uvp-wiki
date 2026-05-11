@@ -1,6 +1,6 @@
 # Getting Started
 
-This section is the learning path after the homepage. It is for readers who already know why UVP matters and now need a low-friction path from story, to actors, to terms, to local verification.
+If you already understand roughly what UVP is trying to solve but do not yet have the object map in your head, start here. Build intuition from the story first, then read the roles and terms, and only then move into local verification.
 
 This is not the concept encyclopedia. The first pass should build the business intuition: a reusable coordination rulebook is a Zhixu, one concrete runtime is an Order, the subject handling a step is an Executor, and the accountable business declaration that moves the order forward is a Signal.
 

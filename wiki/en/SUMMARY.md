@@ -3,6 +3,7 @@
 ## Learn UVP
 
 - [Wiki Entry](README.md)
+- [Coordination Infrastructure for the AI Era](getting-started/ai-era-coordination.md)
 - [Reader Entry](getting-started/README.md)
 - [One Order Story](getting-started/one-order-story.md)
 - [One Order Through UVP Components](getting-started/order-through-components.md)
@@ -11,6 +12,7 @@
 
 - [Core Object Overview](core/README.md)
   - [Core Object Relations](concepts/overview.md)
+  - [Store Core Concept](concepts/core/store.md)
   - [Zhixu DSL](concepts/core/zhixu.md)
   - [Order](concepts/core/order.md)
   - [Signal](concepts/core/signal.md)
@@ -25,6 +27,9 @@
 
 ## Implementation Modules
 
+- [Engineering Architecture](engineering/README.md)
+- [Protocol Backbone](protocol/README.md)
+- [Core Components](components/README.md)
 - [From Zhixu to a Registrable Plan](components/semantics-and-compiler.md)
   - [Hook Core and Compiler](concepts/architecture/components/compiler-hook-core.md)
   - [Compiler Input](concepts/artifacts/compiler-input.md)
@@ -79,6 +84,9 @@
     - [Executor Kit](execution/executor-kit.md)
     - [Docked Zhixu / Zhixu as Executor](execution/zhixu-as-executor.md)
 - [Architecture Overview](concepts/architecture.md)
+  - [Data Flow and Truth Source](concepts/architecture/flow-and-truth.md)
+  - [Full Lifecycle](concepts/architecture/lifecycle.md)
+  - [Module Boundaries](concepts/architecture/modules.md)
 - [Module Map](reference/module-map.md)
 
 ## Local / Staging / Release

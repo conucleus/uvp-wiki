@@ -3,6 +3,7 @@
 ## 认识 UVP
 
 - [Wiki 入口](README.md)
+- [AI 时代的协作地基](getting-started/ai-era-coordination.md)
 - [读者入口](getting-started/README.md)
 - [一个订单故事](getting-started/one-order-story.md)
 - [一个订单穿过 UVP 组件](getting-started/order-through-components.md)
@@ -11,6 +12,7 @@
 
 - [核心对象总览](core/README.md)
   - [核心对象关系](concepts/overview.md)
+  - [秩序商店（Store）核心概念](concepts/core/store.md)
   - [秩序 (Zhixu) DSL](concepts/core/zhixu.md)
   - [订单 (Order)](concepts/core/order.md)
   - [Signal](concepts/core/signal.md)
@@ -25,6 +27,9 @@
 
 ## 实现模块
 
+- [工程架构入口](engineering/README.md)
+- [协议主干](protocol/README.md)
+- [核心组件](components/README.md)
 - [从 Zhixu 到可注册 Plan](components/semantics-and-compiler.md)
   - [Hook Core 与 Compiler](concepts/architecture/components/compiler-hook-core.md)
   - [编译输入](concepts/artifacts/compiler-input.md)
@@ -79,6 +84,9 @@
     - [Executor Kit](execution/executor-kit.md)
     - [Docked Zhixu / Zhixu 作为 Executor](execution/zhixu-as-executor.md)
 - [架构总览](concepts/architecture.md)
+  - [数据流与事实源](concepts/architecture/flow-and-truth.md)
+  - [完整生命周期](concepts/architecture/lifecycle.md)
+  - [模块边界](concepts/architecture/modules.md)
 - [模块地图](reference/module-map.md)
 
 ## 本地 / 预发 / 发布
