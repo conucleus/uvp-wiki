@@ -113,3 +113,4 @@
 ## Contribution
 
 - [Documentation Rules](contribute/documentation-rules.md)
+- [Afterword: The Zeroth Understander](contribute/epilogue.md)

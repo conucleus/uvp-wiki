@@ -113,3 +113,4 @@
 ## 贡献
 
 - [文档规则](contribute/documentation-rules.md)
+- [后记：第零个理解者](contribute/epilogue.md)
