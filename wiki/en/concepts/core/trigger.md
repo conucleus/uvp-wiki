@@ -4,7 +4,7 @@ A Trigger turns a ready condition into an executable task. More precisely, it is
 
 For first-pass readers, `HookReady` means "this task is ready to handle." It does not mean the business work is complete. Completion is proven later by an authorized `SignalSubmitted` event and its evidence fingerprint.
 
-Trigger is a compile-time mark on Hook, coming from the `trigger` array in a Zhixu stage. The array is a pure OR wakeup set: any listed key may wake the stage. Each key points to one `receiveSignals` hook; that hook keeps the original full Hook DSL semantics, including `~`, `&`, `|`, and `+T`, and is validated by the existing Hook DSL parser/compiler rules.
+Trigger is a compile-time mark on Hook, coming from the `trigger` array in a Zhixu stage. The array is a pure OR wakeup set: any listed key may wake the stage. Each key points to one `receiveSignals` hook; that hook keeps the current stable Hook DSL semantics, including `~`, `&`, `|`, and explicit duration delays such as `+5s`, and is validated by the existing Hook DSL parser/compiler rules. Legacy `+T` is not part of the current stable semantics; it should only be enabled after Rust core, cloud PG trigger handling, and the on-chain runtime agree on one behavior.
 
 ```yaml
 trigger:

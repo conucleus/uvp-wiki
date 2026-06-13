@@ -4,7 +4,7 @@ Trigger 把一个 ready condition 变成可执行任务。它是一种特殊 hoo
 
 第一遍可以把 `HookReady` 理解成“这个任务可以处理了”。它不表示业务已经完成；业务完成要等后续授权 `SignalSubmitted` 事件和证据指纹来证明。
 
-Trigger 是 Hook 的一个编译标记，来自秩序 stage 的 `trigger` 数组。这个数组是纯 OR 唤醒集合：任意一个 key 到达都可以唤醒该 stage；每个 key 指向一个 `receiveSignals` hook。这个 hook 保持原来的 Hook DSL 完整语义，`~`、`&`、`|`、`+T` 都照旧，并继续由既有 Hook DSL parser/compiler 规则校验。
+Trigger 是 Hook 的一个编译标记，来自秩序 stage 的 `trigger` 数组。这个数组是纯 OR 唤醒集合：任意一个 key 到达都可以唤醒该 stage；每个 key 指向一个 `receiveSignals` hook。这个 hook 保持当前 Hook DSL 稳定语义，`~`、`&`、`|`、显式 duration delay（例如 `+5s`）照旧，并继续由既有 Hook DSL parser/compiler 规则校验。Legacy `+T` 不属于当前稳定语义，等 Rust core、cloud PG trigger 和链上 runtime 有一致方案后再启用。
 
 ```yaml
 trigger:
