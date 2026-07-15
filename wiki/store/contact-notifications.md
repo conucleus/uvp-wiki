@@ -13,7 +13,7 @@ Store 可以维护联系和通知工作流，因为真实履约需要找到人�
 
 ## 来源和边界
 
-- 通知触发可以来自 `HookReady`、order-level authorization、supplier trust 和 Product task projection。
+- 通知触发可以来自 `HookReady`、order-level authorization、supplier identity 和 Product task projection。
 - 通知状态只能说明 Store/chain-services 是否尝试联系或提醒。
 - 业务完成必须由授权 submitter 的链上 signal 表示。
 - 联系方式、凭证、私密 note、证件、合同、invoice、evidence plaintext 不应上链。

@@ -36,26 +36,26 @@ In a cross-border photovoltaic delivery, the project company, EPC, OEM, customs 
 ```text
 Zhixu rulebook
   -> deterministic Plan artifact
-  -> trust-registry endorsement for rule or capability subject
+  -> StateMachine Plan commit and publication
   -> Order creation and signal authorization
   -> executor submits evidence hash and signed Signal
   -> UVPStateMachine records events and advances HookReady
   -> Chain Services rebuilds order, task, timeline, and proof rows
 ```
 
-If you read one story first, read [One Order Story](getting-started/one-order-story.md). On the second pass, read [One Order Through UVP Components](getting-started/order-through-components.md) to locate Store, compiler, trust registry, state machine, Chain Services, Order App, and executor-kit.
+If you read one story first, read [One Order Story](getting-started/one-order-story.md). On the second pass, read [One Order Through UVP Components](getting-started/order-through-components.md) to locate Store, compiler, Identity Registry, state machine, Chain Services, Order App, and executor-kit.
 
 ## What UVP Is Not
 
 UVP is not a generic workflow SaaS, payment provider, custodian, escrow product, or AI agent runtime.
 
-Funding, USDC, escrow, guarantee, settlement, and AI/MCP agent adapters can connect around UVP, but they belong in periphery or external adapters. The core protocol boundary is the coordination state machine: Plans, Orders, authorizations, Signals, hooks, attestations, and replayable events.
+Funding, USDC, escrow, guarantee, settlement, and AI/MCP agent adapters can connect around UVP, but they belong in periphery or external adapters. The core protocol boundary is the coordination state machine: Plans, Orders, authorizations, Signals, hooks, publications, and replayable events.
 
 ## Current Implementation and Maturity
 
 The runnable implementation track today is EVM/Web3. `uvp-protocol`, `uvp-chain-services`, `zhixu-store`, `uvp-order-app`, and `uvp-executor-kit` make up the public implementation: the compiler emits deterministic artifacts, contracts record Plan/Order/Signal/trust events, Chain Services rebuilds Product/Store views, and frontends plus executor tools consume those views and submit authorized actions.
 
-Status must be read by layer: compiler, contracts/event replay, trust registry, Product DTO, and Chain Services projection have verified claims; Store Console, Order App, executor-kit live operator path, and ops console remain prototype or partial. See [Project Status](status/README.md) for the current wording.
+Status must be read by layer: compiler, contracts/event replay, Identity Registry, Product DTO, and Chain Services projection have verified claims; Store Console, Order App, executor-kit live operator path, and ops console remain prototype or partial. See [Project Status](status/README.md) for the current wording.
 
 ## Start Reading
 

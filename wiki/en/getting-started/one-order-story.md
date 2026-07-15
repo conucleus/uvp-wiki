@@ -108,11 +108,11 @@ The system first checks and packages the Zhixu: whether references are complete,
 
 That stable version has a fingerprint. The same rule set gets the same fingerprint; changes that alter coordination meaning get a new fingerprint. Later review, order registration, and accountability all point to the same version.
 
-### 5.3 A Trust Domain Endorses That Version
+### 5.3 Publish the Version and Register Participant Identities
 
-A trust registry is a responsible subject willing to endorse a kind of judgment. It can review the stable version's materials, evidence requirements, participant requirements, applicability, and version fingerprint. After approval, it emits an endorsement event on chain.
+The publisher signs the stable version through EIP-712. StateMachine records the Plan hash, metadata, and publisher as replayable events. A Store may review the material and decide whether to recommend the version.
 
-The endorsement event means this trust registry recognizes this version under its endorsement policy. It gives Store displays, Order creation, and partner review a verifiable basis.
+After offline verification of a participating organization, the Registry owner may record its subject-to-wallet mapping in the Identity Registry. This mapping lets participants resolve the real-world subject represented by a wallet.
 
 ### 5.4 Create This Concrete Run
 
@@ -121,7 +121,7 @@ An Order is one concrete execution of a stable rule version. For example, when a
 ```text
 Zhixu DSL: how this class of PV project coordinates
   -> stable version and fingerprint: everyone points to the same rule set
-  -> endorsement record: a responsible subject recognizes this version
+  -> Plan publication record: the publisher signs this version
   -> Order: one project starts running under this version
   -> authorization table: who may emit which signal in this Order
 ```
@@ -179,5 +179,5 @@ This means "the task is ready to handle." It does not mean the business work is 
 ## Read Next
 
 - [Core Object Overview](../core/README.md): read the protocol objects by layer after the story is clear.
-- [One Order Through UVP Components](order-through-components.md): use the same order on the second pass to locate Store, compiler, trust registry, state machine, Chain Services, Order App, and executor-kit.
+- [One Order Through UVP Components](order-through-components.md): use the same order on the second pass to locate Store, compiler, Identity Registry, state machine, Chain Services, Order App, and executor-kit.
 - [Glossary](../reference/glossary.md): use it when you meet unfamiliar terms or key concept pairs.

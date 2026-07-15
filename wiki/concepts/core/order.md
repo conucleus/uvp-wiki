@@ -1,6 +1,6 @@
 # 订单 (Order)
 
-Order 是“订单”。在协议里，它是某个 Plan 的一次动态运行实例。它记录这个订单里哪些 signal 被接受、哪些 hook ready 或 cancelled、哪些 executor/resource overlay 被应用，以及这些事实对应的链上 proof。
+Order 是“订单”。在协议里，它是从某个已注册 Plan 分叉出来的一条独立事实流。Order 一旦开启并取得 `orderId`，协议只承诺它已经注册并可继续接收符合规则的事实；核心协议不为 Order 定义 `running`、`completed`、`cancelled` 等生命周期状态。
 
 ## Order 创建
 
@@ -21,9 +21,9 @@ triggerOrderFromSignalFor(trigger, authorizations, signature)
 - materialize ready 的 trigger stage。
 - 发出 `OrderRegistered`、`OrderTriggered`、`OrderMaterialized`、`StageMaterialized` 和 `SignalSubmitterAuthorized`。
 
-## Order 里的动态状态
+## Order 里的动态事实
 
-| 状态 | 来源 |
+| 事实 | 来源 |
 | --- | --- |
 | signal records | `SignalSubmitted`。 |
 | hook runtime | `HookStatusChanged`、`HookReady`、`TimerPoked`。 |
@@ -35,13 +35,17 @@ triggerOrderFromSignalFor(trigger, authorizations, signature)
 
 ## Order 和 Product Order
 
-链上 Order 是协议状态。`ProductOrderDTO` 是产品视图。Product Order 会把链上字段翻译成阶段、任务、参与方、证明和普通语言。事实仍来自 `UVPStateMachine` 事件。
+链上 Order 是协议事实容器。`ProductOrderDTO` 是产品视图。它的 Order 状态只表达 `registered`；阶段是否 ready、任务是否待办、某个业务目标是否完成，分别由 hook、task 和 signal 表达，不能上卷成 Order 终态。
 
-Product task ID、Store docking session ID、adapter job ID 都是工作流索引。链上 Order 的身份仍是 `orderId`，链上状态仍来自 `UVPStateMachine` 事件。
+Product task ID、Store docking session ID、adapter job ID 都是工作流索引。链上 Order 的身份仍是 `orderId`，具体事实来自 `UVPStateMachine` 事件。
 
 ## Order 可以分叉和交汇
 
-一个 Order 内部可以有多条 source 因果链。比如跨境供货里，供应、支付、物流、现场交付和买方验收各自推进，在特定 hook 处交汇。Order 的动态性不在于数据库随便改状态，而在于不同授权 signal 按合约规则不断写入同一条可重放事件流。
+一个 Order 内部可以有多条 source 因果链。比如跨境供货里，供应、支付、物流、现场交付和买方验收各自推进，在特定 hook 处交汇。Order 的动态性不来自一个可变的总状态，而来自不同授权 signal 按合约规则写入同一条可重放事件流。
+
+## 不设关闭与纠错入口
+
+Order 不需要被“关闭”才能保持一致性。业务方可以停止继续写入，也可以从同一个 Zhixu 重新创建新的 Order。Signal 采用 first-writer-wins；如果首次写入的业务事实有误，核心协议不覆盖或删除旧事实，而是创建新的 Order 重新执行，并由上层产品把两条事实流的业务关系展示清楚。
 
 如果某个 stage 由另一条 Zhixu 承接，通常会形成 local order 和 linked order
 之间的信号绑定：

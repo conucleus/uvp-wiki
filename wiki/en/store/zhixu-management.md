@@ -1,85 +1,40 @@
-# Zhixu Catalog, Configuration, and Publishing
+# Zhixu Catalog, Configuration, and Publication
 
-The Zhixu Catalog in the Store is where the Nucleus publishes a Zhixu design, organizes materials, asks the platform workflow to review it, and requests trust-domain endorsement. Internal stages, fairness rules, and supplier organization principles are maintained by the Nucleus; this page only describes the Store side. The DSL object itself is covered in the core concept [Zhixu](../concepts/core/zhixu.md).
+The Zhixu Catalog is the Nucleus workspace for coordination design, compiler material, and Store-facing records. The Nucleus owns stages, fairness rules, exception handling, and supplier organization. The Store owns cataloging, review, search, version selection, and operating records.
 
-## Page Goals
-
-The Zhixu Catalog should help the Nucleus, Store operators, and trust reviewers each see clearly:
-
-- which Nucleus created and maintains this Zhixu;
-- which stages, sources, triggers, supplier slots, resources, and evidence requirements it defines;
-- how it explains internal fairness, choice, exception handling, and transparency;
-- its current draft / compiled / reviewed / attested / revoked / deprecated status;
-- whether the planId, planHash, compiler/schema version are reproducible;
-- whether it includes peer docking with `supplierType=zhixu`;
-- whether the current version can create new orders or only browse historical orders.
-
-## Who Is Responsible for What
-
-| Item | Owner | Store role |
-| --- | --- | --- |
-| Internal Zhixu design | Nucleus | Provides authoring/import, compile preview, graph, and version workbench. |
-| Supplier organization and fairness rules | Nucleus | Shows supplier requirements, resource/evidence checklist, and explanation materials. |
-| Platform catalog tagging | Store operator | Adds platform tags for catalog, industry, risk, visibility, and recommended version. |
-| Publishing material review | Store reviewer | Confirms the materials are complete, compilable, and reviewable; does not directly decide whether they are fair and trustworthy. |
-| External trust endorsement | Trust registry | Expressed through registry attestation/revocation. |
-| Order runtime facts | `UVPStateMachine` | The Store only displays projections and proof. |
-
-## Publishing Path
+## Publication path
 
 ```text
-Nucleus imports Zhixu
+Import Zhixu
   -> compile preview
-  -> Product Schema / resource / supplier requirement validation
-  -> Nucleus fills in fairness, transparency, and exception handling notes
-  -> Store workflow review
-  -> approved_for_broadcast
-  -> governance admin requests attestation
-  -> indexed PlanAttested
-  -> active/order-creatable version
+  -> Product Schema and resource validation
+  -> Store review
+  -> publisher signature
+  -> PlanCommitted / metadata registration / PlanFinalized
+  -> StateMachine PlanRegistered projection
+  -> Store selects an active version
 ```
 
-`approved_for_broadcast` means the platform workflow allows an endorsement request to be started. On-chain endorsement is expressed by `PlanAttested`, and Zhixu fairness is supported jointly by Nucleus materials and trust-domain review.
+Plan publication authority comes from the publisher signature. Any relayer may broadcast a valid signature. Store review determines Store display, recommendation, and publishing assistance.
 
-## What the Store Can Save
+## Store-managed records
 
-- draft source, compile preview, planId, planHash, artifact hash;
-- Nucleus identity, maintenance notes, version notes, deprecated/revoked display status;
-- stage explanation, source map, trigger, supplier slot, resource handle;
-- fairness / transparency / exception policy materials;
-- platform catalog tags, risk labels, visibility, active recommendation;
-- Product Schema bundle, add-on manifest, capability/plugin metadata;
-- governance request id, broadcast state, audit reference.
+- draft source, compile preview, planId, planHash, and artifact hash;
+- Nucleus identity, maintenance notes, version notes, and Store lifecycle;
+- stage explanations, supplier requirements, and resource/evidence checklists;
+- catalog tags, risk notices, visibility, and active recommendation;
+- Product Schema bundles, add-on manifests, and capability/plugin metadata;
+- review, broadcast, and audit records.
 
-## Store Display Language
+## Sources of fact
 
-- Store review approved: the platform workflow has passed, and the item can move to endorsement request or publishing.
-- Compile preview passed: the artifact can be generated; on-chain registration depends on `registerPlan()`, while official display depends on the registry projection.
-- Active recommendation: the Store recommends a version as the new-order entry point, while existing orders stay bound to the original `planId`.
-- Store copy: explains the materials and operational state; `planId`, `planHash`, and the on-chain artifact keep the compile result.
-- Store admin: maintains the platform workflow, while the Nucleus maintains internal Zhixu stages, fairness rules, and supplier organization principles.
+| Fact | Source |
+| --- | --- |
+| DSL compilation | Compiler output. |
+| Plan publication | `UVPStateMachine` Plan-event projection. |
+| Plan publisher | Publisher signature and publisher event. |
+| Store recommendation | Store database and audit records. |
+| Plan bound to an Order | `OrderRegistered` and the Order projection. |
+| Supplier fit for a stage | Nucleus judgment and Store matching records. |
 
-## What the Trust Domain Looks At
-
-The trust registry is the external endorsement source for the Store page. It should judge whether a Zhixu can be endorsed based on reviewable materials, for example:
-
-- whether the stages, sources, and triggers are transparent and explainable;
-- whether supplier selection and selector permissions are clear;
-- whether evidence requirements, resource handles, and proof paths are verifiable;
-- whether failure, disputes, revocation, and exception handling are defined;
-- whether the planId/planHash match the submitted materials;
-- whether this Nucleus has the reputation and ability to maintain the Zhixu.
-
-The Store can organize and display these materials; endorsement facts can only come from the `ZhixuTrustRegistry` projection.
-
-## Checklist
-
-| Check | What the Store shows | Authority |
-| --- | --- | --- |
-| Is the DSL compilable? | compile preview, artifact hash, validation errors. | compiler output. |
-| Who is the Nucleus? | `spec.nucleation.id`, maintenance notes, version history. | Zhixu metadata + Store workspace. |
-| Are the fairness materials complete? | selector, supplier slot, exception handling, evidence requirements. | Nucleus-submitted materials; trust registry makes the external decision. |
-| Is the Plan officially trusted? | trusted/revoked/not found badge. | `ZhixuTrustRegistry` projection. |
-| Does the stage have an execution entry point? | trigger hook, Product task preview. | compiled HookPlan + state-machine events. |
-| Does the Supplier capability match? | required capability vs supplier passport. | Internal Zhixu semantics + Store metadata; trust is checked in the registry. |
-| Is the docked Zhixu usable? | peer plan trust, signalMap validation, relation draft. | registry projection + compiler validation + workflow audit. |
+The Identity Registry records real-world subject-to-wallet mappings. StateMachine, the Nucleus, and the Store respectively own Plan publication, capability judgment, and version recommendation.

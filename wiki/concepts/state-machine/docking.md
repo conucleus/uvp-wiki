@@ -42,7 +42,7 @@ local stage HookReady
 ## 边界
 
 - local order 和 linked order 都是独立链上订单。
-- linked Zhixu 的 plan attestation、order registration、signal authorization 和 proof 独立存在。
+- linked Zhixu 的 plan publication、order registration、signal authorization 和 proof 独立存在。
 - Store docking session 只是试拼和审核材料；正式 proof 看 `DockedOrderLinked`、`DockedSignalMapped`、`DockedSignalSubmitted` 和两边订单事件。
 - `signalMap` 描述可映射接口，不等于自动完成业务。
 - `submitDockedSignal` 映射的是 linked order 已存在的 signal，不替 linked order 生成业务事实。

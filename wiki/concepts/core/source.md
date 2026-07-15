@@ -119,6 +119,6 @@ collector_intake
 
 - Role slot 描述参与角色；Source 描述因果链。
 - Executor 描述运行时处理者或提交者；Source 描述 signal 语境。
-- Supplier 是被 Store 和 trust registry 组织、背书的能力主体；Source 是 hook/signal 命名空间。
+- Supplier 是被凝结核组织、由 Store 维护能力资料的参与主体；Source 是 hook/signal 命名空间。
 - 成交后的履约可以形成新的 source 或新的 Order。
 - Source 必须可编译、可授权、可重放，不能当作任意动态字段使用。

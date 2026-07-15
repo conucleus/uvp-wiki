@@ -22,7 +22,7 @@ ABI / EIP-712 / calldata helpers
 | protocol-bindings | ABI, typed data, hash helpers, calldata helpers, ResourceManifest/StagePatch helpers. | Network requests, private keys, databases, and business authorization decisions. |
 | rebuildable service layer / chain-services | Product API, Store API, submission API, evidence/proof API, notification ops, runtime diagnostics. | Facts come from chain events, business signatures come from participants. |
 | product-dto | order/task/proof/trust DTO in ordinary user language. | HookPlan raw text, low-level sourceId/signalId, gas/ABI details. |
-| Store API | nucleation workspace, drafts, review, supplier metadata, contact, audit, governance workflow. | trust attestation, nucleation-internal governance, and business completion are expressed by registry, nucleation, and state-machine proof respectively. |
+| Store API | nucleation workspace, drafts, review, supplier metadata, contact, audit, governance workflow. | trust publication, nucleation-internal governance, and business completion are expressed by registry, nucleation, and state-machine proof respectively. |
 | Executor Kit | signal producer CLI/SDK/MCP. | authorization creation, default private-key custody, and business signatures are handled by Product/registrar, key management, and business-party wallets. |
 
 ## Reading Path

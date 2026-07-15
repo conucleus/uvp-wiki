@@ -27,7 +27,7 @@ The service layer may cache and project, but its databases must be rebuildable f
 
 | Module | Responsibility |
 | --- | --- |
-| `zhixu-store/app` | Store/workbench prototype for order creation, task review, chain proofs, and trust attestation display. |
+| `zhixu-store/app` | Store/workbench prototype for order creation, task review, chain proofs, and trust publication display. |
 | `uvp-order-app/app` | Ordinary participant app for invite onboarding, task inbox, evidence fingerprints, and proof display. |
 | `uvp-executor-kit/package` | CLI and SDK for executors. |
 

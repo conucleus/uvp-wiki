@@ -43,12 +43,12 @@ UVP aims to be an engineering practice of Coase-style transaction-cost reduction
 
 | Transaction cost | UVP engineering object |
 | --- | --- |
-| Search cost | Store, Supplier registry, trust projection, Product catalog. |
+| Search cost | Store, Supplier Directory, identity projection, Product catalog. |
 | Agreement cost | Zhixu DSL, Plan, plan hash, file resources, supplier requirements. |
 | Coordination cost | Source, Signal, Hook, Trigger, Order, executor authorization. |
 | Supervision cost | Evidence metadata, payload hash, metadata URI, proof row, timeline. |
 | Integration cost | Product DTO, Chain Services, executor-kit, adapter/periphery boundary. |
-| Dispute and denial cost | EIP-712 signatures, `SignalSubmitted`, `HookReady`, trust-registry events, replayable chain proof. |
+| Dispute and denial cost | EIP-712 signatures, `SignalSubmitted`, `HookReady`, identity-binding events, and replayable chain proof. |
 
 The table is not about inventing vocabulary. It is about turning production relationships that used to depend on experience, contracts, emails, screenshots, and platform back offices into objects that can be verified, indexed, composed, and replayed.
 
@@ -60,9 +60,9 @@ That claim only works if AI is operating over verifiable coordination objects, n
 
 **AI's comfort zone is text, and UVP provides a language that turns text into executable coordination rules.** Zhixu DSL is YAML-like, so LLMs can understand, generate, and compose it; the compiler's deterministic translation and the state machine's on-chain enforcement guarantee that the same DSL always produces the same coordination boundary. AI does not need hands. It needs to articulate "who starts first, who waits on whom, what evidence counts as completion," then route signals to real-world customs brokers, logistics providers, and funders who become its hands.
 
-**The Trust Registry accumulates reusable coordination inventory, not just a supplier list.** Every time a real order completes a customs, logistics, or payment Zhixu, its evidence hash and proof row become that Zhixu version's track record. When organizing the 101st photovoltaic export, the AI Organizer does not reinvent customs clearance from scratch. It retrieves verified Zhixu modules from the Trust Registry, composes them via Docking into a complete collaboration graph, and slots the right humans, enterprises, or AI agents into executor positions.
+**StateMachine records Plan publication, while the Identity Registry records subject-to-wallet mappings.** A Zhixu's operating history comes from Order events, evidence hashes, and proof projections. An AI Organizer can retrieve published Zhixu modules, compose them through Docking, and assign humans, enterprises, or AI agents that satisfy Store or Order policy to executor positions.
 
-**AI is the director, not the actor.** A human expresses intent--"organize this photovoltaic export"--the AI produces the Zhixu DSL, the compiler versions it on chain, and UVP coordinates the production forces around signal boundaries. The human's role in the loop contracts from "designer + executor" to "supervisor + exception handler." UVP provides the stage and the script format, so every actor--human, enterprise, future AI agent--performs from the same script, with every scene recorded on chain and accountable.
+**An AI Organizer generates and composes coordination rules; real-world subjects authorize and execute them.** A human states the objective and approves critical boundaries, the AI produces Zhixu DSL, the compiler fixes its version, and UVP coordinates humans, enterprises, and AI agents through signal boundaries. Humans remain responsible for authorization, supervision, and exception handling, while chain records preserve the provenance of each critical action.
 
 ## This Claim Still Needs Evidence
 

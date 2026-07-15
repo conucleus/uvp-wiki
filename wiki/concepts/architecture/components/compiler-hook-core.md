@@ -26,8 +26,8 @@ Hook Core 的输出仍然是平台中立语义，不含 Solidity ABI。
 
 ## Compiler 的输入输出边界
 
-Compiler 的输出是确定性的计划产物和注册参数。订单参与者、钱包授权、合约部署、supplier trust、escrow 或 funding 由后续的 Product、registry、deployment 或 periphery 层处理。Compiler 只回答一个问题：这份静态 Zhixu 能否被确定性地编译成 EVM 可注册计划。
+Compiler 的输出是确定性的计划产物和注册参数。订单参与者、钱包授权、合约部署、supplier identity、escrow 或 funding 由后续的 Product、registry、deployment 或 periphery 层处理。Compiler 只回答一个问题：这份静态 Zhixu 能否被确定性地编译成 EVM 可注册计划。
 
 ## 为什么它是架构核心
 
-如果 compiler 不确定，后面所有 trust attestation 都失去意义。Trust registry 背书的是 plan hash；合约注册的是 compact hooks；Product DTO 显示的是 Plan 对应的任务。任何一个哈希或 schema 不可复现，整条链路就不可审计。
+Compiler 的确定性保证各方得到同一个 plan hash。合约注册 compact hooks，publisher 对 plan hash 签名，Product DTO 显示该 Plan 对应的任务。哈希与 schema 可复现，整条链路才能审计。

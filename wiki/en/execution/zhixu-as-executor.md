@@ -14,7 +14,7 @@ local Zhixu / local order
   -> authorized mapped signal is submitted to local order
 ```
 
-The local order and the linked order are both independent `UVPStateMachine` orders. Each one has its own plan, authorization, events, proof, and lifecycle. The docking relation explains which signals can be connected between the two Zhixu; the runtime relation is recorded by docking-link and mapped-signal events.
+The local order and the linked order are both independent `UVPStateMachine` orders. Each has its own plan, authorization, events, and proof; they neither share nor require an aggregate lifecycle status. The docking relation explains which signals can be connected between the two Zhixu; the runtime relation is recorded by docking-link and mapped-signal events.
 
 ## Why This Design Exists
 
@@ -23,7 +23,7 @@ Real fulfillment often involves several independent Zhixu working together. A lo
 This brings several benefits:
 
 - the linked Zhixu can be reused: one `customs-clearance` Zhixu can serve many local orders;
-- the linked Zhixu can be governed independently: its own plan hash, trust attestation, and supplier network remain auditable;
+- the linked Zhixu can be governed independently: its own plan hash, trust publication, and supplier network remain auditable;
 - the linked Zhixu can evolve independently: the local order can choose a specific active peer Zhixu version through Store configuration;
 - the linked Zhixu can preserve internal context: the local order only consumes verifiable proof and mapped signals.
 
@@ -80,7 +80,7 @@ A complete docked Zhixu proof should cover at least:
 | Why was the local stage opened for execution? | `HookReady` on the local order. |
 | Who opened the external entrance of the link stage? | The order-level authorization and submission event for the `::OUTSIDE` signal, or the proof of the previous business signal. |
 | Which plan did the linked Zhixu use? | `OrderRegistered` and the linked plan projection for the linked order. |
-| Was the linked Zhixu endorsed? | The `PlanAttested` projection for the linked plan. |
+| Is the linked Plan usable? | The linked StateMachine's `PlanCommitted/PlanFinalized` projection. |
 | How did the linked order advance? | The linked order's `SignalSubmitted` / hook proof. |
 | How did the local order continue? | The mapped signal on the local order, which can come from the authorized submitter or `DockedSignalSubmitted`. |
 
@@ -93,7 +93,7 @@ The Store should manage a docked Zhixu as an auditable workflow:
 ```text
 choose local stage
   -> search available peer Zhixu / supplierType=zhixu subjects
-  -> check linked plan attestation and active version
+  -> check linked plan publication and active version
   -> validate whether signalMap matches the source/signal
   -> save docking session draft
   -> operator review
@@ -102,4 +102,4 @@ choose local stage
   -> submitDockedSignal or authorized submitter maps the local signal
 ```
 
-Sandbox validation is for trial pairing and review materials. Formal runtime requires plan attestation, order registration, signal authorization, docking links, and proof.
+Sandbox validation is for trial pairing and review materials. Formal runtime requires plan publication, order registration, signal authorization, docking links, and proof.

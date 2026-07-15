@@ -27,7 +27,7 @@ hook-core
 
 | 组件组 | 先读 | 覆盖范围 |
 | --- | --- | --- |
-| 订单组件路径 | [一个订单穿过 UVP 组件](../getting-started/order-through-components.md) | 用一条订单串起 Store、compiler、trust registry、state machine、Chain Services、Order App 和 executor-kit。 |
+| 订单组件路径 | [一个订单穿过 UVP 组件](../getting-started/order-through-components.md) | 用一条订单串起 Store、compiler、Identity Registry、state machine、Chain Services、Order App 和 executor-kit。 |
 | 语义、Hook Core 与 Compiler | [语义、Hook Core 与 Compiler](semantics-and-compiler.md) | hook-core、compiler、OnchainHookPlan、canonical hash、registerPlan args。 |
 | 链上执行、State Machine 与 Replay | [链上执行、State Machine 与 Replay](onchain-runtime.md) | contracts、registries、state machine、stage overlay、timer、event replay。 |
 | 可重建服务层 | [可重建服务层：Chain Services](chain-services.md) | 可 fork 的链下执行软件：indexer、projection、relayer boundary、proof verifier、Product/Store API、notifications、storage/runtime profile。 |
@@ -36,7 +36,7 @@ hook-core
 
 ## 为什么还有其他核心组件
 
-`UVPStateMachine` 是链上事实源的核心，但核心组件还包括 compiler、protocol-bindings、replay oracle、chain-services 和 deploy/release evidence。compiler 让 trust registry 背书的 plan hash 可复现；protocol-bindings 固定 Product submit 和 stage patch typed data；replay oracle 证明投影可重建；deploy/release evidence 支撑 Base Sepolia claim。因此状态机放在“核心组件 / 链上执行与 Replay”下，核心概念页只解释 Signal、Hook、Order 等对象。
+`UVPStateMachine` 是链上事实源的核心，compiler、protocol-bindings、replay oracle、chain-services 和 deploy/release evidence 共同保证 Plan hash 可复现、签名输入稳定、投影可重建和部署声明可验证。
 
 ## 改动影响面
 

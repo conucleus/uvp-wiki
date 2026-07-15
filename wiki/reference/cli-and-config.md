@@ -87,7 +87,6 @@ Store：
 
 ```text
 VITE_UVP_CHAIN_SERVICES_URL
-VITE_PRODUCT_API_BASE_URL
 VITE_UVP_STORE_ACCESS_LEVEL
 ```
 
@@ -95,10 +94,8 @@ Order App：
 
 ```text
 VITE_UVP_CHAIN_SERVICES_URL
-VITE_PRODUCT_API_BASE_URL
 VITE_UVP_ORDER_APP_DEMO=1
 VITE_UVP_ORDER_APP_WALLET_ADDRESS
-VITE_UVP_ORDER_APP_EVIDENCE_ROUTE_MODE=chain-services-compat
 ```
 
 Production/staging profile 不应启用 demo、fixture、test controls 或 permissive

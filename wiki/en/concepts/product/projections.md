@@ -36,7 +36,7 @@ This key is included in Product proof rows, helping users confirm “which event
 | `contractAddress` | State-machine contract address. |
 | `deploymentId` | Deployment identifier. |
 | `planId` / `planHash` | The plan bound to the order. |
-| `status` | Projected order status. |
+| `status` | Order registration status; it is not derived as a lifecycle from hooks or tasks. |
 | `authorizations` | Order-level signal authorization view. |
 | `signals` | Accepted signals. |
 | `hooks` | Hook status and dueAt. |
@@ -56,7 +56,7 @@ This key is included in Product proof rows, helping users confirm “which event
 | `StageResourcePatchApplied` | Save the resource overlay. |
 | `StageExecutorActivated` | Add executor activation proof. |
 | `HookStatusChanged` | Update hook status and `dueAt`; cancel tasks when cancelled. |
-| `HookReady` | Create or open a task and push the order status toward `action_required`. |
+| `HookReady` | Create or open a task; the Order remains `registered`. |
 | `TimerPoked` | Record timer proof and timeline. |
 
 Task creation is driven by `HookReady`; backend drafts or UI state are only auxiliary workflow.

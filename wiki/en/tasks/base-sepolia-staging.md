@@ -1,96 +1,42 @@
-# Base Sepolia Staging
+# Base Sepolia Deployment
 
-Base Sepolia is the current public test target. It is used for staging/rehearsal evidence and is not the same as production release.
+Base Sepolia is the current public test target with chain id `84532`. Deployment consumes testnet gas and RPC quota.
 
-## Secret Environment
+## Preparation
 
-Local secret file:
+- `BASE_SEPOLIA_RPC_URL` points to a Base Sepolia RPC.
+- `UVP_ETH_DEPLOYER_PRIVATE_KEY` comes from the environment or a secret manager.
+- Optional `UVP_ETH_DEPLOYER_ADDRESS` must match the address derived from the private key.
+- Private keys, RPC secrets, and temporary logs stay out of the repository.
 
-```bash
-set -a
-source ~/.test_envs
-set +a
-```
-
-Rules:
-
-- `~/.test_envs` must stay outside the repository.
-- File permissions should be `0600`.
-- Do not paste private key values into logs, docs, issues, PRs, or chat.
-- `BASE_SEPOLIA_RPC_URL`, `UVP_STAGING_RPC_URL`, and `UVP_RPC_URL` should default to `https://sepolia.base.org` unless a faster RPC has been verified.
-- The Base Sepolia chain id is `84532`, not Ethereum Sepolia’s `11155111`.
-- Current-head staging should use `UVPStateMachine` EIP-712 domain version `0.4`; historical `0.2` records are audit evidence only.
-
-## Non-Spend Preflight
-
-Run this first:
+## Contract-only Deployment
 
 ```bash
-pnpm staging:preflight
+BASE_SEPOLIA_RPC_URL=... \
+UVP_ETH_DEPLOYER_PRIVATE_KEY=... \
+UVP_BASE_SEPOLIA_BROADCAST_CONFIRMATION=I_UNDERSTAND_THIS_BROADCASTS_BASE_SEPOLIA_AND_USES_REMOTE_QUOTA \
+pnpm deploy:base-sepolia
 ```
 
-Preflight should check:
+This entry deploys `UVPStateMachine`, the six frozen modules, `UVPDeploymentRegistry`, and `UVPIdentityRegistry`; records the deployment; and publishes the current Plan. The address manifest uses `uvp-eth.addresses.v5`.
 
-- RPC and chain id;
-- address manifest;
-- active deployment;
-- chain-services runtime profile;
-- PostgreSQL;
-- evidence storage;
-- relayer/gas-payer config;
-- Store auth;
-- demo/E2E/permissive fallback disabled;
-- role wallets and permission inputs.
-
-## Broadcast Rehearsal
-
-Only after preflight passes and funded role wallets plus on-chain permissions are confirmed, run:
+## Deployment with Protocol Smoke
 
 ```bash
-pnpm staging:rehearsal -- --allow-broadcast
+BASE_SEPOLIA_RPC_URL=... \
+UVP_ETH_DEPLOYER_PRIVATE_KEY=... \
+UVP_BASE_SEPOLIA_BROADCAST_CONFIRMATION=I_UNDERSTAND_THIS_BROADCASTS_BASE_SEPOLIA_AND_USES_REMOTE_QUOTA \
+uvp-deploy/deploy/scripts/bootstrap-base-sepolia.sh
 ```
 
-This sends transactions, so you must know the current deployer, owner, publisher, registrar, relayer gas payer, participant, governance domain owner, and governance reviewer.
+The smoke path continues with Order creation, Signal authorization, scenario Signal submission, and chain-event replay checks.
 
-## chain-services Testnet Profile
+## Safety Gate
 
-The testnet profile must fail closed:
-
-```text
-CHAIN_SERVICES_RUNTIME_ENV
-CHAIN_SERVICES_DATABASE_DRIVER=postgres
-CHAIN_SERVICES_DATABASE_URL
-CHAIN_SERVICES_MIGRATIONS_AUTO_RUN
-SECURITY_PREFLIGHT_STRICT
-UVP_CHAIN_ID=84532
-UVP_RPC_URL
-UVP_ADDRESS_MANIFEST
-UVP_PRODUCT_BFF_REGISTRATION_ADAPTER
-UVP_PRODUCT_BFF_REGISTRAR_PRIVATE_KEY_ENV
-UVP_STATE_MACHINE_RELAYER_BROADCAST_ENABLED
-UVP_STATE_MACHINE_RELAYER_PRIVATE_KEY_ENV
-UVP_EVIDENCE_STORAGE_ADAPTER
-UVP_EVIDENCE_OBJECT_NAMESPACE
-RECONCILE_WORKER_ENABLED
+```bash
+pnpm no-spend:safety
 ```
 
-The testnet profile rejects memory/SQLite, implicit database URLs, localhost RPC, Anvil default private keys, demo mode, E2E fixture controls, permissive Product submission authorization, and broadcast-disabled relayers.
+The gate verifies that the Base Sepolia workflow is manual-only, passes the confirmation to the script, checks confirmation before build or broadcast work, keeps deployment secrets out of ordinary CI, and restricts local deployment to loopback RPCs.
 
-## Evidence Output
-
-Release/rehearsal output should include:
-
-- run id;
-- commit;
-- chain id;
-- state-machine and trust-registry address;
-- plan/order/task/submission ids;
-- tx hashes;
-- proof rows;
-- indexer status;
-- storage/evidence readiness;
-- browser E2E summary;
-- redacted role table;
-- failed stage or skipped reason.
-
-Submit only a filtered release record, not secrets, raw logs, or temporary local manifests.
+The address manifest and summary may be retained as public technical records for the run. Private keys, raw RPC URLs, database contents, and unfiltered logs stay out of version control.

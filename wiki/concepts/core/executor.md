@@ -6,7 +6,7 @@ Executor 要和 Supplier 分开：
 
 | 对象 | 解决的问题 | 典型权威 |
 | --- | --- | --- |
-| Supplier | 谁具备某类现实履约能力，是否被 trust registry 背书。 | Store metadata + `ZhixuTrustRegistry` supplier attestation。 |
+| Supplier | Store 目录中的现实主体及其链下能力资料。 | Store metadata + 可选 `UVPIdentityRegistry` 身份绑定。 |
 | Executor | 当前订单、当前阶段实际由谁执行或提交 signal。 | `UVPStateMachine` order authorization、stage executor overlay、EIP-712 签名。 |
 
 Supplier 是能力主体和 trust subject；Executor 是运行时绑定和 signal submitter。一个 Supplier 可以派出多个 executor 钱包；一个 Executor 也可能代表一个 supplier、一个 adapter，或一条可独立运行的 Zhixu。
@@ -17,8 +17,8 @@ Executor 的生效路径通常是：
 
 ```text
 Supplier 在秩序商店注册
-  -> Store 维护 capability tags、联系方式、履约记录和 trust projection
-  -> Trust registry 对 supplier subject 做 attestation/revocation
+  -> Store 维护 capability tags、联系方式、履约记录和 identity projection
+  -> Registry operator 登记或撤销 supplier subject/account binding
   -> Zhixu stage 声明需要某类 executor 或 supplier
   -> Order 注册时写入 order-level signal authorization
   -> Control stage 可通过 executor patch 指定 active executor
@@ -57,7 +57,7 @@ StageExecutorPatchApplied(orderId, selectorStageId, targetStageId, selector, exe
 StageExecutorActivated(orderId, targetStageId, executor, ...)
 ```
 
-active executor overlay 只影响这个 Order，不修改 Plan。目标 stage 一旦有 active executor，后续该 stage 的业务 signal 必须由 active executor 提交；即使另一个钱包原本有 signal 授权，合约也会按 overlay 拒绝错误 submitter。
+active executor overlay 只影响这个 Order，不修改 Plan。Patch 会把 Plan 从目标 stage `sendSignals` 编译出的 current-order signal capability 自动委任给 active executor，因此运行时才出现的钱包也能被选择；它只能提交 Plan 预声明的 signal，不能借 patch 扩张能力范围。换人只影响尚未首次写入的 Signal，既有事实不变。
 
 ## Zhixu 也可以是 Executor
 
@@ -85,7 +85,7 @@ executor:
 这表达的是：
 
 1. local Plan 声明这个 stage 的 executor 类型是 `zhixu`。
-2. `supplierID` 指向 Store/Trust Registry 可以识别的 peer Zhixu 或其 supplier subject。
+2. `supplierID` 指向 Store/Identity Registry 可以识别的 peer Zhixu 或其 supplier subject。
 3. `signalMap` 声明 local stage 如何等待或解释 linked Zhixu 输出信号。
 4. 编译器会为 `signalMap` 生成 `kind=signalMap` hook，`str` 和 `cmp` 必须存在，且同一个 signalMap 必须引用同一个 source。
 5. linked 秩序的创建、通知、proof 校验和 local signal 映射由 Store/Product/adapter/executor-kit 工作流组织。

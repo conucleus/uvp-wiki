@@ -10,7 +10,7 @@ The Product BFF handles the product flow of “turn a Zhixu that can create an o
 - Generate and manage participant invites.
 - Record participant accept/reject actions.
 - Check whether the Zhixu has an active Store version.
-- Check whether the plan is attested or revoked.
+- Check whether the plan is published or revoked.
 - Check whether a supplier wallet is revoked.
 - Generate `SignalAuthorization[]` from `orderPermissionTable` and the participant list.
 - Prepare the order registration payload and the initial trigger.
@@ -45,7 +45,7 @@ The BFF database stores drafts and workflow state. What actually makes the order
 ## Boundary
 
 - It does not sign on behalf of participants.
-- It does not bypass plan attestation or supplier trust checks.
+- It does not bypass plan publication or supplier identity checks.
 - It does not write drafts, invites, or registration attempts as on-chain orders.
 - It does not expose `/product/flows`; the product object is a Zhixu order.
-- It does not treat Store review as trust attestation.
+- It does not treat Store review as trust publication.

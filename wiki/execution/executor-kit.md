@@ -95,7 +95,7 @@ uvp-executor doctor \
 - API 是否可达；
 - wallet 是否看得到任务；
 - task 是否 `canSubmit`；
-- blocked reason 是 assignee、deadline、required evidence、supplier trust 还是 proof endpoint；
+- blocked reason 是 assignee、deadline、required evidence、supplier identity 还是 proof endpoint；
 - 下一步是 `prepare`、`wait`、`proof` 还是 `blocked`。
 
 doctor 不需要私钥，也不应打印协议 secrets。

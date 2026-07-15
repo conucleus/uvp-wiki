@@ -61,7 +61,7 @@ Staging/production 不应依赖 demo fallback。
 - `UVP_PRODUCT_E2E_FIXTURES` 是否误开；
 - `/product/zhixus?fallback=demo` 是否被误用；
 - chain-services runtime profile 是否拒绝 permissive fallback；
-- trust projection 是否缺失或 plan 已 revoked。
+- identity projection 是否缺失或 plan 已 revoked。
 
 ## Order App 看不到任务
 
@@ -70,7 +70,7 @@ Staging/production 不应依赖 demo fallback。
 - `wallet` 或 `VITE_UVP_ORDER_APP_WALLET_ADDRESS` 是否和授权 submitter 一致；
 - `/product/me/tasks` 是否返回空；
 - order-level `SignalSubmitterAuthorized` 是否已 index；
-- supplier trust 是否 revoked；
+- supplier identity 是否 revoked；
 - task 是否等待其他前置 signal；
 - Product API URL 是否指向真实服务而不是 test/stub URL。
 

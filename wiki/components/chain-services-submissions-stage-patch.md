@@ -42,10 +42,9 @@ Submission 状态是 operational state。它可以说明一笔交易是否送出
 
 | Patch | 改什么 | 边界 |
 | --- | --- | --- |
-| executor patch | 某个订单里 target stage 的 active executor。 | Plan 和 supplier registry 保持原状，其他 signal 仍按授权检查。 |
+| executor patch | 某个订单里 target stage 的 active executor。 | Plan 和 supplier directory 保持原状，其他 signal 仍按授权检查。 |
 | resource patch | 某个订单里 target stage 的 resource handle / manifest。 | 证据明文留在链下，File Resource policy 仍按资源层解释。 |
 
-Executor patch 绑定 selector 签名和 target stage。Resource patch 绑定 `resourceKey`、`manifestHash`、`policyHash`、`manifestURI`。两类 patch 使用不同字段；生产 profile 应拒绝 legacy `http`、`txcloud`、`plain_text` resource handle。
 
 ## 边界
 

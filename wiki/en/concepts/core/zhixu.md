@@ -48,7 +48,7 @@ This says: the local Zhixu stage `master.supplier_sourcing` is triggered by `sol
 | Field | Meaning |
 | --- | --- |
 | `apiVersion` | DSL version, currently `uvp/v0`. |
-| `kind` | `Zhixu` for a coordination rulebook; `SupplierDefinition` is used for supplier identity and capability declarations. |
+| `kind` | The current DSL top-level object is always `Zhixu`. |
 | `metadata.name` | Human-readable name, also part of the plan identity. |
 | `metadata.uid` | Stable Zhixu ID. Falls back to the name when absent. |
 | `metadata.labels` | Business category, industry, and demo labels. On-chain authorization is controlled by order authorization and overlays. |
@@ -87,7 +87,7 @@ If a `trigger` refers to a key that does not exist, the compiler raises an error
 
 ## `selectedStages`
 
-`selectedStages` is the executor patch capability from one stage to a target stage. For example, in a phase-2 closing flow, the buyer-submitted stage can specify a concrete executor for `customs-complete`. The compiler turns this relationship into selector bindings, and the contract checks that the stage-to-target binding during executor patching.
+`selectedStages` is the executor patch capability from one stage to a target stage. For example, in a customs flow, the buyer-submitted stage can specify a concrete executor for `customs-complete`. The compiler turns this relationship into selector bindings, and the contract checks that stage-to-target binding during executor patching.
 
 ```yaml
 selectedStages:

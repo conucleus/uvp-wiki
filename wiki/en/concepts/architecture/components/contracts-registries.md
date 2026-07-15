@@ -1,42 +1,21 @@
-# Contracts and Registries
+# Contracts and registries
 
-The on-chain fact layer is made up of three main contracts: `UVPStateMachine`, `ZhixuTrustRegistry`, and `UVPDeploymentRegistry`. Together they decide protocol state without relying on a backend database.
+The on-chain fact layer consists of `UVPStateMachine`, its frozen modules, `UVPIdentityRegistry`, and `UVPDeploymentRegistry`.
 
-## UVPStateMachine
+## UVPStateMachine and modules
 
-The state machine contract is responsible for:
+- A publisher signs a Plan commit and any relayer may broadcast it.
+- Hooks and metadata hashes are bound at commit; metadata is finalized once.
+- Only finalized Plans can create Orders.
+- Order creators and Signal submitters derive authority from signatures and order-level authorization, not relayer allowlists.
+- Six configured module addresses are permanently frozen.
 
-- Registering plans.
-- Registering orders.
-- Writing order-level signal authorization.
-- Accepting direct or relayed signal submissions.
-- Evaluating hooks.
-- Emitting `HookStatusChanged`, `HookReady`, and `TimerPoked`.
-- Handling stage executor / resource overlays.
+## UVPIdentityRegistry
 
-It does not store plaintext business documents, call executors, custody funds, or read the Store database.
-
-## ZhixuTrustRegistry
-
-The trust registry is responsible for:
-
-- Registering trust registries.
-- Attesting or revoking plans.
-- Attesting or revoking suppliers.
-- Providing trust proofs for Product projections.
-
-`UVPStateMachine.registerPlan()` checks publisher permission and plan uniqueness. Plan trust is projected from configured registry events by Product/Store, not enforced by the state machine.
+The Store-operated registry records replayable `subjectId <-> account` identity bindings with descriptor hash/URI and binding-specific revocation. It does not publish Plans or record capability and reputation. Multiple registry addresses are supported for future independent domains; the initial deployment uses one.
 
 ## UVPDeploymentRegistry
 
-The deployment registry records deployment status:
+This registry records deployment cutover hints such as Candidate, Canary, Active, Deprecated, and Retired. It cannot mutate a deployed contract.
 
-```text
-Candidate -> Canary -> Active -> Deprecated -> Retired
-```
-
-When a new deployment is activated, the old active deployment can be marked deprecated. This is the on-chain record of deployment cutover, not order state.
-
-## Public Interface
-
-The ABI, event names, event topics, EIP-712 domain version, and typed data fields of these contracts are all public protocol interfaces. Any change to them requires updates to bindings, fixtures, release gates, and documentation.
+Centralization remains in Store identity checks, labels, directories, compliance, recommendation, and default deployment selection. Decentralization appears in replayable public events, permissionless relaying of valid signatures, direct raw-address use, and frozen contract configuration. Trust comes from making each centralized assertion explicit and cryptographically auditable, not from pretending no operator exists.

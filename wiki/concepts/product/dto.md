@@ -7,14 +7,14 @@ Product DTO 是面向普通用户和产品前端的稳定合同。它把协议�
 `productOrderFromStateMachine()` 把 `StateMachineOrderProjection` 映射为 `ProductOrderDTO`。常见内容：
 
 | 字段 | 来源 |
-| --- | --- |
+| --- | --- | --- |
 | order identity | `orderId`、chain、contract、deployment。 |
 | plan proof | `planId`、`planHash`、plan registration event。 |
 | status | 从 projection status 映射。 |
 | tasks | 从 `StateMachineTaskProjection` 映射。 |
 | timeline | 从链事件和 projection effects 生成。 |
 | proof | 从 event provenance 生成。 |
-| trust | 从 trust projection 合并。 |
+| trust | 从 identity projection 合并。 |
 
 资金字段当前故意表达为未接入：
 
@@ -32,25 +32,22 @@ fundingStatus = "资金托管未接入本接口"
 | 字段 | 含义 |
 | --- | --- |
 | assignee wallet | 当前应处理任务的钱包。 |
-| supplier trust | 供应商可信信息和证明。 |
+| supplier identity | 供应商可信信息和证明。 |
 | capability / add-on | 执行能力或扩展动作。 |
 | resource requirements | 资源需求、manifest、policy。 |
 | canSubmit | 当前用户是否看起来可以提交。 |
 | proofSummary | 摘要证明。 |
 | proofRows | 具体链事件证明。 |
 
-`canSubmit` 是产品辅助判断，不是最终授权。合约仍会检查 `SignalSubmitterAuthorized`。
+`canSubmit` 是产品辅助判断，不是最终授权。合约仍会检查显式 Signal 授权或 Plan 限定的 executor 动态委任。
 
 ## 状态映射
 
-订单状态可以映射成：
+Order 不承载业务生命周期状态：
 
-| Projection 状态 | 产品状态 |
-| --- | --- |
-| `registered` | `pending_participants` |
-| `running` | `active` |
-| `waiting` | `active` |
-| `action_required` | `active` |
+| Projection 状态 | 产品状态 | 含义 |
+| --- | --- | --- |
+| `registered` | `registered` | `orderId` 已注册，之后的进展分别读取 Signal、Hook 和 Task。 |
 
 任务状态可以映射成：
 

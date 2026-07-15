@@ -1,44 +1,29 @@
 # 本地到链上路径
 
-这一页按一次完整发布和订单执行路径串起各模块。
+## 1. 编写与编译
 
-## 1. 编写 Zhixu
+Store 或开发者编写 Zhixu；Compiler 生成 hooks、selector bindings、signal capabilities、`hooksHash`、`metadataHash` 和 runtime `planHash`。编译阶段只做规则结构校验，不认证现实供应商能力。
 
-Store 或开发者准备 Zhixu 定义。定义里描述 task pattern、stage、executor、receive signal、selected stage 和资源要求。此时还没有链上事实。
+## 2. 配置并冻结 StateMachine
 
-## 2. 编译计划
+部署 StateMachine 与六个 modules，设置地址后调用 `freezeModules()`。冻结后 owner 不能替换 module；升级必须部署新 StateMachine，并通过 Deployment Registry 显式切换。
 
-`uvp-protocol/packages/compiler` 生成：
+## 3. 签名提交 Plan
 
-| 产物 | 用途 |
-| --- | --- |
-| `OnchainHookPlanArtifact` | 给 EVM 注册和哈希认证。 |
-| `registerPlan` args | 给 `UVPStateMachine.registerPlan()`。 |
+publisher 签署 `publisher + hooksHash + metadataHash + deadline`。任意 relayer 调用 `commitPlan`，合约验证完整 hooks 的 hash 和 publisher 签名，导出 `planId = hash(publisher, planHash)`。
 
-编译器会同时做结构校验，例如 signal 引用、executor reachability、selected stage binding。
+## 4. 一次冻结 metadata
 
-## 3. 认证计划
+任意调用者提交 selector bindings 与 signal capabilities。`finalizePlan` 验证 `metadataHash` 并一次写入 Metadata Module。只有 finalized Plan 能创建 Order。
 
-官方 trust registry 的 owner 在 `ZhixuTrustRegistry` 里认证：
+## 5. 身份目录（可选）
 
-```text
-registryAddress + planId + planHash
-```
+Store 可以在线下核验主体后，在自己的 `UVPIdentityRegistry` 登记 `subjectId -> account`。这一步只改善名称显示、联系与合规审计，不是 Plan 或 Order 的链上准入步骤。
 
-如果计划没有被认证，或者已经被撤销，`UVPStateMachine` 不应接受它作为有效计划。
+## 6. Trigger 创建 Order
 
-## 4. 注册计划
+creator/submitter 签 trigger typed data；任意 relayer 广播。合约绑定 finalized `planId`、写入订单级 signal authorizations、记录 trigger fact 并 materialize 初始 stage。没有 registrar allowlist。
 
-授权 publisher 调用 `registerPlan()`。合约保存紧凑 hook、依赖索引和 selector binding，并发出 `PlanRegistered`。
+## 7. 业务执行与投影
 
-## 5. Trigger 创建订单和授权
-
-授权 registrar/relayer 广播 `triggerOrderFromOutsideFor` 或 `triggerOrderFromSignalFor`。业务 submitter 必须签 trigger typed data；合约在同一笔交易里绑定 `planId`、写入订单级 signal 授权、记录 trigger fact，并 materialize ready 的 trigger stage。每条授权说明某个 submitter 可以为该订单提交哪个 source/signal。
-
-## 6. 提交业务动作
-
-参与方钱包签 EIP-712 typed data。Relayer 可以拿签名代为广播，但签名主体必须是被授权的 submitter。合约接受后写入 `SignalRecord`，发出 `SignalSubmitted`，并评估受影响 hook。
-
-## 7. 生成产品视图
-
-`chain-services` 从链事件重建 projection，再映射成 `ProductOrderDTO` 和 `ProductTaskDTO`。Store、Order App、executor-kit 都消费这些 DTO 或直接监听链事件。
+被授权钱包直接或通过 relayer 提交 Signal。合约求值 hooks 并发出可重放事件。Chain Services 只从事件重建 order、task、identity 和 proof 视图；Store 的名称、标签、推荐、通知和 draft workflow 是链下状态。

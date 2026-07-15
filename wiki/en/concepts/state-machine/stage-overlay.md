@@ -11,7 +11,7 @@ An executor patch changes the execution constraint of a target stage. The contra
 - The nonce must increase, so older patches cannot overwrite newer ones.
 - Different modes such as assign, handoff, and replacement have different signature or approval requirements.
 
-After the patch becomes active, future business signals for the target stage require both the original signal authorization and the active executor.
+After activation, the contract automatically delegates the target stage’s current-order signal capabilities declared by Plan `sendSignals` to the active executor. The selected wallet need not be preauthorized when the Order is created, but it can submit only those Plan-declared signals; a patch cannot expand Plan capabilities.
 
 See [Executor Patch](executor-patch.md) for the dedicated page.
 
@@ -31,4 +31,4 @@ See [Resource Patch](resource-patch.md) for the dedicated page.
 
 ## Why the Plan Is Not Modified
 
-The Plan is the workflow version attested by the trust registry. Runtime supplier selection, executor handoff, and resource replacement are all execution state for a specific order and should not feed back into plan semantics. Stage overlay gives the order flexibility while keeping the Plan auditable.
+The Plan is a publisher-signed workflow version. Runtime supplier selection, executor handoff, and resource replacement are execution facts for a specific Order and do not modify Plan semantics. Stage overlay gives the Order flexibility while keeping the Plan auditable.

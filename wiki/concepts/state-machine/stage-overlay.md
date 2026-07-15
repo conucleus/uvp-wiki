@@ -11,7 +11,7 @@ Executor patch 会改变某个目标 stage 的执行者约束。合约要求：
 - nonce 必须递增，防止旧 patch 覆盖新 patch。
 - assign、handoff、replacement 这些 mode 有不同的签名或 approval 要求。
 
-patch 激活后，目标 stage 的未来业务 signal 不只要满足原本的 signal 授权，还要由 active executor 提交。
+patch 激活后，合约把 Plan 通过 `sendSignals` 预声明的目标 stage current-order signal capability 自动委任给 active executor。被选择的钱包不必在 Order 创建时预授权，但它只能提交 Plan 已声明的那些 signal；patch 不能扩张 Plan 的能力边界。
 
 详见 [Executor Patch](executor-patch.md)。
 
@@ -31,4 +31,4 @@ Resource patch 用于订单级资源覆盖，例如某阶段需要的文件 mani
 
 ## 为什么不改 Plan
 
-Plan 是被 trust registry 认证的流程版本。运行时的供应商选择、执行者交接、资源替换都属于某个订单的执行状态，不应反向修改计划语义。Stage overlay 让订单有弹性，同时保留 Plan 的可审计性。
+Plan 是由 publisher 签名发布的流程版本。运行时的供应商选择、执行者交接、资源替换属于某个订单的执行事实，不反向修改计划语义。Stage overlay 让订单具备弹性，同时保留 Plan 的可审计性。

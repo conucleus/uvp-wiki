@@ -17,7 +17,7 @@ Notifications 和 Reconcile 是可重建服务层里的运行辅助系统。前�
 
 - `HookReady`：某个环节已经 ready，需要通知对应执行方。
 - order-level submitter authorization：谁有资格提交某个 signal。
-- supplier trust projection：供应商是否 active/revoked。
+- supplier identity projection：供应商是否 active/revoked。
 - supplier contact profile：如何联系、通知偏好、负责人、可用时段。
 
 通知派生自这些事实。delivery state 说明服务是否尝试发送、是否失败、是否进入 retry 或 dead-letter。

@@ -6,8 +6,7 @@
 
 ```text
 编译器产物
-  -> TrustRegistry 认证
-  -> StateMachine 注册计划
+  -> StateMachine 提交并发布 Plan
   -> StateMachine 注册订单和授权
   -> 参与方提交 signal
   -> 合约发出事件
@@ -25,7 +24,8 @@
 | signal 是否被接受 | `SignalSubmitted`。 |
 | hook 是否等待、就绪、取消 | `HookStatusChanged` 和 `HookReady`。 |
 | timer 是否被 poke | `TimerPoked`。 |
-| 计划或供应商是否可信 | `ZhixuTrustRegistry` 的 attestation/revocation 事件。 |
+| Plan 是否可用 | publisher 签名及 `PlanCommitted` / `PlanFinalized`。 |
+| 钱包对应哪个现实主体 | `UVPIdentityRegistry` 的 binding/revocation 事件；能力判断仍属 Store。 |
 | 部署版本是否 active | `UVPDeploymentRegistry` 的 cutover 事件。 |
 
 ## 可以缓存但必须可重建
@@ -35,12 +35,12 @@
 | `StateMachineOrderProjection` | 从 state-machine 事件重建。 |
 | `StateMachineTaskProjection` | 从 `HookReady`、授权、stage overlay、signal 事件重建。 |
 | Product proof rows | 从事件 provenance 生成。 |
-| Supplier trust projection | 从 trust registry 事件重建。 |
-| Store catalog 状态 | 可以合并 metadata，但链认证必须来自事件。 |
+| supplier identity projection | 从 Identity Registry 事件重建。 |
+| Store catalog 状态 | 可以合并 metadata；Plan 发布与身份绑定状态必须来自链事件。 |
 
 ## 只能作为操作辅助
 
-Relayer retry 状态、notification delivery 状态、Store draft、browser E2E fixture、本地 demo fallback 都只能帮助操作。它们不能改变“计划是否可信、订单是否存在、signal 是否被接受、hook 是否 ready”。
+Relayer retry 状态、notification delivery 状态、Store draft、browser E2E fixture、本地 demo 数据都只能帮助操作。它们不能改变 Plan 发布状态、Order 是否存在、Signal 是否被接受或 Hook 是否 ready。
 
 ## Reorg 处理
 

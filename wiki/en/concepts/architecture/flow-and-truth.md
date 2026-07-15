@@ -6,8 +6,7 @@ The key design of `uvp-eth` is that on-chain contracts and chain events are the 
 
 ```text
 compiler artifacts
-  -> TrustRegistry attestation
-  -> StateMachine plan registration
+  -> StateMachine Plan commit and publication
   -> StateMachine order registration and authorization
   -> participants submit signal
   -> contracts emit events
@@ -25,7 +24,8 @@ compiler artifacts
 | Whether a signal was accepted | `SignalSubmitted`. |
 | Whether a hook is waiting, ready, or cancelled | `HookStatusChanged` and `HookReady`. |
 | Whether a timer was poked | `TimerPoked`. |
-| Whether a plan or supplier is trusted | attestation / revocation events from `ZhixuTrustRegistry`. |
+| Whether a Plan is usable | publisher signature plus `PlanCommitted` / `PlanFinalized`. |
+| Which real-world subject an account represents | Identity Registry binding/revocation; capability remains a Store judgment. |
 | Whether a deployment version is active | cutover events from `UVPDeploymentRegistry`. |
 
 ## Can Be Cached, But Must Be Rebuildable
@@ -35,12 +35,12 @@ compiler artifacts
 | `StateMachineOrderProjection` | Rebuild from state-machine events. |
 | `StateMachineTaskProjection` | Rebuild from `HookReady`, authorization, stage overlay, and signal events. |
 | Product proof rows | Generate from event provenance. |
-| Supplier trust projection | Rebuild from trust registry events. |
-| Store catalog state | Metadata may be merged, but chain attestation must come from events. |
+| supplier identity projection | Rebuild from Identity Registry events. |
+| Store catalog state | Metadata may be merged; Plan publication and identity binding status must come from chain events. |
 
 ## Operational Aids Only
 
-Relayer retry state, notification delivery state, Store drafts, browser E2E fixtures, and local demo fallbacks are only operational aids. They cannot change whether a plan is trusted, whether an order exists, whether a signal was accepted, or whether a hook is ready.
+Relayer retry state, notification delivery state, Store drafts, browser E2E fixtures, and local demo data are operational aids. They cannot change Plan publication state, Order existence, Signal acceptance, or Hook readiness.
 
 ## Reorg Handling
 

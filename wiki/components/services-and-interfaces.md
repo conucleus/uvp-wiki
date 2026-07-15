@@ -21,7 +21,7 @@ compiler artifacts / canonical hashes
 | --- | --- | --- | --- |
 | ABI 与事件 | `uvp-protocol/contracts/uvp-contracts/src/`、`uvp-protocol/packages/protocol-bindings/src/` | Chain Services、executor-kit、deploy scripts、前端调试工具。 | 事件名、字段、indexed 语义和合约地址上下文不能随意变。 |
 | EIP-712 typed data | `uvp-protocol/packages/protocol-bindings/src/`、`uvp-chain-services/service/src/submissions/`、`src/stage-patches/` | Order App、executor-kit、relayer、contracts。 | domain、type name、message 字段、deadline、nonce 和 signer recovery 必须一致。 |
-| Canonical hash | `uvp-protocol/packages/compiler/src/canonical.ts`、`hash.ts` | compiler、trust registry workflow、Store compile preview、release checks。 | 同一份 Zhixu/manifest 在同一版本下必须得到同一 hash。 |
+| Canonical hash | `uvp-protocol/packages/compiler/src/canonical.ts`、`hash.ts` | compiler、Identity Registry workflow、Store compile preview、release checks。 | 同一份 Zhixu/manifest 在同一版本下必须得到同一 hash。 |
 | Product DTO | `uvp-protocol/packages/product-dto/src/` | Chain Services、zhixu-store、uvp-order-app、executor-kit Product API mode。 | 普通用户语言稳定，低层 sourceId/signalId/ABI 细节不泄漏到普通界面。 |
 | Product / Store HTTP API | `uvp-chain-services/service/src/api/routes/` | Store、Order App、executor-kit、operator scripts。 | Route、错误码、proof rows、readiness 和 authz 语义需要和 DTO 同步。 |
 | CLI 与运行配置 | `uvp-executor-kit/package/src/cli.ts`、`uvp-deploy/deploy/scripts/`、`uvp-chain-services/service/src/config/` | executor、release owner、staging operator。 | 私钥只从显式 env 读取；staging/profile 配置必须 fail closed。 |
@@ -39,15 +39,15 @@ compiler artifacts / canonical hashes
 | `uvp-protocol/packages/protocol-bindings/src/evm.ts` | EVM ABI、typed data、calldata 和 hash helpers。 |
 | `uvp-protocol/packages/protocol-bindings/src/index.ts` | 对外导出边界。 |
 | `uvp-protocol/packages/protocol-bindings/src/unsupported-chain-target.ts` | 非当前支持链目标的 fail-closed helper。 |
-| `uvp-protocol/packages/protocol-bindings/test/` | 绑定层的消费者兼容测试。 |
+| `uvp-protocol/packages/protocol-bindings/test/` | 绑定层的消费者一致性测试。 |
 
 ## Drift 检查
 
 改这些内容时，需要同时检查消费者：
 
 - 改合约 ABI、event 或 EIP-712 domain：同步 protocol-bindings、Chain Services、executor-kit、deploy scripts 和合约/接口 reference。
-- 改 compiler artifact 或 canonical hash：同步 compiler fixtures、trust registry attestation path、Store compile preview 和 release gate。
+- 改 compiler artifact 或 canonical hash：同步 compiler fixtures、Identity Registry publication path、Store compile preview 和 release gate。
 - 改 Product DTO 或 Product API：同步 Chain Services route、Store、Order App、executor-kit Product API mode 和浏览器/API 测试。
 - 改 stage executor/resource patch：同步 contracts、protocol-bindings、Chain Services stage-patches、Product task action 和 Order App/Executor Kit 消费。
 
-公共接口的目标不是让所有代码在一个包里，而是让每个包围绕同一份链上事实、同一份签名语义和同一份产品 DTO 工作。
+公共接口让各个包围绕同一份链上事实、签名语义和产品 DTO 工作，无需把所有代码放进一个包。

@@ -8,7 +8,7 @@ UVP（通用价值协议，Universal Value Protocol）是一套面向跨组织�
 
 ## UVP 证明什么
 
-UVP 证明的不是“货一定真实到港”或“某家公司一定可信”。这些现实判断仍由合同、监管、保险、审计、trust registry、供应商或 adapter 承担。
+UVP 证明的不是“货一定真实到港”或“某家公司一定可信”。这些现实判断仍由合同、监管、保险、审计、Identity Registry、供应商或 adapter 承担。
 
 UVP 证明的是协作边界里的可追责声明：
 
@@ -27,7 +27,7 @@ UVP 证明的是协作边界里的可追责声明：
 
 AI 正在降低“完成单个任务”的成本，但它没有自动消灭交易成本。一个 agent 可以写代码、审单、报价或生成报关材料；真正卡住协作的，仍然是该和谁协作、按什么规则协作、谁有资格接下一步、谁能确认结果、确认之后谁负责。
 
-UVP 的回答不是让 AI agent 自己说了算，而是把协作规则写成可复用的 Zhixu DSL，把执行权限、证据指纹、钱包签名和状态后果收束成标准化业务信号，再把关键事实落成可重放 proof。如果你想继续看这套判断如何连接交易成本、平台信任和 L4/L5，读 [AI 时代的协作地基](getting-started/ai-era-coordination.md)。
+UVP 把协作规则写成可复用的 Zhixu DSL，把执行权限、证据指纹、钱包签名和状态后果收束成标准化业务信号，再把关键事实落成可重放 proof；AI agent 无权自行决定这些事实。如果你想继续看这套判断如何连接交易成本、平台信任和 L4/L5，读 [AI 时代的协作地基](getting-started/ai-era-coordination.md)。
 
 ## 一条订单如何留下 proof
 
@@ -36,26 +36,26 @@ UVP 的回答不是让 AI agent 自己说了算，而是把协作规则写成可
 ```text
 Zhixu 规则书
   -> 编译成 deterministic Plan
-  -> trust registry 背书规则或能力主体
+  -> Identity Registry 登记主体与钱包
   -> 创建 Order 并写入 signal 授权
   -> 执行者提交 evidence hash 和签名 Signal
   -> UVPStateMachine 记录事件并推进 HookReady
   -> Chain Services 重建订单、任务、timeline 和 proof row
 ```
 
-如果你只读一篇故事，先读 [一个订单故事](getting-started/one-order-story.md)。第二遍再读 [一个订单穿过 UVP 组件](getting-started/order-through-components.md)，看 Store、compiler、trust registry、state machine、Chain Services、Order App 和 executor-kit 的位置。
+如果你只读一篇故事，先读 [一个订单故事](getting-started/one-order-story.md)。第二遍再读 [一个订单穿过 UVP 组件](getting-started/order-through-components.md)，看 Store、compiler、Identity Registry、state machine、Chain Services、Order App 和 executor-kit 的位置。
 
 ## UVP 不是什么
 
 UVP 不是普通工作流 SaaS，不是支付服务商，不是托管方，不是 escrow 产品，也不是 AI agent runtime。
 
-资金、USDC、escrow、guarantee、settlement、AI/MCP agent adapter 都可以围绕 UVP 接入，但它们属于 periphery 或外部 adapter。核心协议边界是协作状态机：Plans、Orders、authorizations、Signals、hooks、attestations 和可重放事件。
+资金、USDC、escrow、guarantee、settlement、AI/MCP agent adapter 都可以围绕 UVP 接入，但它们属于 periphery 或外部 adapter。核心协议边界是协作状态机：Plans、Orders、authorizations、Signals、hooks、publications 和可重放事件。
 
 ## 当前实现和成熟度
 
 当前可运行实现轨道是 EVM/Web3。`uvp-protocol`、`uvp-chain-services`、`zhixu-store`、`uvp-order-app` 和 `uvp-executor-kit` 共同组成公开实现：compiler 生成 deterministic artifacts，合约记录 Plan/Order/Signal/trust events，Chain Services 重建 Product/Store 视图，前端和 executor 工具消费这些视图并提交授权动作。
 
-当前状态要分层阅读：compiler、contracts/event replay、trust registry、Product DTO 和 Chain Services projection 有 verified 口径；Store Console、Order App、executor-kit live operator path 和 ops console 仍是 prototype 或 partial。最新口径见 [项目状态](status/README.md)。
+当前状态要分层阅读：compiler、contracts/event replay、Identity Registry、Product DTO 和 Chain Services projection 有 verified 口径；Store Console、Order App、executor-kit live operator path 和 ops console 仍是 prototype 或 partial。最新口径见 [项目状态](status/README.md)。
 
 ## 开始阅读
 

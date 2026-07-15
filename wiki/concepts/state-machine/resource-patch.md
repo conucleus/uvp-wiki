@@ -41,6 +41,5 @@ Resource patch 至少受这些条件约束：
 - Resource patch 和 Executor patch 是两种不同动作，字段和签名 payload 不能混用。
 - Resource patch 不证明业务完成；业务完成仍看授权业务 signal。
 - Resource patch 不把文件明文写上链；文件内容通过 object storage、manifest URI、hash 和 proof 关联。
-- 生产 profile 应拒绝 legacy `http`、`txcloud`、`plain_text` resource handle。
 
 相关总览见 [Stage Overlay：Executor Patch 与 Resource Patch](stage-overlay.md)，静态资源对象见 [File Resources](../core/file-resources.md)。

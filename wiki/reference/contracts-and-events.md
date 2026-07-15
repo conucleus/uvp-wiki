@@ -6,7 +6,7 @@
 
 | 合约 | 作用 |
 | --- | --- |
-| `ZhixuTrustRegistry` | trust registry、plan attestation、supplier attestation、revocation。 |
+| `UVPIdentityRegistry` | 线下 subject 与钱包的身份绑定及逐 binding 撤销。 |
 | `UVPStateMachine` | plan/order/signal/hook/timer/stage overlay runtime。 |
 | `UVPDeploymentRegistry` | versioned state-machine deployment cutover ledger。 |
 | `ECDSA` | minimal signature recovery helper。 |
@@ -17,8 +17,8 @@
 `UVPStateMachine` public boundary 包括：
 
 - constructor args；
-- publisher/registrar governance；
-- `registerPlan`；
+- module 配置与一次 `freezeModules`；
+- signed `commitPlan` 与一次 `finalizePlan`；
 - signed `triggerOrderFromOutsideFor` / `triggerOrderFromSignalFor`；
 - `submitSignal`；
 - `submitSignalFor`；
@@ -41,17 +41,12 @@ Indexer 和 replay tooling 应把这些 event name 当作 public interface：
 
 ```text
 OwnershipTransferred
-OwnershipTransferred
-OwnershipTransferred
-PlanAttested
-PlanRevoked
-SupplierAttested
-SupplierRevoked
-OwnershipTransferred
-PlanPublisherSet
-OrderRegistrarSet
+StateMachineModuleSet
+StateMachineModulesFrozen
+PlanCommitted
+PlanFinalized
 PlanPublisherRecorded
-OrderRegistrarRecorded
+OrderRelayerRecorded
 SignalSubmitterAuthorized
 PlanRegistered
 OrderRegistered
@@ -64,6 +59,7 @@ DockedSignalSubmitted
 StageExecutorPatchApplied
 StageResourcePatchApplied
 StageExecutorActivated
+StageExecutorSignalDelegated
 HookStatusChanged
 HookReady
 TimerPoked
@@ -72,6 +68,8 @@ DeploymentCanaryMarked
 DeploymentActivated
 DeploymentDeprecated
 DeploymentRetired
+IdentityBindingRegistered
+IdentityBindingRevoked
 ```
 
 ## Fixture Verification
@@ -92,7 +90,7 @@ forge test
 
 ## Funding Boundary
 
-当前合约模块的 core boundary 聚焦 state machine、trust registry 和 deployment registry。
+当前合约模块的 core boundary 聚焦 state machine、薄身份 registry 和 deployment registry。
 funding、escrow、custody、settlement、release、refund、dispute-payment、ERC20 或
 USDC 合约属于 adapter/periphery 工作。未来资金相关工作必须有自己的 authorization、
 event mapping、tests 和 PRD，并消费 `UVPStateMachine` signal。

@@ -14,25 +14,25 @@ This page explains project terms in plain language first, then points to code or
 | nucleation | Process, context, or field name, not the subject name. Existing DSL/API names keep this spelling to avoid public-interface drift. | `spec.nucleation.id`, `nucleationId`. |
 | Stage | A step or execution segment inside a task pattern. | `taskPatterns[].stages[]`, `stageIdentifier`, `stageId`. |
 | Task Pattern | A reusable grouping of stages inside a Zhixu. Many examples use `master` as the main task pattern. | `taskPatterns[].name`. |
-| Supplier | An ordinary project-work capability subject that can be organized by Store and endorsed when needed. | `SupplierDefinition`, `SupplierAttested`, `SupplierRevoked`. |
+| Supplier | A real-world or digital subject organized by Store; capability remains off-chain Store data. | Store metadata and Identity Binding. |
 | Executor | The Supplier or submitter selected or elected to handle the current Order stage or submit its signal. | order authorization, stage executor overlay, EIP-712 submitter. |
 | Source | The causal namespace a signal belongs to. | `source`, `sourceId`, `signalKey`. |
 | Signal | The smallest business fact accepted by the state machine for an Order. | `submitSignal()`, `SignalSubmitted`, `SignalRecord`. |
 | Hook | A state-machine condition; not an HTTP webhook or callback. | `CompiledHook`, `HookStatusChanged`. |
 | Trigger | A hook mark that opens an executable task by emitting `HookReady`. | stage `trigger`, `HookReady`. |
 | File Resource | A handle for off-chain materials such as stage protocols, evidence templates, and resource manifests. It is not plaintext file storage. | `fileResources`, resource patch, metadata URI/hash. |
-| OnchainHookPlan | Compact EVM-facing artifact used for registration and attestation. | `OnchainHookPlanArtifact`, compact hooks, dependency indexes, selector bindings. |
+| OnchainHookPlan | Compact EVM-facing artifact used for registration and publication. | `OnchainHookPlanArtifact`, compact hooks, dependency indexes, selector bindings. |
 | HookPlan IR | Compiler-internal intermediate shape; no longer a public Store/import/deploy flow. | Used inside `compileZhixuOnchainHookPlan()`. |
 
 ## Actions and Events
 
 | Term | Plain meaning | Code or on-chain counterpart |
 | --- | --- | --- |
-| Attestation | A trust-registry endorsement. It says a plan or supplier is trusted by that registry address. | `PlanAttested`, `SupplierAttested`. |
+| Identity Binding | A revocable Store Registry statement mapping a real-world subject to an account; it is not Plan or capability endorsement. | `IdentityBindingRegistered`, `IdentityBindingRevoked`. |
 | Authorization | Permission for a wallet to submit a specific source/signal for a specific Order, or to perform a controlled stage patch. | `SignalSubmitterAuthorized`, stage patch authorization. |
 | Publisher | The allowed registration account or mechanism that registers Plans. | plan publisher allowlist, `registerPlan()`. |
 | Registrar | The allowed account or mechanism that broadcasts trigger-order creation and writes initial signal authorization; the business action is still signed by the submitter. | order registrar allowlist, `triggerOrderFromOutsideFor()` / `triggerOrderFromSignalFor()`. |
-| Registry Boundary | A `ZhixuTrustRegistry` contract address is one trust boundary. Product/Store may configure which registry they trust, but `UVPStateMachine.registerPlan()` does not read a registry. | `registryAddress`, `ZhixuTrustRegistry.owner()`. |
+| Registry Boundary | One `UVPIdentityRegistry` address is one identity-resolution domain. The initial domain is Store-operated; future independent regulated entities may run others. StateMachine does not read it. | `registryAddress`, `bindingId`, `UVPIdentityRegistry.owner()`. |
 | HookReady | The event that says a trigger hook became ready and a Product task can open. | `HookReady(orderId, hookId, stageId, hookName)`. |
 | Stage Overlay | Order-level runtime change that assigns executor or resources without changing the Plan. | executor/resource patch events. |
 | Stage Patch | A controlled order action that applies an executor or resource overlay. "Patch" here is not a code patch. | `StageExecutorPatchApplied`, `StageResourcePatchApplied`. |
@@ -73,7 +73,7 @@ This page explains project terms in plain language first, then points to code or
 | Zhixu / Order | Zhixu is the static design; Order is one runtime of that design. |
 | Plan / Order | Plan is an endorsed version; Order is a concrete run under that Plan. |
 | Nucleus / Store operator | The Nucleus owns internal Zhixu design; Store operator manages platform workflow. |
-| Trust Domain / Authorization | Attestation is endorsement; authorization is permission to submit an order action. |
+| Store or external institution / Authorization | publication is endorsement; authorization is permission to submit an order action. |
 | Supplier / Executor | Supplier is capability and trust identity; Executor is the runtime submitter or handler. |
 | Evidence / Proof | Evidence is off-chain material or metadata; proof is the trace from hash/signature/event to Product display. |
 | File Resource / Business File | File Resource is a handle or requirement; private business files stay off chain. |

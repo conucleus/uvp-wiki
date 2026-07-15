@@ -42,10 +42,9 @@ Submission state is operational state. It can tell you whether a transaction was
 
 | Patch | What it changes | Boundary |
 | --- | --- | --- |
-| executor patch | the active executor of the target stage within a given order. | the Plan and supplier registry stay unchanged, and other signals are still checked against authorization. |
+| executor patch | the active executor of the target stage within a given order. | the Plan and supplier directory stay unchanged, and other signals are still checked against authorization. |
 | resource patch | the resource handle / manifest of the target stage within a given order. | evidence plaintext stays off chain, and File Resource policy is still interpreted at the resource layer. |
 
-Executor patches bind the selector signature and the target stage. Resource patches bind `resourceKey`, `manifestHash`, `policyHash`, and `manifestURI`. The two patch types use different fields; production profiles should reject legacy `http`, `txcloud`, and `plain_text` resource handles.
 
 ## Boundary
 

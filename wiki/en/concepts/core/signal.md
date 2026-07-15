@@ -68,8 +68,11 @@ Within a single Order, the same `signalKey` can only be successfully submitted o
 
 - The first submission writes a `SignalRecord` and emits `SignalSubmitted`.
 - Later duplicate submissions revert with `SignalAlreadyExists`.
+- The first successful write is the final on-chain fact for that `(orderId, sourceId, signalId)`; there is no overwrite, revocation, or administrator rewrite entry point.
 
 `idempotencyKey` is stored in events and projections to help services identify the request source; but the contract-level deduplication key is `(orderId, sourceId, signalId)`.
+
+If the first submission is wrong, the remedy is not to edit that Signal. Create a new Order from the Zhixu and submit again; the old Order remains as auditable history.
 
 ## Payloads Are Hashes Only
 
@@ -92,7 +95,7 @@ The Product API may show a task to a participant, but whether they can actually 
 orderId + signalKey + submitter
 ```
 
-If there is no matching `SignalSubmitterAuthorized` record, the contract rejects the submission even if the UI shows a button.
+Authority may come from explicit Order-creation authorization or from an executor patch dynamically delegating the Plan-declared `sendSignals` scope. Both paths are enforced by the contract; a UI button cannot create authority.
 
 ## Signal Protocol Boundary
 

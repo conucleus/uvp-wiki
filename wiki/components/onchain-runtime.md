@@ -5,8 +5,8 @@
 ## 组件链路
 
 ```text
-ZhixuTrustRegistry attests plan/supplier
-  -> UVPStateMachine registers plan/order/authorization
+publisher signs and finalizes Plan in UVPStateMachine
+  -> UVPStateMachine registers order/authorization
   -> authorized wallets submit signals or stage patches
   -> contract emits status and readiness events
   -> statemachine / Chain Services replay events
@@ -16,17 +16,17 @@ ZhixuTrustRegistry attests plan/supplier
 
 | 组件 | 职责 |
 | --- | --- |
-| `UVPStateMachine` | 注册 plan/order、保存 signal records、求值 hooks、发出 `HookReady`、处理 executor/resource overlay。 |
-| `ZhixuTrustRegistry` | trust registry、plan attestation/revocation、supplier attestation/revocation。 |
+| `UVPStateMachine` | 签名提交并冻结 Plan、注册 Order、保存 signal records、求值 hooks、发出 `HookReady`、处理 executor/resource overlay。 |
+| `UVPIdentityRegistry` | Store 运营的薄身份目录，只记录主体与钱包绑定及按 binding 撤销。 |
 | `UVPDeploymentRegistry` | 记录部署 cutover 和 release/deployment 线索。 |
 | statemachine package | reference transition model 和 replay tests，用来防止服务投影偏离合约语义。 |
-| 可重建服务层 / chain-services replay | 从链事件重建 Product order/task/proof/trust projection。 |
+| 可重建服务层 / chain-services replay | 从链事件重建 Product order/task/proof/identity projection。 |
 
 ## 阅读路径
 
 | 页面 | 作用 |
 | --- | --- |
-| [Contracts 与 Registries](../concepts/architecture/components/contracts-registries.md) | `UVPStateMachine`、`ZhixuTrustRegistry`、`UVPDeploymentRegistry` 的职责。 |
+| [Contracts 与 Registries](../concepts/architecture/components/contracts-registries.md) | `UVPStateMachine`、`UVPIdentityRegistry`、`UVPDeploymentRegistry` 的职责。 |
 | [状态机](../concepts/state-machine.md) | 合约保存 signal、hook runtime、timer 和 order state 的方式。 |
 | [Hook 求值](../concepts/state-machine/evaluation.md) | compact hook instruction 如何求值。 |
 | [计时器与状态](../concepts/state-machine/timers-and-status.md) | timer、Wait/Ready/Cancelled 状态和产品展示。 |
@@ -40,7 +40,7 @@ ZhixuTrustRegistry attests plan/supplier
 
 ## 运行时语义速查
 
-- `registerPlan()` 检查 publisher 权限、plan 非空、未重复；plan/supplier trust 由产品配置的 registry 投影表达，不是状态机前置条件。
+- `commitPlan()` 验证 publisher 签名并绑定 hooks/metadata hash；`finalizePlan()` 一次冻结 metadata。只有 finalized Plan 可以创建 Order。
 - `triggerOrderFromOutsideFor()` / `triggerOrderFromSignalFor()` 绑定 `orderId` 和 `planId`，记录 trigger fact 或 trigger-origin link，并可同时写入 order-level signal authorizations。
 - `submitSignal()` 按 `(orderId, sourceId, signalId)` 去重，并检查授权 submitter 和 active executor overlay。
 - `HookReady` 只在 `trigger=true` 的 hook 第一次 Ready 时发出。
@@ -51,7 +51,7 @@ ZhixuTrustRegistry attests plan/supplier
 ## 运行时边界
 
 - Chain Services projection 从事件重建 signal 和 hook truth。
-- Store review 进入 workflow/audit；plan/supplier attestation 来自 trust registry。
+- Store review、能力标签和匹配进入 workflow/audit；身份名称解析来自 Identity Registry，Plan 不经过 Registry 材料审核。
 - Relayer 广播已签名交易；业务签名来自授权参与方。
 - Chain replay oracle 只校验事件语义；ETH runtime authority 是部署的合约。
 - Docking relation metadata 组织 workflow；local order 继续推进需要授权 mapped signal 或 `DockedSignalSubmitted`。

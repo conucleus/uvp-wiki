@@ -1,43 +1,32 @@
 # Plan
 
-Plan 是某个秩序 (Zhixu) 针对某条链编译出来的确定性产物。它把可复用协作规则书变成链上可注册、可认证、可求值的 artifact，也就是“这个秩序版本在 EVM 上如何运行”。
+Plan 是 Zhixu 针对某条链编译出的不可变运行规则。它只承载状态机必须知道的 hooks、dependency keys、selector bindings 和 signal capabilities；供应商能力、推荐标签、履约材料与撮合逻辑不属于 Plan。
 
-## 从 Zhixu 到 Plan
+## 身份与哈希
 
 ```text
-秩序 (Zhixu) DSL
-  -> OnchainHookPlanArtifact
-  -> registerPlan args
-  -> planId / planHash
+hooksHash    = keccak256(abi.encode(hooks))
+metadataHash = keccak256(abi.encode(selectorBindings, signalCapabilities))
+planHash     = hash("uvp.plan.runtime.v1", hooksHash, metadataHash)
+planId       = hash("uvp.plan.id.v1", publisher, planHash)
 ```
 
-同一条秩序，如果平台、版本、编译器、stage、hook、source、signal 或 selector binding 变化，都会得到不同的 plan identity 或 plan hash。
+编译器自己的 artifact hash 继续用于追溯源产物，但不再冒充链上 `planHash`。把 publisher 放进 `planId`，可以避免不同发布者对同一内容争抢全局名字。
 
-## Plan 里有什么
+## 两步凝固
 
-| 内容 | 说明 |
-| --- | --- |
-| `planId` | 计划身份，来自编译器、平台、版本、Zhixu ID 和名称。 |
-| `planHash` | 链上 artifact 的哈希，被 trust registry 认证。 |
-| `compiledHooks` | 编译后的 hook。 |
-| `dependencyIndex` | `signalKey -> hookIds`，用于局部求值。 |
-| `executorRoutes` | 阶段默认 executor/supplier 路由。 |
-| `selectorBindings` | stage 到 target stage 的 executor patch 绑定。字段名保留 selector 是 wire/API 兼容名。 |
-| resource defaults | stage-level `fileResources` 句柄，用于 Product/Store 展示和后续 resource overlay 解释。 |
+1. publisher 对 `publisher + hooksHash + metadataHash + deadline` 做 EIP-712 签名；任意 relayer 调用 `commitPlan`，同时提交完整 hooks。
+2. 任意调用者提交 selector bindings 与 signal capabilities；`finalizePlan` 验证 `metadataHash` 后，由 Metadata Module 一次写入并永久冻结。
 
-## 职责边界
+pending Plan 不能创建 Order。finalized 后 hooks 和 metadata 都不能修改；如果规则变化，发布新的 Plan。
 
-- 订单运行态进入 Order：参与方提交记录、证据、HookReady runtime 和 active executor 都属于订单事件。
-- Store draft 和 review 状态属于 Store workflow；official 可用 claim 来自 trust registry attestation。
-- `fileResources` 是句柄和默认说明；业务文件明文留在链下。
-- USDC、escrow、fiat bridge 作为 adapter 或 periphery workflow 消费 Plan/Order signal。
+## Module 冻结
 
-## 注册与背书分层
+StateMachine 部署并配置六个 module 后调用 `freezeModules()`。冻结后的 module 地址不能由 owner 更换，因此“代码含义”不再依赖部署者日后的善意。新实现只能通过新的 StateMachine deployment 和显式 cutover 引入。
 
-`UVPStateMachine.registerPlan()` 只检查 publisher 权限、plan 非空和未重复。`ZhixuTrustRegistry` 对 `(planId, planHash)` 的背书由 Product/Store 按配置的 registry 地址投影，不是状态机注册前置条件。
+## 不承担的责任
 
-这个边界对 Store 很重要：`approved_for_broadcast` 只是 Store workflow 状态；只有被 indexer 观察到的 `PlanAttested` 才能支撑官方产品目录里的 trusted plan 展示。
-
-## Plan 不应被订单修改
-
-Plan 是静态、可审计、被认证的版本。运行时变化，例如 executor 选择、resource manifest、业务 evidence、docked linked order proof，都进入 Order 的动态事件或 Product/Store workflow projection；Plan 继续代表原始静态版本。
+- Plan 不声明哪个公司“有能力”履约。
+- Plan 不替 Store 做搜索、推荐和撮合。
+- Plan 不保存文件明文、联系人或现实名称。
+- Order 运行时的 executor/resource 变化进入 Order overlay，不回写 Plan。

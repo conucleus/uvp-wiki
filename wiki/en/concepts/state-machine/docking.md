@@ -42,7 +42,7 @@ If a local stage opens the docking workflow through `::OUTSIDE`, that external e
 ## Boundaries
 
 - The local order and linked order are both independent on-chain orders.
-- The linked Zhixu has its own plan attestation, order registration, signal authorization, and proof.
+- The linked Zhixu has its own plan publication, order registration, signal authorization, and proof.
 - A Store docking session is trial composition and review material; formal proof comes from `DockedOrderLinked`, `DockedSignalMapped`, `DockedSignalSubmitted`, and events on both orders.
 - `signalMap` describes a mappable interface; it is not automatic business completion.
 - `submitDockedSignal` maps a signal that already exists in the linked order; it does not create business facts for the linked order.

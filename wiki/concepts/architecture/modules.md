@@ -27,7 +27,7 @@
 
 | 模块 | 职责 |
 | --- | --- |
-| `zhixu-store/app` | Store/workbench 原型，处理订单创建、任务审阅、链证明、trust attestation 展示。 |
+| `zhixu-store/app` | Store/workbench 原型，处理订单创建、任务审阅、链证明、trust publication 展示。 |
 | `uvp-order-app/app` | 普通参与者 App，处理 invite onboarding、任务 inbox、证据指纹、证明展示。 |
 | `uvp-executor-kit/package` | executor、executor 的 CLI 和 SDK。 |
 

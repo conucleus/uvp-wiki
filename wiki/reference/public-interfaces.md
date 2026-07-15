@@ -11,7 +11,7 @@
 | Solidity ABI / bytecode / function selector | `uvp-protocol/contracts/uvp-contracts` | protocol-bindings、chain-services、executor-kit、deploy scripts、release gates | 更新 fixture、bindings、contract tests、deploy/replay tests 和 release note。 |
 | Event name / topic / indexed fields | contracts | indexer、statemachine replay、Product projection、proof verifier | 更新 replay oracle、projection tests、contracts/events reference。 |
 | EIP-712 domain / typed data | contracts、protocol-bindings | Product submit、relayer、executor-kit、wallet UI | 更新 digest helpers、signing tests、staging domain check；staging 不能回退到旧 `0.1` domain。 |
-| Canonical hash / artifact schema | compiler、hook-core、statemachine | trust registry、registerPlan、release evidence | 更新 golden fixtures、canonical hash docs、compiler/statemachine tests。 |
+| Canonical hash / artifact schema | compiler、hook-core、statemachine | Plan publication、registerPlan、release evidence | 更新 golden fixtures、canonical hash docs、compiler/statemachine tests。 |
 | Product DTO | product-dto | chain-services、Store、Order App、executor-kit、periphery adapter | 更新 DTO tests、route tests、frontend/API consumers 和 ordinary-user copy。 |
 | Product API | chain-services | Store、Order App、executor-kit Product API mode、MCP adapter | 更新 API reference、route tests、browser E2E、failure language。 |
 | Deployment manifest | uvp-deploy/deploy | chain-services、staging scripts、release records | 只提交 curated manifest/evidence；local generated address files 默认不提交。 |
@@ -36,7 +36,7 @@ release record or PRD trace
 
 ## 非接口状态
 
-- Store metadata 是平台 workflow/材料状态；trust registry attestation 是链上背书接口。
+- Store metadata 是平台 workflow 和材料状态；Identity Registry binding 是主体与钱包的链上对应记录。
 - Product BFF database 是可重建读模型；plan/order/signal/hook 的 source of truth 是链上事件。
 - Relayer 配置是广播配置；业务授权来自 order authorization 和签名。
 - Demo fallback、fixture catalog、mock frontend mode 只能支撑 demo 或测试口径。

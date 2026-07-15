@@ -14,7 +14,7 @@ local Zhixu / local order
   -> authorized mapped signal is submitted to local order
 ```
 
-local order 和 linked order 都是独立的 `UVPStateMachine` order。它们各自有自己的 plan、授权、事件、proof 和生命周期。Docking relation 说明两条秩序之间哪些 signal 可以对接；运行态关系由 docking link 和 mapped signal 事件记录。
+local order 和 linked order 都是独立的 `UVPStateMachine` order。它们各自有自己的 plan、授权、事件和 proof，不共享也不需要聚合生命周期状态。Docking relation 说明两条秩序之间哪些 signal 可以对接；运行态关系由 docking link 和 mapped signal 事件记录。
 
 ## 为什么要这样设计
 
@@ -23,7 +23,7 @@ local order 和 linked order 都是独立的 `UVPStateMachine` order。它们各
 这样带来几个好处：
 
 - linked Zhixu 可以复用：同一条 `customs-clearance` 可以服务很多 local order。
-- linked Zhixu 可以独立治理：自己的 plan hash、trust attestation、supplier network 可审计。
+- linked Zhixu 可以独立治理：自己的 plan hash、trust publication、supplier network 可审计。
 - linked Zhixu 可以独立演进：local order 通过 Store 配置选择某个 active peer Zhixu 版本。
 - linked Zhixu 可以保留内部上下文：local order 只消费可验证 proof 和映射 signal。
 
@@ -80,7 +80,7 @@ local order 和 linked order 都是独立的 `UVPStateMachine` order。它们各
 | local stage 为什么开放执行 | local order 的 `HookReady`。 |
 | link stage 的外部入口是谁打开的 | `::OUTSIDE` signal 的订单级授权和提交事件，或上一条业务 signal 的 proof。 |
 | linked Zhixu 使用哪个计划 | linked order 的 `OrderRegistered` 和 linked plan projection。 |
-| linked Zhixu 是否被背书 | linked plan 的 `PlanAttested` projection。 |
+| linked Zhixu 的 Plan 是否可用 | linked StateMachine 的 `PlanCommitted/PlanFinalized` projection。 |
 | linked order 如何推进 | linked order 的 `SignalSubmitted` / hook proof。 |
 | local order 如何继续 | local order 上的 mapped signal，来源可以是授权 submitter 或 `DockedSignalSubmitted`。 |
 
@@ -93,7 +93,7 @@ Store 应把 docked Zhixu 管成一个可审核 workflow：
 ```text
 选择 local stage
   -> 搜索可用 peer Zhixu / supplierType=zhixu subject
-  -> 检查 linked plan attestation 和 active version
+  -> 检查 linked plan publication 和 active version
   -> 校验 signalMap 与 source/signal 是否匹配
   -> 保存 docking session draft
   -> operator review
@@ -102,4 +102,4 @@ Store 应把 docked Zhixu 管成一个可审核 workflow：
   -> submitDockedSignal 或授权 submitter 映射 local signal
 ```
 
-Sandbox validation 是试拼和审核材料。正式运行需要 plan attestation、order registration、signal authorization、docking link 和 proof。
+Sandbox validation 是试拼和审核材料。正式运行需要 plan publication、order registration、signal authorization、docking link 和 proof。

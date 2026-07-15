@@ -1,6 +1,6 @@
 # Signal Authorization
 
-Order-level signal authorization answers one very specific question: for this order, which wallet may submit which source / signal.
+Order-level signal authorization answers one very specific question: for this order, which wallet may submit which source / signal. There are two contract paths: explicit authorization written when the Order is created, and dynamic delegation created by an Executor patch within Plan capabilities.
 
 ## Contract Authorization Structure
 
@@ -22,7 +22,17 @@ The contract stores it as:
 _signalAuthorizations[orderId][signalKey][submitter]
 ```
 
-When a signal is submitted, the contract checks whether `orderId + signalKey + submitter` has authorization.
+When a signal is submitted, the contract checks whether `orderId + signalKey + submitter` has valid explicit authorization or dynamic executor delegation.
+
+## Dynamic Delegation from Executor Patch
+
+The compiler turns stage `sendSignals` into Plan `signalCapabilities`. When a valid Executor patch selects a wallet for a target stage, the contract delegates only those predeclared current-order `(sourceId, signalId)` pairs:
+
+- The executor may be a wallet that appears after Order creation; it need not be in a preauthorized candidate list.
+- Selector authority comes from `StageSelectorBinding`, internal patch-signal authorization, signatures, and mode constraints.
+- Executor signal authority comes from the registered Plan capability combined with the valid patch.
+- The patch changes who may execute but cannot add a Signal the Plan did not declare.
+- First-writer-wins remains final; changing executor never changes an existing Signal.
 
 ## Product Authorization Builder
 
@@ -46,18 +56,18 @@ metadataHash = keccak256("uvp:product-bff:authorization:v3:...")
 
 ## Initial Trigger
 
-The Product BFF prepares system authorization for order startup:
+The Product BFF prepares business-submitter authorization for order startup:
 
 ```text
 sourceId = keccak256("")
 signalId = keccak256("OUTSIDE")
-submitter = registrar address
+submitter = participant/business submitter address
 ```
 
-This authorization is used for the registrar to trigger the order’s initial path. It does not give the backend all business-action permissions.
+The business submitter signs the trigger typed data; the registrar/relayer only broadcasts it. Broadcasting does not grant business-submission authority.
 
 If a docked Zhixu link stage uses `::OUTSIDE` as its entry signal, it must follow the same order-level authorization boundary: only an authorized wallet can submit the `OUTSIDE` signal on the empty source. The later `str/cmp/err` mapping for a linked order still follows `signalMap`, docking links, and mapped signal authorization checks.
 
 ## Authorization and Task Display
 
-Projections may assign task assignees based on authorization, but that is only a product view. When the contract actually accepts a submission, it checks authorization again, so a service-layer display mistake cannot cross the protocol boundary.
+Projections may assign task assignees from explicit authorization or executor delegation, but that is only a product view. When the contract accepts a submission, it checks authority again, so a service-layer display mistake cannot cross the protocol boundary.

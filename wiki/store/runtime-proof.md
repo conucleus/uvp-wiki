@@ -11,8 +11,8 @@ Store 的履约视图把订单、任务、供应商参与、证据 hash 和链�
 | Signal 是否提交 | `SignalSubmitted` proof row。 |
 | Executor 是否 active | `StageExecutorPatchApplied` / `StageExecutorActivated` projection。 |
 | Evidence 绑定 | Product evidence metadata、content hash、metadata hash、payload hash。 |
-| Supplier 历史参与 | order/task projection + supplier metadata/trust projection。 |
-| Plan/Supplier trust | `ZhixuTrustRegistry` plan/supplier attestation projection。 |
+| Supplier 历史参与 | order/task projection + supplier metadata/identity projection。 |
+| Plan 与身份 | `UVPStateMachine` Plan finalization + `UVPIdentityRegistry` identity binding projection。 |
 | Docked linked order | local/linked relation metadata + 两边 state-machine proof + mapped local signal。 |
 
 ## Store 应展示什么
@@ -29,8 +29,8 @@ Store 的履约视图把订单、任务、供应商参与、证据 hash 和链�
 
 | 字段 | 说明 |
 | --- | --- |
-| event | `OrderRegistered`、`SignalSubmitted`、`HookReady`、`SupplierAttested` 等。 |
-| contract | state-machine 或 trust-registry address。 |
+| event | `OrderRegistered`、`SignalSubmitted`、`HookReady`、`IdentityBindingRegistered` 等。 |
+| contract | state-machine、identity-registry 或 deployment-registry address。 |
 | deployment | deployment id / chain id / release evidence reference。 |
 | tx/block/log | tx hash、block number、log index。 |
 | subject | orderId、planId、supplier subject、stageId、hookId。 |

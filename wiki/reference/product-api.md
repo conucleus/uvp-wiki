@@ -1,8 +1,8 @@
 # Product API 参考
 
-Product API 位于 `@uvp-eth/chain-services`，模块归属见 [Chain Services](../components/chain-services.md)。它把链事件 projection 翻译成 Store、Order App 和 executor-kit 可消费的 DTO。
+Product API 位于 `@uvp-eth/chain-services`，把 StateMachine 事件投影与 Store 链下资料组合成 Store、Order App 和 executor-kit 使用的 DTO。
 
-## Catalog 和 Orders
+## Catalog、Orders 与 Tasks
 
 ```text
 GET /product/zhixus
@@ -11,50 +11,31 @@ GET /product/orders
 GET /product/orders/:orderId
 GET /product/orders/:orderId/timeline
 GET /product/orders/:orderId/proof
-```
-
-规则：
-
-- `/product/zhixus` 是 canonical route。
-- `/product/zhixu` 只是旧 singular alias。
-- `/product/flows` 不存在。
-- `zhixus` 默认只返回 official-domain active/non-revoked plan。
-- bare `orderId` 若跨 state-machine deployment 不唯一，应返回 ambiguous candidates。
-
-## Tasks 和 Participant Scope
-
-```text
 GET /product/tasks
 GET /product/tasks/:taskId
 GET /product/me
 GET /product/me/orders
 GET /product/me/tasks
 GET /product/me/tasks/:taskId
+GET /product/me/activity-feed
 ```
 
-`/product/me*` 通过以下输入显式过滤 wallet：
+Plan 发布状态来自 `UVPStateMachine.PlanRegistered` 投影。任务来自 `HookReady`，执行钱包来自 Plan 声明的 signal capability 与订单级 `SignalSubmitterAuthorized`。角色名称只负责展示。
 
-- `wallet`
-- `walletAddress`
-- `x-uvp-wallet-address`
-- `x-wallet-address`
-
-角色 label 只用于展示。任务必须来自 indexed state-machine projection 和
-order-level submitter authorization。
-
-## Submission
+## Submission 与 Evidence
 
 ```text
+POST /product/evidence
+GET  /product/evidence/:evidenceId
+GET  /product/evidence/:evidenceId/proof
 POST /product/tasks/:taskId/prepare-submit
 POST /product/tasks/:taskId/submit
 GET  /product/submissions/:submissionId
 ```
 
-`prepare-submit` 生成 EIP-712 typed data。`submit` 验证签名并把 signed payload
-交给 relayer adapter。Relayer broadcast disabled 时，API 可以在签名验证后记录
-`broadcast_disabled`；链上信号仍以 `SignalSubmitted` 为准。
+`prepare-submit` 生成 EIP-712 typed data。`submit` 验证签名并交给 relayer；链上结果以 `SignalSubmitted` 为准。
 
-## Stage Overlay
+## Order Overlay
 
 ```text
 POST /product/tasks/:taskId/prepare-stage-executor-patch
@@ -63,44 +44,15 @@ POST /product/tasks/:taskId/prepare-stage-resource-patch
 POST /product/tasks/:taskId/submit-stage-resource-patch
 ```
 
-Executor patch 只处理 executor selection/handoff/replacement。Resource patch
-绑定 `resourceKey`、`manifestHash`、`policyHash` 和 `manifestURI`。生产模式应拒绝
-legacy `http`、`txcloud` 和 `plain_text` resource handle。
+Executor patch 处理订单级 executor selection、handoff 和 replacement。Resource patch 绑定 `resourceKey`、`manifestHash`、`policyHash` 与 `manifestURI`。
 
-## Evidence
-
-当前 chain-services compatibility routes：
+## Store Console
 
 ```text
-POST /product/evidence
-GET  /product/evidence/:evidenceId
-GET  /product/evidence/:evidenceId/proof
-```
-
-Order App 的目标边界是：
-
-```text
-POST /evidence
-GET  /evidence/:evidenceId/proof
-```
-
-迁移期间可用 `VITE_UVP_ORDER_APP_EVIDENCE_ROUTE_MODE=chain-services-compat`。
-
-## Readiness
-
-```text
-GET /product/staging/readiness
-```
-
-这个 route 是 release-evidence gate。它应返回 redacted summary，并在未满足 staging
-条件时返回 `503 not_ready`。
-
-## Store Console API
-
-Store routes 是 nucleus/operator 表面；ordinary participant 表面走 Product/Order App routes：
-
-```text
+GET  /store/session
 GET  /store/search
+GET  /store/audit
+GET  /store/runtime/summary
 GET  /store/zhixus
 GET  /store/zhixus/:zhixuId
 GET  /store/orders/:orderId/candidates
@@ -112,14 +64,20 @@ POST /store/zhixu-drafts/import
 GET  /store/zhixu-drafts/:draftId
 POST /store/zhixu-drafts/:draftId/compile-preview
 POST /store/zhixu-drafts/:draftId/submit-review
-POST /store/zhixu-drafts/:draftId/request-attestation
 GET  /store/suppliers
 GET  /store/suppliers/:supplierId
 POST /store/suppliers
 POST /store/suppliers/:supplierId/review
-POST /store/suppliers/:supplierId/request-attestation
-POST /store/suppliers/:supplierId/request-revocation
+POST /store/suppliers/:supplierId/request-identity-registration
+POST /store/suppliers/:supplierId/request-identity-revocation
 ```
 
-Store write routes 需要 operator/admin identity。Store draft、docking session 和
-supplier metadata 是 workflow/material；chain attestation 看 trust registry projection。
+Store 写接口需要 operator/admin 身份。Draft、docking session、供应商名称、能力标签、匹配资料与审核记录属于 Store 的链下事实。Identity Registry 投影只提供 `subjectId` 与钱包的公开对应关系。
+
+## Readiness
+
+```text
+GET /product/staging/readiness
+```
+
+该接口输出脱敏的部署、索引、存储、角色输入与 Product 状态摘要；条件不足时返回 `503 not_ready`。

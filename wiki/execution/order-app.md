@@ -2,7 +2,7 @@
 
 `uvp-order-app/app` 是普通参与者的订单履约界面。它和 executor-kit 一样是 signal producer，但默认读者是人：参与者打开任务、检查钱包责任、准备证据指纹、确认签名、提交并回看 proof。
 
-它不拥有订单事实。订单、signal、hook、attestation 和 proof 的事实来自 `UVPStateMachine`、`ZhixuTrustRegistry` 和可重放链事件；Order App 消费 Chain Services 暴露的 Product DTO 和 signal container。
+它不拥有订单事实。订单、signal、hook 和 proof 来自 `UVPStateMachine` 可重放事件；可选的名称解析来自 `UVPIdentityRegistry`。Order App 消费 Chain Services 暴露的 Product DTO 和 signal container。
 
 ```text
 Product API /product/me/tasks
@@ -38,7 +38,7 @@ Product API /product/me/tasks
 
 ## 界面语言边界
 
-普通参与者界面使用待办、提交确认、凭证指纹、证明、履约者、执行方和供应商背书这类语言。HookPlan、sourceId、signalId、ABI、calldata、gas、registryAddress 等词只出现在工程或高级调试界面。
+普通参与者界面使用待办、提交确认、凭证指纹、证明、履约者、执行方和供应商材料审核这类语言。HookPlan、sourceId、signalId、ABI、calldata、gas、registryAddress 等词只出现在工程或高级调试界面。
 
 ## 相关页面
 
