@@ -1,6 +1,6 @@
 # Executor Patch
 
-Executor patch is one kind of Stage Overlay runtime change. It affects only the target stage executor of one Order. It does not modify the Plan and does not modify the Supplier Registry.
+Executor patch is one kind of Stage Overlay runtime change. It affects only the target stage executor of one Order. It does not modify the Plan and does not modify the Supplier Directory.
 
 ## What It Solves
 
@@ -13,6 +13,7 @@ selector stage
   -> applyStageExecutorPatchFor
   -> StageExecutorPatchApplied
   -> StageExecutorActivated
+  -> Plan-declared target-stage signal authority is delegated to executor
   -> target stage future signal must match active executor
 ```
 
@@ -25,7 +26,11 @@ Executor patch is constrained by at least these checks:
 - patch nonce must increase.
 - executor address cannot be zero.
 - modes such as assign, handoff, and replacement have different previous-executor or approval-signal requirements.
-- after activation, future business signals for the target stage still pass normal source/signal authorization checks, and the submitter must match the active executor.
+- the Plan must declare at least one current-order signal capability for the target stage through `sendSignals`.
+- after activation, the contract automatically delegates those Plan-declared `(sourceId, signalId)` capabilities to the new executor; the wallet does not need to be a preauthorized candidate when the Order is created.
+- a later replacement or handoff moves the still-unwritten capability scope to the new executor; already written Signals remain unchanged.
+
+This is Plan-bounded automatic delegation, not wildcard Signal authority. The selector may change who executes, but cannot expand what the Zhixu says that stage may emit.
 
 ## Code Entry
 
@@ -33,13 +38,14 @@ Executor patch is constrained by at least these checks:
 | --- | --- |
 | `UVPStagePatchModule.sol` | `applyStageExecutorPatch`, `applyStageExecutorPatchFor`, patch digest, mode checks. |
 | `UVPStateMachine.sol` | active executor activation and later signal checks. |
+| `UVPPlanMetadataModule.sol` | Plan signal capabilities compiled from `sendSignals`, which cap dynamic delegation. |
 | `protocol-bindings/src/index.ts` | stage executor patch typed data, call builder, signer recovery. |
 | `uvp-chain-services/service/src/stage-patches/` | Product API prepare/submit executor patch. |
 
 ## Boundaries
 
-- Executor patch is not Supplier trust; supplier endorsement still comes from `ZhixuTrustRegistry`.
-- Executor patch is not business completion; completion still comes from the target source/signal `SignalSubmitted`.
-- Executor patch does not write back to the Plan; the Plan remains the attested static version.
+- Executor patch is not Supplier capability proof; capability and matching remain Store judgments, while Identity Registry only resolves subject/account identity.
+- Executor patch is not a business outcome; whether an outcome occurred still comes from the target source/signal `SignalSubmitted`.
+- Executor patch does not write back to the Plan; the Plan remains the published static version.
 
 See [Stage Overlay: Executor Patch and Resource Patch](stage-overlay.md) for the overview.

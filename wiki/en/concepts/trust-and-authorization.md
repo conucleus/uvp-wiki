@@ -1,34 +1,13 @@
-# Trust and Authorization
+# Identity, publication, and authorization
 
-`uvp-eth` separates “who attests the plan” from “who may submit a given order action”. Plan trust comes from trust-domain attestation in `ZhixuTrustRegistry`; order-action permission comes from order-level signal authorization in `UVPStateMachine` and participant EIP-712 signatures.
+UVP separates three facts that must not imply one another:
 
-## Subpages
+| Layer | Fact or right | Source | Revocability |
+| --- | --- | --- | --- |
+| Identity Registry | Default Store-directory identity resolution. | A binding written by the registry owner. | The owner may revoke the directory binding, not erase history or control the account. |
+| Plan publication | Publication of an immutable hooks + metadata Plan. | The publisher's EIP-712 signature. | A relayer cannot alter it; frozen modules cannot be silently replaced. |
+| Order and Signal actions | Creation of an Order or submission of a specific Signal. | Participant signatures and order-level authorization. | Registry revocation does not retroactively remove these rights. |
 
-| Subpage | Description |
-| --- | --- |
-| [Trust Domain](trust/domains.md) | Official domains, plan attestation, supplier attestation, revocation, and projection. |
-| [Signal Authorization](trust/signal-authorization.md) | How source / signal / submitter permissions are bound at order registration time. |
-| [EIP-712 and Relayer](trust/eip712-relayer.md) | How relayers submit signed transactions, and why the business signature must come from the authorized wallet. |
-| [Stage Patch Authorization](trust/stage-patch.md) | How executor / resource patches reuse order-level authorization with selector binding. |
+Plan and Order transactions may be broadcast by any relayer. A relayer pays gas and transports signed data; it is not the source of publisher, creator, or submitter authority.
 
-## Three Layers of Checks
-
-| Layer | Problem It Solves |
-| --- | --- |
-| Trust registry | Whether a plan or supplier is endorsed by some trust registry. |
-| Publisher / registrar allowlist | Who can register plans, and who can register orders. |
-| Order-level signal authorization | For a given order, which wallet may submit which source / signal. |
-
-These three layers check different questions: plan attestation solves plan / supplier trust, allowlists solve who can register, and order-level signal authorization solves who can submit the current order action.
-
-## Supplier Trust and Signal Authorization
-
-Supplier trust states that a trust registry endorses a supplier subject. It can affect Store recommendations, Product warnings, admission checks during BFF authorization building, and whether executor-kit fails closed. `submitSignal()` permission still belongs to order-level authorization.
-
-The actual submission permission always lives at the order level:
-
-```text
-orderId + sourceId + signalId + submitter
-```
-
-This boundary avoids the mistake of thinking “because a supplier got a customs tag in Store, it can submit every customs order”.
+Store capability tags and private matching features are commercial metadata. They are not written to `UVPIdentityRegistry` and do not become `SignalSubmitterAuthorized` permissions.

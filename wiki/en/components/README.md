@@ -36,7 +36,7 @@ Core component pages are organized around four things:
 
 ## Why There Are Other Core Components
 
-`UVPStateMachine` is the core source of truth for on-chain facts, but core components also include the compiler, protocol-bindings, replay oracle, chain-services, and deploy/release evidence. The compiler makes trust-domain-backed plan hashes reproducible; protocol-bindings freeze Product submit and stage patch typed data; the replay oracle proves that projections can be rebuilt; deploy/release evidence supports Base Sepolia claims. That is why the state machine lives under “Core Components / On-chain Execution and Replay,” while the core concept pages only explain objects such as Signal, Hook, and Order.
+`UVPStateMachine` is the core source of truth for on-chain facts, but core components also include the compiler, protocol-bindings, replay oracle, chain-services, and deploy/release evidence. The compiler makes Store or external institution-backed plan hashes reproducible; protocol-bindings freeze Product submit and stage patch typed data; the replay oracle proves that projections can be rebuilt; deploy/release evidence supports Base Sepolia claims. That is why the state machine lives under “Core Components / On-chain Execution and Replay,” while the core concept pages only explain objects such as Signal, Hook, and Order.
 
 ## Impact Surface of Changes
 

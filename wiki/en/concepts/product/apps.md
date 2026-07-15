@@ -9,14 +9,14 @@ Store, Order App, and executor-kit consume the same on-chain facts from differen
 - Order creation and participant configuration.
 - Task review and workflow viewing.
 - Chain proof display.
-- Plan attestation and supplier trust display.
+- Plan publication and supplier identity display.
 - Metadata, catalog, review, and audit support workflows.
 
 Store may not:
 
 - Let metadata replace `PlanRegistered`.
 - Let a review draft replace `SignalSubmitted`.
-- Let the Store database replace the trust registry.
+- Let the Store database replace the Identity Registry.
 - Sign business actions on behalf of participants.
 
 Store’s centralized authority can influence recommendations, review, tagging, and governance entry points, but it cannot directly change order runtime facts.
@@ -48,4 +48,4 @@ Both paths are ultimately signal producers. They do not own order state; the bus
 
 ## Periphery Adapter
 
-Funding, guarantee, AI / MCP, and demo executors can live in `uvp-periphery`. They should consume `UVPStateMachine`, `ZhixuTrustRegistry`, Product DTOs, or executor-kit, rather than defining new core order truth.
+Funding, guarantee, AI / MCP, and demo executors can live in `uvp-periphery`. They should consume `UVPStateMachine`, optional Identity Registry name resolution, Product DTOs, or executor-kit, rather than defining new core order truth.

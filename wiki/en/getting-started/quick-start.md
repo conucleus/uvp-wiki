@@ -42,7 +42,7 @@ This script deploys the contracts, compiles Zhixu, registers plans and orders, s
 | `pnpm test` | Test all packages. |
 | `pnpm build` | Build all packages. |
 | `pnpm lint` | Run lint for packages that provide a lint script. |
-| `pnpm verify:protocol-freeze` | Verify the v0.4 `UVPStateMachine`, `ZhixuTrustRegistry`, `UVPDeploymentRegistry`, and EIP-712 domain fixtures. |
+| `pnpm verify:protocol-freeze` | Verify the v0.8 `UVPStateMachine`, v0.1 `UVPIdentityRegistry`, modules, `UVPDeploymentRegistry`, and EIP-712 fixtures. |
 | `pnpm verify:product-signal-map` | Verify that Product UI actions, permission rows, compiled signal ids, BFF authorizations, and contract authorization pairs converge. |
 | `pnpm release:baseline:dry-run` | Dry-run the local release baseline. |
 | `pnpm staging:preflight` | Non-spending preflight for Base Sepolia staging. |

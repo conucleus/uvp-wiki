@@ -13,13 +13,12 @@
 | `evidence.ts` | evidence upload metadata, proof route, object handle. |
 | `store-console.ts` | Store search, Zhixu console, draft/version/runtime view. |
 | `store-docking.ts` | docking session, validate, draft map. |
-| `store-suppliers.ts` | supplier directory, review, trust request input. |
-| `governance.ts` | admin review, attestation/revocation tx workflow. |
+| `store-suppliers.ts` | supplier directory, review, and matching inputs. |
+| `governance.ts` | admin review and identity-binding register/revoke transaction workflow. |
 | `notifications.ts` | supplier notification profile, delivery ops. |
 | `diagnostics.ts` | health/readiness/admin diagnostics. |
 | `admin-ops.ts` | ops-only maintenance route. |
 | `e2e-controls.ts` | local/product E2E fixture controls; must be disabled for testnet/production. |
-| `legacy-orders.ts` | compatibility route; it should not become the primary path for new interfaces. |
 
 ## Route Shell
 
@@ -36,6 +35,6 @@
 
 - A new route must clearly belong to Product, Store, governance, ops, or local E2E.
 - Product routes must not expose Store admin workflows.
-- Store routes must not fabricate Product proof or on-chain trust.
+- Store routes must not fabricate Product proof, Plan publication state, or identity bindings.
 - E2E controls are for local testing only; testnet/production profiles must fail closed.
 - Every public claim must be traceable to an event, hash, signature, DTO contract, or workflow audit.

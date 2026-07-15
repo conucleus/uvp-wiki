@@ -36,7 +36,7 @@ chainId:contractAddress:blockNumber:transactionHash:logIndex
 | `contractAddress` | state-machine 合约地址。 |
 | `deploymentId` | 部署标识。 |
 | `planId` / `planHash` | 订单绑定的计划。 |
-| `status` | 投影后的订单状态。 |
+| `status` | Order 注册状态；不从 hook/task 推导生命周期。 |
 | `authorizations` | 订单级 signal 授权视图。 |
 | `signals` | 已接受 signal。 |
 | `hooks` | hook 状态和 dueAt。 |
@@ -56,7 +56,7 @@ chainId:contractAddress:blockNumber:transactionHash:logIndex
 | `StageResourcePatchApplied` | 保存 resource overlay。 |
 | `StageExecutorActivated` | 增加 executor activation proof。 |
 | `HookStatusChanged` | 更新 hook 状态和 `dueAt`；取消时取消任务。 |
-| `HookReady` | 创建或打开任务，并把订单状态推向 action_required。 |
+| `HookReady` | 创建或打开任务；Order 仍保持 registered。 |
 | `TimerPoked` | 记录 timer proof 和 timeline。 |
 
 任务创建由 `HookReady` 驱动；后端草稿或 UI 状态只做辅助 workflow。

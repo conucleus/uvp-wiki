@@ -1,6 +1,6 @@
 # Order
 
-An Order is one runtime instance of a Plan. It records which signals were accepted, which hooks became ready or cancelled, which executor and resource overlays were applied, and which on-chain proofs correspond to those facts.
+An Order is an independent fact stream forked from a registered Plan. Once opened and assigned an `orderId`, the protocol promises only that it is registered and can continue accepting rule-compliant facts. Core does not define Order lifecycle states such as `running`, `completed`, or `cancelled`.
 
 ## Order Creation
 
@@ -21,9 +21,9 @@ During creation, the contract:
 - materializes the ready trigger stage;
 - emits `OrderRegistered`, `OrderTriggered`, `OrderMaterialized`, `StageMaterialized`, and `SignalSubmitterAuthorized`.
 
-## Dynamic State Inside an Order
+## Dynamic Facts Inside an Order
 
-| State | Source |
+| Fact | Source |
 | --- | --- |
 | signal records | `SignalSubmitted`. |
 | hook runtime | `HookStatusChanged`, `HookReady`, `TimerPoked`. |
@@ -35,13 +35,17 @@ During creation, the contract:
 
 ## Order and Product Order
 
-The on-chain Order is protocol state. `ProductOrderDTO` is the product view. A Product Order translates on-chain fields into stages, tasks, participants, proofs, and ordinary language. The facts still come from `UVPStateMachine` events.
+The on-chain Order is a protocol fact container. `ProductOrderDTO` is the product view. Its Order status only says `registered`; stage readiness, pending work, and business outcomes are represented separately by hooks, tasks, and signals and must not be promoted into an Order terminal state.
 
-Product task IDs, Store docking session IDs, and adapter job IDs are workflow indexes. The on-chain identity of the Order is still `orderId`, and the on-chain state still comes from `UVPStateMachine` events.
+Product task IDs, Store docking session IDs, and adapter job IDs are workflow indexes. The on-chain identity of the Order is still `orderId`, and its facts come from `UVPStateMachine` events.
 
 ## An Order Can Branch and Converge
 
-An Order can contain multiple source causal chains. For example, in cross-border supply, supply, payment, logistics, on-site delivery, and buyer acceptance all progress independently and converge at specific hooks. The dynamic nature of an Order comes from different authorized signals continuously writing into the same replayable event stream under contract rules.
+An Order can contain multiple source causal chains. For example, in cross-border supply, supply, payment, logistics, on-site delivery, and buyer acceptance all progress independently and converge at specific hooks. Its dynamics come from authorized signals entering the same replayable event stream, not from a mutable aggregate lifecycle state.
+
+## No Close or Rewrite Entry Point
+
+An Order does not need to be “closed” to remain consistent. Business participants may stop writing or create a new Order from the same Zhixu. Signals are first-writer-wins. If the first write is wrong, core does not overwrite or delete it; participants create a new Order and the product layer explains the relationship between the two auditable fact streams.
 
 If a stage is taken over by another Zhixu, it usually creates signal binding between the local Order and the linked Order:
 

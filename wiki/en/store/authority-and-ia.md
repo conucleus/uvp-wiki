@@ -1,14 +1,14 @@
 # Store Authority Boundary and Information Architecture
 
-The information architecture of the Store must separate three things: internal Nucleus governance, Store platform workflow, and external trust-domain endorsement. The Store gives the Nucleus a stage, gives operators a catalog and review tools, and gives trust reviewers materials and proof. Protocol facts come from registry/state-machine events.
+The information architecture of the Store must separate three things: internal Nucleus governance, Store platform workflow, and external Store or external institution endorsement. The Store gives the Nucleus a stage, gives operators a catalog and review tools, and gives trust reviewers materials and proof. Protocol facts come from registry/state-machine events.
 
 ## Information Objects
 
 | Store object | Primary owner | On-chain fact | Store-organized information |
 | --- | --- | --- | --- |
 | Nucleus | Zhixu designer / Zhixu organizer | No independent contract state; it is reflected in Zhixu/Plan/Order/proof. | identity, maintenance notes, version history, design materials, and publishing materials. |
-| Zhixu draft/version | Nucleus design, trust-domain endorsement | `PlanAttested` / `PlanRevoked` determine official trust. | draft, compile preview, fairness materials, platform tags, active recommendation. |
-| Supplier | Nucleus organization, trust-domain endorsement | `SupplierAttested` / `SupplierRevoked` determine the trust projection. | profile, capability tags, contacts, notification channels, review status, historical participation records. |
+| Zhixu draft/version | Nucleus design and publisher-signed publication | `PlanCommitted` / `PlanFinalized` determine on-chain usability. | draft, compile preview, fairness materials, platform tags, active recommendation. |
+| Supplier | Store organization and real-world verification | Identity bindings determine default name resolution, not capability. | profile, capability tags, contacts, notification channels, review status, historical participation records. |
 | Order | registrar/participants/executors | `OrderRegistered` and state-machine events determine runtime status. | search, sorting, tags, operator notes, proof summary. |
 | Task / performance | authorized submitters | `SignalSubmitted`, `HookReady`, and stage overlay events determine status. | fulfillment view, anomaly hints, contact reminders, SLA display. |
 | Platform workflow | Store operator/reviewer/admin | registry tx and indexed events determine public claims. | approval, confirmation, audit, broadcast request, failure reason. |
@@ -18,7 +18,7 @@ The information architecture of the Store must separate three things: internal N
 
 - Search first: the same query can hit Nucleus, Zhixu, Order, Supplier, and governance objects.
 - Nucleus visible: Zhixu versions should show who designed and maintains them, and also show Store status.
-- Trust visible: any plan/supplier trust must show the status from the registry projection.
+- Trust visible: any plan/supplier identity must show the status from the registry projection.
 - Proof reachable: orders, tasks, and supplier participation should all lead into proof/timeline views.
 - Store-only metadata labeled: draft, review, note, contact, notification, and platform tag must be marked as Store/workflow information.
 - Revoked visible but blocked: revoked plans/suppliers can still be found by operators, and they must be blocked from new-order creation entry points.
@@ -32,17 +32,17 @@ Store Home / Search
        -> identity / design material / supplier organization / publish material
   -> Zhixu Catalog
        -> draft / compile preview / fairness material / trust status / active version
-  -> Supplier Registry
+  -> Supplier Directory
        -> profile / nucleation fit / platform tags / contact / trust / participation
   -> Orders & Proof
        -> order detail / task timeline / proof rows / revoked warnings
   -> Docking
        -> sandbox / signalMap validation / local-linked relation / proof bridge
   -> Platform Workflow
-       -> review / attestation request / revocation request / audit
+       -> review / publication request / revocation request / audit
 ```
 
-Search can cross object types, but each object detail page must show its own authority source. For example, a supplier search hit is a Store profile, so the trust badge must come from the registry projection; a Zhixu card can show a Store-recommended version, but the official status must come from the plan attestation.
+Search can cross object types, but each object detail page must show its own authority source. For example, a supplier search hit is a Store profile, so the trust badge must come from the registry projection; a Zhixu card can show a Store-recommended version, but the official status must come from the plan publication.
 
 ## Disallowed IA
 

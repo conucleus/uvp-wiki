@@ -36,9 +36,9 @@ Product DTO 最终落在真实可跑的产品表面上：Order App 面向普通�
 | 层 | 负责什么 |
 | --- | --- |
 | [Chain Services](../components/chain-services.md) | 从链事件重建 projection，提供 Product API、Store API、relayer、proof verifier 和 runtime profile。 |
-| Product DTO 与用户表面 | 约定普通用户和产品前端如何表达 order/task/proof/trust，以及 signal container 的数据合同。 |
+| Product DTO 与用户表面 | 约定普通用户和产品前端如何表达 order/task/proof/identity，以及 signal container 的数据合同。 |
 | [Order App](../execution/order-app.md) / [Executor Kit](../execution/README.md) | 消费 Product DTO，准备证据、签名、提交和读取 proof。 |
-| [Zhixu Store](../store/README.md) | 消费 Product/Store DTO，组织凝结核工作台、supplier、trust、operator workflow 和 audit。 |
+| [Zhixu Store](../store/README.md) | 消费 Product/Store DTO，组织凝结核工作台、supplier、identity、operator workflow 和 audit。 |
 
 ## 边界
 

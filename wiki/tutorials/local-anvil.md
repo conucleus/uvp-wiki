@@ -14,6 +14,22 @@ Zhixu -> HookPlan -> OnchainHookPlan -> registerPlan/triggerOrderFromOutsideFor
 - Foundry 和 Anvil 可用。
 - 不需要真实私钥。脚本可使用本地 Anvil key。
 
+## 只部署合约
+
+在一个终端保持 Anvil 运行：
+
+```bash
+anvil --host 127.0.0.1 --port 8545 --chain-id 31337
+```
+
+在另一个终端执行：
+
+```bash
+pnpm deploy:local
+```
+
+该入口只接受 loopback RPC，部署当前 State Machine、冻结 modules、Deployment Registry 和 Identity Registry，并写入地址清单。
+
 ## Happy Path Self Update
 
 ```bash
@@ -24,16 +40,14 @@ uvp-deploy/deploy/scripts/bootstrap-local-anvil.sh --self-update
 
 1. 启动或连接本地 Anvil。
 2. 构建 workspace 和合约。
-3. 部署 `UVPDeploymentRegistry`、`ZhixuTrustRegistry`、`UVPStateMachine`。
+3. 部署 `UVPDeploymentRegistry`、`UVPIdentityRegistry`、`UVPStateMachine` 与六个 modules，并冻结 modules。
 4. 编译 UVP update Zhixu YAML，目标为 `platform.type=blockchain`、
    `platform.provider=eth`、`platform.network=base`。
-5. 部署 configured trust registry，并用 registry owner 背书计划。
-6. attests 当前 plan。
-7. allowlist plan publisher 和 order registrar。
-8. register plan 和 order，并写入 signal submitter authorizations。
-9. 提交链上 signals。
-10. 对 `HookReady`、`HookStatusChanged`、`TimerPoked` 做 replay oracle 校验。
-11. 注册 next plan 和 next order，证明旧订单仍绑定旧 plan。
+5. 由 publisher 签名并发布当前 Plan。
+6. 由 creator 签 trigger typed data，创建 Order 并写入 signal submitter authorizations。
+7. 提交链上 Signals。
+8. 对 `HookReady`、`HookStatusChanged`、`TimerPoked` 做 replay oracle 校验。
+9. `--self-update` 模式部署下一套 State Machine 与冻结 modules，登记 deployment cutover，并验证旧 Order 仍绑定原 Plan。
 
 ## Failure Branch
 
@@ -60,7 +74,7 @@ reducer 一致。
 成功时你应该看到：
 
 - 合约已部署；
-- plan attested；
+- plan published；
 - plan/order 已注册；
 - signal 已提交；
 - hook 事件已发出；

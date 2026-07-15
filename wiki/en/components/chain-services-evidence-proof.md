@@ -39,7 +39,7 @@ The common form is off-chain object storage: S3, R2, private object storage, or 
 Proof verifier boundaries:
 
 - Whether goods were actually delivered is judged by business participants, evidence, and the dispute/review system.
-- Supplier trust is expressed by trust-domain attestation.
+- supplier identity is expressed by Store or external institution publication.
 - Object handle accessibility cannot generate `SignalSubmitted`.
 - Hash alignment is a proof condition; hook readiness comes from state-machine events.
 

@@ -12,7 +12,7 @@
 - Industry demos or scenario adapters.
 - Executor demos.
 
-Periphery can consume `UVPStateMachine`, `ZhixuTrustRegistry`, Product DTOs, or executor-kit. It cannot turn funding, guarantee, payment, release, refund, or dispute state into new core facts.
+Periphery can consume `UVPStateMachine`, optional `UVPIdentityRegistry` name resolution, Product DTOs, or executor-kit. It cannot turn funding, guarantee, payment, release, refund, or dispute state into new core facts.
 
 ## Scenario Adaptation Principle
 

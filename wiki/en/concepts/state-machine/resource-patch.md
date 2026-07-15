@@ -41,6 +41,5 @@ The chain stores only hashes, URIs, and events. It does not store contracts, inv
 - Resource patch and Executor patch are different actions; their fields and signed payloads cannot be mixed.
 - Resource patch does not prove business completion; completion still comes from an authorized business signal.
 - Resource patch does not put file plaintext on chain; file content is linked through object storage, manifest URI, hashes, and proof.
-- Production profiles should reject legacy `http`, `txcloud`, and `plain_text` resource handles.
 
 See [Stage Overlay: Executor Patch and Resource Patch](stage-overlay.md) for the overview, and [File Resources](../core/file-resources.md) for the static resource object.

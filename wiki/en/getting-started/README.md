@@ -14,7 +14,7 @@ This is not the concept encyclopedia. The first pass should build the business i
 
 After the first pass, move into the engineering path:
 
-1. [One Order Through UVP Components](order-through-components.md): the same order crossing Store, compiler, trust registry, state machine, Chain Services, Order App, and executor-kit.
+1. [One Order Through UVP Components](order-through-components.md): the same order crossing Store, compiler, Identity Registry, state machine, Chain Services, Order App, and executor-kit.
 2. [Architecture Overview](../concepts/architecture.md): module boundaries, dependency direction, source of truth, and data flow.
 
 ## Engineering First Pass

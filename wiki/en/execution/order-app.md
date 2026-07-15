@@ -2,7 +2,7 @@
 
 `uvp-order-app/app` is the ordinary participant interface for order fulfillment. Like executor-kit, it is a signal producer, but its default user is human: a participant opens tasks, checks wallet responsibility, prepares evidence fingerprints, confirms signatures, submits, and reads proof.
 
-It does not own order facts. Order, signal, hook, attestation, and proof facts come from `UVPStateMachine`, `ZhixuTrustRegistry`, and replayable chain events. Order App consumes Product DTOs and signal containers exposed by Chain Services.
+It does not own order facts. Order, Signal, Hook, and proof facts come from replayable `UVPStateMachine` events; optional name resolution comes from `UVPIdentityRegistry`. Order App consumes Product DTOs and signal containers exposed by Chain Services.
 
 ```text
 Product API /product/me/tasks

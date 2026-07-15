@@ -49,7 +49,7 @@ Base Sepolia / testnet profile 必须拒绝：
 - localhost RPC。
 - demo fallback、E2E fixture controls、permissive authorization。
 - Anvil default private keys。
-- 缺失 `UVPStateMachine` / `ZhixuTrustRegistry` address manifest。
+- 缺失 `UVPStateMachine` / `UVPIdentityRegistry` address manifest。
 - broadcast 关闭但仍声明 staging ready。
 
 Readiness 可以说明“这个服务实例是否按正确配置运行”；链上 plan/order/signal/trust 事实仍来自事件。

@@ -4,11 +4,11 @@ UVP EVM 轨道按事实源分层：Zhixu 和 compiler 产生可注册的 Plan，
 
 ```mermaid
 flowchart TD
-  Z["Zhixu draft"] --> HC["hook-core / compiler"]
+  Z["Zhixu draft"] --> HC["uvp-core semantics / hook-core adapter / compiler"]
   HC --> P["Plan artifact / plan hash"]
-  P --> TR["ZhixuTrustRegistry"]
+  Store --> IR["UVPIdentityRegistry"]
   P --> SM["UVPStateMachine"]
-  TR --> EV["registry events"]
+  IR --> EV["identity events"]
   SM --> EV["state-machine events"]
   EV --> CS["Chain Services replay / projection"]
   CS --> DTO["Product DTO / HTTP API"]
@@ -33,7 +33,7 @@ flowchart LR
   ProductAPI["Chain Services\nProduct API"]
   StoreAPI["Chain Services\nStore API"]
   Relayer["Relayer / RPC boundary"]
-  Contracts["UVPStateMachine\nZhixuTrustRegistry"]
+  Contracts["UVPStateMachine\nUVPIdentityRegistry"]
   Events["链上事件"]
   Indexer["Indexer / replay worker"]
   DB["Postgres projection"]
@@ -63,7 +63,7 @@ flowchart LR
 | 层 | 代码入口 | 负责什么 | 不能负责什么 |
 | --- | --- | --- | --- |
 | 语义和编译 | `uvp-protocol/packages/hook-core/`、`uvp-protocol/packages/compiler/` | 解析 Zhixu、求值 Hook 语义、生成 deterministic artifact 和 hash。 | 注册订单、保存业务证据明文、替参与者签名。 |
-| 链上事实 | `uvp-protocol/contracts/uvp-contracts/` | Plan、Order、Signal、Hook、attestation、deployment cutover 的事实记录。 | Product 展示、Store workflow、私有文件存储。 |
+| 链上事实 | `uvp-protocol/contracts/uvp-contracts/` | Plan、Order、Signal、Hook、身份绑定、deployment cutover 的事实记录。 | Product 展示、Store workflow、私有文件存储。 |
 | 可重建服务层 | `uvp-chain-services/service/` | indexer、projection、Product/Store API、relayer boundary、proof/evidence workflow、notifications。 | 成为 plan/order/signal/trust 的事实源，或生成业务签名。 |
 | 产品表面 | `uvp-protocol/packages/product-dto/`、`zhixu-store/app/`、`uvp-order-app/app/` | 把链上事实翻译成订单、任务、proof、trust 和 Store 工作台。 | 改写合约事实、绕过 order-level authorization。 |
 | 执行者工具 | `uvp-executor-kit/package/` | CLI/SDK/MCP signal producer、chain watcher、Product API prepare/sign/submit/proof。 | 托管默认私钥、替业务方承担签名责任。 |
@@ -74,13 +74,13 @@ flowchart LR
 ```text
 Zhixu
   -> Plan artifact / plan hash
-  -> PlanAttested / PlanRegistered
+  -> PlanCommitted / PlanFinalized
   -> OrderRegistered / SignalSubmitterAuthorized
   -> SignalSubmitted / HookStatusChanged / HookReady
   -> replayed Product DTO and proof rows
 ```
 
-数据库、对象存储、通知队列、Store draft、operator audit 和 submission status 都是投影或 workflow 状态。它们可以提升产品体验，但不能替代 `UVPStateMachine`、`ZhixuTrustRegistry` 和链事件。
+数据库、对象存储、通知队列、Store draft、operator audit 和 submission status 都是投影或 workflow 状态。它们可以提升产品体验，但不能替代 `UVPStateMachine`、`UVPIdentityRegistry` 和链事件。
 
 ## 相关入口
 

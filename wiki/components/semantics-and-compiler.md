@@ -6,18 +6,20 @@
 
 ```text
 Zhixu YAML/JSON
-  -> hook-core parses receiveSignals
+  -> uvp-core defines and evaluates canonical Hook semantics
+  -> hook-core exposes the TypeScript adapter
   -> compiler builds OnchainHookPlanArtifact
   -> compiler emits Solidity registerPlan args
-  -> trust registry attests planId / planHash
+  -> publisher signs planId / planHash
 ```
 
 ## 组件职责
 
 | 组件 | 负责什么 | 相邻边界 |
 | --- | --- | --- |
-| hook-core | `source::condition` 解析、AST、dependency extraction、正向锚点规则。 | Solidity ABI、钱包授权、Product task 语言由后续层处理。 |
-| compiler | 秩序 input schema、OnchainHookPlan、registerPlan args、canonical hash；HookPlan 仅为内部 IR。 | 订单参与者选择、Supplier trust 判断、linked order 注册、支付/escrow 逻辑由产品、registry 或 periphery 处理。 |
+| uvp-core | Hook DSL、AST、求值、依赖提取、正向锚点与 canonical semantic version 的规范实现。 | Solidity ABI、钱包授权、Product task 语言由后续层处理。 |
+| hook-core | 对 uvp-core 语义的 TypeScript adapter 和版本断言，不另立语义。 | 不得形成与 uvp-core 分叉的解析／求值规则。 |
+| compiler | 秩序 input schema、OnchainHookPlan、registerPlan args、canonical hash；调用 uvp-core 语义，HookPlan 仅为内部 IR。 | 订单参与者选择、supplier identity 判断、linked order 注册、支付/escrow 逻辑由产品、registry 或 periphery 处理。 |
 | artifact/hash | `planId`、`planHash`、`hookId`、`sourceId`、`signalId`、`signalKey` 的稳定边界。 | Store draft 状态和 Product DB primary key 属于读模型。 |
 
 ## 阅读路径
@@ -32,11 +34,11 @@ Zhixu YAML/JSON
 
 ## 关键边界
 
-- Hook Core 是平台中立语义，不含 Solidity ABI。
+- uvp-core 是平台中立的规范语义源；hook-core 是 TypeScript 适配面，不含独立语义或 Solidity ABI。
 - Compiler 不选择订单参与者，不创建钱包授权，不判断 supplier 是否可信。
 - Artifact 是工程和审计材料；普通用户看 Product DTO，Store operator 看 proof panel，协议工程师读 on-chain artifact。
 - Canonical hash、artifact schema 和 registerPlan args 都是公共接口，改动时必须按 [公共接口](../reference/public-interfaces.md) 处理。
-- `supplierType=zhixu` 的 `signalMap` 编译 local Plan 的映射语义；运行态 linked order lifecycle 由 Store/Product/adapter 组织，并可通过 `DockedOrderLinked`、`DockedSignalMapped`、`DockedSignalSubmitted` 落链。
+- `supplierType=zhixu` 的 `signalMap` 编译 local Plan 的映射语义；运行态 linked-order 关系和事实展示由 Store/Product/adapter 组织，并可通过 `DockedOrderLinked`、`DockedSignalMapped`、`DockedSignalSubmitted` 落链。
 - `fileResources` 是 stage resource handle；生产资源访问策略通过 resource manifest/patch 演进，文件明文留在链下。
 
 ## 当前要特别守住的语义

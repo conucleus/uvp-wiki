@@ -9,7 +9,7 @@
 | [架构](../concepts/architecture.md) | 协议核心、链服务、产品表面、执行者工具、部署记录和 periphery 的总体分层。 |
 | [模块边界](../concepts/architecture/modules.md) | 每个 workspace 目录负责什么，哪些接口是公共边界。 |
 | [数据流与事实源](../concepts/architecture/flow-and-truth.md) | 哪些状态必须来自链，哪些只是可重建投影或操作辅助。 |
-| [本地到链上路径](../concepts/architecture/lifecycle.md) | 从 Zhixu 编译、计划认证、订单注册到 Product DTO 的完整生命周期。 |
+| [本地到链上路径](../concepts/architecture/lifecycle.md) | 从 Zhixu 编译、Plan 发布、订单注册到 Product DTO 的完整生命周期。 |
 | [模块地图](../reference/module-map.md) | workspace package、职责和禁止职责速查。 |
 
 ## 组件边界
@@ -17,9 +17,9 @@
 | 页面 | 组件 |
 | --- | --- |
 | [Compiler 与 Hook Core](../concepts/architecture/components/compiler-hook-core.md) | Hook DSL parser/evaluator、compiler、deterministic artifacts。 |
-| [Contracts 与 Registries](../concepts/architecture/components/contracts-registries.md) | `UVPStateMachine`、`ZhixuTrustRegistry`、`UVPDeploymentRegistry`。 |
+| [Contracts 与 Registries](../concepts/architecture/components/contracts-registries.md) | `UVPStateMachine`、`UVPIdentityRegistry`、`UVPDeploymentRegistry`。 |
 | [Product BFF](../concepts/architecture/components/chain-services-bff.md) | order draft、invite、participant confirmation、authorization 和 registration workflow。 |
-| [Store 与治理](../concepts/architecture/components/store-governance.md) | Store Console、governance handoff、supplier registry。 |
+| [Store 与治理](../concepts/architecture/components/store-governance.md) | Store Console、governance handoff、supplier directory。 |
 | [Order App 与 Executor Kit](../concepts/architecture/components/order-app-executor-kit.md) | participant app、executor CLI/SDK、AI/MCP adapter boundary。 |
 | [Periphery 与部署](../concepts/architecture/components/periphery-deploy.md) | funding/guarantee/payment/agent adapters、deploy scripts 和 release records。 |
 

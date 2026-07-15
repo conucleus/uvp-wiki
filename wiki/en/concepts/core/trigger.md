@@ -4,7 +4,7 @@ A Trigger turns a ready condition into an executable task. More precisely, it is
 
 For first-pass readers, `HookReady` means "this task is ready to handle." It does not mean the business work is complete. Completion is proven later by an authorized `SignalSubmitted` event and its evidence fingerprint.
 
-Trigger is a compile-time mark on Hook, coming from the `trigger` array in a Zhixu stage. The array is a pure OR wakeup set: any listed key may wake the stage. Each key points to one `receiveSignals` hook; that hook keeps the original full Hook DSL semantics, including `~`, `&`, `|`, and `+T`, and is validated by the existing Hook DSL parser/compiler rules.
+Trigger is a compile-time mark on Hook, coming from the `trigger` array in a Zhixu stage. Each key independently points to one `receiveSignals` hook. Any key may emit its own `HookReady`, and becoming ready does not suppress later readiness of other trigger hooks in the same stage. Projections use `hookId` as task and proof identity, so multiple trigger keys may produce multiple independently auditable tasks. Each hook uses `~`, `&`, `|`, and explicit duration delays such as `+5s`, validated by the Hook DSL parser/compiler.
 
 ```yaml
 trigger:
@@ -21,7 +21,7 @@ HookReady(orderId, hookId, stageId, hookName)
 
 ## Why Trigger Must Be Explicit
 
-A stage may have multiple hooks: some wait for inputs, some belong to `signalMap`, some are for failure paths or internal conditions. Trigger’s job is to lift “the condition is satisfied” into “this task can now be opened or claimed.”
+A stage may have multiple hooks: some wait for inputs, some belong to `signalMap`, some are for failure paths or internal conditions. Trigger’s job is to lift “the condition is satisfied” into “the task for this hook can now be opened or claimed.”
 
 On the product side, Trigger can be understood as:
 

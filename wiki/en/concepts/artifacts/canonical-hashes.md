@@ -36,7 +36,7 @@ The on-chain artifact uses a separate domain:
 uvp:onchain-hook-plan-artifact:v1
 ```
 
-This hash covers compact hooks, dependency indexes, executor routes, and selector bindings. `ZhixuTrustRegistry` attests this EVM-facing `planHash`, and `UVPStateMachine` checks that same value.
+This hash covers compact hooks and metadata commitments. The publisher signs the commit and `UVPStateMachine` checks the EVM-facing `planHash`; Identity Registry is not involved.
 
 ## Stable IDs
 

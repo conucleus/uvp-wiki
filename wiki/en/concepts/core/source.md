@@ -119,6 +119,6 @@ collector_intake
 
 - Role slots describe participant roles; Source describes causal chains.
 - Executor describes the runtime handler or submitter; Source describes signal context.
-- Supplier is the capability subject organized and endorsed by Store and the trust registry; Source is the namespace for hooks and signals.
+- Supplier is the capability subject organized and endorsed by Store and the Identity Registry; Source is the namespace for hooks and signals.
 - A completed deal may form a new source or a new Order.
 - Source must be compilable, authorizable, and replayable; it cannot be used as an arbitrary dynamic field.

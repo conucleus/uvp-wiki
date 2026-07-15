@@ -32,7 +32,7 @@ stage.receiveSignals
 | `SignalSubmitted` | 参与方已提交凭证指纹或确认动作。 |
 | `HookStatusChanged` | 条件等待、就绪、取消或仍未满足。 |
 
-普通用户主要看到订单、任务、参与方、证据和 proof。`sourceId`、`signalId`、`hookId`、gas、ABI 或 trust-domain 内部结构可以放在高级证明视图中，服务可验证性。
+普通用户主要看到订单、任务、参与方、证据和 proof。`sourceId`、`signalId`、`hookId`、gas、ABI 或 Store or external institution 内部结构可以放在高级证明视图中，服务可验证性。
 
 ## 产品表面的数据流
 

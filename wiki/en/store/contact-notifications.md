@@ -13,7 +13,7 @@ The Store can maintain contact and notification workflows because real fulfillme
 
 ## Source and Boundary
 
-- Notification triggers can come from `HookReady`, order-level authorization, supplier trust, and Product task projections.
+- Notification triggers can come from `HookReady`, order-level authorization, supplier identity, and Product task projections.
 - Notification state can only show whether the Store/chain-services tried to contact or remind someone.
 - Business completion must be expressed by an on-chain signal from an authorized submitter.
 - Contact details, credentials, private notes, certificates, contracts, invoices, and evidence plaintext must not be put on chain.

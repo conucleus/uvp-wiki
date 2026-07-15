@@ -52,7 +52,7 @@ After changing a public interface, you must:
 
 | New feature | Put it here |
 | --- | --- |
-| Hook DSL parse/eval | `uvp-protocol/packages/hook-core` |
+| Normative Hook DSL parse/eval | `uvp-core`; `uvp-protocol/packages/hook-core` is the TypeScript adapter only |
 | Zhixu compiler / artifact | `uvp-protocol/packages/compiler` |
 | Solidity runtime rule | `uvp-protocol/contracts/uvp-contracts` |
 | Chain-event replay oracle | `uvp-protocol/packages/statemachine` |

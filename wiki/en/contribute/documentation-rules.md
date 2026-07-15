@@ -61,15 +61,14 @@ When changing the Product API:
 - update [Product API Reference](../reference/product-api.md);
 - update [Product DTO and User Surfaces](../product/README.md);
 - update the Store/Order App/Executor Kit task docs;
-- note whether the old route is only a compatibility alias.
 
 When changing the Store / Supplier / Zhixu management path:
 
 - update [Store](../store/README.md);
 - update [Nucleus Workbench](../store/nucleation-workbench.md);
 - sync the object boundaries in [Core Concepts](../core/README.md);
-- state that Store metadata, platform labels, contact information, notification status, review status, and fulfillment record views belong to the read model or workflow, while chain events and trust-domain attestations are shown separately;
-- state the boundary between internal Nucleus governance, Store platform workflow, and trust-domain external attestation.
+- state that Store metadata, platform labels, contact information, notification status, review status, and fulfillment record views belong to the read model or workflow, while chain events and Store or external institution publications are shown separately;
+- state the boundary between internal Nucleus governance, Store platform workflow, and Store or external institution external publication.
 
 When changing the Executor / executor-kit / docked Zhixu path:
 

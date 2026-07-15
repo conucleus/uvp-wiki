@@ -48,7 +48,7 @@ spec:
 | 字段 | 解释 |
 | --- | --- |
 | `apiVersion` | DSL 版本，目前是 `uvp/v0`。 |
-| `kind` | 对协作规则书来说是 `Zhixu`；supplier 身份和能力声明使用 `SupplierDefinition`。 |
+| `kind` | 当前 DSL 顶层对象固定为 `Zhixu`。 |
 | `metadata.name` | 可读名称，也会参与计划身份。 |
 | `metadata.uid` | 稳定 Zhixu ID。没有时会回退到名称。 |
 | `metadata.labels` | 业务分类、行业、demo 标签。链上权限由 order authorization 和 overlay 决定。 |
@@ -87,7 +87,7 @@ receiveSignals:
 
 ## `selectedStages`
 
-`selectedStages` 是某个 stage 对目标 stage 的 executor patch 能力。例如 Phase 2 报关闭环中，买家提交的阶段可以为 `customs-complete` 指定具体执行者。编译器把这个关系变成 selector binding，合约在 executor patch 时检查这个 stage-to-target 绑定。
+`selectedStages` 是某个 stage 对目标 stage 的 executor patch 能力。例如在报关闭环中，买家提交的阶段可以为 `customs-complete` 指定具体执行者。编译器把这个关系变成 selector binding，合约在 executor patch 时检查这个 stage-to-target 绑定。
 
 ```yaml
 selectedStages:

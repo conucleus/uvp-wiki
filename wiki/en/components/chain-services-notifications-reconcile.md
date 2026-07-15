@@ -17,7 +17,7 @@ Notifications can be derived from these facts:
 
 - `HookReady`: a stage is ready and the corresponding executor needs to be notified.
 - order-level submitter authorization: who is allowed to submit a given signal.
-- supplier trust projection: whether a supplier is active or revoked.
+- supplier identity projection: whether a supplier is active or revoked.
 - supplier contact profile: how to reach them, notification preferences, owner, and availability window.
 
 Notifications are derived from these facts. Delivery state only describes whether the service tried to send, failed, or entered retry/dead-letter.

@@ -11,8 +11,8 @@ The Store's fulfillment view organizes orders, tasks, supplier participation, ev
 | Whether the signal was submitted | `SignalSubmitted` proof row. |
 | Whether the executor is active | `StageExecutorPatchApplied` / `StageExecutorActivated` projection. |
 | Evidence binding | Product evidence metadata, content hash, metadata hash, payload hash. |
-| Supplier historical participation | order/task projection + supplier metadata/trust projection. |
-| Plan/Supplier trust | `ZhixuTrustRegistry` plan/supplier attestation projection. |
+| Supplier historical participation | order/task projection + supplier metadata/identity projection. |
+| Plan and identity | StateMachine Plan finalization plus Identity Registry binding projection. |
 | Docked linked order | local/linked relation metadata + both sides' state-machine proof + mapped local signal. |
 
 ## What the Store Should Show
@@ -29,8 +29,8 @@ The Store's fulfillment view organizes orders, tasks, supplier participation, ev
 
 | Field | Description |
 | --- | --- |
-| event | `OrderRegistered`, `SignalSubmitted`, `HookReady`, `SupplierAttested`, etc. |
-| contract | state-machine or trust-registry address. |
+| event | `OrderRegistered`, `SignalSubmitted`, `HookReady`, `IdentityBindingRegistered`, etc. |
+| contract | state-machine, identity-registry, or deployment-registry address. |
 | deployment | deployment id / chain id / release evidence reference. |
 | tx/block/log | tx hash, block number, log index. |
 | subject | orderId, planId, supplier subject, stageId, hookId. |

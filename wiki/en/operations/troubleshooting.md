@@ -61,7 +61,7 @@ Check:
 - whether `UVP_PRODUCT_E2E_FIXTURES` was accidentally enabled;
 - whether `/product/zhixus?fallback=demo` was used by mistake;
 - whether the chain-services runtime profile rejects permissive fallback;
-- whether the trust projection is missing or the plan has been revoked.
+- whether the identity projection is missing or the plan has been revoked.
 
 ## Order App Shows No Tasks
 
@@ -70,7 +70,7 @@ Check:
 - whether `wallet` or `VITE_UVP_ORDER_APP_WALLET_ADDRESS` matches the authorized submitter;
 - whether `/product/me/tasks` is returning empty;
 - whether order-level `SignalSubmitterAuthorized` has been indexed;
-- whether supplier trust has been revoked;
+- whether supplier identity has been revoked;
 - whether the task is waiting on another prerequisite signal;
 - whether the Product API URL points to the real service instead of a test/stub URL.
 

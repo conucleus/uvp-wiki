@@ -9,7 +9,7 @@ The engineering architecture page helps developers decide where code should live
 | [Architecture](../concepts/architecture.md) | the overall layering of protocol core, chain services, product surfaces, executor tools, deployment records, and periphery. |
 | [Module Boundaries](../concepts/architecture/modules.md) | what each workspace directory owns, and which interfaces are public boundaries. |
 | [Data Flow and Source of Truth](../concepts/architecture/flow-and-truth.md) | which states must come from chain, and which are only reconstructable projections or operational aids. |
-| [Local to On-chain Path](../concepts/architecture/lifecycle.md) | the full lifecycle from Zhixu compilation and plan attestation to Product DTOs. |
+| [Local to On-chain Path](../concepts/architecture/lifecycle.md) | the full lifecycle from Zhixu compilation and plan publication to Product DTOs. |
 | [Module Map](../reference/module-map.md) | quick reference for workspace packages, responsibilities, and forbidden responsibilities. |
 
 ## Component Boundaries
@@ -17,9 +17,9 @@ The engineering architecture page helps developers decide where code should live
 | Page | Component |
 | --- | --- |
 | [Compiler and Hook Core](../concepts/architecture/components/compiler-hook-core.md) | Hook DSL parser/evaluator, compiler, deterministic artifacts. |
-| [Contracts and Registries](../concepts/architecture/components/contracts-registries.md) | `UVPStateMachine`, `ZhixuTrustRegistry`, `UVPDeploymentRegistry`. |
+| [Contracts and Registries](../concepts/architecture/components/contracts-registries.md) | `UVPStateMachine`, `UVPIdentityRegistry`, `UVPDeploymentRegistry`. |
 | [Product BFF](../concepts/architecture/components/chain-services-bff.md) | order draft, invite, participant confirmation, authorization, and registration workflow. |
-| [Store and Governance](../concepts/architecture/components/store-governance.md) | Store Console, governance handoff, supplier registry. |
+| [Store and Governance](../concepts/architecture/components/store-governance.md) | Store Console, governance handoff, supplier directory. |
 | [Order App and Executor Kit](../concepts/architecture/components/order-app-executor-kit.md) | participant app, executor CLI/SDK, AI/MCP adapter boundary. |
 | [Periphery and Deployment](../concepts/architecture/components/periphery-deploy.md) | funding/guarantee/payment/agent adapters, deploy scripts, and release records. |
 

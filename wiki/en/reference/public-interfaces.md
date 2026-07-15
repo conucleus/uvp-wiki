@@ -11,7 +11,7 @@ When changing any of these, treat the change as a protocol-boundary change and u
 | Solidity ABI / bytecode / function selector | `uvp-protocol/contracts/uvp-contracts` | protocol-bindings, chain-services, executor-kit, deploy scripts, release gates | Update fixtures, bindings, contract tests, deploy/replay tests, and the release note. |
 | Event name / topic / indexed fields | contracts | indexer, statemachine replay, Product projection, proof verifier | Update the replay oracle, projection tests, and contracts/events reference. |
 | EIP-712 domain / typed data | contracts, protocol-bindings | Product submit, relayer, executor-kit, wallet UI | Update digest helpers, signing tests, and the staging domain check; staging must not fall back to the older `0.1` domain. |
-| Canonical hash / artifact schema | compiler, hook-core, statemachine | trust registry, registerPlan, release evidence | Update golden fixtures, canonical hash docs, and compiler/statemachine tests. |
+| Canonical hash / artifact schema | compiler, hook-core, statemachine | Plan publication, registerPlan, release evidence | Update golden fixtures, canonical hash docs, and compiler/statemachine tests. |
 | Product DTO | product-dto | chain-services, Store, Order App, executor-kit, periphery adapter | Update DTO tests, route tests, frontend/API consumers, and ordinary-user copy. |
 | Product API | chain-services | Store, Order App, executor-kit Product API mode, MCP adapter | Update the API reference, route tests, browser E2E, and failure language. |
 | Deployment manifest | uvp-deploy/deploy | chain-services, staging scripts, release records | Commit only curated manifest/evidence; local generated address files should not be committed by default. |
@@ -36,7 +36,7 @@ release record or PRD trace
 
 ## Non-Interface State
 
-- Store metadata is platform workflow/material state; trust-registry attestation is the on-chain endorsement interface.
+- Store metadata is platform workflow/material state; Plan publication and identity bindings are independently verifiable on-chain facts.
 - The Product BFF database is a rebuildable read model; the source of truth for plan/order/signal/hook is chain events.
 - Relayer configuration is broadcast configuration; business authorization comes from order authorization and signatures.
 - Demo fallback, fixture catalog, and mock frontend modes can only support demos or tests.

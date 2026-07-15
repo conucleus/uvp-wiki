@@ -34,7 +34,7 @@ selectorStageId -> targetStageId
 
 Executor patch 可以做 assign、handoff、replacement 等动作。合约会检查 nonce、订单级授权、stage-to-target binding，并根据 mode 检查前任 executor 或 approval signal。
 
-激活后，目标 stage 的业务 signal 必须由 active executor 提交。
+激活后，Plan 为目标 stage 预声明的 current-order signal capability 会自动委任给 active executor。Executor 无需在 Order 创建时预授权，但 patch 不能赋予 Plan 未声明的 signal 权限。
 
 ## Resource Patch
 

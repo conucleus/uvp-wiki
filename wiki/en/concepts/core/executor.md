@@ -6,7 +6,7 @@ Executor must be separated from Supplier:
 
 | Object | Problem it solves | Typical authority |
 | --- | --- | --- |
-| Supplier | Who has a certain real-world fulfillment capability, and whether that subject is endorsed by a trust registry. | Store metadata + `ZhixuTrustRegistry` supplier attestation. |
+| Supplier | A real-world subject and its Store-maintained off-chain capability profile. | Store metadata + optional `UVPIdentityRegistry` identity binding. |
 | Executor | Who is actually executing or submitting the signal for the current Order and current stage. | `UVPStateMachine` order authorization, stage executor overlay, EIP-712 signature. |
 
 Supplier is the capability subject and trust subject; Executor is the runtime binding and signal submitter. One Supplier can send out multiple executor wallets, and one Executor can also represent a Supplier, an adapter, or a Zhixu that runs independently.
@@ -17,8 +17,8 @@ The usual path for an Executor to take effect is:
 
 ```text
 Supplier registers in the Store
-  -> Store maintains capability tags, contacts, fulfillment records, and trust projection
-  -> Trust registry attests/revokes the supplier subject
+  -> Store maintains capability tags, contacts, fulfillment records, and identity projection
+  -> Registry operator registers or revokes the supplier subject/account binding
   -> Zhixu stage declares the required executor or Supplier type
   -> Order registration writes order-level signal authorization
   -> Control stage may specify an active executor through executor patch
@@ -57,7 +57,7 @@ StageExecutorPatchApplied(orderId, selectorStageId, targetStageId, selector, exe
 StageExecutorActivated(orderId, targetStageId, executor, ...)
 ```
 
-The active executor overlay affects only this Order and does not modify the Plan. Once a target stage has an active executor, later business signals for that stage must be submitted by the active executor; even if another wallet originally had signal authorization, the contract rejects the wrong submitter according to the overlay.
+The active executor overlay affects only this Order and does not modify the Plan. A patch automatically delegates the target stage’s current-order signal capabilities compiled from Plan `sendSignals` to the active executor, so a wallet that appears only at runtime may be selected. It may submit only Plan-declared signals; changing executor affects unwritten Signals and never rewrites existing facts.
 
 ## Zhixu Can Also Be an Executor
 
@@ -85,7 +85,7 @@ executor:
 This means:
 
 1. The local Plan declares that the stage executor type is `zhixu`.
-2. `supplierID` points to a peer Zhixu or supplier subject that Store or the Trust Registry can recognize.
+2. `supplierID` points to a peer Zhixu or supplier subject that Store or the Identity Registry can recognize.
 3. `signalMap` declares how the local stage waits for or interprets linked Zhixu output signals.
 4. The compiler generates `kind=signalMap` hooks for `signalMap`; `str` and `cmp` must exist, and a single signalMap must reference the same source.
 5. Creation, notification, proof validation, and local signal mapping for the linked Zhixu are organized by Store/Product/adapter/executor-kit workflows.

@@ -14,6 +14,22 @@ Zhixu -> HookPlan -> OnchainHookPlan -> registerPlan/triggerOrderFromOutsideFor
 - Foundry and Anvil are available.
 - No real private key is required. The script can use a local Anvil key.
 
+## Contract-only Deployment
+
+Keep Anvil running in one terminal:
+
+```bash
+anvil --host 127.0.0.1 --port 8545 --chain-id 31337
+```
+
+Deploy from another terminal:
+
+```bash
+pnpm deploy:local
+```
+
+This entry accepts loopback RPCs only. It deploys the current State Machine, frozen modules, Deployment Registry, and Identity Registry, then writes the address manifest.
+
 ## Happy Path Self Update
 
 ```bash
@@ -24,15 +40,13 @@ The script will:
 
 1. Start or connect to local Anvil.
 2. Build the workspace and contracts.
-3. Deploy `UVPDeploymentRegistry`, `ZhixuTrustRegistry`, and `UVPStateMachine`.
+3. Deploy `UVPDeploymentRegistry`, `UVPIdentityRegistry`, `UVPStateMachine`, and the six modules; then freeze the modules.
 4. Compile the UVP update Zhixu YAML, targeting `platform.type=blockchain`, `platform.provider=eth`, and `platform.network=base`.
-5. Deploy the configured trust registry and attest the plan with the registry owner.
-6. Attest the current plan.
-7. Allowlist the plan publisher and order registrar.
-8. Register the plan and order, and write signal submitter authorizations.
-9. Submit on-chain signals.
-10. Run replay-oracle checks for `HookReady`, `HookStatusChanged`, and `TimerPoked`.
-11. Register the next plan and next order to prove the old order is still bound to the old plan.
+5. Publish the current Plan with the publisher's signature.
+6. Create an Order from creator-signed trigger typed data and install signal submitter authorizations.
+7. Submit on-chain Signals.
+8. Run replay-oracle checks for `HookReady`, `HookStatusChanged`, and `TimerPoked`.
+9. In `--self-update` mode, deploy the next State Machine and frozen modules, record deployment cutover, and verify that the old Order remains bound to its original Plan.
 
 ## Failure Branch
 
@@ -57,7 +71,7 @@ These are local run evidence. Do not put private keys or RPC secrets into the ou
 On success, you should see:
 
 - contracts deployed;
-- plan attested;
+- plan published;
 - plan/order registered;
 - signal submitted;
 - hook events emitted;

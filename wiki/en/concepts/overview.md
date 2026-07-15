@@ -12,7 +12,7 @@ Zhixu: how this class of coordination runs
   -> Proof / Product view: why this is traceable
 ```
 
-The engineering implementation then breaks that relationship into compiler artifacts, on-chain registration parameters, trust registry events, state-machine evaluation, event replay, and Product DTOs. Those are second-layer concepts, not the first entry point for understanding UVP.
+The engineering implementation then breaks that relationship into compiler artifacts, on-chain registration parameters, Identity Registry events, state-machine evaluation, event replay, and Product DTOs. Those are second-layer concepts, not the first entry point for understanding UVP.
 
 ## Reading Order
 
@@ -41,14 +41,14 @@ Read the sibling chapters below as well:
 | [Architecture](architecture.md) | Module boundaries, dependency direction, source of truth, and data flow. |
 | [State Machine](state-machine.md) | How the contract stores signals, evaluates hooks, handles timers, and applies stage overlays; this belongs to the core component flow. |
 | [Artifacts and Hashes](artifacts-and-hashes.md) | Compiler artifacts, canonical hashes, stable IDs, and registration parameters. |
-| [Trust and Authorization](trust-and-authorization.md) | Trust registrys, plan attestation, order-level signal authorization, EIP-712, and relayer boundaries. |
+| [Identity and Authorization](trust-and-authorization.md) | Identity binding, Plan publication, order-level signal authorization, EIP-712, and relayer boundaries. |
 | [Product Surfaces](product-surfaces.md) | How chain-services project chain events into orders, tasks, and proofs that ordinary users can read. |
 | [Store](../store/README.md) | How Store gives the Nucleus a workbench and organizes Zhixu/Supplier, trust checks, contact notifications, fulfillment records, and platform workflow. |
 | [Executors and Integrations](../execution/README.md) | Executor Kit, docked Zhixu, Order App, adapters, and MCP/AI execution entry points. |
 
 ## Boundary Checks
 
-- Contracts and chain events determine the real state of plans, orders, signals, hooks, and attestations.
+- Contracts and chain events determine the real state of plans, orders, signals, hooks, and publications.
 - The indexer database must be rebuildable from events and cannot be the source of truth.
 - A relayer may sponsor or forward transactions, but it cannot generate business signatures on behalf of participants.
 - Store, Order App, and Product API organize user language and metadata; submissions still go through on-chain authorization.

@@ -17,7 +17,7 @@ The compiler turns a Zhixu definition directly into an EVM `OnchainHookPlanArtif
 | `OnchainHookPlanArtifact` | EVM-oriented, using `bytes32` IDs, stack instructions, dependency indexes, and selector bindings. |
 | `registerPlan` args | Solidity registration arguments deterministically compressed from the on-chain artifact. |
 
-`UVPStateMachine.registerPlan()` stores the on-chain plan hash for replay and order binding. `ZhixuTrustRegistry` separately attests `(registryAddress, planId, planHash)` for Product/Store trust projections.
+`UVPStateMachine.commitPlan()` derives and stores the Plan hash from hooks and metadata commitments for replay and Order binding. The publisher signature proves publication origin; Identity Registry does not publish Plans.
 
 ## Public Interface Awareness
 

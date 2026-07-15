@@ -26,8 +26,8 @@ Hook Core output is still platform-neutral semantics, with no Solidity ABI attac
 
 ## Compiler Input / Output Boundary
 
-The compiler outputs deterministic plan artifacts and registration parameters. Order participants, wallet authorization, contract deployment, supplier trust, escrow, and funding are handled by later Product, registry, deployment, or periphery layers. The compiler answers only one question: can this static Zhixu be deterministically compiled into an EVM-registerable plan?
+The compiler outputs deterministic plan artifacts and registration parameters. Order participants, wallet authorization, contract deployment, supplier identity, escrow, and funding are handled by later Product, registry, deployment, or periphery layers. The compiler answers only one question: can this static Zhixu be deterministically compiled into an EVM-registerable plan?
 
 ## Why It Is a Core Architectural Piece
 
-If the compiler is not deterministic, every later trust attestation loses meaning. The trust registry endorses the plan hash; the contract registers compact hooks; the Product DTO shows the tasks for the Plan. If any hash or schema is not reproducible, the whole chain becomes unauditable.
+Compiler determinism gives every party the same Plan hash. The contract registers compact hooks, the publisher signs the Plan hash, and Product DTOs display the tasks for that Plan. Reproducible hashes and schemas make the chain auditable.

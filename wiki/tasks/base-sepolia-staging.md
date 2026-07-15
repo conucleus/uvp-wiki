@@ -1,101 +1,42 @@
-# Base Sepolia Staging
+# Base Sepolia 部署
 
-Base Sepolia 是当前 public test target。它用于 staging/rehearsal 证据，不等于生产
-发布。
+Base Sepolia 是当前 public test target，chain id 为 `84532`。部署会消耗测试网 gas，并使用 RPC 配额。
 
-## Secret 环境
+## 准备
 
-本地 secret 文件：
+- `BASE_SEPOLIA_RPC_URL` 指向 Base Sepolia RPC。
+- `UVP_ETH_DEPLOYER_PRIVATE_KEY` 由环境或密钥管理系统注入。
+- 可选的 `UVP_ETH_DEPLOYER_ADDRESS` 必须与私钥导出的地址一致。
+- 私钥、RPC secret 和临时日志不进入仓库。
 
-```bash
-set -a
-source ~/.test_envs
-set +a
-```
-
-规则：
-
-- `~/.test_envs` 必须留在仓库外。
-- 文件权限应为 `0600`。
-- 不要把私钥值贴进日志、文档、issue、PR 或聊天。
-- `BASE_SEPOLIA_RPC_URL`、`UVP_STAGING_RPC_URL`、`UVP_RPC_URL` 默认使用
-  `https://sepolia.base.org`，除非已验证更快 RPC。
-- Base Sepolia chain id 是 `84532`，不是 Ethereum Sepolia 的 `11155111`。
-- Staging 当前头部应使用 `UVPStateMachine` EIP-712 domain version `0.4`；历史 `0.2` 记录只作为 audit evidence。
-
-## 非花费 Preflight
-
-先运行：
+## 只部署合约
 
 ```bash
-pnpm staging:preflight
+BASE_SEPOLIA_RPC_URL=... \
+UVP_ETH_DEPLOYER_PRIVATE_KEY=... \
+UVP_BASE_SEPOLIA_BROADCAST_CONFIRMATION=I_UNDERSTAND_THIS_BROADCASTS_BASE_SEPOLIA_AND_USES_REMOTE_QUOTA \
+pnpm deploy:base-sepolia
 ```
 
-Preflight 应检查：
+该入口部署 `UVPStateMachine`、六个冻结 modules、`UVPDeploymentRegistry` 和 `UVPIdentityRegistry`，登记 deployment，并发布当前 Plan。输出地址清单使用 `uvp-eth.addresses.v5`。
 
-- RPC 和 chain id；
-- address manifest；
-- active deployment；
-- chain-services runtime profile；
-- PostgreSQL；
-- evidence storage；
-- relayer/gas-payer config；
-- Store auth；
-- 禁止 demo/E2E/permissive fallback；
-- role wallets 和权限输入。
-
-## Broadcast Rehearsal
-
-只有 preflight 通过并确认 funded role wallets 与 on-chain permissions 后，才运行：
+## 部署并运行协议 Smoke
 
 ```bash
-pnpm staging:rehearsal -- --allow-broadcast
+BASE_SEPOLIA_RPC_URL=... \
+UVP_ETH_DEPLOYER_PRIVATE_KEY=... \
+UVP_BASE_SEPOLIA_BROADCAST_CONFIRMATION=I_UNDERSTAND_THIS_BROADCASTS_BASE_SEPOLIA_AND_USES_REMOTE_QUOTA \
+uvp-deploy/deploy/scripts/bootstrap-base-sepolia.sh
 ```
 
-这会发交易，必须明确知道当前使用的 deployer、owner、publisher、registrar、relayer
-gas payer、participant、governance domain owner 和 governance reviewer。
+Smoke 会继续创建 Order、写入 Signal 授权、提交场景 Signal，并核对链事件与 replay 结果。
 
-## chain-services Testnet Profile
+## 安全门
 
-testnet profile 要求 fail-closed：
-
-```text
-CHAIN_SERVICES_RUNTIME_ENV
-CHAIN_SERVICES_DATABASE_DRIVER=postgres
-CHAIN_SERVICES_DATABASE_URL
-CHAIN_SERVICES_MIGRATIONS_AUTO_RUN
-SECURITY_PREFLIGHT_STRICT
-UVP_CHAIN_ID=84532
-UVP_RPC_URL
-UVP_ADDRESS_MANIFEST
-UVP_PRODUCT_BFF_REGISTRATION_ADAPTER
-UVP_PRODUCT_BFF_REGISTRAR_PRIVATE_KEY_ENV
-UVP_STATE_MACHINE_RELAYER_BROADCAST_ENABLED
-UVP_STATE_MACHINE_RELAYER_PRIVATE_KEY_ENV
-UVP_EVIDENCE_STORAGE_ADAPTER
-UVP_EVIDENCE_OBJECT_NAMESPACE
-RECONCILE_WORKER_ENABLED
+```bash
+pnpm no-spend:safety
 ```
 
-Testnet profile 会拒绝 memory/SQLite、implicit database URLs、localhost RPC、Anvil
-default private keys、demo mode、E2E fixture controls、permissive Product
-submission authorization 和 broadcast-disabled relayer。
+安全门检查：Base Sepolia workflow 只能手动触发；workflow 必须把确认串传给脚本；bootstrap 在构建和广播前检查确认；普通 CI 不读取部署 secrets；本地部署入口只接受 loopback RPC。
 
-## 证据输出
-
-Release/rehearsal 输出应包含：
-
-- run id；
-- commit；
-- chain id；
-- state-machine 和 trust-registry address；
-- plan/order/task/submission ids；
-- tx hashes；
-- proof rows；
-- indexer status；
-- storage/evidence readiness；
-- browser E2E summary；
-- redacted role table；
-- failed stage 或 skipped reason。
-
-只提交经过筛选的 release record，不提交 secret、原始日志或临时本地 manifest。
+地址清单和 summary 可以作为本次运行的公开技术记录。私钥、原始 RPC URL、数据库内容和未筛选日志不进入版本控制。

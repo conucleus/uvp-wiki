@@ -7,7 +7,7 @@
 | 层 | 代码入口 | 事实或接口 |
 | --- | --- |
 | DSL/语义 | `uvp-protocol/packages/hook-core/`、`uvp-protocol/packages/compiler/` | Hook expression、HookPlan、OnchainHookPlan、planId/planHash。 |
-| 链上执行 | `uvp-protocol/contracts/uvp-contracts/` | ABI、events、EIP-712 domain、`UVPStateMachine`、`ZhixuTrustRegistry`。 |
+| 链上执行 | `uvp-protocol/contracts/uvp-contracts/` | ABI、events、EIP-712 domain、`UVPStateMachine`、modules、`UVPIdentityRegistry`。 |
 | Replay/reference | `uvp-protocol/packages/statemachine/` | reference reducer、event replay、runtime semantic tests。 |
 | Bindings | `uvp-protocol/packages/protocol-bindings/` | browser-safe ABI、typed-data builders、hash helpers、calldata builders。 |
 | 可重建服务层 | `uvp-chain-services/service/` | 可 fork 的链下 indexer、projection、relayer boundary、proof verifier、Product/Store API。 |
@@ -35,12 +35,12 @@ core objects
 | [架构总览](../concepts/architecture.md) | 系统按协议核心、链服务、产品表面、执行者工具、部署记录、periphery adapter 分层。 |
 | [模块边界](../concepts/architecture/modules.md) | 每个 workspace 目录负责什么，禁止跨哪些边界。 |
 | [数据流与事实源](../concepts/architecture/flow-and-truth.md) | 哪些状态必须来自链，哪些状态只是可重建投影或操作辅助。 |
-| [本地到链上路径](../concepts/architecture/lifecycle.md) | 从 Zhixu 编译、计划认证、订单注册到 Product DTO 的完整生命周期。 |
+| [本地到链上路径](../concepts/architecture/lifecycle.md) | 从 Zhixu 编译、Plan 发布、订单注册到 Product DTO 的完整生命周期。 |
 | [模块地图](../reference/module-map.md) | package、职责和禁止职责速查。 |
 
 ## 架构规则
 
-- 合约和链事件是 plan、order、signal、hook、attestation、deployment cutover 的事实源。
+- 合约和链事件是 plan、order、signal、hook、publication、deployment cutover 的事实源。
 - Store、Product API、Order App 和 executor-kit 只能消费、投影、展示、中继或提交授权动作。
 - Indexer 和 durable database 必须能从事件重建，不能成为协议事实源。
 - Periphery 可以实现 funding、guarantee、payment、agent adapter，但必须消费核心接口。

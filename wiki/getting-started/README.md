@@ -14,7 +14,7 @@
 
 完成第一遍之后，再进入工程路径：
 
-1. [一个订单穿过 UVP 组件](order-through-components.md)：用同一条订单看 Store、compiler、trust registry、state machine、Chain Services、Order App 和 executor-kit 的位置。
+1. [一个订单穿过 UVP 组件](order-through-components.md)：用同一条订单看 Store、compiler、Identity Registry、state machine、Chain Services、Order App 和 executor-kit 的位置。
 2. [架构总览](../concepts/architecture.md)：看模块边界、依赖方向、事实源和数据流。
 
 ## 工程第一遍

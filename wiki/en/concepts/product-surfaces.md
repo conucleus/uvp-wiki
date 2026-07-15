@@ -32,7 +32,7 @@ stage.receiveSignals
 | `SignalSubmitted` | A participant has submitted a credential fingerprint or confirmation action. |
 | `HookStatusChanged` | The condition is waiting, ready, cancelled, or still unsatisfied. |
 
-Ordinary users mainly see orders, tasks, participants, evidence, and proof. `sourceId`, `signalId`, `hookId`, gas, ABI, or trust-domain internals can live in advanced proof views for service verifiability.
+Ordinary users mainly see orders, tasks, participants, evidence, and proof. `sourceId`, `signalId`, `hookId`, gas, ABI, or Store or external institution internals can live in advanced proof views for service verifiability.
 
 ## Product Surface Data Flow
 

@@ -7,7 +7,7 @@ This page is an object index, not the first tutorial. New readers can start with
 ```text
 First layer: Zhixu -> Order -> Executor -> Signal
 Second layer: Plan / Source / Hook / Trigger / File Resources
-Governance layer: Nucleus / Supplier / Attestation / Authorization
+Governance layer: Nucleus / Supplier / publication / Authorization
 Display layer: Proof / Product DTO / Store / Order App / executor-kit
 ```
 
@@ -53,14 +53,14 @@ Read these sibling chapters next:
 | [Architecture](../concepts/architecture.md) | Module boundaries, dependency direction, source of truth, and data flow. |
 | [State Machine](../concepts/state-machine.md) | How the contract stores signals, evaluates hooks, handles timers, and applies stage overlays; this belongs to the core component flow. |
 | [Artifacts and Hashes](../concepts/artifacts-and-hashes.md) | Compiler artifacts, canonical hashes, stable IDs, and registration parameters. |
-| [Trust and Authorization](../concepts/trust-and-authorization.md) | Trust registries, plan attestation, order-level signal authorization, EIP-712, and relayer boundaries. |
+| [Trust and Authorization](../concepts/trust-and-authorization.md) | Trust registries, plan publication, order-level signal authorization, EIP-712, and relayer boundaries. |
 | [Product Surfaces](../concepts/product-surfaces.md) | How chain-services project chain events into orders, tasks, and proofs readable by ordinary users. |
 | [Store](../store/README.md) | How Store gives the Nucleus a workbench and organizes Zhixu/Supplier, trust checks, contact notifications, fulfillment records, and platform workflow. |
 | [Executors and Integrations](../execution/README.md) | Executor Kit, docked Zhixu, Order App, adapters, and MCP/AI execution entry points. |
 
 ## Boundary Checks
 
-- Contracts and chain events determine the real state of plans, orders, signals, hooks, and attestations.
+- Contracts and chain events determine the real state of plans, orders, signals, hooks, and publications.
 - The indexer database must be rebuildable from events and cannot be the source of truth.
 - A relayer may sponsor or forward transactions, but it cannot generate business signatures on behalf of participants.
 - Store, Order App, and Product API organize user language and metadata; submissions still go through on-chain authorization.

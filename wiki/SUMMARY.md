@@ -37,8 +37,8 @@
   - [Canonical Hash](concepts/artifacts/canonical-hashes.md)
   - [链上注册参数](concepts/artifacts/solidity-registration.md)
   - [Protocol Bindings 与公共接口](components/services-and-interfaces.md)
-- [Trust Registry 与授权边界](concepts/trust-and-authorization.md)
-  - [Trust Domain](concepts/trust/domains.md)
+- [身份、发布与授权边界](concepts/trust-and-authorization.md)
+  - [Store or external institution](concepts/trust/domains.md)
   - [Signal 授权](concepts/trust/signal-authorization.md)
   - [EIP-712 与 Relayer](concepts/trust/eip712-relayer.md)
   - [Stage Patch 授权](concepts/trust/stage-patch.md)
@@ -73,7 +73,7 @@
     - [Store 权威边界与信息架构](store/authority-and-ia.md)
     - [凝结核工作台](store/nucleation-workbench.md)
     - [Zhixu Catalog、配置与发布](store/zhixu-management.md)
-    - [Supplier Registry、能力与联系](store/supplier-registry.md)
+    - [Supplier Directory、能力与联系](store/supplier-directory.md)
     - [履约状态、Proof 与 Trust 校验](store/runtime-proof.md)
     - [联系与通知](store/contact-notifications.md)
     - [Operator 权限、治理与 Audit](store/governance-audit.md)
@@ -103,6 +103,7 @@
 
 ## 参考与证据
 
+- [版本与语义矩阵](reference/version-matrix.md)
 - [公共接口](reference/public-interfaces.md)
 - [合约与事件](reference/contracts-and-events.md)
 - [Product API](reference/product-api.md)

@@ -9,14 +9,14 @@ Store、Order App 和 executor-kit 站在不同用户视角上消费同一套链
 - 订单创建和参与方配置。
 - 任务审阅和流程查看。
 - 链证明展示。
-- plan attestation 和 supplier trust 展示。
+- plan publication 和 supplier identity 展示。
 - metadata、catalog、review、audit 辅助流程。
 
 Store 不可以：
 
 - 让 metadata 替代 `PlanRegistered`。
 - 让审核草稿替代 `SignalSubmitted`。
-- 让 Store 数据库替代 trust registry。
+- 让 Store 数据库替代 Identity Registry。
 - 替参与方生成业务签名。
 
 Store 的中心化权威可以影响推荐、审核、打标和治理入口，但不能直接改变订单运行事实。
@@ -48,4 +48,4 @@ Store 的中心化权威可以影响推荐、审核、打标和治理入口，�
 
 ## Periphery Adapter
 
-资金、担保、AI/MCP、demo executor 可以放在 `uvp-periphery`。它们消费 `UVPStateMachine`、`ZhixuTrustRegistry`、Product DTO 或 executor-kit，而不是定义新的核心订单真相。
+资金、担保、AI/MCP、demo executor 可以放在 `uvp-periphery`。它们消费 `UVPStateMachine`、可选的 `UVPIdentityRegistry` 名称解析、Product DTO 或 executor-kit，而不是定义新的核心订单真相。

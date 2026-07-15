@@ -95,7 +95,7 @@ It should answer:
 - whether the API is reachable;
 - whether the wallet can see the task;
 - whether the task can submit;
-- whether the blocked reason is assignee, deadline, required evidence, supplier trust, or proof endpoint;
+- whether the blocked reason is assignee, deadline, required evidence, supplier identity, or proof endpoint;
 - whether the next step is `prepare`, `wait`, `proof`, or `blocked`.
 
 Doctor does not need a private key, and it should not print protocol secrets.

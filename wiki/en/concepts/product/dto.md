@@ -14,7 +14,7 @@ Product DTOs are stable contracts for ordinary users and product frontends. They
 | tasks | Mapped from `StateMachineTaskProjection`. |
 | timeline | Generated from chain events and projection effects. |
 | proof | Generated from event provenance. |
-| trust | Merged from the trust projection. |
+| trust | Merged from the identity projection. |
 
 The funding fields are intentionally expressed as not yet integrated:
 
@@ -32,25 +32,22 @@ This means the core UVP protocol is not a payment provider. USDC, escrow, or gua
 | Field | Meaning |
 | --- | --- |
 | assignee wallet | The wallet currently expected to handle the task. |
-| supplier trust | Supplier trust information and proof. |
+| supplier identity | supplier identity information and proof. |
 | capability / add-on | Execution capability or extension action. |
 | resource requirements | Resource requirements, manifest, and policy. |
 | canSubmit | Whether the current user appears able to submit. |
 | proofSummary | Summary proof. |
 | proofRows | Concrete chain-event proof rows. |
 
-`canSubmit` is only a product-side helper; it is not the final authorization. The contract still checks `SignalSubmitterAuthorized`.
+`canSubmit` is only a product-side helper; it is not final authority. The contract still checks explicit Signal authorization or Plan-bounded executor delegation.
 
 ## Status Mapping
 
-Order status can be mapped as:
+Order does not carry a business lifecycle status:
 
-| Projection status | Product status |
-| --- | --- |
-| `registered` | `pending_participants` |
-| `running` | `active` |
-| `waiting` | `active` |
-| `action_required` | `active` |
+| Projection status | Product status | Meaning |
+| --- | --- | --- |
+| `registered` | `registered` | The `orderId` is registered; progress is read separately from Signals, Hooks, and Tasks. |
 
 Task status can be mapped as:
 

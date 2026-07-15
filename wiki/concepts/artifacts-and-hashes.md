@@ -17,7 +17,7 @@
 | `OnchainHookPlanArtifact` | 面向 EVM，使用 `bytes32` ID、stack instructions、dependency index 和 selector bindings。 |
 | `registerPlan` args | 从链上产物确定性压缩出的 Solidity 注册参数。 |
 
-合约最终检查的是链上计划哈希。`ZhixuTrustRegistry` 认证 `(registryAddress, planId, planHash)`，`UVPStateMachine.registerPlan()` 再检查该认证是否有效。
+`UVPStateMachine.commitPlan()` 从完整 hooks 与 metadata 承诺导出并保存 `planHash`，供 replay 和订单绑定；publisher 签名说明发布来源。`UVPIdentityRegistry` 不认证 Plan。
 
 ## 公共接口意识
 

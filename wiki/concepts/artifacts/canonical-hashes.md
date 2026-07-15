@@ -36,7 +36,7 @@ payload 包含 canonicalized source Zhixu、编译器信息、平台信息、hoo
 uvp:onchain-hook-plan-artifact:v1
 ```
 
-这个哈希覆盖 compact hooks、dependency index、executor routes 和 selector bindings。`ZhixuTrustRegistry` 认证的、`UVPStateMachine` 检查的就是这个 EVM-facing `planHash`。
+这个哈希覆盖 compact hooks 与 metadata 承诺。publisher 对提交内容签名，`UVPStateMachine` 在 commit/finalize 时检查这个 EVM-facing `planHash`；Identity Registry 不参与。
 
 ## 稳定 ID
 

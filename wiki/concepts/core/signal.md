@@ -68,8 +68,11 @@ signalKey = keccak256(abi.encode(sourceId, signalId))
 
 - 第一次提交会写入 `SignalRecord` 并发出 `SignalSubmitted`。
 - 后续重复提交会因为 `SignalAlreadyExists` 回滚。
+- 第一次成功写入就是该 `(orderId, sourceId, signalId)` 的最终链上事实，不提供覆盖、撤销或管理员改写入口。
 
 `idempotencyKey` 会保存在事件和投影里，方便服务层识别请求来源；但合约语义上的去重键是 `(orderId, sourceId, signalId)`。
+
+首次提交错误时，应从 Zhixu 创建新的 Order 重新提交。原 Signal 不可修改，旧 Order 仍作为可审计事实保留。
 
 ## Payload 只上哈希
 
@@ -92,7 +95,7 @@ Product API 可以把某个任务显示给某个参与方，但最终能否提�
 orderId + signalKey + submitter
 ```
 
-如果没有对应的 `SignalSubmitterAuthorized` 记录，即使 UI 显示了按钮，合约也会拒绝提交。
+授权可以来自 Order 创建时的显式授权，也可以来自有效 Executor patch 对 Plan 预声明 `sendSignals` 范围的动态委任。两种路径都由合约检查；即使 UI 显示了按钮，没有有效授权仍会被拒绝。
 
 ## Signal 的协议边界
 

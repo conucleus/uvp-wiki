@@ -4,9 +4,10 @@
 
 | 仓库 | 对应模块 | 负责什么 |
 | --- | --- | --- |
+| [uvp-core](https://github.com/conucleus/uvp-core) | `uvp-core/` | Rust 规范语义核心、golden corpus、CLI/FFI/N-API adapters。 |
 | [uvp-protocol](https://github.com/conucleus/uvp-protocol) | `uvp-protocol/` | compiler、HookPlan、state-machine reference、contracts、ABI/EIP-712、Product DTO。 |
 | [uvp-chain-services](https://github.com/conucleus/uvp-chain-services) | `uvp-chain-services/` | indexer、relayer、proof verifier、Product/Store API、projection、workflow runtime。 |
-| [zhixu-store](https://github.com/conucleus/zhixu-store) | `zhixu-store/` | Store/workbench frontend、catalog、supplier registry、trust/proof views。 |
+| [zhixu-store](https://github.com/conucleus/zhixu-store) | `zhixu-store/` | Store/workbench frontend、catalog、supplier directory、identity/proof views。 |
 | [uvp-order-app](https://github.com/conucleus/uvp-order-app) | `uvp-order-app/` | participant Order App、task inbox、evidence/proof display、readiness checks。 |
 | [uvp-executor-kit](https://github.com/conucleus/uvp-executor-kit) | `uvp-executor-kit/` | executor CLI/SDK/MCP、chain watcher、Product API signal producer、adapter integration。 |
 
@@ -14,7 +15,8 @@
 
 | 路径 | Package | 负责什么 | 不负责什么 |
 | --- | --- | --- | --- |
-| `uvp-protocol/packages/hook-core` | `@uvp-eth/hook-core` | Hook DSL parser/evaluator、dependency extraction | DB、Solidity、escrow、runtime service |
+| `uvp-core/crates/uvp-node` | `@conucleus/uvp-core-node` | Rust semantic core 的版本化 Node native artifact | Product API、DB、RPC |
+| `uvp-protocol/packages/hook-core` | `@uvp-eth/hook-core` | 唯一 TS core adapter、版本断言和产品侧 Hook API | 独立语义实现、DB、Solidity |
 | `uvp-protocol/packages/compiler` | `@uvp-eth/compiler` | Zhixu compiler、OnchainHookPlan、registerPlan args | hook runtime execution |
 | `uvp-protocol/packages/statemachine` | `@uvp-eth/statemachine` | offline chain event replay oracle | contract authorization、HTTP dispatch |
 | `uvp-protocol/packages/protocol-bindings` | `@uvp-eth/protocol-bindings` | ABI、EIP-712、calldata、hash helpers | private keys、env、watcher、tx submit |

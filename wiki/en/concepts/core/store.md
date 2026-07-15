@@ -12,24 +12,24 @@ Store’s authority is organizational authority and platform workflow authority.
 - this Supplier is tagged by the platform as having `customs` or `logistics` capabilities;
 - this version is the currently recommended active version for creating Orders;
 - this draft passed compilation preview and schema validation;
-- a certain attestation request has already been initiated or is waiting for indexing.
+- a certain publication request has already been initiated or is waiting for indexing.
 
 Protocol facts need on-chain event support:
 
-- the plan has already been attested on chain;
+- the plan has already been published on chain;
 - the Order has already been registered;
 - the signal has already been submitted;
-- the Supplier has already been endorsed by a trust registry;
+- the Supplier has already been endorsed by a Identity Registry;
 - a certain Zhixu is already trusted and fair;
 - a certain executor has already become the active executor.
 
-These must come from trust-domain judgments or contract events.
+These must come from Store or external institution judgments or contract events.
 
 ## What Store Manages
 
 | Object | What Store does | What Store does not do |
 | --- | --- | --- |
-| Nucleus | Provides a workbench for design, release, supplier organization, proof, and attestation requests. | Does not govern the internal coordination design on the Nucleus's behalf. |
+| Nucleus | Provides a workbench for design, release, supplier organization, proof, and publication requests. | Does not govern the internal coordination design on the Nucleus's behalf. |
 | Zhixu | Imports, previews compilation, shows versions, reviews release materials, and requests endorsement. | Does not directly determine whether something is trustworthy and fair. |
 | Supplier | Registers profiles, platform tags, contacts, proof, and endorsement materials. | Displays tags, chain trust, and order authorization as separate layers. |
 | Order | Searches, locates, and views projections and proof. | Does not create on-chain runtime facts. |
@@ -38,6 +38,6 @@ These must come from trust-domain judgments or contract events.
 
 ## Division Between Centralized and Decentralized Responsibilities
 
-Store’s value is centralized organizational capability: classification, review, tagging, explanation, operations, governance entry points, and the Nucleus workbench. The value of the on-chain protocol is to preserve verifiable boundaries: plan hash, order, signal, hook, patch, attestation, and revocation.
+Store’s value is centralized organizational capability: classification, review, tagging, explanation, operations, governance entry points, and the Nucleus workbench. The value of the on-chain protocol is to preserve verifiable boundaries: plan hash, order, signal, hook, patch, publication, and revocation.
 
 Mixing the two causes problems. If Store becomes the source of truth, the protocol degrades into a normal backend; if Store takes over internal Zhixu governance, the responsibility of the coordination designer is erased; if the contract tries to carry all product interpretation, ordinary users get buried under `sourceId`, `signalId`, ABI, and gas.

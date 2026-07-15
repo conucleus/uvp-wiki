@@ -34,7 +34,7 @@ The contract uses the binding to decide whether the stage may patch the target s
 
 An executor patch can perform assign, handoff, or replacement actions. The contract checks the nonce, order-level authorization, and stage-to-target binding, and then checks the previous executor or approval signal according to the mode.
 
-After activation, the target stage’s business signals must be submitted by the active executor.
+After activation, the Plan-declared current-order signal capabilities for the target stage are automatically delegated to the active executor. The executor need not be preauthorized at Order creation, but the patch cannot grant Signals the Plan did not declare.
 
 ## Resource Patch
 

@@ -61,15 +61,14 @@ PRD 仍放在 `docs/product/`。Release record 仍放在 `uvp-deploy/deploy/rele
 - 更新 [Product API 参考](../reference/product-api.md)；
 - 更新 [Product DTO 与用户表面](../product/README.md)；
 - 更新 Store/Order App/Executor Kit 相关任务文档；
-- 标明旧 route 是否只是 compatibility alias。
 
 改 Store / Supplier / Zhixu 管理路径时：
 
 - 更新 [秩序商店](../store/README.md)；
 - 更新 [凝结核工作台](../store/nucleation-workbench.md)；
 - 同步 [核心概念](../core/README.md) 中的对象边界；
-- 说明 Store metadata、平台标签、联系信息、通知状态、审核状态、履约记录视图属于读模型或 workflow，链上事件和 trust-domain 背书另行展示；
-- 说明凝结核内部治理、Store 平台 workflow、trust-domain 外部背书三者的边界。
+- 说明 Store metadata、平台标签、联系信息、通知状态、审核状态、履约记录视图属于读模型或 workflow，链上事件和 Store or external institution 材料审核另行展示；
+- 说明凝结核内部治理、Store 平台 workflow、Store or external institution 外部材料审核三者的边界。
 
 改 Executor / executor-kit / docked Zhixu 路径时：
 

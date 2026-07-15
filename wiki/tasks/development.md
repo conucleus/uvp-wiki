@@ -52,7 +52,7 @@ forge test
 
 | 新功能 | 应放位置 |
 | --- | --- |
-| Hook DSL parse/eval | `uvp-protocol/packages/hook-core` |
+| Hook DSL 规范 parse/eval | `uvp-core`；`uvp-protocol/packages/hook-core` 仅为 TypeScript adapter |
 | Zhixu compiler / artifact | `uvp-protocol/packages/compiler` |
 | Solidity runtime rule | `uvp-protocol/contracts/uvp-contracts` |
 | 链事件 replay oracle | `uvp-protocol/packages/statemachine` |

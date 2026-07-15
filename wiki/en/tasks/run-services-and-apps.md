@@ -23,7 +23,6 @@ Other services:
 pnpm --filter @uvp-eth/chain-services dev:indexer
 pnpm --filter @uvp-eth/chain-services rebuild:indexer
 pnpm --filter @uvp-eth/chain-services dev:relayer
-pnpm --filter @uvp-eth/chain-services dev:proof-verifier
 ```
 
 Staging/testnet profiles must not use memory/SQLite, localhost RPC, or demo/E2E fixture controls.

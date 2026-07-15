@@ -37,8 +37,8 @@
   - [Canonical Hashes](concepts/artifacts/canonical-hashes.md)
   - [Onchain Registration Parameters](concepts/artifacts/solidity-registration.md)
   - [Protocol Bindings and Public Interfaces](components/services-and-interfaces.md)
-- [Trust Registry and Authorization Boundary](concepts/trust-and-authorization.md)
-  - [Trust Domain](concepts/trust/domains.md)
+- [Identity, Publication, and Authorization Boundary](concepts/trust-and-authorization.md)
+  - [Store or external institution](concepts/trust/domains.md)
   - [Signal Authorization](concepts/trust/signal-authorization.md)
   - [EIP-712 and Relayer](concepts/trust/eip712-relayer.md)
   - [Stage Patch Authorization](concepts/trust/stage-patch.md)
@@ -73,7 +73,7 @@
     - [Store Authority Boundary and Information Architecture](store/authority-and-ia.md)
     - [Nucleus Workbench](store/nucleation-workbench.md)
     - [Zhixu Catalog, Configuration, and Release](store/zhixu-management.md)
-    - [Supplier Registry, Capability, and Contact](store/supplier-registry.md)
+    - [Supplier Directory, Capability, and Contact](store/supplier-directory.md)
     - [Fulfillment Status, Proof, and Trust Checks](store/runtime-proof.md)
     - [Contact and Notifications](store/contact-notifications.md)
     - [Operator Permissions, Governance, and Audit](store/governance-audit.md)
@@ -103,6 +103,7 @@
 
 ## Reference and Evidence
 
+- [Version and Semantic Matrix](reference/version-matrix.md)
 - [Public Interfaces](reference/public-interfaces.md)
 - [Contracts and Events](reference/contracts-and-events.md)
 - [Product API](reference/product-api.md)

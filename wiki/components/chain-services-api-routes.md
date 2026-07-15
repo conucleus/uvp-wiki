@@ -13,13 +13,12 @@
 | `evidence.ts` | evidence upload metadata、proof route、object handle。 |
 | `store-console.ts` | Store search、Zhixu console、draft/version/runtime view。 |
 | `store-docking.ts` | docking session、validate、draft map。 |
-| `store-suppliers.ts` | supplier directory、review、trust request input。 |
-| `governance.ts` | admin review、attestation/revocation tx workflow。 |
+| `store-suppliers.ts` | supplier directory、review、匹配资料输入。 |
+| `governance.ts` | admin review、identity binding register/revoke tx workflow。 |
 | `notifications.ts` | supplier notification profile、delivery ops。 |
 | `diagnostics.ts` | health/readiness/admin diagnostics。 |
 | `admin-ops.ts` | ops-only maintenance route。 |
 | `e2e-controls.ts` | local/product E2E fixture controls；testnet/production 必须禁用。 |
-| `legacy-orders.ts` | compatibility route；不应成为新接口主路径。 |
 
 ## Route shell
 
@@ -36,6 +35,6 @@
 
 - 新 route 要明确属于 Product、Store、governance、ops 还是 local E2E。
 - Product route 不应暴露 Store admin workflow。
-- Store route 不应伪造 Product proof 或链上 trust。
+- Store route 不应伪造 Product proof、Plan 发布状态或 identity binding。
 - E2E controls 只能用于本地测试，testnet/production profile 必须 fail-closed。
 - 所有 public claim 都要能追溯到 event、hash、signature、DTO contract 或 workflow audit。

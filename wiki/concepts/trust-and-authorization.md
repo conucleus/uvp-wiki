@@ -1,34 +1,25 @@
-# 信任与授权
+# 身份、发布与授权
 
-`uvp-eth` 把“谁认可计划”和“谁能提交某个订单动作”分开处理。计划可信度来自 `ZhixuTrustRegistry` 的 trust registry 认证；订单动作权限来自 `UVPStateMachine` 的订单级 signal 授权和参与方 EIP-712 签名。
+UVP 把三件容易混淆的事彻底拆开：Registry 说明“这个钱包在线下是谁”；Plan publisher 的签名说明“谁发布了这份不可变规则”；订单级授权说明“谁能在这个 Order 里提交哪个动作”。三者不能互相推出。
 
-## 本篇子项
+| 层 | 权利或事实 | 来源 | 能否被更上层剥离 |
+| --- | --- | --- | --- |
+| Identity Registry | Store 默认目录中的身份解析。 | Registry owner 写入的 binding。 | owner 可撤销目录解析，但不能抹掉历史或链上钱包本身。 |
+| Plan publication | 发布一个确定 hooks + metadata 的 Plan。 | publisher 的 EIP-712 签名。 | relayer 不能修改；合约 owner 冻结 module 后也不能换实现。 |
+| Order creation | 用已 finalized Plan 创建 Order。 | creator/submitter 签名与 trigger payload。 | 任意 relayer 可广播；Store 不能垄断入口。 |
+| Signal submission | 提交具体 source/signal。 | 订单显式授权、active executor overlay 与签名。 | Registry 撤销不能追溯剥离。 |
 
-| 子页 | 说明 |
-| --- | --- |
-| [Trust Domain](trust/domains.md) | 官方域、计划认证、供应商认证、撤销和投影。 |
-| [Signal 授权](trust/signal-authorization.md) | 订单注册时如何绑定 source/signal/submitter 权限。 |
-| [EIP-712 与 Relayer](trust/eip712-relayer.md) | relayer 如何提交已签交易，业务签名为何必须来自授权钱包。 |
-| [Stage Patch 授权](trust/stage-patch.md) | executor/resource patch 如何复用订单级授权并加上 selector binding。 |
+## Relayer 不是权利来源
 
-## 三层校验
+Plan 和 Order 都允许任意 relayer 代发。relayer 只支付 gas、传播签名内容，不拥有 publisher、creator 或 submitter 的业务权利。合约校验签名、deadline、hash 和 nonce/idempotency 约束。
 
-| 层 | 解决的问题 |
-| --- | --- |
-| Trust registry | 这个 plan 或 supplier 是否被某个信任域认可。 |
-| Publisher / registrar allowlist | 谁可以注册计划、谁可以注册订单。 |
-| Order-level signal authorization | 某个订单里，哪个钱包可以提交哪个 source/signal。 |
+## Store 标签不是协议授权
 
-这三层分别检查不同问题：计划认证解决 plan/supplier trust，allowlist 解决谁能注册，order-level signal authorization 解决谁能提交当前订单动作。
+Store 可以维护 customs、logistics 等能力标签和水下匹配特征，但这些字段既不上 `UVPIdentityRegistry`，也不会自动变成 `SignalSubmitterAuthorized`。这避免 Store 的商业判断扩张成协议层撮合责任。
 
-## Supplier Trust 和 Signal 授权
+## 子页
 
-Supplier trust 说明某个 trust registry 背书了某个 supplier subject。它可以影响 Store 推荐、Product 警告、BFF 创建授权时的准入判断、executor-kit 是否 fail closed。`submitSignal()` 权限仍落在订单级授权。
-
-真正的提交权限永远落在订单级：
-
-```text
-orderId + sourceId + signalId + submitter
-```
-
-这个边界能避免“某个供应商被 Store 打了 customs 标签，就能提交所有报关订单”的错误。
+- [Identity Registry](trust/domains.md)
+- [Signal 授权](trust/signal-authorization.md)
+- [EIP-712 与 Relayer](trust/eip712-relayer.md)
+- [Stage Patch 授权](trust/stage-patch.md)

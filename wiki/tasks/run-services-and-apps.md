@@ -23,7 +23,6 @@ pnpm --filter @uvp-eth/chain-services dev:api
 pnpm --filter @uvp-eth/chain-services dev:indexer
 pnpm --filter @uvp-eth/chain-services rebuild:indexer
 pnpm --filter @uvp-eth/chain-services dev:relayer
-pnpm --filter @uvp-eth/chain-services dev:proof-verifier
 ```
 
 Staging/testnet profile 不能使用 memory/SQLite，也不能使用 localhost RPC 或 demo/E2E

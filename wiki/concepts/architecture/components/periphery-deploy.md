@@ -12,7 +12,7 @@
 - 行业 demo 或场景适配器。
 - executor demo。
 
-Periphery 可以消费 `UVPStateMachine`、`ZhixuTrustRegistry`、Product DTO 或 executor-kit。它不能把资金、担保、付款、释放、退款、争议等状态改造成新的核心事实源。
+Periphery 可以消费 `UVPStateMachine`、可选的 `UVPIdentityRegistry` 名称解析、Product DTO 或 executor-kit。它不能把资金、担保、付款、释放、退款、争议等状态改造成新的核心事实源。
 
 ## 场景适配原则
 
