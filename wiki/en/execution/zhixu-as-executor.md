@@ -50,15 +50,15 @@ A settlement stage can use another Zhixu as the execution interface like this:
 
 The source of the local stage is `settlement`. It chooses a linked Zhixu as the executor and declares how the linked Zhixu's `str/cmp/err` outputs map into signals that the local Zhixu can consume.
 
-If this docking stage is opened directly by the Product/registrar workflow outside the order, instead of waiting for the previous business signal, the link-stage entrance can be written as `::OUTSIDE`:
+If this docking stage is opened directly by the Product/registrar workflow outside the order, instead of waiting for the previous business signal, declare the link-stage entrance as `externalSignals`:
 
 ```yaml
 - name: dock_customs_clearance
   source: customs
   trigger:
     - LINK_READY
-  receiveSignals:
-    LINK_READY: ::OUTSIDE
+  externalSignals:
+    - LINK_READY
   executor:
     supplierType: zhixu
     supplierID: "{{ .customs_clearance_zhixu_uid }}"
@@ -78,7 +78,7 @@ A complete docked Zhixu proof should cover at least:
 | Question | Proof source |
 | --- | --- |
 | Why was the local stage opened for execution? | `HookReady` on the local order. |
-| Who opened the external entrance of the link stage? | The order-level authorization and submission event for the `::OUTSIDE` signal, or the proof of the previous business signal. |
+| Who opened the external entrance of the link stage? | The backend/executor verification, deduplication, and normalization record for `LINK_READY`, or the proof of the previous business signal. |
 | Which plan did the linked Zhixu use? | `OrderRegistered` and the linked plan projection for the linked order. |
 | Is the linked Plan usable? | The linked StateMachine's `PlanCommitted/PlanFinalized` projection. |
 | How did the linked order advance? | The linked order's `SignalSubmitted` / hook proof. |

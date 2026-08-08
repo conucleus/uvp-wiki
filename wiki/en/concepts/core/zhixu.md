@@ -63,7 +63,8 @@ This says: the local Zhixu stage `master.supplier_sourcing` is triggered by `sol
 | --- | --- |
 | `name` | Stage name. Combined with the task pattern name to form `stageIdentifier`. |
 | `source` | The causal chain this stage’s signals belong to; user roles are interpreted separately by Product and authorization. |
-| `trigger` | Which hooks emit `HookReady` after becoming ready, thereby producing actionable tasks. See [Trigger](trigger.md). |
+| `trigger` | Stage-entry key; a `receiveSignals` key becomes a task through Hook Ready, while an `externalSignals` key is received directly by the backend/executor. See [Trigger](trigger.md). |
+| `externalSignals` | Raw external fact names received by the backend/executor; they do not automatically create a Hook or UVP signal. |
 | `receiveSignals` | Mapping from hook key to a Hook DSL expression. |
 | `sendSignals` | Signal names that may be emitted after the stage completes. |
 | `executor` | Default executor configuration, pointing to a Supplier or another Zhixu. |
@@ -72,9 +73,9 @@ This says: the local Zhixu stage `master.supplier_sourcing` is triggered by `sol
 
 The compiler turns `taskPattern.name + "." + stage.name` into `stageIdentifier`. For example, `master.supplier_sourcing` becomes the on-chain `stageId` hash.
 
-## `trigger` and `receiveSignals`
+## `trigger`, `externalSignals`, and `receiveSignals`
 
-`receiveSignals` defines the hook conditions, and `trigger` decides which hooks become Product tasks. The two must align:
+`externalSignals` defines direct backend/executor inputs, `receiveSignals` defines Hook conditions, and `trigger` must reference one of the two:
 
 ```yaml
 trigger:
@@ -83,7 +84,7 @@ receiveSignals:
   SCOPE_READY: solution::master.technical_scope.cmp
 ```
 
-If a `trigger` refers to a key that does not exist, the compiler raises an error. Only hooks marked by the stage `trigger` emit `HookReady` when they first become ready; other hooks can be used for internal dependencies, `signalMap`, or observation.
+If a `trigger` refers to a key that does not exist, the compiler raises an error. Only receive Hooks marked by the stage `trigger` emit `HookReady` when they first become ready; an external signal does not create a Hook, and other hooks can be used for internal dependencies, `signalMap`, or observation.
 
 ## `selectedStages`
 

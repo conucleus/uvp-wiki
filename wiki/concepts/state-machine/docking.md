@@ -37,7 +37,7 @@ local stage HookReady
   -> local hooks 继续求值
 ```
 
-如果 local stage 通过 `::OUTSIDE` 打开 docking workflow，这个外部入口本身仍然需要订单级授权。linked order 的 `str/cmp/err` 等输出不会自动推进 local order，必须经过 signal binding、docking link 和 mapped signal proof。
+如果 local stage 通过 `externalSignals` 打开 docking workflow，backend/executor 必须先完成外部事实的验签、去重和规范化；该输入不会自动生成 Hook 或推进 UVP。若入口来自另一个订单的 canonical signal，应使用显式的 `OUTSIDE@(source::task.stage.signal)` 或 `OUTSOURCE@(source::task.stage.signal)` wrapper，并经过 signal binding、docking link 和 mapped signal proof。linked order 的 `str/cmp/err` 等输出不会自动推进 local order。
 
 ## 边界
 

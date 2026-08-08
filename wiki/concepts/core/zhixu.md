@@ -63,7 +63,8 @@ spec:
 | --- | --- |
 | `name` | 阶段名称。和 task pattern 名拼成 `stageIdentifier`。 |
 | `source` | 该阶段 signal 所属的因果链；用户角色由 Product/authorization 另行解释。 |
-| `trigger` | 哪些 hook ready 后会发出 `HookReady`，从而形成可处理任务。详见 [Trigger](trigger.md)。 |
+| `trigger` | 阶段入口 key；引用 `receiveSignals` 时由 Hook Ready 形成任务，引用 `externalSignals` 时由 backend/executor 直接接收。详见 [Trigger](trigger.md)。 |
+| `externalSignals` | backend/executor 接收的原始外部事实名称；不会自动生成 Hook 或 UVP signal。 |
 | `receiveSignals` | hook key 到 Hook DSL 表达式的映射。 |
 | `sendSignals` | 阶段完成后可能发出的 signal 名称。 |
 | `executor` | 默认执行者配置，指向 supplier 或另一条 Zhixu。 |
@@ -72,9 +73,9 @@ spec:
 
 编译器把 `taskPattern.name + "." + stage.name` 变成 `stageIdentifier`。例如 `master.supplier_sourcing` 会被哈希为链上的 `stageId`。
 
-## `trigger` 和 `receiveSignals`
+## `trigger`、`externalSignals` 和 `receiveSignals`
 
-`receiveSignals` 定义 hook 条件，`trigger` 决定哪些 hook 会变成 Product 任务。两者必须对齐：
+`externalSignals` 定义 backend/executor 的直接输入，`receiveSignals` 定义 Hook 条件，`trigger` 必须引用两者之一：
 
 ```yaml
 trigger:
@@ -83,7 +84,7 @@ receiveSignals:
   SCOPE_READY: solution::master.technical_scope.cmp
 ```
 
-如果 `trigger` 引用的 key 不存在，编译器会报错。只有被 stage `trigger` 标记的 hook Ready 后会发 `HookReady`；其他 hook 可以用于内部依赖、signalMap 或观察。
+如果 `trigger` 引用的 key 不存在，编译器会报错。只有被 stage `trigger` 标记的 receive Hook Ready 后会发 `HookReady`；external signal 不生成 Hook，其他 Hook 可以用于内部依赖、signalMap 或观察。
 
 ## `selectedStages`
 

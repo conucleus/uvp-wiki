@@ -56,17 +56,17 @@ metadataHash = keccak256("uvp:product-bff:authorization:v3:...")
 
 ## Initial Trigger
 
-Product BFF 会为订单启动准备业务提交者授权：
+`externalSignals` 是 backend/executor 的直接输入契约，不是一个固定的链上 `OUTSIDE` signal。backend 先完成验签、去重、落库和规范化；如果 EVM adapter 需要把规范化事实提交到状态机，授权必须绑定到实际的 `entry.source` 与 `entry.signalName`：
 
 ```text
-sourceId = keccak256("")
-signalId = keccak256("OUTSIDE")
+sourceId = keccak256(entry.source)
+signalId = keccak256(entry.signalName)
 submitter = participant/business submitter address
 ```
 
-业务提交者签署 trigger typed data；registrar/relayer 只负责广播。广播地址不会因此获得业务提交权限。
+业务提交者签署对应的 trigger 或 signal typed data；registrar/relayer 只负责广播。广播地址不会因此获得业务提交权限。
 
-docked Zhixu 的 link stage 如果使用 `::OUTSIDE` 作为入口，也必须走同样的订单级授权边界：只有被授权的钱包能提交这个空 source 上的 `OUTSIDE` signal。linked order 后续的 `str/cmp/err` 映射仍按 `signalMap`、docking link 和 mapped signal 授权检查。
+docked Zhixu 的跨源入口必须使用显式的 `OUTSIDE@(source::task.stage.signal)` 或 `OUTSOURCE@(source::task.stage.signal)` wrapper，并对实际的 source/signal 建立同样的订单级授权。linked order 后续的 `str/cmp/err` 映射仍按 `signalMap`、docking link 和 mapped signal 授权检查。
 
 ## 授权和任务展示
 

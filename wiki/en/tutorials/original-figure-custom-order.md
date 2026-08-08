@@ -54,7 +54,7 @@ It naturally produces evidence: briefs, originality declarations, concept sheets
 The fixture follows the current compiler rules:
 
 - `trigger` must be an array, not a string.
-- Every `trigger` key must exist in the same stage's `receiveSignals`.
+- Every `trigger` key must exist in the same stage's `externalSignals` or `receiveSignals`.
 - `receiveSignals` values must use Hook DSL: `{source}::{condition}`.
 - Local signal references should use `source::task.stage.signal`.
 - `sendSignals: ["cmp"]` compiles to the current stage's `task.stage.cmp`.

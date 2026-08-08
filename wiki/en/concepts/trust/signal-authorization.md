@@ -56,17 +56,17 @@ metadataHash = keccak256("uvp:product-bff:authorization:v3:...")
 
 ## Initial Trigger
 
-The Product BFF prepares business-submitter authorization for order startup:
+`externalSignals` is a direct backend/executor input contract, not a fixed on-chain `OUTSIDE` signal. The backend first verifies, deduplicates, persists, and normalizes the fact. If an EVM adapter needs to submit that normalized fact to the state machine, authorization must bind to the actual `entry.source` and `entry.signalName`:
 
 ```text
-sourceId = keccak256("")
-signalId = keccak256("OUTSIDE")
+sourceId = keccak256(entry.source)
+signalId = keccak256(entry.signalName)
 submitter = participant/business submitter address
 ```
 
-The business submitter signs the trigger typed data; the registrar/relayer only broadcasts it. Broadcasting does not grant business-submission authority.
+The business submitter signs the corresponding trigger or signal typed data; the registrar/relayer only broadcasts it. Broadcasting does not grant business-submission authority.
 
-If a docked Zhixu link stage uses `::OUTSIDE` as its entry signal, it must follow the same order-level authorization boundary: only an authorized wallet can submit the `OUTSIDE` signal on the empty source. The later `str/cmp/err` mapping for a linked order still follows `signalMap`, docking links, and mapped signal authorization checks.
+A docked Zhixu cross-source entry must use an explicit `OUTSIDE@(source::task.stage.signal)` or `OUTSOURCE@(source::task.stage.signal)` wrapper, with the same order-level authorization for the actual source/signal. The later `str/cmp/err` mapping for a linked order still follows `signalMap`, docking links, and mapped signal authorization checks.
 
 ## Authorization and Task Display
 

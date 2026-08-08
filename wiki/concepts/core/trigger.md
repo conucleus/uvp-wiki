@@ -4,7 +4,9 @@ Trigger 把一个 ready condition 变成可执行任务。它是一种特殊 hoo
 
 第一遍可以把 `HookReady` 理解成“这个任务可以处理了”。它不表示业务已经完成；业务完成要等后续授权 `SignalSubmitted` 事件和证据指纹来证明。
 
-Trigger 是 Hook 的一个编译标记，来自秩序 stage 的 `trigger` 数组。每个 key 独立指向一个 `receiveSignals` hook；任意一个 key 到达都能产生自己的 `HookReady`，但不会压制同一 stage 中其他 trigger hook 后续 ready。Projection 以 `hookId` 为任务／proof 身份，因此多个 trigger key 可以形成多个可独立审计的 task。每个 hook 使用 `~`、`&`、`|` 和显式 duration delay（例如 `+5s`），由 Hook DSL parser/compiler 校验。
+Trigger 是 stage 的入口声明，来自秩序 stage 的 `trigger` 数组。每个 key 必须对应 `externalSignals` 或 `receiveSignals`：前者是 backend/executor 的直接输入，不生成 `HookReady`；后者才编译为 Hook 并在条件满足时产生 `HookReady`。Projection 以 `hookId` 为任务／proof 身份，因此多个 receive trigger key 可以形成多个可独立审计的 task。每个 Hook 使用 `~`、`&`、`|` 和显式 duration delay（例如 `+5s`），由 Hook DSL parser/compiler 校验。
+
+`externalSignals` 只描述原始外部事实名称。backend/executor 负责验签、去重、落库和规范化；它不会因为声明了一个 `externalSignals` 就自动向 UVP 发送 signal 或触发 callback。
 
 ```yaml
 trigger:
@@ -34,9 +36,13 @@ HookReady(orderId, hookId, stageId, hookName)
 
 ## 编译和合约语义
 
-当前 compiler 要求 `stage.trigger` 里的每个名字必须引用本 stage 已存在的 `receiveSignals` key。也就是说，Trigger 必须绑定在一个 receive hook 上。
+当前 compiler 要求 `stage.trigger` 里的每个名字必须引用本 stage 已存在的 `externalSignals` 或 `receiveSignals` key。只有 receive key 会绑定到 Hook；external key 是直接输入入口。
 
 ```text
+stage.externalSignals.START
+  -> backend/executor direct input
+  -> no compiled hook / no HookReady
+
 stage.receiveSignals.START
   -> compiled hook trigger=true
   -> StoredHook.trigger=true
@@ -50,13 +56,13 @@ stage.receiveSignals.START
 
 当 local order 某个 stage 由另一个秩序执行时，local stage 的 Trigger 表示“现在可以把这个 stage 交给 peer 秩序或 adapter 执行”。后续 linked 秩序的 `str`、`cmp`、`err` 通过 `signalMap` 和授权 submitter 或 docking events 映射回 local order。
 
-如果 Product、registrar 或 operator workflow 从订单外部打开这个对接阶段，建议给这个 link stage 一个显式入口：
+如果 Product、registrar 或 operator workflow 从订单外部打开这个对接阶段，直接入口应声明为 `externalSignals`：
 
 ```yaml
 trigger:
   - LINK_READY
-receiveSignals:
-  LINK_READY: ::OUTSIDE
+externalSignals:
+  - LINK_READY
 executor:
   supplierType: zhixu
   supplierID: "{{ .peer_zhixu_uid }}"
@@ -67,7 +73,7 @@ executor:
       err: peer::task.close.err
 ```
 
-这里的 `::OUTSIDE` 是空 source 上的外部入口 signal，用来打开本地 stage 的 docking workflow。它必须由业务 submitter 签 trigger typed data；registrar/relayer 只负责广播。`signalMap` 负责解释 linked order 输出，不会自己发出 `HookReady`。
+这里的 `LINK_READY` 是 backend/executor 的外部输入契约，用来打开本地 stage 的 docking workflow；它本身不会生成 `HookReady`。如果需要等待另一个订单的 canonical signal，应改用带目标的 `OUTSIDE@(source::task.stage.signal)` 或 `OUTSOURCE@(source::task.stage.signal)` wrapper。`signalMap` 负责解释 linked order 输出，不会自己发出 `HookReady`。
 
 ```text
 local stage trigger Ready

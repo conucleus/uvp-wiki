@@ -43,7 +43,8 @@ Zhixu YAML/JSON
 
 ## 当前要特别守住的语义
 
-- `stage.trigger` 必须引用本 stage 已存在的 `receiveSignals` key。
+- `stage.trigger` 必须引用本 stage 已存在的 `externalSignals` 或 `receiveSignals` key。
+- `externalSignals` 是 backend/executor 的直接输入契约，不编译成 Hook；只有 `receiveSignals` 会产生 Hook。
 - receive hook 的 `trigger=true` 才会在 Ready 时发出 `HookReady`。
 - `signalMap` hook 当前 `trigger=false`。
 - `supplierType=zhixu` 的 `signalMap` 必须包含 `str` 和 `cmp`，并且同一个 map 引用同一个 source。

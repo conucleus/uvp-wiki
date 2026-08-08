@@ -39,7 +39,7 @@ Hook 表达式里的 `~A` 是存在逻辑里的缺席判断。它表示“当前
 
 ## HookPlan 里保存什么
 
-编译器为每个 `receiveSignals` 生成一个 hook；如果 executor 是 `supplierType=zhixu`，还会为 `signalMap` 生成额外 hook。当前实现里，`signalMap` hook 的 `trigger=false`，它们用于解释 docked Zhixu 的输出关系，不直接变成 Product task。
+编译器为每个 `receiveSignals` 生成一个 hook；Stage 上的 `externalSignals` 只保留为 backend/executor 输入契约，不生成 hook。如果 executor 是 `supplierType=zhixu`，还会为 `signalMap` 生成额外 hook。当前实现里，`signalMap` hook 的 `trigger=false`，它们用于解释 docked Zhixu 的输出关系，不直接变成 Product task。
 
 可读 hook 通常包含：
 

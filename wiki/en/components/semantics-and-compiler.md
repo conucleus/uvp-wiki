@@ -43,7 +43,8 @@ Zhixu YAML/JSON
 
 ## Semantics That Must Be Preserved
 
-- `stage.trigger` must reference a `receiveSignals` key that already exists in that stage.
+- `stage.trigger` must reference an `externalSignals` or `receiveSignals` key that already exists in that stage.
+- `externalSignals` is a direct backend/executor input contract and is not compiled into a Hook; only `receiveSignals` produces Hooks.
 - A receive hook emits `HookReady` when `trigger=true` and it becomes Ready.
 - A `signalMap` hook currently has `trigger=false`.
 - A `signalMap` with `supplierType=zhixu` must include both `str` and `cmp`, and the same map must reference the same source.

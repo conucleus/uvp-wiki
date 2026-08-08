@@ -39,7 +39,7 @@ The parser rejects conditions without a positive anchor and also rejects branche
 
 ## What Is Stored in HookPlan
 
-The compiler generates one hook for each `receiveSignals` entry; if the executor is `supplierType=zhixu`, it also generates extra hooks for `signalMap`. In the current implementation, `signalMap` hooks have `trigger=false`; they are used to interpret output relationships for docked Zhixu and do not directly become Product tasks.
+The compiler generates one hook for each `receiveSignals` entry; stage `externalSignals` remain direct backend/executor input contracts and do not generate hooks. If the executor is `supplierType=zhixu`, it also generates extra hooks for `signalMap`. In the current implementation, `signalMap` hooks have `trigger=false`; they are used to interpret output relationships for docked Zhixu and do not directly become Product tasks.
 
 Readable hook data usually includes:
 
