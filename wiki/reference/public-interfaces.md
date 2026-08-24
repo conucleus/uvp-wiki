@@ -24,7 +24,7 @@ status: verified
 | Solidity ABI / bytecode / function selector | `uvp-protocol/contracts/uvp-contracts` | protocol-bindings、chain-services、executor-kit、deploy scripts、release gates | 更新 fixture、bindings、contract tests、deploy/replay tests 和 release note。 |
 | Event name / topic / indexed fields | contracts | indexer、statemachine replay、Product projection、proof verifier | 更新 replay oracle、projection tests、contracts/events reference。 |
 | EIP-712 domain / typed data | contracts、protocol-bindings | Product submit、relayer、executor-kit、wallet UI | 更新 digest helpers、signing tests、staging domain check；staging 不能回退到旧 `0.1` domain。 |
-| Canonical hash / artifact schema | compiler、hook-core、statemachine | Plan publication、registerPlan、release evidence | 更新 golden fixtures、canonical hash docs、compiler/statemachine tests。 |
+| Canonical hash / artifact schema | compiler、hook-core、statemachine | Plan publication、commitPlan/finalizePlan、release evidence | 更新 golden fixtures、canonical hash docs、compiler/statemachine tests。 |
 | Product DTO | product-dto | chain-services、Store、Order App、executor-kit、periphery adapter | 更新 DTO tests、route tests、frontend/API consumers 和 ordinary-user copy。 |
 | Product API | chain-services | Store、Order App、executor-kit Product API mode、MCP adapter | 更新 API reference、route tests、browser E2E、failure language。 |
 | Deployment manifest | uvp-deploy/deploy | chain-services、staging scripts、release records | 只提交 curated manifest/evidence；local generated address files 默认不提交。 |
