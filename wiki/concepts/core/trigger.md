@@ -15,7 +15,7 @@ receiveSignals:
   START: buyer::order.confirm.cmp
 ```
 
-编译后，`START` 这个 receive hook 会带上 `trigger=true`。如果它第一次变成 Ready，`UVPStateMachine` 会发出：
+编译后，`START` 这个 receive hook 会带上 `isTrigger=true`。如果它第一次变成 Ready，`UVPStateMachine` 会发出：
 
 ```text
 HookReady(orderId, hookId, stageId, hookName)
@@ -44,8 +44,8 @@ stage.externalSignals.START
   -> no compiled hook / no HookReady
 
 stage.receiveSignals.START
-  -> compiled hook trigger=true
-  -> StoredHook.trigger=true
+  -> compiled hook isTrigger=true
+  -> StoredHook.isTrigger=true
   -> HookStatus Ready
   -> HookReady emitted once
 ```
@@ -73,7 +73,7 @@ executor:
       err: peer::task.close.err
 ```
 
-这里的 `LINK_READY` 是 backend/executor 的外部输入契约，用来打开本地 stage 的 docking workflow；它本身不会生成 `HookReady`。如果需要等待另一个订单的 canonical signal，应改用带目标的 `OUTSIDE@(source::task.stage.signal)` 或 `OUTSOURCE@(source::task.stage.signal)` wrapper。`signalMap` 负责解释 linked order 输出，不会自己发出 `HookReady`。
+这里的 `LINK_READY` 是 backend/executor 的外部输入契约，用来打开本地 stage 的 docking workflow；它本身不会生成 `HookReady`。如果需要等待另一个订单的 canonical signal，应改用空标头 wrapper：`::OUTSIDE@(source::task.stage.signal)`（分叉外部订单）、`::MERGE@(source::a.cmp, source::b.cmp)`（多源汇聚）或 `::ANCHOR@(task.stage.signal)`（锚定汇合回流）。`signalMap` 负责解释 linked order 输出，不会自己发出 `HookReady`。
 
 ```text
 local stage trigger Ready

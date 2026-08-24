@@ -66,7 +66,7 @@ submitter = participant/business submitter address
 
 业务提交者签署对应的 trigger 或 signal typed data；registrar/relayer 只负责广播。广播地址不会因此获得业务提交权限。
 
-docked Zhixu 的跨源入口必须使用显式的 `OUTSIDE@(source::task.stage.signal)` 或 `OUTSOURCE@(source::task.stage.signal)` wrapper，并对实际的 source/signal 建立同样的订单级授权。linked order 后续的 `str/cmp/err` 映射仍按 `signalMap`、docking link 和 mapped signal 授权检查。
+docked Zhixu 的跨源入口必须使用显式的空标头 wrapper（`::OUTSIDE@(...)`、`::MERGE@(...)` 或 `::ANCHOR@(task.stage.signal)`），并对实际的 source/signal 建立同样的订单级授权。linked order 后续的 `str/cmp/err` 映射仍按 `signalMap`、docking link 和 mapped signal 授权检查。
 
 ## 授权和任务展示
 

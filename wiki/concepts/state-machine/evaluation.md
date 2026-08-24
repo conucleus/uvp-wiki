@@ -26,6 +26,9 @@ struct Instruction {
 | `Or` | 任一输入成立即成立。 |
 | `Delay` | 基于正向锚点计算到期时间。 |
 
+除 `wait/ready/cxl` 之外，核心求值还可能返回 `needs_more`：`::MERGE@(...)` 与
+`::ANCHOR@(...)` 入口采用逐事件投递语义，表达式本身不聚合裁决，而是把每个贡献事件交给状态机按血缘与配对规则处理；因此这两类 hook 在链上 HookPlan 中暂不支持，编译期会显式拒绝。
+
 ## 示例
 
 Hook DSL：

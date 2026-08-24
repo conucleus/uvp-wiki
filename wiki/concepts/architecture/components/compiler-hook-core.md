@@ -7,7 +7,7 @@ Compiler 和 Hook Core 是协议语义进入链上前的入口。它们不处理
 `uvp-protocol/packages/hook-core` 负责：
 
 - 解析 `source::condition`。
-- 支持 `&`、`|`、`~`、delay，以及带目标的 `OUTSIDE@(…)`、`OUTSOURCE@(…)` wrapper；裸 `OUTSIDE` / `OUTSOURCE` 已删除。
+- 支持 `&`、`|`、`~`、delay，以及空标头 wrapper `::OUTSIDE@(…)`、`::MERGE@(…)`、`::ANCHOR@(task.stage.signal)`；裸 `OUTSIDE` / `ANCHOR` 已删除，`OUTSOURCE` 整体退役（解析期报错）。
 - Stage 的 `externalSignals` 由 compiler 保留为 backend/executor 直接输入契约，不会编译成 Hook。
 - 把 `~A` 解释为“A signal 尚未出现在当前订单事件集中”。signal 一旦出现就不会消失，所以这里是单调存在逻辑。
 - 抽取 positive、negative、timer dependencies。

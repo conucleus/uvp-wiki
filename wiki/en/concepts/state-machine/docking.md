@@ -37,7 +37,7 @@ local stage HookReady
   -> local hooks continue evaluation
 ```
 
-If a local stage opens the docking workflow through `externalSignals`, the backend/executor must first verify, deduplicate, and normalize the external fact; the input does not automatically create a Hook or advance UVP. If the entry comes from a canonical signal on another Order, use an explicit `OUTSIDE@(source::task.stage.signal)` or `OUTSOURCE@(source::task.stage.signal)` wrapper and pass signal binding, docking-link, and mapped-signal proof. Linked-order outputs such as `str/cmp/err` do not automatically move the local order.
+If a local stage opens the docking workflow through `externalSignals`, the backend/executor must first verify, deduplicate, and normalize the external fact; the input does not automatically create a Hook or advance UVP. If the entry comes from a canonical signal on another Order, use an explicit empty-header wrapper (`::OUTSIDE@(...)`, `::MERGE@(...)`, or `::ANCHOR@(task.stage.signal)`) and pass signal binding, docking-link, and mapped-signal proof. Linked-order outputs such as `str/cmp/err` do not automatically move the local order.
 
 ## Boundaries
 

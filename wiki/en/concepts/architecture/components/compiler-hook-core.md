@@ -7,7 +7,7 @@ Compiler and Hook Core are the entry point where protocol semantics enter the ch
 `uvp-protocol/packages/hook-core` is responsible for:
 
 - Parsing `source::condition`.
-- Supporting `&`, `|`, `~`, `delay`, and target-bearing `OUTSIDE@(…)` / `OUTSOURCE@(…)` wrappers; bare `OUTSIDE` / `OUTSOURCE` syntax has been removed.
+- Supporting `&`, `|`, `~`, `delay`, and the empty-header wrappers `::OUTSIDE@(…)`, `::MERGE@(…)`, `::ANCHOR@(task.stage.signal)`; bare `OUTSIDE` / `ANCHOR` syntax has been removed, and `OUTSOURCE` is fully retired (rejected at parse time).
 - Preserving stage `externalSignals` as a direct backend/executor input contract without compiling it into a Hook.
 - Interpreting `~A` as “A signal has not yet appeared in the current order event set”. Once a signal appears, it does not disappear, so this is monotonic existence logic.
 - Extracting positive, negative, and timer dependencies.

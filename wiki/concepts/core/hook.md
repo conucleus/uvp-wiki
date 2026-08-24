@@ -6,7 +6,7 @@ Hook 本身只是条件。只有被标记为 [Trigger](trigger.md) 的 hook Read
 
 ## Hook 表达式
 
-Hook 表达式使用 `source::condition` 形式。`parseHookExpression()` 要求表达式有 source 和 condition：
+Hook 表达式使用 `source::condition` 形式。`parseHookExpression()` 要求表达式有 source 和 condition；唯一的例外是跨源入口 wrapper，它们必须使用空标头（`::OUTSIDE@(...)`、`::MERGE@(...)`、`::ANCHOR@(task.stage.signal)`）：
 
 ```text
 source::condition
@@ -29,11 +29,13 @@ Hook 表达式里的 `~A` 是存在逻辑里的缺席判断。它表示“当前
 | 节点 | 含义 |
 | --- | --- |
 | `signal` | 等待某个 `task.stage.signal` 出现。 |
-| `external` | 外部条件占位，必须由适配器或后续实现解释。 |
+| `external` | `::OUTSIDE@(...)` 分叉入口：由目标 source 的 signal 事件驱动，运行时为它派生独立订单。 |
+| `merge` | `::MERGE@(source::a.cmp, ...)` 多源观察入口：逐个贡献事件投递，由状态机完成聚合裁决；核心求值恒返回 `needs_more`。 |
+| `anchor` | `::ANCHOR@(task.stage.signal)` 锚定汇合入口：子订单回流按血缘逐事件投递，目标必须是裸三段式 signal。 |
 | `not` | 缺席条件，表示某个 signal 尚未出现；如果它后来出现，依赖该缺席条件的分支取消。 |
 | `and` | 多个条件都满足。 |
 | `or` | 任一分支满足。 |
-| `delay` | 某个正向锚点出现后等待一段时间。 |
+| `delay` | 某个正向锚点出现后等待一段时间（正整数时长，上限 30 天）。 |
 
 解析器会拒绝没有正向锚点的条件，也会拒绝 `OR` 中没有正向锚点的分支。纯缺席条件例如 `buyer::~task.cancel.cmp` 不能成为 hook，因为状态机需要先有一个正向事件，才能知道从什么时候开始判断“尚未出现”。
 
@@ -49,7 +51,7 @@ Hook 表达式里的 `~A` 是存在逻辑里的缺席判断。它表示“当前
 | `kind` | `receive` 或 `signalMap`。 |
 | `stageIdentifier` | 这个 hook 属于哪个 stage。 |
 | `hookName` | hook 名称，常来自 receive signal 或 signal map。 |
-| `trigger` | 是否在 Ready 时发出 `HookReady`。 |
+| `isTrigger` | 是否在 Ready 时发出 `HookReady`。 |
 | `rawExpression` | 原始表达式。 |
 | `normalizedExpression` | 编译器规范化后的表达式。 |
 | `ast` | hook 条件 AST。 |
@@ -58,7 +60,7 @@ Hook 表达式里的 `~A` 是存在逻辑里的缺席判断。它表示“当前
 
 ## Trigger 的含义
 
-只有 `trigger=true` 的 hook 在合约里第一次变成 `Ready` 时会发出 `HookReady`。Product 任务创建、Store 通知和 executor-kit watcher 都跟随 `HookReady`，UI 草稿或后端临时状态只用于辅助展示。
+只有 `isTrigger=true` 的 hook 在合约里第一次变成 `Ready` 时会发出 `HookReady`。Product 任务创建、Store 通知和 executor-kit watcher 都跟随 `HookReady`，UI 草稿或后端临时状态只用于辅助展示。
 
 详细语义见 [Trigger](trigger.md)。
 

@@ -66,7 +66,7 @@ submitter = participant/business submitter address
 
 The business submitter signs the corresponding trigger or signal typed data; the registrar/relayer only broadcasts it. Broadcasting does not grant business-submission authority.
 
-A docked Zhixu cross-source entry must use an explicit `OUTSIDE@(source::task.stage.signal)` or `OUTSOURCE@(source::task.stage.signal)` wrapper, with the same order-level authorization for the actual source/signal. The later `str/cmp/err` mapping for a linked order still follows `signalMap`, docking links, and mapped signal authorization checks.
+A docked Zhixu cross-source entry must use an explicit empty-header wrapper (`::OUTSIDE@(...)`, `::MERGE@(...)`, or `::ANCHOR@(task.stage.signal)`), with the same order-level authorization for the actual source/signal. The later `str/cmp/err` mapping for a linked order still follows `signalMap`, docking links, and mapped signal authorization checks.
 
 ## Authorization and Task Display
 

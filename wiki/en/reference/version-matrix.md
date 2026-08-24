@@ -5,7 +5,7 @@ The executable source is `uvp-deploy/deploy/compatibility/uvp-stack.v1.json`; th
 | Boundary | Current version | Meaning |
 | --- | --- | --- |
 | Rust core package | `0.1.0` | Release version of the `uvp-core` crates and Node package. |
-| Protocol semantics | `uvp-semantic/0.1` | Compatibility version for Hook parsing, evaluation, and replay. |
+| Protocol semantics | `uvp-semantic/0.3` | Compatibility version for Hook parsing, evaluation, and replay. |
 | Hook corpus | `uvp.hookSemanticsCorpus.v1` | Golden corpus schema shared by Rust and the TypeScript adapter. |
 | HookPlan artifact | `uvp.hookPlan.v1` | HookPlan artifact schema. |
 | OnchainHookPlan | `uvp.onchainHookPlan.v1` | EVM registration artifact schema. |

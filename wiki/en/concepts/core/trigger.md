@@ -73,7 +73,7 @@ executor:
       err: peer::task.close.err
 ```
 
-Here `LINK_READY` is the backend/executor external-input contract used to open the local docking workflow; it does not produce `HookReady` by itself. If the stage must wait for a canonical signal from another Order, use an explicit `OUTSIDE@(source::task.stage.signal)` or `OUTSOURCE@(source::task.stage.signal)` wrapper. `signalMap` explains linked-order output and does not emit `HookReady` on its own.
+Here `LINK_READY` is the backend/executor external-input contract used to open the local docking workflow; it does not produce `HookReady` by itself. If the stage must wait for a canonical signal from another Order, use an empty-header wrapper: `::OUTSIDE@(source::task.stage.signal)` (external spawn), `::MERGE@(source::a.cmp, source::b.cmp)` (multi-source convergence), or `::ANCHOR@(task.stage.signal)` (anchored reflux). `signalMap` explains linked-order output and does not emit `HookReady` on its own.
 
 ```text
 local stage trigger Ready
