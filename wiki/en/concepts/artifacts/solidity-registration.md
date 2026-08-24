@@ -7,7 +7,7 @@ status: verified
 
 # On-chain Registration Parameters
 
-`OnchainHookPlanArtifact` is not yet the final transaction parameter set. The compiler further converts it into the compact structure required by `UVPStateMachine.registerPlan()`.
+`OnchainHookPlanArtifact` is not yet the final transaction parameter set. The compiler further converts it into the compact structures required by `UVPStateMachine.commitPlan()` and `UVPStateMachine.finalizePlan()`.
 
 ## CompactHook
 

@@ -29,7 +29,7 @@ Hook Core output remains platform-neutral semantics with no Solidity ABI.
 - Loading YAML/JSON Zhixu.
 - Validating stages, triggers, receiveSignals, selectedStages, and executor reachability.
 - Generating the `OnchainHookPlanArtifact`.
-- Generating Solidity `registerPlan` parameters.
+- Generating Solidity `commitPlan`/`finalizePlan` parameters.
 - Computing `planId`, `planHash`, and hook/stage/source/signal/dependency/route ids.
 
 ## Component Responsibilities
@@ -38,7 +38,7 @@ Hook Core output remains platform-neutral semantics with no Solidity ABI.
 | --- | --- | --- |
 | uvp-core | Normative implementation of the Hook DSL, AST, evaluation, dependency extraction, positive anchors, and canonical semantic version. | Solidity ABI, wallet authorization, and Product task language are handled by later layers. |
 | hook-core | TypeScript adapter over uvp-core semantics plus version assertions; introduces no separate semantics. | Must not fork parsing/evaluation rules away from uvp-core. |
-| compiler | Order input schema, OnchainHookPlan, registerPlan args, canonical hash; calls uvp-core semantics, with HookPlan only as internal IR. | Order participant selection, supplier identity judgment, linked-order registration, and payment/escrow logic belong to products, registries, or periphery. |
+| compiler | Order input schema, OnchainHookPlan, commitPlan/finalizePlan args, canonical hash; calls uvp-core semantics, with HookPlan only as internal IR. | Order participant selection, supplier identity judgment, linked-order registration, and payment/escrow logic belong to products, registries, or periphery. |
 | artifact/hash | The stable boundary of `planId`, `planHash`, `hookId`, `sourceId`, `signalId`, `signalKey`. | Store draft state and Product DB primary keys are read models. |
 
 ## Compiler Input/Output Boundary
