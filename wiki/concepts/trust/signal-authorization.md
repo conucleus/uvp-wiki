@@ -1,3 +1,10 @@
+---
+title: Signal 授权
+type: explanation
+audience: 工程贡献者
+status: verified
+---
+
 # Signal 授权
 
 订单级 signal 授权回答一个非常具体的问题：在这个订单里，哪个钱包可以提交哪个 source/signal。授权有两条合约路径：Order 创建时写入的显式授权，以及 Executor patch 在 Plan 能力范围内创建的动态委任。
@@ -56,6 +63,8 @@ metadataHash = keccak256("uvp:product-bff:authorization:v3:...")
 
 ## Initial Trigger
 
+订单由签名过的 `triggerOrderFromOutsideFor()` / `triggerOrderFromSignalFor()` 创建：合约把订单绑定到 finalized `planId`，记录 trigger fact 或 trigger-origin link，并可同时写入上述 order-level signal authorizations。
+
 `externalSignals` 是 backend/executor 的直接输入契约，不是一个固定的链上 `OUTSIDE` signal。backend 先完成验签、去重、落库和规范化；如果 EVM adapter 需要把规范化事实提交到状态机，授权必须绑定到实际的 `entry.source` 与 `entry.signalName`：
 
 ```text
@@ -70,4 +79,4 @@ docked Zhixu 的跨源入口必须使用显式的空标头 wrapper（`::OUTSIDE@
 
 ## 授权和任务展示
 
-Projection 会根据显式授权或 executor 委任给任务分配 assignee，但这只是产品视图。合约真正接受提交时仍重新检查授权，所以服务层展示错误不会突破协议边界。
+Projection 会根据显式授权或 executor 委任给任务分配 assignee，但这只是产品视图；合约在真正接受提交时会重新检查授权，服务层展示错误不会突破协议边界（见 [协议边界](../protocol-boundaries.md)）。

@@ -1,3 +1,10 @@
+---
+title: 版本与语义矩阵
+type: reference
+audience: 工程贡献者
+status: verified
+---
+
 # 版本与语义矩阵
 
 | 边界 | 当前版本 | 含义 |
@@ -12,4 +19,4 @@
 | Derived signal domain | `0.6` | Derived signal EIP-712 domain。 |
 | Patch/Docking domains | `0.1` | executor/resource patch 与 docking。 |
 
-Plan runtime identity 由 `publisher + hooksHash + metadataHash` 导出。Identity Registry 只记录 subject/account 绑定。Supplier capability、reputation、名称、标签、联系信息、搜索推荐和 workflow 状态由 Store 独立保存。Chain Services 的链上投影可重建。
+Plan runtime identity 由 `publisher + hooksHash + metadataHash` 导出。Identity Registry 只记录 subject/account 绑定。Supplier capability、reputation、名称、标签、联系信息、搜索推荐和 workflow 状态由 Store 独立保存。Chain Services 的链上投影可重建。完整边界见 [协议边界](../concepts/protocol-boundaries.md)。

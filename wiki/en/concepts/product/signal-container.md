@@ -1,18 +1,26 @@
+---
+title: Signal Container
+type: explanation
+audience: 产品与集成工程师
+preread: dto.md
+status: verified
+---
+
 # Signal Container
 
-A signal container is the product-layer wrapper for one authorized business action. It is a product/API concept, not a new contract object. It organizes the existing task, evidence, typed data, business signature, submission, and proof into a repeatable user and integration model; the chain still uses the existing contract types and events.
+The signal container is the product layer's wrapper for one authorized business action. It is a product/API concept, not a new contract object. It organizes the existing task, evidence, typed data, business signature, submit, and proof into a repeatable model for users and integrations; the chain still uses the existing contract types and events.
 
-## Why This Concept Is Needed
+## Why this concept is needed
 
-Customs brokers, logistics systems, AI agents, payment adapters, guarantors, human teams, and ERP systems can all produce business actions. UVP needs a unified boundary:
+Customs brokers, logistics systems, AI agents, payment adapters, guarantors, human teams, and ERPs can all produce business actions. UVP verifies one unified boundary:
 
 ```text
 task -> evidence/input -> prepare typed data -> business signature -> submit -> chain proof
 ```
 
-It is like a shipping container. A port does not need to know how a factory makes the goods; it only needs a standard box, manifest, authorized party, and handoff record.
+It is like a shipping container. A port does not need to know how the factory produces goods; it only needs a standard box, a manifest, an authorized party, and handoff records.
 
-## What the Container Holds
+## What the container holds
 
 Minimal contents:
 
@@ -22,17 +30,17 @@ Minimal contents:
 | `orderId` | Owning order. |
 | `stageId` | Corresponding stage. |
 | `actionKind` | `submit_signal`, `stage_executor_patch`, or `stage_resource_patch`. |
-| `requiredInputs` | Inputs the user or system needs to provide. |
+| `requiredInputs` | Inputs the user or system must provide. |
 | `requiredEvidence` | Required evidence or credential references. |
-| `acceptedActor` | The accepted wallet, supplier subject, and trust status. |
-| `typedData` | EIP-712 data to be signed. |
-| `payloadHash` | Fingerprint of the business payload. |
+| `acceptedActor` | Accepted wallet, supplier subject, trust status. |
+| `typedData` | EIP-712 data to sign. |
+| `payloadHash` | Business payload fingerprint. |
 | `idempotencyKey` | Request idempotency key. |
-| `proof` | Tx, block, event, and proof rows. |
+| `proof` | Tx, block, event, proof rows. |
 
-These fields can be derived from existing `ProductTaskDTO`, prepare / submit APIs, evidence APIs, and projections.
+These fields can be derived from the existing `ProductTaskDTO`, prepare/submit APIs, the evidence API, and projections.
 
-## Product API Mapping
+## Product API mapping
 
 Ordinary signal:
 
@@ -52,16 +60,16 @@ POST /product/tasks/:taskId/prepare-stage-resource-patch
 POST /product/tasks/:taskId/submit-stage-resource-patch
 ```
 
-## Security Rules
+## Security rules
 
-- The container is a product wrapper; authoritative proof comes from on-chain contracts and events.
+- The container is product packaging; authoritative proof comes from on-chain contracts and events.
 - The Product API may prepare and explain containers; the business signature comes from the participant wallet.
-- A relayer may broadcast; the submitter identity comes from the signature and authorization.
-- Evidence plaintext does not go on chain.
+- A relayer may broadcast; submitter identity comes from signatures and authorization.
+- Evidence plaintext never goes on chain.
 - `payloadHash` and metadata URI are the standard external boundary.
-- Missing explicit capability metadata should fail closed, so permissions are not guessed from role copy.
-- Ordinary UI does not display ABI, calldata, gas, `sourceId`, or `signalId`; advanced proof views may display them.
+- Missing explicit capability metadata should fail closed instead of guessing permissions from role copy.
+- Ordinary UIs do not show ABI, calldata, gas, sourceId, or signalId; advanced proof views may.
 
-## What It Means for Executor Kit and MCP
+## Meaning for Executor Kit and MCP
 
-executor-kit Product API mode and future MCP tools should consume signal containers so that AI or enterprise systems do not need to understand `HookReady`, ABI, or event topics directly. Tools can list tasks, fetch containers, prepare evidence, sign, submit, and read proof; order authorization still comes from the state machine.
+executor-kit Product API mode and future MCP tools should consume signal containers so AI or enterprise systems do not need to understand HookReady, ABI, and event topics directly. Tools can list tasks, fetch containers, prepare evidence, sign, submit, and read proof; order authorization still comes from the state machine.

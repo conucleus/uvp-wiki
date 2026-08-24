@@ -1,8 +1,28 @@
+---
+title: Source 因果链
+type: explanation
+audience: 协议读者
+preread: README.md
+status: verified
+---
+
 # Source 因果链
 
 `source` 是 signal 的因果推进线。它回答：“这个业务动作属于哪条推进线？”角色、Supplier 和钱包说明谁在行动；Source 说明这个动作进入哪条业务推进线。
 
 可以先把 source 当作一笔项目里的多条 lane：sales、solution、supply、payment、logistics、field、buyer 可以并行推进，也可以在某个阶段等待另一条 lane 的 proof 后交汇。这些 source 不是部门。一个钱包只要被授权，可以在多个 source 上提交 signal；同一个 Supplier 也可以参与多个 source。
+
+## 谁使用
+
+凝结核在 stage 的 `source` 字段和 Hook 表达式里声明 source；编译器把它们编入依赖索引；被授权的提交者在各自 source 上写入 signal，状态机按 source 隔离重放因果线。
+
+## 产生什么结果
+
+每个 source 参与 `signalKey` 的构成：同名 signal 在不同 source 下是不同的链上事实。source 让 hooks 依赖正确的因果线，也让一条 Order 能并行承载多条推进线并在 hook 处交汇。
+
+## 权威来自哪里
+
+source 只是命名空间和编译输入；权威事实仍是授权提交后的链上 signal/proof 事件。本页 lane 划分是建模建议，不是协议强制枚举。
 
 Hook 表达式写成 `source::condition`，condition 里的 signal 默认都在这个 source 下解释。
 
@@ -70,50 +90,7 @@ procurement_execution:
 
 ## 进阶建模例子
 
-### 成交撮合与新的履约 Source
-
-成交前，卖方准备和买方准备可以是两条独立 source。成交后，可以产生新的共同履约 source，或创建一个新的 Order instance：
-
-```text
-seller-prep source
-buyer-prep source
-  -> deal matched / order registered
-  -> fulfillment source
-       -> payment
-       -> logistics
-       -> delivery
-       -> acceptance
-```
-
-更复杂的动态多方撮合，通常通过新的 source、docked linked Order 或 Store/Product workflow 表达。
-
-### 石油分馏
-
-石油分馏是 source 分叉的例子。原油进入炼厂后，可以分出汽油、柴油、石脑油、润滑油等路径。它们共享上游输入，但下游质量指标、运输、库存、买家和交付条件不同。
-
-```text
-crude_intake
-  -> fractionation
-       -> gasoline source
-       -> diesel source
-       -> naphtha source
-       -> lubricant source
-```
-
-### 农产品收购
-
-农产品收购商可能从很多农户采购橘子。如果农户数量在 Plan 里固定，可以显式建多条 farmer source。如果农户数量是运行时动态的，每个农户的采收包装通常更适合建成 docked linked Order 或子 Zhixu。
-
-```text
-collector_intake
-  -> farmer_a harvest/pack source
-  -> farmer_b harvest/pack source
-  -> farmer_c harvest/pack source
-  -> collector_aggregation source
-       -> grading
-       -> consolidated logistics
-       -> payment settlement
-```
+撮合、石油分馏、农产品收购三个进阶建模案例已移至 [Source 建模例子集](modeling-examples.md)。
 
 ## 边界检查
 
@@ -121,4 +98,4 @@ collector_intake
 - Executor 描述运行时处理者或提交者；Source 描述 signal 语境。
 - Supplier 是被凝结核组织、由 Store 维护能力资料的参与主体；Source 是 hook/signal 命名空间。
 - 成交后的履约可以形成新的 source 或新的 Order。
-- Source 必须可编译、可授权、可重放，不能当作任意动态字段使用。
+- Source 必须可编译、可授权、可重放，不能当作任意动态字段使用；链上事实源、读模型、明文不上链等全站不变量见 [Protocol Boundaries](../protocol-boundaries.md)。

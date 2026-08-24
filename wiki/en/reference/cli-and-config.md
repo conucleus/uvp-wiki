@@ -1,3 +1,10 @@
+---
+title: CLI and Configuration
+type: reference
+audience: 工程贡献者
+status: verified
+---
+
 # CLI and Configuration
 
 ## Root Scripts
@@ -8,15 +15,11 @@ pnpm test
 pnpm build
 pnpm lint
 pnpm verify:protocol-freeze
-pnpm verify:product-signal-map
-pnpm release:baseline:dry-run
-pnpm staging:preflight
-pnpm staging:rehearsal -- --allow-broadcast
 ```
 
 ## executor-kit CLI
 
-See [Executor Kit](../execution/executor-kit.md) for the full semantics. This page keeps a quick command reference.
+See [Executor Kit](../execution/executor-kit.md) for full semantics. This page keeps a command quick reference.
 
 Generate or inspect wallets:
 
@@ -65,7 +68,7 @@ pnpm --filter @uvp-eth/executor-kit cli -- chain-once \
 
 ## chain-services Storage
 
-See [Chain Services](../components/chain-services.md) for full module boundaries. This section keeps local configuration quick reference.
+See [Chain Services](../components/chain-services.md) for full module boundaries. This section keeps a local configuration quick reference.
 
 ```text
 CHAIN_SERVICES_DATABASE_DRIVER=memory|sqlite|postgres
@@ -99,4 +102,4 @@ VITE_UVP_ORDER_APP_DEMO=1
 VITE_UVP_ORDER_APP_WALLET_ADDRESS
 ```
 
-Production/staging profiles should not enable demo, fixture, test controls, or permissive authorization.
+Production/staging profiles must not enable demo, fixture, test controls, or permissive authorization.

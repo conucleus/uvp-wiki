@@ -1,8 +1,28 @@
+---
+title: Hook
+type: explanation
+audience: 协议读者
+preread: README.md
+status: verified
+---
+
 # Hook
 
 Hook 是状态机判断“某个阶段条件是否成立”的最小规则。它不是 HTTP webhook，也不是外部系统回调；它是 Order 事件集上的状态机条件。Zhixu stage 的 `receiveSignals` 每一项通常都会编译成一个 `kind=receive` hook；如果 stage 对接另一条 Zhixu，`signalMap` 还会编译成 `kind=signalMap` hook。
 
 Hook 本身只是条件。只有被标记为 [Trigger](trigger.md) 的 hook Ready 时，链上才会发出 `HookReady`，Product/Store 才应该把它投影成正式可执行任务。
+
+## 谁使用
+
+凝结核在 stage 的 `receiveSignals` 里声明 hook 条件；编译器把它们规范化并编入 Plan；状态机在订单事件上求值；Product/Store/executor-kit 跟随 `HookReady` 创建任务和通知。
+
+## 产生什么结果
+
+hook 求值产生 `HookStatusChanged` 状态流转；`isTrigger=true` 的 hook 第一次 Ready 时发出 `HookReady`，成为 Product task、Store intent 和 adapter job 的投影依据。
+
+## 权威来自哪里
+
+hook 条件的权威形态是链上 `UVPStateMachine.StoredHook`（由 Plan 注册固化）；本页的表达式和 AST 说明以 hook-core parser 与 compiler 实现为准，UI 展示只是读模型。
 
 ## Hook 表达式
 
@@ -30,8 +50,8 @@ Hook 表达式里的 `~A` 是存在逻辑里的缺席判断。它表示“当前
 | --- | --- |
 | `signal` | 等待某个 `task.stage.signal` 出现。 |
 | `external` | `::OUTSIDE@(...)` 分叉入口：由目标 source 的 signal 事件驱动，运行时为它派生独立订单。 |
-| `merge` | `::MERGE@(source::a.cmp, ...)` 多源观察入口：逐个贡献事件投递，由状态机完成聚合裁决；核心求值恒返回 `needs_more`。 |
-| `anchor` | `::ANCHOR@(task.stage.signal)` 锚定汇合入口：子订单回流按血缘逐事件投递，目标必须是裸三段式 signal。 |
+| `merge` | `::MERGE@(source::a.cmp, ...)` 多源观察入口：逐个贡献事件投递，由状态机完成聚合裁决；核心求值恒返回 `needs_more`。链上 HookPlan 编译期拒绝（`MERGE@`/`ANCHOR@` 仅 cloud runtime 投递），见 [Hook 求值](../state-machine/evaluation.md)。 |
+| `anchor` | `::ANCHOR@(task.stage.signal)` 锚定汇合入口：子订单回流按血缘逐事件投递，目标必须是裸三段式 signal。链上 HookPlan 编译期拒绝（`MERGE@`/`ANCHOR@` 仅 cloud runtime 投递），见 [Hook 求值](../state-machine/evaluation.md)。 |
 | `not` | 缺席条件，表示某个 signal 尚未出现；如果它后来出现，依赖该缺席条件的分支取消。 |
 | `and` | 多个条件都满足。 |
 | `or` | 任一分支满足。 |

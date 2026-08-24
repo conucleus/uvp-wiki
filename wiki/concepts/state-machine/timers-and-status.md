@@ -1,3 +1,10 @@
+---
+title: 计时器与状态
+type: explanation
+audience: 协议读者
+status: verified
+---
+
 # 计时器与状态
 
 Hook runtime 保存在订单内部。每个订单对计划里的每个 hook 都有自己的状态。
@@ -57,3 +64,5 @@ pokeTimer(orderId, hookId)
 ## 产品层应该怎么展示
 
 Product DTO 可以把 `Wait + dueAt` 显示为“等待到某个时间后自动/可手动继续检查”。但真实推进仍需要链上交易。前端不能只因为本地时间到了就把任务改成 ready，必须等待 `HookReady` 或新的 `HookStatusChanged`。
+
+谁能提交推动求值的 signal 由订单级授权决定，见 [Signal 授权](../trust/signal-authorization.md)。

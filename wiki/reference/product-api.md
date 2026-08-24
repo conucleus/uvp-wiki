@@ -1,3 +1,10 @@
+---
+title: Product API 参考
+type: reference
+audience: 工程贡献者
+status: verified
+---
+
 # Product API 参考
 
 Product API 位于 `@uvp-eth/chain-services`，把 StateMachine 事件投影与 Store 链下资料组合成 Store、Order App 和 executor-kit 使用的 DTO。

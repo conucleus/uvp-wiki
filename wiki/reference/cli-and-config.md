@@ -1,3 +1,10 @@
+---
+title: CLI 与配置
+type: reference
+audience: 工程贡献者
+status: verified
+---
+
 # CLI 与配置
 
 ## Root Scripts
@@ -8,9 +15,6 @@ pnpm test
 pnpm build
 pnpm lint
 pnpm verify:protocol-freeze
-pnpm release:baseline:dry-run
-pnpm staging:preflight
-pnpm staging:rehearsal -- --allow-broadcast
 ```
 
 ## executor-kit CLI

@@ -1,3 +1,10 @@
+---
+title: On-chain Registration Parameters
+type: reference
+audience: 工程贡献者
+status: verified
+---
+
 # On-chain Registration Parameters
 
 `OnchainHookPlanArtifact` is not yet the final transaction parameter set. The compiler further converts it into the compact structure required by `UVPStateMachine.registerPlan()`.

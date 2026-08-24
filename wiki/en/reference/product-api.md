@@ -1,6 +1,13 @@
+---
+title: Product API Reference
+type: reference
+audience: 工程贡献者
+status: verified
+---
+
 # Product API Reference
 
-The Product API lives in `@uvp-eth/chain-services`. It combines StateMachine event projections with Store-managed off-chain records for Store, Order App, and executor-kit DTOs.
+The Product API lives in `@uvp-eth/chain-services`. It combines StateMachine event projections with Store-managed off-chain records into the DTOs used by Store, Order App, and executor-kit.
 
 ## Catalog, Orders, and Tasks
 
@@ -20,7 +27,7 @@ GET /product/me/tasks/:taskId
 GET /product/me/activity-feed
 ```
 
-Plan publication comes from the `UVPStateMachine.PlanRegistered` projection. Tasks come from `HookReady`; executor wallets come from Plan-declared signal capabilities and order-level `SignalSubmitterAuthorized` events. Role names are display metadata.
+Plan publication status comes from the `UVPStateMachine.PlanRegistered` projection. Tasks come from `HookReady`; executor wallets come from Plan-declared signal capabilities and order-level `SignalSubmitterAuthorized`. Role names are display only.
 
 ## Submission and Evidence
 
@@ -33,7 +40,7 @@ POST /product/tasks/:taskId/submit
 GET  /product/submissions/:submissionId
 ```
 
-`prepare-submit` produces EIP-712 typed data. `submit` verifies the signature and hands the request to the relayer. `SignalSubmitted` records the on-chain result.
+`prepare-submit` produces EIP-712 typed data. `submit` verifies the signature and hands the request to the relayer; the on-chain result is authoritative via `SignalSubmitted`.
 
 ## Order Overlay
 
@@ -72,7 +79,7 @@ POST /store/suppliers/:supplierId/request-identity-registration
 POST /store/suppliers/:supplierId/request-identity-revocation
 ```
 
-Store writes require operator/admin identity. Drafts, docking sessions, supplier names, capability tags, matching records, and reviews are Store-managed off-chain facts. The Identity Registry projection only exposes the public `subjectId` to wallet mapping.
+Store write endpoints require operator/admin identity. Drafts, docking sessions, supplier names, capability tags, matching profiles, and review records are Store off-chain facts. The Identity Registry projection only provides the public correspondence between `subjectId` and wallets.
 
 ## Readiness
 
@@ -80,4 +87,4 @@ Store writes require operator/admin identity. Drafts, docking sessions, supplier
 GET /product/staging/readiness
 ```
 
-This endpoint returns a redacted deployment, indexer, storage, role-input, and Product-state summary. It returns `503 not_ready` when the required conditions are incomplete.
+This endpoint outputs a redacted summary of deployment, indexing, storage, role inputs, and Product state; it returns `503 not_ready` when conditions are insufficient.

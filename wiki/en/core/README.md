@@ -1,70 +1,8 @@
-# Core Concepts
+---
+title: (Merged) Core Concepts
+type: meta
+audience: 全部读者
+status: archived
+---
 
-Core concepts answer the question “what are the protocol objects.” These objects form the language layer consumed by Store, Product API, Order App, executor-kit, and periphery adapters.
-
-This page is an object index, not the first tutorial. New readers can start with four foundational objects: Zhixu is the reusable coordination rulebook, Order is one runtime, Executor is the runtime handler, and Signal is the authorized business statement. The other objects explain versions, causality, task readiness, endorsement, resources, and proof.
-
-```text
-First layer: Zhixu -> Order -> Executor -> Signal
-Second layer: Plan / Source / Hook / Trigger / File Resources
-Governance layer: Nucleus / Supplier / publication / Authorization
-Display layer: Proof / Product DTO / Store / Order App / executor-kit
-```
-
-## How to Read This
-
-### First Pass
-
-Start with these basic terms. Zhixu is the reusable rulebook, Order is the runtime instance, Executor explains who handles a step, and Signal explains what moves the order forward:
-
-| Subpage | Description |
-| --- | --- |
-| [Zhixu DSL](../concepts/core/zhixu.md) | How a reusable coordination rulebook is described. |
-| [Order](../concepts/core/order.md) | How one concrete runtime records signals, tasks, and proof. |
-| [Signal](../concepts/core/signal.md) | The smallest business input accepted by the state machine, signed and submitted by an authorized wallet. |
-| [Executor](../concepts/core/executor.md) | The subject that actually executes or submits signals in a given Order, including a peer Zhixu acting as executor. |
-
-### Rule Internals
-
-Read these when you need to explain how the rule is compiled, how causality works, or why a task opens:
-
-| Subpage | Description |
-| --- | --- |
-| [Hook](../concepts/core/hook.md) | The rule used to derive stage readiness from signal conditions. |
-| [Trigger](../concepts/core/trigger.md) | The special hook marker that decides when `HookReady` is emitted and the execution entry opens. |
-| [Source Causal Chain](../concepts/core/source.md) | The causal context where a signal lives, used to express chaining, branching, and convergence. |
-| [File Resources](../concepts/core/file-resources.md) | Stage resource handles pointing to off-chain objects, protocol files, or resource manifests. |
-| [Plan](../concepts/core/plan.md) | The deterministic artifact compiled from a Zhixu for a target chain. |
-
-### Organization and Endorsement
-
-Read these when you need to explain who designs, who has capability, who is endorsed, and who may submit:
-
-| Subpage | Description |
-| --- | --- |
-| [Nucleus / Nucleation](../concepts/core/nucleation.md) | The originating nucleus, designer, and organizer of a Zhixu; `nucleation` remains the field/context name. |
-| [Supplier](../concepts/core/supplier.md) | The capability subject and trust subject registered, tagged, and endorsed by Store. |
-| [Trust and Authorization](../concepts/trust-and-authorization.md) | How endorsement and order action permissions stay separate. |
-
-Read these sibling chapters next:
-
-| Chapter | Description |
-| --- | --- |
-| [Architecture](../concepts/architecture.md) | Module boundaries, dependency direction, source of truth, and data flow. |
-| [State Machine](../concepts/state-machine.md) | How the contract stores signals, evaluates hooks, handles timers, and applies stage overlays; this belongs to the core component flow. |
-| [Artifacts and Hashes](../concepts/artifacts-and-hashes.md) | Compiler artifacts, canonical hashes, stable IDs, and registration parameters. |
-| [Trust and Authorization](../concepts/trust-and-authorization.md) | Trust registries, plan publication, order-level signal authorization, EIP-712, and relayer boundaries. |
-| [Product Surfaces](../concepts/product-surfaces.md) | How chain-services project chain events into orders, tasks, and proofs readable by ordinary users. |
-| [Store](../store/README.md) | How Store gives the Nucleus a workbench and organizes Zhixu/Supplier, trust checks, contact notifications, fulfillment records, and platform workflow. |
-| [Executors and Integrations](../execution/README.md) | Executor Kit, docked Zhixu, Order App, adapters, and MCP/AI execution entry points. |
-
-## Boundary Checks
-
-- Contracts and chain events determine the real state of plans, orders, signals, hooks, and publications.
-- The indexer database must be rebuildable from events and cannot be the source of truth.
-- A relayer may sponsor or forward transactions, but it cannot generate business signatures on behalf of participants.
-- Store, Order App, and Product API organize user language and metadata; submissions still go through on-chain authorization.
-- Store is a first-class trust/workflow system and is described separately from the ordinary product surfaces.
-- Store admin owns platform workflow; the Nucleus owns internal Zhixu design; trust registries own external endorsement.
-- Executor Kit is the executor integration surface and works around the state machine and Product API.
-- USDC, escrow, guarantee, and AI agents belong to adapters or periphery, and they consume signals/proofs around the core interface.
+This page has been superseded. See [../concepts/README.md](../concepts/README.md). This path is kept only for backward compatibility.

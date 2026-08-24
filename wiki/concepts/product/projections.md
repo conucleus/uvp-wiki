@@ -1,3 +1,11 @@
+---
+title: 事件投影
+type: reference
+audience: 服务工程师
+preread: ../services/indexer-projections.md
+status: verified
+---
+
 # 事件投影
 
 事件投影把链上事件变成产品可读状态。它是可重建 view；删除 indexer 数据库后，理论上应能从链事件重建同样的 projection。
@@ -60,3 +68,8 @@ chainId:contractAddress:blockNumber:transactionHash:logIndex
 | `TimerPoked` | 记录 timer proof 和 timeline。 |
 
 任务创建由 `HookReady` 驱动；后端草稿或 UI 状态只做辅助 workflow。
+
+## 相关页面
+
+- [Indexer 与投影](../services/indexer-projections.md)：indexer 如何从链事件建立这些投影。
+- [数据流与事实源](../data-flow-and-truth.md)：投影在整体数据流中的位置与事实边界。

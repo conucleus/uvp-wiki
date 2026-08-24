@@ -1,51 +1,23 @@
+---
+title: Store and Order App
+type: meta
+audience: 产品与前端工程师
+preread: README.md
+status: verified
+---
+
 # Store and Order App
 
-Store, Order App, and executor-kit consume the same on-chain facts from different user perspectives. Store is the centralized governance and cataloging tool; Order App is the ordinary participant task tool; executor-kit is the integration tool for executors, enterprise systems, and AI / MCP adapters.
+The Store, Order App, and executor-kit consume the same set of on-chain facts from different user perspectives. This page is an index; detailed boundaries of each surface live on their own pages.
 
-## Store
+| Surface | One-line positioning | See |
+| --- | --- | --- |
+| Store | The Nucleus's and operators' centralized governance and cataloging tool: order creation, task review, plan publication, supplier identity, metadata, review, audit. | [Zhixu Store](../store/README.md) |
+| Order App | The ordinary participant task tool: to-dos, submission confirmation, evidence fingerprints, on-chain proof, readiness. | [Order App](../apps/order-app.md) |
+| executor-kit | Integration tool for executors, enterprise systems, and AI/MCP adapters: Product API mode and chain watcher mode paths. | [Executor Kit](../apps/executor-kit.md), [Order App vs Executor Kit](../apps/order-app-vs-executor-kit.md) |
 
-`zhixu-store/app` is for the Store / workbench. It can handle:
+The shared bottom line for all three: they do not own order state — the authorized wallet's signature makes the business action. The Store's centralized authority can influence recommendations, reviews, tagging, and governance entry points, but it cannot let metadata replace `PlanRegistered`, a review draft replace `SignalSubmitted`, or the Store database replace the Identity Registry, nor can it generate business signatures on behalf of participants.
 
-- Order creation and participant configuration.
-- Task review and workflow viewing.
-- Chain proof display.
-- Plan publication and supplier identity display.
-- Metadata, catalog, review, and audit support workflows.
+## Periphery adapters
 
-Store may not:
-
-- Let metadata replace `PlanRegistered`.
-- Let a review draft replace `SignalSubmitted`.
-- Let the Store database replace the Identity Registry.
-- Sign business actions on behalf of participants.
-
-Store’s centralized authority can influence recommendations, review, tagging, and governance entry points, but it cannot directly change order runtime facts.
-
-## Order App
-
-`uvp-order-app/app` is for ordinary participants and uses plain language to show:
-
-- Pending tasks.
-- Submission confirmation.
-- Evidence fingerprints.
-- On-chain proofs.
-- Fulfillment or execution party.
-- Resource requirements.
-- Readiness checks.
-
-The ordinary task UI does not require users to understand `HookPlan`, `sourceId`, `signalId`, ABI, or gas details. Advanced proof / debug views can show those fields.
-
-## Executor Kit
-
-`uvp-executor-kit` has two paths:
-
-| Path | Purpose |
-| --- | --- |
-| Product API mode | Find tasks through Product DTOs, read proofs, and prepare submissions. |
-| Chain watcher mode | Watch chain events and contract state directly, for executors or adapters. |
-
-Both paths are ultimately signal producers. They do not own order state; the business action comes from the authorized wallet signature.
-
-## Periphery Adapter
-
-Funding, guarantee, AI / MCP, and demo executors can live in `uvp-periphery`. They should consume `UVPStateMachine`, optional Identity Registry name resolution, Product DTOs, or executor-kit, rather than defining new core order truth.
+Funding, guarantee, AI/MCP, and demo executors can live in `uvp-periphery`. They consume `UVPStateMachine`, optional `UVPIdentityRegistry` name resolution, Product DTOs, or executor-kit instead of defining new core order truth.

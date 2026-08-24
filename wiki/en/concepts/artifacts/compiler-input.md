@@ -1,3 +1,10 @@
+---
+title: Compiler Input
+type: reference
+audience: 工程贡献者
+status: verified
+---
+
 # Compiler Input
 
 The compiler input is `ZhixuDefinition`. The compiler does more than move strings around; it first validates whether the definition can produce deterministic protocol artifacts.

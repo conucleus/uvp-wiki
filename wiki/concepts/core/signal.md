@@ -1,6 +1,26 @@
+---
+title: Signal
+type: explanation
+audience: 协议读者
+preread: README.md
+status: verified
+---
+
 # Signal
 
 Signal 是订单状态机接受的最小业务输入。它代表“某个被授权的钱包，对某个订单，提交了某类动作或凭证指纹”。
+
+## 谁使用
+
+被授权的 submitter（参与方钱包、executor、adapter）提交 signal；合约校验并记录；Product/Store/executor-kit 把 `SignalSubmitted` 投影成任务完成状态和 proof row。
+
+## 产生什么结果
+
+一次成功提交写入不可变的 `SignalRecord` 并发出 `SignalSubmitted`；它推动依赖该 signal 的 [Hook](hook.md) 求值，可能触发 `HookStatusChanged` 或 `HookReady`。
+
+## 权威来自哪里
+
+signal 的有效性由合约按 `(orderId, signalKey, submitter)` 授权检查决定；payload 只上哈希，业务含义由 Zhixu、stage protocol 和 Product DTO 解释。
 
 ## Signal 在 DSL 里的位置
 
@@ -8,7 +28,7 @@ Zhixu stage 里有两处和 signal 直接相关：
 
 | 字段 | 含义 |
 | --- | --- |
-| `receiveSignals` | 当前 stage 等待哪些输入 signal。每个 key 会编译成一个 hook。 |
+| `receiveSignals` | 当前 stage 等待哪些输入 signal。每个 key 会编译成一个 [Hook](hook.md)。 |
 | `sendSignals` | 当前 stage 执行后可能发出哪些输出 signal。 |
 
 例如一个买方承诺 stage：
@@ -44,11 +64,11 @@ signalId = keccak256(signalName)
 signalKey = keccak256(abi.encode(sourceId, signalId))
 ```
 
-`source` 表示因果语境，也就是这个动作被放进哪条可追踪链路里。角色、供应商或系统入口可以是提交者或业务解释的一部分，但链上 signal key 由 `source` 和 `signalName` 决定。`signalName` 表示具体动作名，合约最终按 `signalKey` 去重和查依赖。
+`source` 表示因果语境，也就是这个动作被放进哪条可追踪链路里，详见 [Source 因果链](source.md)。角色、供应商或系统入口可以是提交者或业务解释的一部分，但链上 signal key 由 `source` 和 `signalName` 决定。`signalName` 表示具体动作名，合约最终按 `signalKey` 去重和查依赖。
 
 ## 常见 Signal 名称约定
 
-`str`、`cmp`、`err`、`cxl`、`pass`、`fail` 是当前 DSL 和产品语义里常见的 signal 约定：
+常见名称约定包括 str、cmp、err、cxl、pass、fail，以及用于否决场景的 reject：
 
 | 名称 | 常见含义 |
 | --- | --- |
@@ -63,6 +83,8 @@ signalKey = keccak256(abi.encode(sourceId, signalId))
 具体含义仍由 Zhixu、stage protocol、Product DTO 和业务证据解释。合约只认 `signalId` 和授权。
 
 ## First Writer Wins
+
+协议边界总览见 [Protocol Boundaries](../protocol-boundaries.md)。
 
 同一个订单里，同一个 `signalKey` 只能成功提交一次：
 
@@ -95,8 +117,8 @@ Product API 可以把某个任务显示给某个参与方，但最终能否提�
 orderId + signalKey + submitter
 ```
 
-授权可以来自 Order 创建时的显式授权，也可以来自有效 Executor patch 对 Plan 预声明 `sendSignals` 范围的动态委任。两种路径都由合约检查；即使 UI 显示了按钮，没有有效授权仍会被拒绝。
+授权可以来自 Order 创建时的显式授权，也可以来自有效 Executor patch 对 Plan 预声明 `sendSignals` 范围的动态委任，详见 [Signal 授权](../trust/signal-authorization.md)。两种路径都由合约检查；即使 UI 显示了按钮，没有有效授权仍会被拒绝。
 
 ## Signal 的协议边界
 
-一个 signal 表示“某个授权动作发生了”。供应商内部工作流、采购过程、融资过程或 AI 推理过程可以在 evidence、metadata URI 或 supplier 系统里保存；UVP 核心验证标准边界：授权、签名、payload hash、事件证明。
+一个 signal 表示“某个授权动作发生了”。供应商内部工作流、采购过程、融资过程或 AI 推理过程可以保存在 evidence、metadata URI 或 supplier 系统里；UVP 核心只验证授权、签名、payload hash 和事件证明。链上事实源、明文不上链、relayer 不签名等全站不变量总览见 [Protocol Boundaries](../protocol-boundaries.md)。

@@ -1,36 +1,8 @@
-# Store 与治理
+---
+title: （已合并）Store 与治理
+type: meta
+audience: 全部读者
+status: archived
+---
 
-`zhixu-store/app` 是凝结核工作台和 Store 平台 workflow 前端。它服务凝结核、Store operator、reviewer、governance admin 和 trust reviewer，不是普通参与者任务 App，也不是 Zhixu 内部治理者。
-
-## Store 的产品对象
-
-Store 组织这些对象：
-
-- nucleation identity、设计材料、版本历史；
-- Zhixu draft、compile preview、review、version；
-- fairness / transparency / exception policy material；
-- supplier directory、凝结核内部适配关系、平台 capability tags；
-- order search 和 proof drilldown；
-- identity binding register/revoke request。
-
-## Store 的边界
-
-Store 可以用自身平台权威做目录打标、材料审核和 workflow 管理，但这些状态要清楚标注来源：
-
-| Store 状态 | 是否链上事实 |
-| --- | --- |
-| draft imported | 否。 |
-| compile preview passed | 否，只是可复现编译结果。 |
-| design/fairness material submitted | 否，材料来自凝结核。 |
-| submitted for review | 否。 |
-| approved for broadcast | 否，只是可发起材料审核请求。 |
-| Plan finalized indexed | 是，来自 StateMachine 事件和 publisher 签名。 |
-| Identity binding indexed | 是，来自 Identity Registry 事件；不含能力或信誉。 |
-
-## Governance Handoff
-
-Store 的治理动作应委托给已有 governance service 或管理员流程。它不直接持有私钥，不绕过 admin header，不把 review approval 说成 chain publication，也不把 Store reviewer 写成 Identity Registry。
-
-## 为什么 Store 是中心化必要组件
-
-去中心化合约只能验证哈希、签名、事件顺序和授权。现实世界的“哪个凝结核维护这条秩序”“这条 Zhixu 的公平性材料是否完整”“这家报关行联系方式是什么”“这个版本是否推荐使用”需要中心化产品界面组织。Store 就是这层组织能力的产品化入口；可信和可执行仍要回到 Store or external institution publication 与 state-machine events。
+本页已合并：治理权限与 audit 见 [Operator 权限、治理与 Audit](../../store/governance-audit.md)，状态权威归属见 [秩序商店](../../store/README.md)「信息对象与权威来源」表。此路径仅保留以兼容旧链接。

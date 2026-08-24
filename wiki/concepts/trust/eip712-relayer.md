@@ -1,6 +1,13 @@
+---
+title: EIP-712 与 Relayer
+type: explanation
+audience: 工程贡献者
+status: verified
+---
+
 # EIP-712 与 Relayer
 
-Relayer 可以帮助广播交易，但不能替参与方做业务决定。业务动作必须由被授权 submitter 的钱包签名。
+Relayer 可以帮助广播交易，但不能替参与方做业务决定。业务动作必须由被授权 submitter 的钱包签名；“relayer 不是权利来源”是协议不变量之一，总述见 [协议边界](../protocol-boundaries.md)。
 
 ## Typed Data
 
@@ -8,7 +15,7 @@ Relayer 可以帮助广播交易，但不能替参与方做业务决定。业务
 
 ```text
 name = UVPStateMachine
-version = 0.4
+version = 0.8
 ```
 
 Signal 提交的 primary type 是：

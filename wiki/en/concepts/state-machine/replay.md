@@ -1,10 +1,17 @@
+---
+title: Event Replay
+type: explanation
+audience: 工程贡献者
+status: verified
+---
+
 # Event Replay
 
-`uvp-protocol/packages/statemachine` provides a platform-neutral reference reducer. It replays order state from chain events and verifies whether the contract output matches the local semantics.
+`uvp-protocol/packages/statemachine` provides a platform-neutral reference reducer. It replays order state from chain events and verifies whether contract events and local semantics agree.
 
 ## Input Events
 
-Chain events are mapped into reducer events that the reducer understands:
+Chain events are mapped into inputs the reducer understands:
 
 | Chain event | Reducer event |
 | --- | --- |
@@ -13,7 +20,7 @@ Chain events are mapped into reducer events that the reducer understands:
 | `SignalSubmitted` | `SignalReceived` |
 | `TimerPoked` | `TimerDue` |
 
-`HookStatusChanged` and `HookReady` are not written into the reducer directly as state sources. They are treated as contract output observations and are compared against the state derived by the reference reducer.
+`HookStatusChanged` and `HookReady` are not written into the reducer directly as state sources. They are treated as observed contract outputs, compared against what the reference reducer derives.
 
 ## Reducer State
 
@@ -33,9 +40,15 @@ The states used by the reference runtime are:
 Replay solves three problems:
 
 - After a contract upgrade or compiler change, confirm that the same event sequence still produces the expected state.
-- When the indexer database is corrupted or migrated, rebuild projections from chain events.
+- When the indexer database is corrupted or migrated, projections can be rebuilt from chain events.
 - Product proof can trace the order state a user sees back to the exact events.
 
 ## First Writer Wins
 
 The reference reducer also applies first-writer-wins by signal key. A duplicate signal should not change state. That keeps it aligned with the contract semantics of `_signals[orderId][signalKey]`.
+
+## Projection and Authority
+
+The Chain Services projection rebuilds signal truth and hook truth from the same event stream; the indexer database can be dropped and rebuilt at any time. The chain replay oracle validates event semantics only — the ETH runtime authority is the deployed contract. Whenever the local model, reducer, or projection disagrees with actual contract behavior, the contract wins and the model is corrected.
+
+For the stable event list, see [Contracts and Events](../../reference/contracts-and-events.md).

@@ -1,12 +1,20 @@
+---
+title: Trigger
+type: explanation
+audience: 协议读者
+preread: README.md
+status: verified
+---
+
 # Trigger
 
-A Trigger turns a ready condition into an executable task. More precisely, it is a special hook marker: once a receive hook becomes ready, the task for that stage can open, the chain should emit `HookReady`, and Product/Store/executor-kit can project it as an executable task, notification, or adapter job.
+A Trigger turns a ready condition into an actionable task. It is a special hook marker: after some receive hook becomes Ready, that stage's task can open, chain should emit `HookReady`, and only then can Product/Store/executor-kit project it into a task, notification, or adapter job.
 
-For first-pass readers, `HookReady` means "this task is ready to handle." It does not mean the business work is complete. Completion is proven later by an authorized `SignalSubmitted` event and its evidence fingerprint.
+On a first pass, read `HookReady` as "this task can be handled now". It does not mean the business is complete; completion must be proven by subsequent authorized `SignalSubmitted` events and evidence fingerprints.
 
-Trigger is a stage-entry declaration from the `trigger` array in a Zhixu stage. Each key must exist in either `externalSignals` or `receiveSignals`: the former is a direct backend/executor input and does not produce `HookReady`; the latter is compiled into a Hook and can produce `HookReady` when its condition becomes ready. Projections use `hookId` as task and proof identity, so multiple receive-trigger keys may produce independently auditable tasks. Each Hook uses `~`, `&`, `|`, and explicit duration delays such as `+5s`, validated by the Hook DSL parser/compiler.
+Trigger is the stage entry declaration, coming from the order stage's `trigger` array. Each key must reference `externalSignals` or `receiveSignals`: the former are direct inputs for backend/executor and generate no `HookReady`; the latter compile into hooks and produce `HookReady` when conditions hold. Projections use `hookId` as task/proof identity, so multiple receive trigger keys can form multiple independently auditable tasks. Each Hook uses `~`, `&`, `|`, and explicit duration delays (e.g. `+5s`), validated by the Hook DSL parser/compiler.
 
-`externalSignals` only names raw external facts. The backend/executor verifies, deduplicates, persists, and normalizes them; declaring one does not automatically send a UVP signal or emit a callback.
+`externalSignals` only describe raw external fact names. The backend/executor is responsible for signature verification, deduplication, persistence, and normalization; declaring an `externalSignals` entry does not automatically send a signal to UVP or fire a callback.
 
 ```yaml
 trigger:
@@ -15,28 +23,40 @@ receiveSignals:
   START: buyer::order.confirm.cmp
 ```
 
-After compilation, the `START` receive hook carries `trigger=true`. If it becomes ready for the first time, `UVPStateMachine` emits:
+After compilation, the `START` receive hook carries `isTrigger=true`. If it becomes Ready for the first time, `UVPStateMachine` emits:
 
 ```text
 HookReady(orderId, hookId, stageId, hookName)
 ```
 
-## Why Trigger Must Be Explicit
+## Who Uses It
 
-A stage may have multiple hooks: some wait for inputs, some belong to `signalMap`, some are for failure paths or internal conditions. Trigger’s job is to lift “the condition is satisfied” into “the task for this hook can now be opened or claimed.”
+Nuclei declare triggers on stages; the compiler binds them to hooks and writes them into Plans; Product task creation, Store notification intents, and executor-kit chain watchers all work by following `HookReady`.
 
-On the product side, Trigger can be understood as:
+## What It Produces
 
-- A Product task can be created or marked ready.
-- Store can create a contact or notification intent.
-- An executor-kit chain watcher can claim or route a job.
-- An adapter can assign an external execution number, work order number, or linked Zhixu start request.
+A receive trigger emits one `HookReady` the first time it becomes Ready in the contract (`readyEmitted` guarantees one-shot), which produces claimable task numbers and workflow entries; external triggers only open backend/executor direct input contracts and emit no on-chain events.
 
-Numbering boundary: on-chain `orderId` is created through a trigger-order entrypoint such as `triggerOrderFromOutsideFor` or `triggerOrderFromSignalFor`. Trigger may also open a Product task ID, Store docking session ID, external work order number, or linked-order creation flow; these are workflow numbers. The identity of the local Order and the proof of progress still come from the on-chain `orderId`, trigger link, and signal/docking events.
+## Where Authority Comes From
 
-## Compiler and Contract Semantics
+The trigger binding comes from compiled artifacts and on-chain `StoredHook.isTrigger`; `orderId` comes from the trigger order entry; whether a task truly completes is decided by subsequent signal/proof events.
 
-The current compiler requires every name in `stage.trigger` to reference an existing `externalSignals` or `receiveSignals` key in the same stage. Only a receive key is attached to a Hook; an external key is a direct input entry.
+## Why Trigger Must Be Specified
+
+A stage may have several hooks: some wait for input, some serve signalMap, some cover failure paths or internal conditions. Trigger's job is to promote "condition holds" into "this hook's corresponding task may open or be claimed".
+
+In product terms a Trigger means:
+
+- A Product task can be created or become ready.
+- Store can generate contact or notification intents.
+- The executor-kit chain watcher can claim or route jobs.
+- Adapters can assign external execution numbers, ticket numbers, or linked-Zhixu launch requests.
+
+Numbering boundary: the on-chain `orderId` is created by trigger order entries such as `triggerOrderFromOutsideFor` or `triggerOrderFromSignalFor`. Triggers may also cause Product task IDs, Store docking session IDs, external ticket numbers, or linked-order creation flows; these are workflow numbers — the local order's identity and progression proof still follow the on-chain `orderId`, trigger links, and signal/docking events.
+
+## Compilation and Contract Semantics
+
+The compiler currently requires every name in `stage.trigger` to reference an existing `externalSignals` or `receiveSignals` key of the same stage. Only receive keys bind to Hooks; external keys are direct input entries.
 
 ```text
 stage.externalSignals.START
@@ -44,50 +64,41 @@ stage.externalSignals.START
   -> no compiled hook / no HookReady
 
 stage.receiveSignals.START
-  -> compiled hook trigger=true
-  -> StoredHook.trigger=true
+  -> compiled hook isTrigger=true
+  -> StoredHook.isTrigger=true
   -> HookStatus Ready
   -> HookReady emitted once
 ```
 
-The contract has a `readyEmitted` flag, so `HookReady` for the same hook is emitted only once. A `trigger=false` hook can still become ready, but it does not emit `HookReady` and should not directly create a Product task.
+The contract keeps a `readyEmitted` marker so a hook's `HookReady` is emitted exactly once. Hooks with `trigger=false` may still become Ready but emit no `HookReady` and should not directly create Product tasks.
 
 ## Relation to Docked Zhixu
 
-When a stage in a local Order is executed by another Zhixu, the Trigger on the local stage means “it is now possible to hand this stage to the peer Zhixu or adapter for execution.” The linked Zhixu’s `str`, `cmp`, and `err` are then mapped back into the local Order through `signalMap` and authorized submitters or docking events.
+When a local order's stage is executed by another order, the local stage's Trigger means "this stage can now be handed to the peer order or adapter". The linked order's `str`, `cmp`, `err` are then mapped back into the local order via `signalMap` and an authorized submitter or docking events; docking event semantics are described in [Docked Zhixu Runtime](../state-machine/docking.md).
 
-If Product, registrar, or an operator workflow opens this docking stage from outside the Order, declare the direct entry as `externalSignals`:
+If Product, registrar, or operator workflows open this docking stage from outside the order, the direct entry should be declared as `externalSignals`. Here `LINK_READY` is the backend/executor's external input contract to open the local stage's docking workflow; it generates no `HookReady` itself:
 
 ```yaml
-trigger:
-  - LINK_READY
-externalSignals:
-  - LINK_READY
-executor:
-  supplierType: zhixu
-  supplierID: "{{ .peer_zhixu_uid }}"
-  zhixuExecutorConfig:
-    signalMap:
-      str: peer::task.start.str
-      cmp: peer::task.close.cmp
-      err: peer::task.close.err
+trigger: [LINK_READY]
+externalSignals: [LINK_READY]
+executor: { supplierType: zhixu, supplierID: "{{ .peer_zhixu_uid }}" }
 ```
 
-Here `LINK_READY` is the backend/executor external-input contract used to open the local docking workflow; it does not produce `HookReady` by itself. If the stage must wait for a canonical signal from another Order, use an empty-header wrapper: `::OUTSIDE@(source::task.stage.signal)` (external spawn), `::MERGE@(source::a.cmp, source::b.cmp)` (multi-source convergence), or `::ANCHOR@(task.stage.signal)` (anchored reflux). `signalMap` explains linked-order output and does not emit `HookReady` on its own.
+For the full `zhixuExecutorConfig` syntax see [Zhixu as Executor](../apps/zhixu-as-executor.md). To await another order's canonical signal, use empty-header wrappers instead: `::OUTSIDE@(source::task.stage.signal)` (fork an external order), `::MERGE@(source::a.cmp, source::b.cmp)` (multi-source convergence), or `::ANCHOR@(task.stage.signal)` (anchored convergence backflow). Of the three, only `::OUTSIDE@` can create orders on the on-chain track (`UVPStateMachine.triggerOrderFromOutsideFor`); `::MERGE@`/`::ANCHOR@` are cloud-runtime only and rejected at on-chain compile time. `signalMap` interprets linked-order output and does not emit `HookReady` by itself.
 
 ```text
 local stage trigger Ready
-  -> Store/Product start docking workflow
+  -> Store/Product starts the docking workflow
   -> linked order executes
-  -> linked order proof is validated
-  -> submitDockedSignal or authorized submitter submits mapped signal to local order
+  -> linked order proof validated
+  -> submitDockedSignal or authorized submitter submits mapped signal into the local order
 ```
 
-Every cross-Zhixu advancement must still return to on-chain signal, proof, and replayable events.
+Every cross-order advancement returns to on-chain signals, proof, and replayable events.
 
-## Boundary Checks
+## Boundary Checklist
 
-- Trigger is a hook mark compiled into HookPlan and the contract. Manual UI buttons call product actions that eventually submit signals or patches.
-- On-chain `orderId` comes from a trigger-order entrypoint.
-- Trigger becoming ready usually means execution has started or a task can be claimed; business completion is decided by later signal/proof.
-- `signalMap` hooks do not currently emit `HookReady`; they are used for docked Zhixu output mapping.
+- Trigger is a hook marker compiled into the HookPlan and contracts, not a manual UI button.
+- On-chain orderId comes from trigger order entries.
+- Trigger Ready usually means a task is claimable or handleable; business completion follows later signal/proof.
+- `signalMap` hooks currently do not fire `HookReady`; they map docked Zhixu outputs.

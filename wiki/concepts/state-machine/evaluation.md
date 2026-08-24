@@ -1,3 +1,10 @@
+---
+title: Hook 求值
+type: explanation
+audience: 工程贡献者
+status: verified
+---
+
 # Hook 求值
 
 链上 hook 求值使用 stack machine。编译器把 Hook DSL AST 编译成 `Instruction[]`，合约按顺序执行指令，最后得到一个 `EvalValue`。
@@ -80,6 +87,10 @@ struct EvalValue {
 `AND` 要求所有输入都满足。如果某些输入还在等待，则整体等待；如果任一输入取消，则整体取消。
 
 `OR` 任一分支满足即可满足。编译器要求每个 OR 分支有正向锚点，避免纯缺席条件让状态机没有可追踪的等待点。
+
+## 提交与去重
+
+`submitSignal()` 按 `(orderId, sourceId, signalId)` 去重：同一 `signalKey` 只有第一次提交会写入 `SignalRecord`（first-writer-wins）。提交时合约检查 submitter 是否持有显式订单级授权，或是否是当前 active executor overlay 委任的钱包；两者都不满足时提交被拒绝。授权模型详见 [Signal 授权](../trust/signal-authorization.md)。
 
 ## 合约是权威实现
 

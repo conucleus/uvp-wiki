@@ -1,3 +1,10 @@
+---
+title: Executor Patch
+type: explanation
+audience: 工程贡献者
+status: verified
+---
+
 # Executor Patch
 
 Executor patch 是 Stage Overlay 的一类运行时变更。它只影响某个 Order 的目标 stage executor，不修改 Plan，也不修改 Supplier Directory。
@@ -30,7 +37,7 @@ Executor patch 至少受这些条件约束：
 - patch 激活后，合约把这些 Plan 预声明的 `(sourceId, signalId)` 权限自动委任给新 executor；executor 不需要在 Order 创建时已经位于候选钱包授权表中。
 - 后续 replacement 或 handoff 会把尚未首次写入的同一能力范围切换给新 executor；已经写入的 Signal 不会被重写。
 
-这是一种受 Plan 限定的自动委任，而不是给 executor 任意写 Signal 的通配权限。选择者能改变“谁执行”，但不能扩大 Zhixu 已声明的“这个 stage 能发什么”。
+这是一种受 Plan 限定的自动委任，而不是给 executor 任意写 Signal 的通配权限。选择者能改变“谁执行”，但不能扩大 Zhixu 已声明的“这个 stage 能发什么”。selector binding 是 Plan 发布时冻结的公共接口约束，patch 只能消费它而不能绕过或改写；公共接口边界见 [合约与事件](../../reference/contracts-and-events.md)。
 
 ## 代码入口
 

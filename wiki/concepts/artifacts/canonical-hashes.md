@@ -1,32 +1,35 @@
+---
+title: Canonical Hash
+type: reference
+audience: 工程贡献者
+status: verified
+---
+
 # Canonical Hash
 
 `uvp-eth` 使用带 domain 的 canonical hash。这样同样的 JSON 内容在不同用途下不会撞到同一个语义空间。
 
 ## PlanId
 
-`planId` 标识一个编译计划版本：
+`planId` 把某个 publisher 与某份链上产物绑定为一个计划版本：
 
 ```text
-hashCanonical("uvp:hook-plan-id:v1", {
-  compiler,
-  platform,
-  version,
-  zhixuId,
-  zhixuName
-})
+planId = keccak256(abi.encode(
+  keccak256("uvp.plan.id.v1"), // domain
+  publisher,                   // address
+  planHash                     // 来自 OnchainHookPlanArtifact 的 EVM-facing planHash
+))
 ```
 
-改变平台、版本或 Zhixu 标识都会改变 `planId`。
+实现见 `uvp-protocol/packages/compiler/src/onchain-hook-plan.ts` 的 `planIdForPublisher()` 和 `UVPStateMachine.sol` 的 `planIdFor()`。改变 publisher 或 planHash 都会改变 `planId`；同一个 publisher 对同一份产物的 `planId` 是确定的。
 
 ## HookPlan planHash
-
-可读 HookPlan 的 artifact hash 使用：
 
 ```text
 hashCanonical("uvp:hook-plan-artifact:v1", payload)
 ```
 
-payload 包含 canonicalized source Zhixu、编译器信息、平台信息、hook、依赖和 route。
+这是历史对外产物的 domain。现 HookPlan 仅作编译器内部 IR，不再是 Store/import/deploy 的公开流程，见 [编译输入](compiler-input.md)。payload 曾包含 canonicalized source Zhixu、编译器信息、平台信息、hook、依赖和 route。
 
 ## 链上 planHash
 

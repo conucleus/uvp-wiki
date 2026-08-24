@@ -1,6 +1,26 @@
+---
+title: File Resources
+type: explanation
+audience: 协议读者
+preread: README.md
+status: verified
+---
+
 # File Resources
 
 `fileResources` 是阶段资源句柄。它描述一个 stage 需要引用哪些链下对象、协议文件、证据模板、验收标准或资源 manifest。链上事实来自授权 signal、hash、metadata URI 和事件；文件明文留在链下。
+
+## 谁使用
+
+凝结核在 stage 上声明 fileResources；Store/Product API 用它展示协议与证据要求；Order App 和 executor-kit 把它翻译成上传与校验流程；operator 在 resource patch 时使用同样的句柄模型。
+
+## 产生什么结果
+
+静态声明进入 Plan 的资源说明；运行时替换或补充通过 resource overlay（`StageResourcePatchApplied`）表达，产生 manifest hash、visibility 和加密对象引用等可验证句柄。
+
+## 权威来自哪里
+
+资源是否满足要求最终由授权 signal 和 proof 决定，不由文件本身决定；链上只保存 hash、URI 或 patch 事件，明文永远留在链下。
 
 当前 compiler 类型把它定义成宽松句柄：
 
@@ -53,7 +73,7 @@ fileResources:
 
 静态 `fileResources` 来自秩序 stage，是 Plan 编译时的默认资源说明。运行中如果某个订单、某个 stage 需要替换或补充资源，应使用 resource overlay，Plan 仍保持静态版本。
 
-PRD87 里的目标模型是：
+PRD87（docs/product/prd-87-native-resource-manifest-and-access.md）里的目标模型是：
 
 ```text
 StageResourcePatch
@@ -78,8 +98,9 @@ Order App 和 executor-kit 把它翻译成“需要上传什么证据、hash 是
 
 ## 不允许的用法
 
+贡献者安全规范见 ../../meta/documentation-rules.md。
+
 - 合同、发票、物流文件、照片或报告明文上链。
 - `fileResources` 表示资源要求，业务完成看 signal/proof。
 - 对象存储可访问性是辅助条件，链上 proof 看事件和 hash。
 - resource patch 和 executor patch 是两个授权动作。
-- 不在 wiki、fixtures 或日志里写真实 storage credential。

@@ -1,3 +1,10 @@
+---
+title: 核心术语表
+type: reference
+audience: 全部读者
+status: verified
+---
+
 # 核心术语表
 
 本页先用普通语言解释项目术语，再给出代码和链上名字。`Zhixu` 是“秩序”的拼音；代码、ABI、DTO、事件和类型名保留英文。
@@ -8,7 +15,7 @@
 | --- | --- | --- |
 | UVP / 通用价值协议 | Universal Value Protocol，一套协作协议和产品语言，用来记录被授权的业务信号，以及这些信号带来的状态后果。 | `uvp-eth` 是 EVM/Web3 实现轨道。 |
 | 秩序 / Zhixu | 描述“一类订单应该怎么运行”的可复用协作规则书。 | `ZhixuDefinition`、`kind: "Zhixu"`、compiler input。 |
-| Plan / 秩序版本 | 某个 Zhixu 编译后的确定性链上版本。 | `OnchainHookPlanArtifact`、`registerPlan()`、`PlanRegistered`。 |
+| Plan / 秩序版本 | 某个 Zhixu 编译后的确定性链上版本。 | `OnchainHookPlanArtifact`、`commitPlan()` + `finalizePlan()` 两步注册定稿、`PlanRegistered`。 |
 | Order / 订单 | 某个 Plan 的一次具体运行。 | `UVPStateMachine.Order`、`triggerOrderFromOutsideFor()` / `triggerOrderFromSignalFor()`、`OrderRegistered`、`OrderTriggered`。 |
 | 凝结核 / Nucleus | 发起、设计并维护某类 Zhixu 的组织核心。它让一类协作规则成形、获得边界并持续维护；可以是团队、组织、项目 owner 或 workflow owner。 | `spec.nucleation.id`、Store 凝结核工作台。 |
 | nucleation / 成核上下文 | 成核过程、上下文或字段名，不是主体名。现有 DSL/API 保留这个拼写以避免 public interface 漂移。 | `spec.nucleation.id`、`nucleationId`。 |
@@ -30,8 +37,8 @@
 | --- | --- | --- |
 | Identity Binding / 身份绑定 | Store Registry 对现实主体与钱包对应关系作出的可撤销登记，不包含 Plan 或能力材料审核。 | `IdentityBindingRegistered`、`IdentityBindingRevoked`。 |
 | Authorization / 授权 | 某个钱包可以为某个 Order 提交特定 source/signal，或执行受控 stage patch。 | `SignalSubmitterAuthorized`、stage patch authorization。 |
-| Publisher | 被允许注册 Plan 的注册账户或机制。 | plan publisher allowlist、`registerPlan()`。 |
-| Registrar | 被允许广播 trigger-order 创建并写入初始 signal authorization 的注册账户或机制；业务动作仍由 submitter 签名。 | order registrar allowlist、`triggerOrderFromOutsideFor()` / `triggerOrderFromSignalFor()`。 |
+| Publisher | 被允许注册 Plan 的注册账户或机制。 | plan publisher allowlist、`commitPlan()` 提交 + `finalizePlan()` 定稿（仅 finalized Plan 可创建 Order）。 |
+| Registrar | 创建 trigger order 的账户或机制：订单创建者签名 trigger typed data 创建 Order（现行合约没有 registrar allowlist）。 | `triggerOrderFromOutsideFor()` / `triggerOrderFromSignalFor()`。 <!-- TODO(confirm): Registrar 词条已按现行合约改写，请人工复核对外沟通口径 --> |
 | Registry Boundary | 一个 `UVPIdentityRegistry` 地址就是一个身份解析域。首期由 Store 运营一个，未来可配置多个独立合规主体。StateMachine 不读取它。 | `registryAddress`、`bindingId`、`UVPIdentityRegistry.owner()`。 |
 | HookReady | trigger hook ready 后发出的事件，表示 Product task 可以打开。 | `HookReady(orderId, hookId, stageId, hookName)`。 |
 | Stage Overlay | Order 运行时对 executor 或 resource 的订单级覆盖，不改变 Plan。 | executor/resource patch events。 |

@@ -65,6 +65,11 @@ function ensureDir(filePath) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
 }
 
+function stripFrontMatter(markdown) {
+  const match = markdown.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/);
+  return match ? markdown.slice(match[0].length) : markdown;
+}
+
 function escapeHtml(value) {
   return value
     .replaceAll("&", "&amp;")
@@ -634,7 +639,7 @@ function build() {
   for (const file of markdownFiles) {
     const rel = path.relative(wikiRoot, file);
     const language = languageForSourceRel(rel);
-    const markdown = fs.readFileSync(file, "utf8");
+    const markdown = stripFrontMatter(fs.readFileSync(file, "utf8"));
     const outputRel = outputRelForMarkdown(rel);
     const rootRel = currentRootRel(outputRel);
     const body = markdownToHtml(markdown);

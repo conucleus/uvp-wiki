@@ -1,3 +1,10 @@
+---
+title: Canonical Hash
+type: reference
+audience: 工程贡献者
+status: verified
+---
+
 # Canonical Hash
 
 `uvp-eth` uses canonical hashes with a domain. That keeps the same JSON content from colliding across different semantic spaces.

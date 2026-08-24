@@ -1,6 +1,13 @@
+---
+title: 链上注册参数
+type: reference
+audience: 工程贡献者
+status: verified
+---
+
 # 链上注册参数
 
-`OnchainHookPlanArtifact` 还不是最终交易参数。编译器会把它进一步转换为 `UVPStateMachine.registerPlan()` 需要的紧凑结构。
+`OnchainHookPlanArtifact` 还不是最终交易参数。编译器把它压缩成紧凑结构后，CompactHook 等参数构成 `commitPlan()` 的提交载荷，metadata 在 `finalizePlan()` 中一次冻结；旧的单步入口 `registerPlan` 在 v0.8 已不存在。
 
 ## CompactHook
 
@@ -56,3 +63,6 @@ pnpm verify:protocol-freeze
 ```
 
 ABI、bytecode、selector、event topic、typed-data 字段、canonical hash 或 artifact schema 的变化都应进入发布说明和迁移判断。
+
+<!-- TODO(confirm): CompactHook struct 字段与 fixtures/uvp-state-machine.v0.8.json 逐字段比对 -->
+

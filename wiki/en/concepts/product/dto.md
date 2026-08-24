@@ -1,29 +1,37 @@
+---
+title: Product DTO
+type: reference
+audience: 产品与前端工程师
+preread: README.md
+status: verified
+---
+
 # Product DTO
 
-Product DTOs are stable contracts for ordinary users and product frontends. They translate protocol fields into orders, tasks, proofs, participants, and trust state.
+Product DTOs are stable contracts for ordinary users and product frontends. They translate protocol fields into orders, tasks, proof, participants, and trust status.
 
 ## ProductOrderDTO
 
-`productOrderFromStateMachine()` maps `StateMachineOrderProjection` to `ProductOrderDTO`. Typical content includes:
+`productOrderFromStateMachine()` maps `StateMachineOrderProjection` to `ProductOrderDTO`. Typical content:
 
 | Field | Source |
 | --- | --- |
 | order identity | `orderId`, chain, contract, deployment. |
-| plan proof | `planId`, `planHash`, and the plan registration event. |
-| status | Mapped from projection status. |
+| plan proof | `planId`, `planHash`, plan registration event. |
+| status | Mapped from the projection status. |
 | tasks | Mapped from `StateMachineTaskProjection`. |
 | timeline | Generated from chain events and projection effects. |
 | proof | Generated from event provenance. |
 | trust | Merged from the identity projection. |
 
-The funding fields are intentionally expressed as not yet integrated:
+Funding fields are intentionally expressed as not yet integrated:
 
 ```text
 totalAmount.display = "funding custody not integrated"
 fundingStatus = "funding custody is not integrated into this interface"
 ```
 
-This means the core UVP protocol is not a payment provider. USDC, escrow, or guarantee should be integrated by a periphery adapter.
+This means the core UVP protocol is not a payment provider. USDC, escrow, or guarantees should be integrated by a periphery adapter.
 
 ## ProductTaskDTO
 
@@ -32,24 +40,24 @@ This means the core UVP protocol is not a payment provider. USDC, escrow, or gua
 | Field | Meaning |
 | --- | --- |
 | assignee wallet | The wallet currently expected to handle the task. |
-| supplier identity | supplier identity information and proof. |
+| supplier identity | Supplier trust information and proof. |
 | capability / add-on | Execution capability or extension action. |
-| resource requirements | Resource requirements, manifest, and policy. |
+| resource requirements | Resource requirements, manifest, policy. |
 | canSubmit | Whether the current user appears able to submit. |
 | proofSummary | Summary proof. |
-| proofRows | Concrete chain-event proof rows. |
+| proofRows | Concrete chain-event proof. |
 
-`canSubmit` is only a product-side helper; it is not final authority. The contract still checks explicit Signal authorization or Plan-bounded executor delegation.
+`canSubmit` is a product-side helper judgment, not final authorization. Contracts still check explicit Signal authorization or Plan-bounded dynamic executor appointment.
 
-## Status Mapping
+## Status mapping
 
-Order does not carry a business lifecycle status:
+Orders do not carry a business lifecycle status:
 
 | Projection status | Product status | Meaning |
 | --- | --- | --- |
-| `registered` | `registered` | The `orderId` is registered; progress is read separately from Signals, Hooks, and Tasks. |
+| `registered` | `registered` | The `orderId` is registered; later progress is read separately from Signals, Hooks, and Tasks. |
 
-Task status can be mapped as:
+Task statuses map as:
 
 | Projection status | Product status |
 | --- | --- |
@@ -57,3 +65,5 @@ Task status can be mapped as:
 | `submitted` | `submitted` |
 | `cancelled` | `blocked` |
 | unknown | `blocked` |
+
+DTO field and status mapping is authoritative in the `@uvp-eth/product-dto` package type definitions.

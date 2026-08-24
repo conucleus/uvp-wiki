@@ -1,3 +1,12 @@
+---
+title: Original Character Figure Zhixu Example
+type: tutorial
+audience: 协议读者
+status: archived
+---
+
+<!-- Legacy figure-based walkthrough kept from earlier docs; superseded by one-order-story.md. Not part of SUMMARY navigation. -->
+
 # Original Character Figure Zhixu Example
 
 This example uses an original-character physicalization workflow to show a lightweight but real multi-party production relationship. The full compilable YAML lives at:

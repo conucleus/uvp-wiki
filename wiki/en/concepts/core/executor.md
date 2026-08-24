@@ -1,35 +1,55 @@
+---
+title: Executor
+type: explanation
+audience: 协议读者
+preread: README.md
+status: verified
+---
+
 # Executor
 
-Executor is the actual subject that takes on a stage, produces business actions, or submits signals at runtime for an Order. It can be a person, an enterprise system, a wallet sent out by a Supplier, an adapter, an AI/MCP agent, or a standalone Zhixu.
+An Executor is whoever actually carries a stage at order runtime, produces business actions, or submits signals. It can be a person, an enterprise system, a supplier-deployed wallet, an adapter, an AI/MCP agent — or an independent Zhixu order.
 
-Executor must be separated from Supplier:
+Keep Executor separate from Supplier:
 
 | Object | Problem it solves | Typical authority |
 | --- | --- | --- |
-| Supplier | A real-world subject and its Store-maintained off-chain capability profile. | Store metadata + optional `UVPIdentityRegistry` identity binding. |
-| Executor | Who is actually executing or submitting the signal for the current Order and current stage. | `UVPStateMachine` order authorization, stage executor overlay, EIP-712 signature. |
+| Supplier | The real-world subject in the Store catalog and its off-chain capability profile. | Store metadata + optional `UVPIdentityRegistry` identity binding. |
+| Executor | Who actually executes or submits signals for the current order and stage. | `UVPStateMachine` order authorization, stage executor overlay, EIP-712 signatures. |
 
-Supplier is the capability subject and trust subject; Executor is the runtime binding and signal submitter. One Supplier can send out multiple executor wallets, and one Executor can also represent a Supplier, an adapter, or a Zhixu that runs independently.
+Supplier is the capability subject and trust subject; Executor is the runtime binding and signal submitter. One Supplier can deploy many executor wallets; one Executor may represent a supplier, an adapter, or an independently runnable Zhixu.
 
-## How an Executor Is Chosen
+## Who Uses It
 
-The usual path for an Executor to take effect is:
+Nuclei declare static executors and `selectedStages` on stages; control stages choose active executors at runtime through executor patches; Product/Store/executor-kit route tasks by active executor, present fulfillment instructions, and organize signed submissions.
+
+## What It Produces
+
+Order registration writes order-level signal authorization; executor patches at runtime produce `StageExecutorPatchApplied` and `StageExecutorActivated`, delegating Plan-predeclared signal capability to the current wallet; active-executor submissions become on-chain signals/proof.
+
+## Where Authority Comes From
+
+Who may submit a signal is decided by `UVPStateMachine` order authorization, the stage executor overlay, and EIP-712 signatures; supplier capability profiles are only Store's off-chain judgment (see [Supplier](supplier.md)) and confer no submission right.
+
+## How an Executor Gets Selected
+
+The effective path of an Executor usually is:
 
 ```text
-Supplier registers in the Store
-  -> Store maintains capability tags, contacts, fulfillment records, and identity projection
-  -> Registry operator registers or revokes the supplier subject/account binding
-  -> Zhixu stage declares the required executor or Supplier type
+Supplier registers in the Zhixu Store
+  -> Store maintains capability tags, contacts, fulfillment records, identity projection
+  -> Registry operator registers or revokes supplier subject/account binding
+  -> Zhixu stage declares what kind of executor or supplier it needs
   -> Order registration writes order-level signal authorization
-  -> Control stage may specify an active executor through executor patch
-  -> only the active executor can submit the business signal for the target stage
+  -> Control stage may designate the active executor via executor patch
+  -> Only the active executor can submit the target stage's business signal
 ```
 
-Store provides candidate networks, contactability, and proof materials for the Nucleus and operators; on-chain stage binding, order-level authorization, active executor overlays, and EIP-712 signatures determine whether a given Order can accept the signals submitted by that subject.
+Store gives nuclei and operators a candidate network, contact capability, and proof material; on-chain stage bindings, order-level authorization, the active executor overlay, and EIP-712 signatures decide whether an order accepts its submitted signal.
 
 ## Static Executor
 
-The `executor` field in the Zhixu DSL is the static default configuration in the Plan. It expresses “which kind of subject is expected to take over this stage.” The wallet that can submit for the current Order is still determined by order authorization and the active executor overlay.
+The DSL `executor` field is the static default configuration in the plan. It expresses "which class of subject this stage expects to carry it". Which wallet holds submission rights in the current order is decided by order authorization and the active executor overlay.
 
 ```yaml
 executor:
@@ -37,11 +57,11 @@ executor:
   supplierID: "{{ .customs_broker_uid }}"
 ```
 
-The static executor enters the compiler artifact’s executor route, helping Product API, Store, Order App, and executor-kit know who should be contacted for that stage, what fulfillment notes should be shown, and what resources or evidence are required. Whether a signal is actually submittable still depends on order registration authorization and runtime overlays.
+The static executor enters the compiled artifact's executor routes so Product API, Store, Order App, and executor-kit know who to approach for that stage, which fulfillment instructions to show, and which resources or evidence are needed. Whether a signal is submittable still depends on order registration authorization and runtime overlays.
 
 ## Dynamic Active Executor
 
-For some stages, the executor is selected during Order runtime by a control stage with `stage_executor_patch` capability. The control stage must be authorized to select the target stage in `selectedStages`.
+Some stages have their executor chosen during the run by a control stage carrying the `stage_executor_patch` capability. The control stage must be authorized via `selectedStages` to choose the target stage.
 
 ```yaml
 selectedStages:
@@ -50,86 +70,32 @@ sendSignals:
   - select_executor
 ```
 
-Runtime events may look like this:
+At runtime events like these appear:
 
 ```text
 StageExecutorPatchApplied(orderId, selectorStageId, targetStageId, selector, executor, ...)
 StageExecutorActivated(orderId, targetStageId, executor, ...)
 ```
 
-The active executor overlay affects only this Order and does not modify the Plan. A patch automatically delegates the target stage’s current-order signal capabilities compiled from Plan `sendSignals` to the active executor, so a wallet that appears only at runtime may be selected. It may submit only Plan-declared signals; changing executor affects unwritten Signals and never rewrites existing facts.
+The active executor overlay affects only this Order and never modifies the Plan. The patch automatically delegates the current-order signal capability compiled from the target stage's `sendSignals` to the active executor, so wallets appearing only at runtime can be chosen; they can only submit Plan-predeclared signals and cannot expand capability scope via patches. Changing executor affects only signals not yet first-written; existing facts stay unchanged.
 
-## Zhixu Can Also Be an Executor
+## A Zhixu Can Also Be an Executor
 
-A Zhixu can serve as the executor of another Zhixu. It receives the local Zhixu’s exposed execution interface, runs according to its own plan, authorization, and proof path, and then maps the agreed signals back to the local Zhixu through `signalMap`.
+One Zhixu can act as another Zhixu's stage executor: it receives the execution interface opened by the local order, runs by its own plan, authorization, and proof path, then maps agreed signals back into the local order via `signalMap`. A typical example: in cross-border supply the settlement stage chooses `payment-settlement`, whose internals may choose `fiat-payout-bridge` as executor. For the full model, DSL syntax, and constraints see [Zhixu as Executor](../apps/zhixu-as-executor.md).
 
-A typical example is cross-border supply:
+## Runtime Path of Docked Zhixu
 
-- The local procurement Zhixu is responsible for demand confirmation, sourcing, payment path, logistics, and acceptance.
-- The settlement stage can choose the `payment-settlement` Zhixu as the executor.
-- The internal `fiat_bridge` stage of `payment-settlement` can in turn choose the `fiat-payout-bridge` Zhixu as the executor.
+The skeleton of docked execution: after the local trigger becomes Ready the docking workflow starts, the linked order executes independently and produces str/cmp/err proof, and after validation `linkDockedOrder`/`submitDockedSignal` or an authorized submitter maps it back into local signals. On-chain orderId can coexist with Product/Store/adapter workflow numbers, while runtime proof returns to on-chain events; see [Zhixu as Executor](../apps/zhixu-as-executor.md) for the detailed path.
 
-The local stage is written like this:
+## Protocol Meaning of signalMap
 
-```yaml
-executor:
-  supplierType: zhixu
-  supplierID: "{{ .fiat_payout_bridge_zhixu_uid }}"
-  zhixuExecutorConfig:
-    signalMap:
-      str: fiat_bridge::payout.start.str
-      cmp: fiat_bridge::payout.close.cmp
-      err: fiat_bridge::payout.close.err
-```
-
-This means:
-
-1. The local Plan declares that the stage executor type is `zhixu`.
-2. `supplierID` points to a peer Zhixu or supplier subject that Store or the Identity Registry can recognize.
-3. `signalMap` declares how the local stage waits for or interprets linked Zhixu output signals.
-4. The compiler generates `kind=signalMap` hooks for `signalMap`; `str` and `cmp` must exist, and a single signalMap must reference the same source.
-5. Creation, notification, proof validation, and local signal mapping for the linked Zhixu are organized by Store/Product/adapter/executor-kit workflows.
-6. Runtime docking can land in `linkDockedOrder`, `DockedOrderLinked`, `DockedSignalMapped`, `submitDockedSignal`, and `DockedSignalSubmitted`.
-7. The local Order and linked Order each use their own `UVPStateMachine` events as the source of truth.
-
-The engineering model of a docked Zhixu is: the linked Zhixu runs independently, Store/Product or an adapter observes the linked proof, and then the local Order is advanced through an on-chain docking link and an authorized signal mapping. That bridging action leaves signal proof on the local Order.
-
-## Runtime Path for a Docked Zhixu
-
-```text
-some trigger hook in the local Order becomes Ready
-  -> Product/Store create the local stage task
-  -> Store selects or confirms the peer Zhixu version
-  -> Product/adapter registers or locates the linked Order
-  -> the linked Order executes according to its own Plan, authorization, and executor
-  -> the linked Order produces str/cmp/err proof
-  -> adapter or Product workflow validates the proof and signalMap
-  -> linkDockedOrder / submitDockedSignal or authorized submitter maps the local signal
-  -> the local Order reaches Hook Ready / Cancelled / next stage
-```
-
-Two numbering systems may appear here:
-
-- On chain, the local `orderId` and linked `orderId` are created by their respective trigger-order entrypoints.
-- Product task IDs, Store docking sessions, and adapter jobs may have their own execution numbers; runtime proof still returns to on-chain order/signal/docking events.
-
-## Protocol Meaning of `signalMap`
-
-`signalMap` is the semantic contract for how a local stage accepts output from a linked Zhixu.
-
-| Field | Meaning |
-| --- | --- |
-| `str` | The signal that the linked Zhixu has started or received the delegation. The current compiler requires it. |
-| `cmp` | The signal that the linked Zhixu has completed. The current compiler requires it. |
-| `err` | The signal that the linked Zhixu failed, rejected, or raised an exception. Optional, but most real workflows should configure it. |
-
-The compiler validates that `signalMap` expressions can be parsed by hook-core and that the referenced local stages/signals exist.
+`signalMap` is the semantic contract by which a local stage accepts a linked Zhixu's output: `str` and `cmp` are compiler-required, `err` is optional but recommended, and one signalMap must reference a single source. For the field-level semantics table and compiler validation rules see [Zhixu as Executor](../apps/zhixu-as-executor.md).
 
 ## Where Executor Kit Fits
 
-`uvp-executor-kit` is the integration toolkit for Executors, as described in [Executor Kit](../../execution/executor-kit.md). It has two equally important entry points:
+`uvp-executor-kit` is the integration toolbox for Executors; see [Executor Kit](../apps/executor-kit.md). It has two equally important entries:
 
-- Chain-native: listen for `HookReady`, route by handler, and submit authorized signals.
-- Product API: read the task/signal container, prepare evidence, sign, submit, and read proof.
+- Chain-native: listen for `HookReady`, route by handler, submit authorized signals.
+- Product API: read task/signal containers, prepare evidence, sign, submit, and read proof.
 
-Executor Kit can help an executor observe tasks, generate payload hashes, sign, submit, and diagnose blocked reasons.
+Executor Kit helps executors observe tasks, generate payload hashes, sign, submit, and diagnose blocked reasons.

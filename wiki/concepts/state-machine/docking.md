@@ -1,3 +1,10 @@
+---
+title: Docked Zhixu Runtime
+type: explanation
+audience: 工程贡献者
+status: verified
+---
+
 # Docked Zhixu Runtime
 
 Docked Zhixu 是状态机运行时里的 order-to-order 对接能力。它允许一条 local order 把某个 stage 交给另一条 linked Zhixu / linked order 执行，再把 linked order 中已经发生的 signal 映射回 local order。
@@ -47,4 +54,4 @@ local stage HookReady
 - `signalMap` 描述可映射接口，不等于自动完成业务。
 - `submitDockedSignal` 映射的是 linked order 已存在的 signal，不替 linked order 生成业务事实。
 
-更完整的执行者视角见 [Docked Zhixu / Zhixu 作为 Executor](../../execution/zhixu-as-executor.md)。
+`DockedOrderLinked` / `DockedSignalMapped` / `DockedSignalSubmitted` 记录对接关系与 mapped signal proof，是 docking 的稳定事件面。执行者视角的 canonical 叙事见 [Docked Zhixu / Zhixu 作为 Executor](../apps/zhixu-as-executor.md)。

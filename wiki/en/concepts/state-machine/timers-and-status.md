@@ -1,3 +1,10 @@
+---
+title: Timers and Status
+type: explanation
+audience: 协议读者
+status: verified
+---
+
 # Timers and Status
 
 Hook runtime is stored inside the order. Each order has its own status for each hook in the plan.
@@ -29,7 +36,7 @@ After the contract evaluates a hook, if its status changes, it emits:
 HookStatusChanged(orderId, hookId, previousStatus, nextStatus, dueAt)
 ```
 
-If a hook becomes `Ready` and `trigger=true`, the contract also emits:
+If a hook becomes `Ready` and `trigger=true`, the contract also emits once:
 
 ```text
 HookReady(orderId, hookId, stageId, hookName)
@@ -56,4 +63,6 @@ After the check passes, the contract emits `TimerPoked` and reevaluates the hook
 
 ## How Product Surfaces Should Show It
 
-Product DTOs can display `Wait + dueAt` as “waiting until a certain time, then automatically or manually rechecking”. But actual progression still requires an on-chain transaction. The frontend must not mark the task as ready just because local time has passed; it must wait for `HookReady` or a new `HookStatusChanged`.
+Product DTOs can display `Wait + dueAt` as "waiting until a certain time, then automatically or manually rechecking". But actual progression still requires an on-chain transaction. The frontend must not mark the task as ready just because local time has passed; it must wait for `HookReady` or a new `HookStatusChanged`.
+
+Who may submit the signal that drives evaluation is decided by order-level authorization; see [Signal Authorization](../trust/signal-authorization.md).

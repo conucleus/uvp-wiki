@@ -1,3 +1,10 @@
+---
+title: 编译输入
+type: reference
+audience: 工程贡献者
+status: verified
+---
+
 # 编译输入
 
 编译输入是 `ZhixuDefinition`。编译器不会只做字符串搬运，它会先验证定义是否能生成确定性的协议产物。
@@ -37,3 +44,5 @@
 ## Source Zhixu 也参与哈希
 
 `OnchainHookPlanArtifact` 的 `planHash` 包含 canonicalized source Zhixu。也就是说，影响协议语义的源定义变化会改变计划哈希。编译产物不是手写 JSON，应由脚本从源定义可重复生成。
+
+字段清单以 `uvp-protocol/packages/compiler/src/types` 为准。

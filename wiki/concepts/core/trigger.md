@@ -1,3 +1,11 @@
+---
+title: Trigger
+type: explanation
+audience: 协议读者
+preread: README.md
+status: verified
+---
+
 # Trigger
 
 Trigger 把一个 ready condition 变成可执行任务。它是一种特殊 hook 标记：某个 receive hook Ready 后，这个 stage 的任务可以打开，链上应发出 `HookReady`，Product/Store/executor-kit 才能把它投影成任务、通知或 adapter job。
@@ -20,6 +28,18 @@ receiveSignals:
 ```text
 HookReady(orderId, hookId, stageId, hookName)
 ```
+
+## 谁使用
+
+凝结核在 stage 上声明 trigger；编译器把它们绑定到 hook 并写入 Plan；Product task 创建、Store 通知 intent 和 executor-kit chain watcher 都跟随 `HookReady` 工作。
+
+## 产生什么结果
+
+一个 receive trigger 在合约里第一次 Ready 时发出一次 `HookReady`（`readyEmitted` 保证一次性），由此产生可领取的任务编号和工作流入口；external trigger 只打开 backend/executor 的直接输入契约，不上链发事件。
+
+## 权威来自哪里
+
+trigger 绑定关系来自编译产物和链上 `StoredHook.isTrigger`；`orderId` 来自 trigger order 入口；任务是否真的完成仍由后续 signal/proof 事件决定。
 
 ## 为什么必须指定 Trigger
 
@@ -54,26 +74,17 @@ stage.receiveSignals.START
 
 ## 和 docked Zhixu 的关系
 
-当 local order 某个 stage 由另一个秩序执行时，local stage 的 Trigger 表示“现在可以把这个 stage 交给 peer 秩序或 adapter 执行”。后续 linked 秩序的 `str`、`cmp`、`err` 通过 `signalMap` 和授权 submitter 或 docking events 映射回 local order。
+当 local order 某个 stage 由另一个秩序执行时，local stage 的 Trigger 表示“现在可以把这个 stage 交给 peer 秩序或 adapter 执行”。后续 linked 秩序的 `str`、`cmp`、`err` 通过 `signalMap` 和授权 submitter 或 docking events 映射回 local order；docking 事件语义见 [Docked Zhixu Runtime](../state-machine/docking.md)。
 
-如果 Product、registrar 或 operator workflow 从订单外部打开这个对接阶段，直接入口应声明为 `externalSignals`：
+如果 Product、registrar 或 operator workflow 从订单外部打开这个对接阶段，直接入口应声明为 `externalSignals`。这里的 `LINK_READY` 是 backend/executor 的外部输入契约，用来打开本地 stage 的 docking workflow；它本身不会生成 `HookReady`：
 
 ```yaml
-trigger:
-  - LINK_READY
-externalSignals:
-  - LINK_READY
-executor:
-  supplierType: zhixu
-  supplierID: "{{ .peer_zhixu_uid }}"
-  zhixuExecutorConfig:
-    signalMap:
-      str: peer::task.start.str
-      cmp: peer::task.close.cmp
-      err: peer::task.close.err
+trigger: [LINK_READY]
+externalSignals: [LINK_READY]
+executor: { supplierType: zhixu, supplierID: "{{ .peer_zhixu_uid }}" }
 ```
 
-这里的 `LINK_READY` 是 backend/executor 的外部输入契约，用来打开本地 stage 的 docking workflow；它本身不会生成 `HookReady`。如果需要等待另一个订单的 canonical signal，应改用空标头 wrapper：`::OUTSIDE@(source::task.stage.signal)`（分叉外部订单）、`::MERGE@(source::a.cmp, source::b.cmp)`（多源汇聚）或 `::ANCHOR@(task.stage.signal)`（锚定汇合回流）。`signalMap` 负责解释 linked order 输出，不会自己发出 `HookReady`。
+完整 `zhixuExecutorConfig` 写法见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md)。如果需要等待另一个订单的 canonical signal，应改用空标头 wrapper：`::OUTSIDE@(source::task.stage.signal)`（分叉外部订单）、`::MERGE@(source::a.cmp, source::b.cmp)`（多源汇聚）或 `::ANCHOR@(task.stage.signal)`（锚定汇合回流）。三者中仅 `::OUTSIDE@` 可用于链上轨道生单（`UVPStateMachine.triggerOrderFromOutsideFor`）；`::MERGE@`/`::ANCHOR@` 仅 cloud runtime 支持，链上编译期拒绝。`signalMap` 负责解释 linked order 输出，不会自己发出 `HookReady`。
 
 ```text
 local stage trigger Ready

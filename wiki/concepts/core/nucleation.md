@@ -1,8 +1,26 @@
+---
+title: Nucleus / 凝结核
+type: explanation
+audience: 协议读者
+preread: README.md
+status: verified
+---
+
 # Nucleus / 凝结核
 
 凝结核 (Nucleus) 是秩序 (Zhixu) 的发起、设计和维护核心，是让一类协作规则开始成形、获得边界、持续维护的组织原点；具体订单阶段由参与方执行。先把它理解成可复用运营模型的 originating organizer：采购运营团队、行业项目组织者、平台侧 workflow 设计者，或其他能长期维护这份规则书的组织。
 
 `Nucleus` 是主体名；`nucleation` 是成核过程、成核上下文和 DSL/API 字段名。`spec.nucleation.id` 标识发起并维护某类秩序设计的凝结核。订单里的 executor、Store admin 和 Registry operator 分别承担运行时执行、平台 workflow 与身份核验。
+
+## 谁使用
+
+凝结核组织（采购运营团队、行业组织者、workflow 设计者）使用它声明自己的角色身份；Store 提供凝结核工作台；Registry 和合约只在其发布与注册动作上落权威事实。
+
+## 产生什么结果
+
+凝结核设计并维护 Zhixu DSL，经编译和发布形成 Plan 版本边界，并组织 supplier 网络与秩序运转；它的设计决策进入 Plan artifact、plan hash 和可审查的版本记录。
+
+## 权威来自哪里
 
 凝结核不自动等同于 Store operator、Identity Registry、registrar 或 submitter wallet。它可以出现在 workflow 材料和 Store 记录里，但链上权威仍然来自 plan publication、publisher/registrar 权限、订单级 authorization 和参与方签名。
 
@@ -38,21 +56,12 @@ spec:
 
 | 相邻角色 | 分工 |
 | --- | --- |
-| Store admin | 提供平台工作台、审核材料、目录和发布流程。 |
-| Store / 外部机构 | 对材料、合规、能力与推荐作出各自判断。 |
+| Store admin / 外部机构 | 平台工作台、材料审核、目录与发布流程；对外部合规、能力与推荐作各自判断。 |
 | Supplier | 能力主体，可能被凝结核组织进秩序。 |
 | Executor | 某个订单里的运行时执行者或 submitter。 |
 | Registrar | 注册订单的授权主体。 |
 
-## 命名口径
-
-| 名称 | 用法 |
-| --- | --- |
-| 凝结核 / `Nucleus` | 主体。指发起、设计、组织并维护一类 Zhixu 的组织核心。 |
-| `nucleation` | 过程、上下文或字段名。当前 DSL/API 中保留 `spec.nucleation.id` 和 `nucleationId`。 |
-| 凝结核工作台 / Nucleus workbench | Store 中服务凝结核的产品工作区，管理 draft、版本、供应商、资源和材料审核材料。 |
-| Store operator | 平台 workflow 角色，不是凝结核。 |
-| Registry operator | 核验主体并维护 subject/account binding。 |
+拼写约定见 [核心术语表](../../reference/glossary.md)。
 
 ## 和 Zhixu、Plan、Order 的关系
 
@@ -71,4 +80,4 @@ Nucleus / 凝结核
 
 Store 是凝结核的工作台和展示场。Store 可以帮助凝结核导入秩序、编译预览、组织供应商资料、展示履约 proof、发起 publication request、维护 audit；链上 plan/supplier/order/signal 事实来自 registry 和 state-machine 事件。
 
-Store 侧的产品视角见 [凝结核工作台](../../store/nucleation-workbench.md)。
+Store 侧的产品视角见 [凝结核工作台](../store/nucleation-workbench.md)。

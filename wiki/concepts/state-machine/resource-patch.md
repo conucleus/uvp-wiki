@@ -1,3 +1,10 @@
+---
+title: Resource Patch
+type: explanation
+audience: 工程贡献者
+status: verified
+---
+
 # Resource Patch
 
 Resource patch 是 Stage Overlay 的另一类运行时变更。它为某个 Order 的目标 stage 覆盖或补充 resource manifest，让订单可以在不修改 Plan 的情况下绑定新的链下资源句柄。
@@ -25,7 +32,7 @@ Resource patch 至少受这些条件约束：
 - `resourceKey`、`manifestHash`、`policyHash`、`patchHash` 必须非零。
 - patch nonce 必须递增。
 
-链上只保存 hash、URI 和事件，不保存合同、发票、物流文件、车辆资料或其他业务明文。
+链上只保存 hash、URI 和事件，不保存合同、发票、物流文件、车辆资料或其他业务明文。selector binding 同样是 Plan 发布时冻结的公共接口约束，resource patch 只能消费它而不能绕过或改写；公共接口边界见 [合约与事件](../../reference/contracts-and-events.md)。
 
 ## 代码入口
 

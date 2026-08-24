@@ -1,8 +1,28 @@
+---
+title: 秩序 (Zhixu) DSL
+type: explanation
+audience: 协议读者
+preread: README.md
+status: verified
+---
+
 # 秩序 (Zhixu) DSL
 
 `Zhixu` 是“秩序”的拼音。在本仓库里，秩序 (Zhixu) 是凝结核设计出的可复用协作规则书。它用 DSL 声明一类可复用的生产关系：有哪些任务模式、每个任务有哪些阶段、阶段在哪条 source 因果链上、接收什么 signal、发出什么 signal、默认 supplier 是谁、哪些阶段能为其他阶段选择 executor、需要哪些资源。
 
 代码入口是 `uvp-protocol/packages/compiler/src/types/index.ts` 的 `ZhixuDefinition`。订单 (Order) 是这份规则书编译、注册之后的一次运行实例。
+
+## 谁使用
+
+凝结核和秩序设计者编写 Zhixu DSL；compiler 把它编译成链上产物；Store、publisher 和 registrar 负责审核、发布和用它创建订单。普通参与者通常只通过 Product/Store 投影间接消费它。
+
+## 产生什么结果
+
+一条 Zhixu 编译出确定性的 HookPlanArtifact 和 OnchainHookPlanArtifact，经 `commitPlan` + `finalizePlan` 注册后成为可创建 Order 的 Plan；同一个 Plan 可以运行出多个 Order。
+
+## 权威来自哪里
+
+DSL 文本本身只是设计稿。计划身份由编译产物哈希和链上注册决定，订单运行时事实来自 `UVPStateMachine` 事件；本页字段说明与 compiler 类型定义保持同步。
 
 ## 最小骨架
 
@@ -19,7 +39,7 @@ spec:
     type: blockchain
     provider: eth
     network: base
-    version: 0.1.3
+    version: 0.1.3 <!-- 示例值，以 compiler 当前版本为准 -->
   nucleation:
     id: procurement-nucleus
   taskPatterns:
@@ -41,7 +61,7 @@ spec:
                 err: sourcing::source.close.err
 ```
 
-这段说明：本地秩序的 `master.supplier_sourcing` 阶段由 `solution::master.technical_scope.cmp` 触发；该阶段把另一条 `supplier-sourcing` 秩序作为执行接口；linked 秩序里的 `sourcing::source.close.cmp` 经 proof 校验和授权 submitter 映射后，推动本地秩序继续运行。详见 [Zhixu 作为 Executor](../../execution/zhixu-as-executor.md)。
+这段示例说明三件事：本地秩序的 `master.supplier_sourcing` 阶段由 `solution::master.technical_scope.cmp` 触发；该阶段把另一条 `supplier-sourcing` 秩序作为执行接口；linked 秩序的输出经 proof 校验和授权 submitter 映射后推动本地秩序继续运行。`signalMap` 的协议语义与运行时对接详见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md) 和 [Executor](executor.md)。
 
 ## 顶层字段
 
@@ -88,11 +108,11 @@ receiveSignals:
 
 ## `selectedStages`
 
-`selectedStages` 是某个 stage 对目标 stage 的 executor patch 能力。例如在报关闭环中，买家提交的阶段可以为 `customs-complete` 指定具体执行者。编译器把这个关系变成 selector binding，合约在 executor patch 时检查这个 stage-to-target 绑定。
+`selectedStages` 是某个 stage 对目标 stage 的 executor patch 能力。例如在报关闭环中，买家提交的阶段可以为 `customs.complete` 指定具体执行者。编译器把这个关系变成 selector binding，合约在 executor patch 时检查这个 stage-to-target 绑定。
 
 ```yaml
 selectedStages:
-  - customs-complete
+  - customs.complete
 ```
 
 只有存在 selector binding 的 stage 才能为对应目标 stage 改 executor。

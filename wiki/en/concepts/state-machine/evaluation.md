@@ -1,3 +1,10 @@
+---
+title: Hook Evaluation
+type: explanation
+audience: 工程贡献者
+status: verified
+---
+
 # Hook Evaluation
 
 On-chain hook evaluation uses a stack machine. The compiler turns the Hook DSL AST into `Instruction[]`, the contract executes the instructions in order, and the result is an `EvalValue`.
@@ -25,6 +32,8 @@ struct Instruction {
 | `And` | Holds only if all inputs hold. |
 | `Or` | Holds if any input holds. |
 | `Delay` | Compute the due time from a positive anchor. |
+
+Besides `wait/ready/cxl`, core evaluation can also return `needs_more`: the `::MERGE@(...)` and `::ANCHOR@(...)` entry points use per-event delivery semantics — the expression itself does not aggregate a verdict, but hands each contributing event to the state machine for lineage and pairing rules; therefore these two hook kinds are not yet supported in on-chain HookPlans, and the compiler rejects them explicitly at compile time.
 
 ## Example
 
@@ -77,6 +86,10 @@ struct EvalValue {
 `AND` requires every input to hold. If some inputs are still waiting, the whole expression waits; if any input is cancelled, the whole expression is cancelled.
 
 `OR` is satisfied when any branch is satisfied. The compiler requires every OR branch to have a positive anchor so that the state machine does not end up with a pure absence condition and no trackable waiting point.
+
+## Submission and Dedup
+
+`submitSignal()` deduplicates by `(orderId, sourceId, signalId)`: for the same `signalKey` only the first submission writes a `SignalRecord` (first-writer-wins), while a duplicate submission reverts with `SignalAlreadyExists`. On submission the contract also checks whether the submitter holds an explicit order-level authorization, or is the wallet currently delegated by the active executor overlay; when neither holds, the submission is rejected. For the authorization model, see [Signal Authorization](../trust/signal-authorization.md).
 
 ## The Contract Is the Authority
 
