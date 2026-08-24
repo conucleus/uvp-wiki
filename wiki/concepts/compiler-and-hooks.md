@@ -29,7 +29,7 @@ Hook Core 的输出仍然是平台中立语义，不含 Solidity ABI。
 - 加载 YAML/JSON Zhixu。
 - 校验 stage、trigger、receiveSignals、selectedStages、executor reachability。
 - 生成 `OnchainHookPlanArtifact`。
-- 生成 Solidity `registerPlan` 参数。
+- 生成 Solidity `commitPlan`/`finalizePlan` 参数。
 - 计算 `planId`、`planHash`、hook/stage/source/signal/dependency/route id。
 
 ## 组件职责
@@ -38,7 +38,7 @@ Hook Core 的输出仍然是平台中立语义，不含 Solidity ABI。
 | --- | --- | --- |
 | uvp-core | Hook DSL、AST、求值、依赖提取、正向锚点与 canonical semantic version 的规范实现。 | Solidity ABI、钱包授权、Product task 语言由后续层处理。 |
 | hook-core | 对 uvp-core 语义的 TypeScript adapter 和版本断言，不另立语义。 | 不得形成与 uvp-core 分叉的解析／求值规则。 |
-| compiler | 秩序 input schema、OnchainHookPlan、registerPlan args、canonical hash；调用 uvp-core 语义，HookPlan 仅为内部 IR。 | 订单参与者选择、supplier identity 判断、linked order 注册、支付/escrow 逻辑由产品、registry 或 periphery 处理。 |
+| compiler | 秩序 input schema、OnchainHookPlan、register 参数（commitPlan+finalizePlan）、canonical hash；调用 uvp-core 语义，HookPlan 仅为内部 IR。 | 订单参与者选择、supplier identity 判断、linked order 注册、支付/escrow 逻辑由产品、registry 或 periphery 处理。 |
 | artifact/hash | `planId`、`planHash`、`hookId`、`sourceId`、`signalId`、`signalKey` 的稳定边界。 | Store draft 状态和 Product DB primary key 属于读模型。 |
 
 ## Compiler 的输入输出边界

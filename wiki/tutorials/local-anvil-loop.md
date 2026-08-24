@@ -11,7 +11,7 @@ status: verified
 这个教程验证最小链上语义闭环：
 
 ```text
-Zhixu -> HookPlan -> OnchainHookPlan -> registerPlan/triggerOrderFromOutsideFor
+Zhixu -> HookPlan -> OnchainHookPlan -> commitPlan+finalizePlan / triggerOrderFromOutsideFor
   -> submitSignal/pokeTimer -> HookReady/HookStatusChanged
   -> statemachine chain replay oracle
 ```
