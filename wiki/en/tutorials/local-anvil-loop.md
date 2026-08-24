@@ -11,7 +11,7 @@ status: verified
 This tutorial verifies the smallest on-chain semantic loop:
 
 ```text
-Zhixu -> HookPlan -> OnchainHookPlan -> registerPlan/triggerOrderFromOutsideFor
+Zhixu -> HookPlan -> OnchainHookPlan -> commitPlan+finalizePlan / triggerOrderFromOutsideFor
   -> submitSignal/pokeTimer -> HookReady/HookStatusChanged
   -> statemachine chain replay oracle
 ```

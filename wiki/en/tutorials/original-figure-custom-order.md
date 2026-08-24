@@ -79,7 +79,7 @@ The example is covered by the compiler tests:
 pnpm --filter @uvp-eth/compiler test
 ```
 
-The test loads the fixture with `loadZhixuDefinition()` and compiles it into the internal HookPlan, the EVM-facing on-chain HookPlan, and Solidity `registerPlan` args. The current fixture compiles into 16 hooks and 13 selector bindings.
+The test loads the fixture with `loadZhixuDefinition()` and compiles it into the internal HookPlan, the EVM-facing on-chain HookPlan, and the Solidity `commitPlan`/`finalizePlan` args. The current fixture compiles into 16 hooks and 13 selector bindings.
 
 ## What To Notice
 
