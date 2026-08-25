@@ -8,6 +8,7 @@ status: verified
 
 # Product DTO 与用户表面
 
+> 前置阅读：[协议边界（不变量总纲）](../protocol-boundaries.md)
 Product DTO 与用户表面定义普通用户和产品前端看到的对象语言：订单、任务、证据、证明、参与方、信任状态和 signal container。它不承载事件重建、索引或 HTTP runtime；这些运行时能力属于 [Chain Services](../services/chain-services.md)。产品表面只关心链上 projection 如何被表达成 DTO，并被 Store、Order App、executor-kit 消费。
 
 ```text
@@ -60,7 +61,7 @@ Product DTO 最终落在真实可跑的产品表面上：Order App 面向普通�
 | [Product DTO](dto.md) | 面向普通用户的 order/task/proof/trust DTO，隐藏 hook 和 ABI 细节。 |
 | [Signal Container](signal-container.md) | task、evidence、typed data、签名、submit、proof 的产品包装。 |
 | [Store 与 Order App](apps.md) | Store、Order App、executor-kit 和 periphery adapter 如何消费同一套 Product projection。 |
-| [Product API 参考](../../reference/product-api.md) | 当前 Product API 路由和语义。 |
+| [Product API 端点速查](../../reference/product-api-endpoints.md) | 当前 Product API 路由和语义。 |
 
 ## 边界
 

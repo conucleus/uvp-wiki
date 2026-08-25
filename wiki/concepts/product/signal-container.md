@@ -8,6 +8,7 @@ status: verified
 
 # Signal Container
 
+> 前置阅读：[Product DTO](dto.md)
 Signal container 是产品层对一个授权业务动作的包装。它是 product/API 概念，不是新的合约对象。它把现有 task、evidence、typed data、business signature、submit、proof 组织成一个可重复的用户和集成模型；链上仍使用现有合约类型和事件。
 
 ## 为什么需要这个概念
@@ -73,3 +74,10 @@ POST /product/tasks/:taskId/submit-stage-resource-patch
 ## 对 Executor Kit 和 MCP 的意义
 
 executor-kit Product API mode 和未来 MCP tools 应消费 signal container，让 AI 或企业系统不用直接理解 HookReady、ABI 和 event topic。工具可以列任务、取 container、准备证据、签名、提交、读 proof；订单授权仍来自 state machine。
+
+## 相关页面
+
+- [Product 表面入口](README.md)
+- [Product DTO](dto.md)
+- [Evidence、Proof 与 File Resource](../services/evidence-proof.md)
+- [Product API 端点速查](../../reference/product-api-endpoints.md)

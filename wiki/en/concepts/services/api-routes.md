@@ -7,7 +7,7 @@ status: verified
 
 # API Routes
 
-`src/api/routes/` is the entry point for Chain Services HTTP route modules. Routes are grouped by consumption surface: Product, Store, submission, evidence, governance, notification, diagnostics, and local test control. For user-facing route documentation, see [Product API Reference](../../reference/product-api.md).
+`src/api/routes/` is the entry point for Chain Services HTTP route modules. Routes are grouped by consumption surface: Product, Store, submission, evidence, governance, notification, diagnostics, and local test control. For user-facing route documentation, see [Product API Endpoints](../../reference/product-api-endpoints.md).
 
 ## Route Module Ownership
 

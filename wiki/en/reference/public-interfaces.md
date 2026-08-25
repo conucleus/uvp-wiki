@@ -28,9 +28,11 @@ It reads no environment variables, stores no private keys, submits no transactio
 | Product DTO | product-dto | chain-services, Store, Order App, executor-kit, periphery adapter | Update DTO tests, route tests, frontend/API consumers, and ordinary-user copy. |
 | Product API | chain-services | Store, Order App, executor-kit Product API mode, MCP adapter | Update the API reference, route tests, browser E2E, and failure language. |
 | Deployment manifest | uvp-deploy/deploy | chain-services, staging scripts, release records | Commit only curated manifest/evidence; local generated address files are not committed by default. |
-| Release evidence schema | uvp-deploy/deploy | release owner, audit, PRD101 evidence pack <!-- TODO(confirm): which PRD does PRD101 refer to? No prd-101 found under docs/product --> | Keep it no-secret, redacted, and auditable; do not treat raw logs or object bytes as release records. |
+| Release evidence schema | uvp-deploy/deploy | release owner, audit, PRD101 evidence pack | Keep it no-secret, redacted, and auditable; do not treat raw logs or object bytes as release records. |
 | Store Console HTTP API | chain-services (`uvp-chain-services/service/src/api/routes/`) | Store workbench, operator scripts | Routes, error codes, proof rows, and authz semantics must stay in sync with the DTO; update Store frontend consumers and route tests. |
 | CLI and runtime configuration | executor-kit, chain-services config, deploy scripts | executors, release owner, staging operator | Private keys are read only from explicitly named env vars; staging/profile configuration must fail closed; update the CLI reference and profile tests. |
+
+> TODO(confirm): which PRD does PRD101 refer to? No prd-101 found under docs/product.
 
 ## Drift Checklist
 
@@ -51,16 +53,17 @@ release record or PRD trace
 
 ## Non-Interface State
 
-- Store metadata is platform workflow and material state; the Identity Registry binding is the on-chain subject-to-wallet correspondence record; see [Read Model Boundary](../concepts/protocol-boundaries.md#读模型边界).
-- The Product BFF database is a rebuildable read model; the source of truth for plan/order/signal/hook is chain events; see [Sources of Truth](../concepts/protocol-boundaries.md#事实源).
-- Relayer configuration is broadcast configuration; business authorization comes from order authorization and signatures; see [Authorization and Signatures](../concepts/protocol-boundaries.md#授权与签名).
+- Store metadata is platform workflow and material state; the Identity Registry binding is the on-chain subject-to-wallet correspondence record; see [Read Model Boundary](../concepts/protocol-boundaries.md#read-model-boundary).
+- The Product BFF database is a rebuildable read model; the source of truth for plan/order/signal/hook is chain events; see [Sources of Truth](../concepts/protocol-boundaries.md#source-of-truth).
+- Relayer configuration is broadcast configuration; business authorization comes from order authorization and signatures; see [Authorization and Signatures](../concepts/protocol-boundaries.md#authorization-and-signatures).
 - Demo fallback, fixture catalogs, and mock frontend modes only support demo or test profiles; for the complete boundary see [Protocol Boundaries](../concepts/protocol-boundaries.md).
-- Funding, USDC, escrow, guarantee, and settlement adapters belong to adapter/periphery; see [Periphery Adapters](../concepts/protocol-boundaries.md#外围适配).
+- Funding, USDC, escrow, guarantee, and settlement adapters belong to adapter/periphery; see [Periphery Adapters](../concepts/protocol-boundaries.md#periphery-adapters).
 
 ## Related References
 
 - [Contracts and Events](contracts-and-events.md)
-- [Product API](product-api.md)
+- [Product API Endpoints](product-api-endpoints.md)
 - [CLI and Configuration](cli-and-config.md)
 - [Module Map](module-map.md)
-- [Release and Verification](../operations/release-and-verification.md)
+- [Release and Verification](../how-to/release-checklist.md)
+- Fixed change flow: [Development § Fixed Flow After Changing a Public Interface](../how-to/development.md)

@@ -96,7 +96,7 @@
 - [版本与语义矩阵](reference/version-matrix.md)
 - [公共接口](reference/public-interfaces.md)
 - [合约与事件](reference/contracts-and-events.md)
-- [Product API 参考](reference/product-api.md)
+- [Product API 端点速查](reference/product-api-endpoints.md)
 - [CLI 与配置](reference/cli-and-config.md)
 - [模块地图](reference/module-map.md)
 - [核心术语表](reference/glossary.md)

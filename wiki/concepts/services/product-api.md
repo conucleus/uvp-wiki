@@ -22,7 +22,7 @@ Product API 是普通参与者、Order App、executor-kit 和 agent adapter 消�
 
 ## 核心路由
 
-完整路由清单见 [Product API 参考](../../reference/product-api.md)。
+完整路由清单见 [Product API 端点速查](../../reference/product-api-endpoints.md)。
 
 Product object 是订单 (Order)，即某个秩序 (Zhixu) 的一次运行；route 命名保持 order/task/proof 口径，不引入 `/product/flows` 这类传统线性 flow 语义。
 

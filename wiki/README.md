@@ -22,7 +22,7 @@ Wiki 按 Diátaxis 分为四类内容加项目元信息：
 | 完成一项具体任务 | [操作指南](how-to/quick-start.md)：开发、运行服务、staging、排障 |
 | 查权威事实 | [参考](reference/version-matrix.md)：版本、接口、事件、CLI、术语 |
 
-项目愿景与交易成本论证见仓库根目录 `whitepaper.md` 与 [为什么需要 UVP](tutorials/why-uvp.md)；项目成熟度口径见 [项目状态](meta/status.md)。
+项目愿景与交易成本论证见 [whitepaper.md](https://github.com/conucleus/uvp-eth/blob/main/whitepaper.md)（主仓库根目录，wiki 站点外）与 [为什么需要 UVP](tutorials/why-uvp.md)；项目成熟度口径见 [项目状态](meta/status.md)。
 
 ## 一条订单如何留下 proof
 

@@ -22,7 +22,7 @@ The Product API is the main entry point for ordinary participants, the Order App
 
 ## Core Routes
 
-For the full route list, see [Product API Reference](../../reference/product-api.md).
+For the full route list, see [Product API Endpoints](../../reference/product-api-endpoints.md).
 
 The Product object is an Order — one runtime instance of a Zhixu; route naming keeps the order/task/proof vocabulary and does not introduce traditional linear `/product/flows` semantics.
 

@@ -7,7 +7,7 @@ status: verified
 
 # API Routes
 
-`src/api/routes/` 是 Chain Services 的 HTTP route module 入口。路由按消费面分组：Product、Store、submission、evidence、governance、notification、diagnostics 和本地测试控制。面向用户的路由文档见 [Product API 参考](../../reference/product-api.md)。
+`src/api/routes/` 是 Chain Services 的 HTTP route module 入口。路由按消费面分组：Product、Store、submission、evidence、governance、notification、diagnostics 和本地测试控制。面向用户的路由文档见 [Product API 端点速查](../../reference/product-api-endpoints.md)。
 
 ## Route module 归属
 

@@ -44,7 +44,8 @@ status: verified | prototype | planned | archived
 - 首次出现专有名词时用中文优先写法，例如"秩序 (Zhixu)"和"订单 (Order)"。
 - 每个协议对象页按「是什么 / 谁使用 / 产生什么结果 / 权威来自哪里」组织；需要硬边界时用一句话引用 [协议边界](../concepts/protocol-boundaries.md)。
 - **协议不变量只有一个定义处**（`concepts/protocol-boundaries.md`）。其他页面只做一句话概括并链接，禁止整段复述。
-- 区分已实现、fixture/local demo、staging evidence、planned PRD；拿不准的事实标 `<!-- TODO(confirm): ... -->`，禁止编写内容填补。
+- 区分已实现、fixture/local demo、staging evidence、planned PRD；拿不准的事实标 `<!-- TODO(confirm): ... -->`，禁止编写内容填补；页面发布前把注释转换为「待确认」引用块，避免构建站渲染出转义乱码。
+- Front-matter 字段固定为 `title` / `type` / `audience` / `preread` / `status`；`preread` 只写一个裸相对路径（如 `../core/executor.md`），不加引号、不写成 markdown 链接；正文 H1 下的「前置阅读」引用块须与该字段保持一致。
 - Store metadata、database row、relayer queue 标注为读模型或 workflow 状态；协议事实标注为 registry/state-machine event。
 - funding、USDC、escrow、guarantee 写在 periphery 边界内。
 - 私钥、RPC secret、JWT secret、object storage credential 只写 redacted 口径。
@@ -83,7 +84,7 @@ PRD 仍放在 `docs/product/`。Release record 仍放在 `uvp-deploy/deploy/rele
 
 改 Product API 时：
 
-- 更新 [Product API 参考](../reference/product-api.md)；
+- 更新 [Product API 端点速查](../reference/product-api-endpoints.md)；
 - 更新 [Product DTO 与用户表面](../concepts/product/README.md) 与相关 services 页；
 - 同步 Store / Order App / Executor Kit 相关 how-to 与概念页。
 

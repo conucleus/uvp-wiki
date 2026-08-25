@@ -8,6 +8,7 @@ status: verified
 
 # Product DTO
 
+> Prerequisite reading: [Product DTO and User Surfaces](README.md)
 Product DTOs are stable contracts for ordinary users and product frontends. They translate protocol fields into orders, tasks, proof, participants, and trust status.
 
 ## ProductOrderDTO
@@ -67,3 +68,10 @@ Task statuses map as:
 | unknown | `blocked` |
 
 DTO field and status mapping is authoritative in the `@uvp-eth/product-dto` package type definitions.
+
+## Related Pages
+
+- [Product Surfaces entry](README.md)
+- [Signal Container](signal-container.md)
+- [Event Projections](projections.md)
+- [Product API Endpoints](../../reference/product-api-endpoints.md)

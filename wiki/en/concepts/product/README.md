@@ -8,6 +8,7 @@ status: verified
 
 # Product DTO and User Surfaces
 
+> Prerequisite reading: [Protocol Boundaries](../protocol-boundaries.md)
 Product DTOs and user surfaces define the object language that ordinary users and product frontends see: orders, tasks, evidence, proof, participants, trust status, and the signal container. They do not carry event replay, indexing, or HTTP runtime; those runtime capabilities belong to [Chain Services](../services/chain-services.md). Product surfaces only care how on-chain projections are expressed as DTOs and consumed by the Store, Order App, and executor-kit.
 
 ```text
@@ -60,7 +61,7 @@ Ordinary users mainly see orders, tasks, participants, evidence, and proof. Prot
 | [Product DTO](dto.md) | Ordinary-user order/task/proof/trust DTOs that hide hook and ABI details. |
 | [Signal Container](signal-container.md) | The product packaging for task, evidence, typed data, signature, submit, and proof. |
 | [Store and Order App](apps.md) | How the Store, Order App, executor-kit, and periphery adapters consume the same Product projection. |
-| [Product API Reference](../../reference/product-api.md) | Current Product API routes and semantics. |
+| [Product API Endpoints](../../reference/product-api-endpoints.md) | Current Product API routes and semantics. |
 
 ## Boundaries
 

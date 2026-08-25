@@ -28,9 +28,11 @@ status: verified
 | Product DTO | product-dto | chain-services、Store、Order App、executor-kit、periphery adapter | 更新 DTO tests、route tests、frontend/API consumers 和 ordinary-user copy。 |
 | Product API | chain-services | Store、Order App、executor-kit Product API mode、MCP adapter | 更新 API reference、route tests、browser E2E、failure language。 |
 | Deployment manifest | uvp-deploy/deploy | chain-services、staging scripts、release records | 只提交 curated manifest/evidence；local generated address files 默认不提交。 |
-| Release evidence schema | uvp-deploy/deploy | release owner、audit、PRD101 evidence pack <!-- TODO(confirm): PRD101 现指哪个 PRD？docs/product 下无 prd-101 --> | 保持 no-secret、redacted、可审计；不要把 raw logs 或 object bytes 当作 release record。 |
+| Release evidence schema | uvp-deploy/deploy | release owner、audit、PRD101 evidence pack | 保持 no-secret、redacted、可审计；不要把 raw logs 或 object bytes 当作 release record。 |
 | Store Console HTTP API | chain-services（`uvp-chain-services/service/src/api/routes/`） | Store workbench、operator scripts | route、错误码、proof rows 和 authz 语义需要和 DTO 同步；更新 Store 前端消费者与 route tests。 |
 | CLI 与运行配置 | executor-kit、chain-services config、deploy scripts | executor、release owner、staging operator | 私钥只从显式 env 读取；staging/profile 配置必须 fail closed；更新 CLI reference 与 profile tests。 |
+
+> 待确认（TODO）：PRD101 现指哪个 PRD？docs/product 下无 prd-101。
 
 ## Drift checklist
 
@@ -60,7 +62,8 @@ release record or PRD trace
 ## 相关参考
 
 - [合约与事件](contracts-and-events.md)
-- [Product API](product-api.md)
+- [Product API 端点速查](product-api-endpoints.md)
 - [CLI 与配置](cli-and-config.md)
 - [模块地图](module-map.md)
-- [发布与验证](../operations/release-and-verification.md)
+- [发布与验证](../how-to/release-checklist.md)
+- 变更固定流程：[日常开发 § 改变公共接口后的固定流程](../how-to/development.md)

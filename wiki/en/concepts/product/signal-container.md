@@ -8,6 +8,7 @@ status: verified
 
 # Signal Container
 
+> Prerequisite reading: [Product DTO](dto.md)
 The signal container is the product layer's wrapper for one authorized business action. It is a product/API concept, not a new contract object. It organizes the existing task, evidence, typed data, business signature, submit, and proof into a repeatable model for users and integrations; the chain still uses the existing contract types and events.
 
 ## Why this concept is needed
@@ -73,3 +74,10 @@ POST /product/tasks/:taskId/submit-stage-resource-patch
 ## Meaning for Executor Kit and MCP
 
 executor-kit Product API mode and future MCP tools should consume signal containers so AI or enterprise systems do not need to understand HookReady, ABI, and event topics directly. Tools can list tasks, fetch containers, prepare evidence, sign, submit, and read proof; order authorization still comes from the state machine.
+
+## Related Pages
+
+- [Product Surfaces entry](README.md)
+- [Product DTO](dto.md)
+- [Evidence, Proof, and File Resource](../services/evidence-proof.md)
+- [Product API Endpoints](../../reference/product-api-endpoints.md)

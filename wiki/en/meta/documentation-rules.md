@@ -44,7 +44,8 @@ status: verified | prototype | planned | archived
 - On first appearance, introduce proper nouns in Chinese-first form, e.g. "秩序 (Zhixu)" and "订单 (Order)".
 - Each protocol-object page is organized by "what it is / who uses it / what result it produces / where authority comes from"; when a hard boundary is needed, cite [Protocol Boundaries](../concepts/protocol-boundaries.md) in one sentence.
 - **Protocol invariants have exactly one defining location** (`concepts/protocol-boundaries.md`). Other pages give at most a one-sentence summary plus a link; restating entire passages is forbidden.
-- Distinguish implemented, fixture/local demo, staging evidence, and planned PRD; mark uncertain facts with `<!-- TODO(confirm): ... -->`; writing filler content is forbidden.
+- Distinguish implemented, fixture/local demo, staging evidence, and planned PRD; mark uncertain facts with `<!-- TODO(confirm): ... -->`; writing filler content is forbidden. Before publishing, convert the comment into a visible "pending confirmation" blockquote so the static site does not render escaped raw HTML.
+- Front-matter fields are fixed to `title` / `type` / `audience` / `preread` / `status`; `preread` takes exactly one bare relative path (e.g. `../core/executor.md`) — no quotes, no markdown link. The "Prerequisite reading" blockquote under the body H1 must stay consistent with that field.
 - Label Store metadata, database rows, and relayer queues as read-model or workflow state; label protocol facts as registry/state-machine events.
 - Keep funding, USDC, escrow, and guarantee topics inside the periphery boundary.
 - Private keys, RPC secrets, JWT secrets, and object-storage credentials are written only in redacted form.
@@ -83,7 +84,7 @@ When changing a protocol public interface:
 
 When changing the Product API:
 
-- update [Product API Reference](../reference/product-api.md);
+- update [Product API Endpoints](../reference/product-api-endpoints.md);
 - update [Product DTO and User Surfaces](../concepts/product/README.md) and the relevant services pages;
 - sync the related Store / Order App / Executor Kit how-to and concept pages.
 

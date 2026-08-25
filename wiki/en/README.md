@@ -22,7 +22,7 @@ The wiki follows Diataxis with four content types plus project meta information:
 | Complete a concrete task | [How-to guides](how-to/quick-start.md): development, running services, staging, troubleshooting |
 | Look up authoritative facts | [Reference](reference/version-matrix.md): versions, interfaces, events, CLI, terminology |
 
-For the project vision and the transaction-cost argument see the repository-root `whitepaper.md` and [Why UVP](tutorials/why-uvp.md); for the project maturity vocabulary see [Project Status](meta/status.md).
+For the project vision and the transaction-cost argument see [whitepaper.md](https://github.com/conucleus/uvp-eth/blob/main/whitepaper.md) (main repository root, outside this wiki) and [Why UVP](tutorials/why-uvp.md); for the project maturity vocabulary see [Project Status](meta/status.md).
 
 ## How One Order Leaves Proof
 

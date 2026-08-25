@@ -1,11 +1,11 @@
 ---
-title: Product API 参考
+title: Product API 端点速查
 type: reference
 audience: 工程贡献者
 status: verified
 ---
 
-# Product API 参考
+# Product API 端点速查
 
 Product API 位于 `@uvp-eth/chain-services`，把 StateMachine 事件投影与 Store 链下资料组合成 Store、Order App 和 executor-kit 使用的 DTO。
 
@@ -88,3 +88,10 @@ GET /product/staging/readiness
 ```
 
 该接口输出脱敏的部署、索引、存储、角色输入与 Product 状态摘要；条件不足时返回 `503 not_ready`。
+
+## 相关页面
+
+- DTO 字段与状态映射：[Product DTO](../concepts/product/dto.md)
+- 本地启动 API 与前端：[运行服务和前端](../how-to/run-services-and-apps.md)
+- 服务语义与边界：[Product API（概念）](../concepts/services/product-api.md)
+- 提交链路（typed data → 签名 → relayer）：[Signal](../concepts/core/signal.md) 与 [EIP-712 与 Relayer](../concepts/trust/eip712-relayer.md)

@@ -1,11 +1,11 @@
 ---
-title: Product API Reference
+title: Product API Endpoints
 type: reference
 audience: 工程贡献者
 status: verified
 ---
 
-# Product API Reference
+# Product API Endpoints
 
 The Product API lives in `@uvp-eth/chain-services`. It combines StateMachine event projections with Store-managed off-chain records into the DTOs used by Store, Order App, and executor-kit.
 
@@ -88,3 +88,10 @@ GET /product/staging/readiness
 ```
 
 This endpoint outputs a redacted summary of deployment, indexing, storage, role inputs, and Product state; it returns `503 not_ready` when conditions are insufficient.
+
+## Related Pages
+
+- DTO fields and status mapping: [Product DTO](../concepts/product/dto.md)
+- Start the API and frontends locally: [Run Services and Frontends](../how-to/run-services-and-apps.md)
+- Service semantics and boundaries: [Product API (concept)](../concepts/services/product-api.md)
+- Submission flow (typed data → signature → relayer): [Signal](../concepts/core/signal.md) and [EIP-712 and Relayer](../concepts/trust/eip712-relayer.md)

@@ -96,7 +96,7 @@
 - [Version and Semantics Matrix](reference/version-matrix.md)
 - [Public Interfaces](reference/public-interfaces.md)
 - [Contracts and Events](reference/contracts-and-events.md)
-- [Product API Reference](reference/product-api.md)
+- [Product API Endpoints](reference/product-api-endpoints.md)
 - [CLI and Configuration](reference/cli-and-config.md)
 - [Module Map](reference/module-map.md)
 - [Glossary](reference/glossary.md)
