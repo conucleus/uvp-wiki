@@ -46,3 +46,10 @@ status: verified
 `OnchainHookPlanArtifact` 的 `planHash` 包含 canonicalized source Zhixu。也就是说，影响协议语义的源定义变化会改变计划哈希。编译产物不是手写 JSON，应由脚本从源定义可重复生成。
 
 字段清单以 `uvp-protocol/packages/compiler/src/types` 为准。
+
+## 相关页面
+
+- [Compiler 与 Hook Core](../compiler-and-hooks.md)
+- [Canonical Hash](canonical-hashes.md)
+- [链上注册参数](solidity-registration.md)
+- [版本与语义矩阵](../../reference/version-matrix.md)

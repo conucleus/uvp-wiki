@@ -2,12 +2,13 @@
 title: File Resources
 type: explanation
 audience: 协议读者
-preread: README.md
+preread: ../README.md
 status: verified
 ---
 
 # File Resources
 
+> Prerequisite reading: [Core Concepts](../README.md)
 `fileResources` are stage resource handles. They describe which off-chain objects, protocol files, evidence templates, acceptance criteria, or resource manifests a stage needs to reference. On-chain facts come from authorized signals, hashes, metadata URIs, and events; file plaintext stays off-chain.
 
 ## Who Uses It
@@ -103,3 +104,9 @@ For contributor security rules see ../../meta/documentation-rules.md.
 - Treating `fileResources` as meaning resource requirements are met; business completion follows signal/proof.
 - Treating object-storage accessibility as more than an auxiliary condition; on-chain proof follows events and hashes.
 - Confusing resource patch and executor patch: they are two separate authorized actions.
+
+## Related Pages
+
+- [Evidence, Proof, and File Resource](../services/evidence-proof.md)
+- [Artifacts and Hashes](../artifacts-and-hashes.md)
+- [Stage Overlay](../state-machine/stage-overlay.md)

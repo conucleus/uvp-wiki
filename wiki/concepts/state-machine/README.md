@@ -2,12 +2,13 @@
 title: 状态机
 type: meta
 audience: 协议读者
-preread: concepts/lifecycle.md
+preread: ../lifecycle.md
 status: verified
 ---
 
 # 状态机
 
+> 前置阅读：[Plan 与订单生命周期](../lifecycle.md)
 状态机是 UVP 的核心链上执行层与事件源：`UVPStateMachine.sol` 接收已授权钱包提交的 signal，按 Plan 的依赖索引找到受影响 hook，执行 stack machine 求值，然后发出 `HookStatusChanged`、`HookReady` 或 timer 相关事件；ETH runtime authority 是部署的合约，本组页面解释其运行时语义。
 
 ## 组件职责

@@ -41,7 +41,7 @@ prepare typed data
   -> participant signs EIP-712 typed data
   -> submit signed payload
   -> verify signer and payload structure
-  -> broadcast or record broadcast_disabled
+  -> broadcast, or record "not_attempted" (local explicit dry-run: no nonce reserved, audit records skipped)
   -> track tx hash / failure / retry
   -> indexer confirms chain event
 ```

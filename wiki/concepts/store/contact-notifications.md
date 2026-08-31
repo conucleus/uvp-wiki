@@ -6,6 +6,9 @@ preread: README.md
 status: verified
 ---
 
+# 联系与通知
+
+> 前置阅读：[秩序商店（Store）](README.md)
 Store 可以维护联系和通知工作流，因为真实履约需要找到人、系统或 adapter。联系与通知属于 operational workflow；链上业务动作由授权 signal 表达。
 
 ## 可组织的信息
@@ -43,4 +46,4 @@ chain-services 可以派生 supplier delivery intents，并保存 retryable oper
 
 早期设计中的 `acknowledged`（对方确认收到）与 `suppressed`（因 revoked/blocked/policy 未发）为愿景状态，尚未实现。
 
-<!-- TODO(confirm): acknowledged/suppressed 是否仍在路线图中？若放弃请从设计材料移除。 -->
+> 待确认（TODO）：acknowledged/suppressed 是否仍在路线图中？若放弃请从设计材料移除。

@@ -52,3 +52,5 @@ pnpm no-spend:safety
 - [ ] 普通 CI 不读取部署 secrets。
 - [ ] 本地部署入口只接受 loopback RPC。
 - [ ] 地址清单和 summary 作为本次运行的公开技术记录保留；私钥、原始 RPC URL、数据库内容和未筛选日志不进入版本控制。
+
+部署失败或 smoke 校验不一致时，按[排障](troubleshooting.md)排查（含 "Base Sepolia RPC 慢或 timeout" 一节）；通过后进入[发布与验证](release-checklist.md)登记地址清单。

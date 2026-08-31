@@ -56,7 +56,7 @@ release record or PRD trace
 - Store metadata is platform workflow and material state; the Identity Registry binding is the on-chain subject-to-wallet correspondence record; see [Read Model Boundary](../concepts/protocol-boundaries.md#read-model-boundary).
 - The Product BFF database is a rebuildable read model; the source of truth for plan/order/signal/hook is chain events; see [Sources of Truth](../concepts/protocol-boundaries.md#source-of-truth).
 - Relayer configuration is broadcast configuration; business authorization comes from order authorization and signatures; see [Authorization and Signatures](../concepts/protocol-boundaries.md#authorization-and-signatures).
-- Demo fallback, fixture catalogs, and mock frontend modes only support demo or test profiles; for the complete boundary see [Protocol Boundaries](../concepts/protocol-boundaries.md).
+- There is no demo fallback, fixture catalog, or mock frontend mode in any product surface — empty projections return empty results by design, and no demo profile exists to switch on; operational aids never change protocol truth; for the complete boundary see [Protocol Boundaries](../concepts/protocol-boundaries.md).
 - Funding, USDC, escrow, guarantee, and settlement adapters belong to adapter/periphery; see [Periphery Adapters](../concepts/protocol-boundaries.md#periphery-adapters).
 
 ## Related References

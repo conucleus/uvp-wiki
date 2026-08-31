@@ -6,6 +6,9 @@ preread: README.md
 status: verified
 ---
 
+# 协议边界（不变量总纲）
+
+> 前置阅读：[核心概念](README.md)
 本页是 UVP 协议边界的唯一权威陈述处。全站其他页面遇到这些边界时只做一句话引用并链接到这里，不再各自复述完整版本。协议事实以代码、`uvp-protocol/contracts/uvp-contracts/fixtures/`、链事件和 release 记录为准；本页表述与实现冲突时，以实现为准并修订本页。
 
 ## 事实源
@@ -52,4 +55,10 @@ ABI、event topic、EIP-712 typed data domain、canonical hash domain、artifact
 
 ## 运行环境纪律
 
-Staging/testnet profile 必须 fail-closed：拒绝 memory/SQLite 存储、localhost RPC、demo fallback、E2E fixture controls、permissive authorization 与 Anvil 默认私钥；demo/mock 模式只能存在于显式声明的 demo profile。私钥、RPC secret、JWT secret、object storage credential 只写 redacted 口径，不进仓库、日志或文档。执行细则见 [Storage、Migration 与 Runtime Profile](services/storage-runtime.md) 与 [排障](../how-to/troubleshooting.md)。
+每个运行时配置都是显式声明；任何 profile 背后都不存在 demo 或 mock 模式。Product API 没有 demo 数据源——空投影返回空数组、缺失明细返回 `detail_unavailable`，不存在 `?fallback=demo` 参数和 `UVP_PRODUCT_DEMO_MODE` 键；前端同样没有 demo 模式，Store 访问级别只来自环境变量与登录会话。`CHAIN_SERVICES_DATABASE_DRIVER` 与 `CHAIN_SERVICES_DATABASE_URL` 全环境必填，缺失即启动失败，报错信息包含键名。
+
+Staging/testnet profile 必须 fail-closed：拒绝 memory/SQLite 存储、localhost RPC、permissive authorization 与 Anvil 默认私钥；所有 bootstrap 入口都要求显式部署私钥（`--private-key` 或 `UVP_ETH_DEPLOYER_PRIVATE_KEY`）。私钥、RPC secret、JWT secret、object storage credential 只写 redacted 口径，不进仓库、日志或文档。
+
+本页同时固定一条「对应」原则：系统承诺对应而非真实——每条记录必须对应某个主体的真实表达。持钥者以私钥作假，是其本意的行使，系统不得另设裁决层代为裁决；相应地，系统绝不代笔内容、不冒充成功、不以静默缺省顶替人的决定。
+
+执行细则见 [Storage、Migration 与 Runtime Profile](services/storage-runtime.md) 与 [排障](../how-to/troubleshooting.md)。

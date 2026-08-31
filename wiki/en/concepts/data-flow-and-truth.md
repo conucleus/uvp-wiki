@@ -43,7 +43,7 @@ The main data flow advances along "compiled artifacts -> Plan registration -> or
 
 ## Operational Aids Only
 
-Relayer retry status, notification delivery status, Store drafts, browser E2E fixtures, and local demo data are operational aids only. They cannot change Plan publication state, whether an Order exists, whether a Signal was accepted, or whether a Hook is ready.
+Relayer retry status, notification delivery status, and Store drafts are operational aids only. They cannot change Plan publication state, whether an Order exists, whether a Signal was accepted, or whether a Hook is ready. The same applies to governance ledger entries with `executionMode: "simulated"`: reconcile skips them, and staging-readiness treats them as unsatisfied. There are no browser E2E fixture stores or local demo data sources left in the service layer to mistake for truth — an empty projection simply returns empty output.
 
 ## Reorg Handling
 

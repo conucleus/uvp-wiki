@@ -8,6 +8,7 @@ status: verified
 
 # One Order Story
 
+> Prerequisite reading: [Coordination Infrastructure for the AI Era](why-uvp.md)
 This page starts from a real production-relationship map, then moves into the order. Keep one sentence in mind first: Zhixu is the reusable rulebook for a class of coordination, and Order is one concrete execution of that rulebook.
 
 The goal here is business intuition, not every engineering object. After this page, you should be able to explain who coordinates, who actually executes a step, which statement moves the order forward, and why those statements are accountable.
@@ -98,7 +99,7 @@ which path handles failure, timeout, rejection, or reassignment
 
 Zhixu is a standard language that lets computers, on-chain contracts, enterprise systems, AI agents, Store, Order App, and executor-kit understand the same coordination boundary. Real contracts keep defining business responsibility; Zhixu writes the coordination boundary as executable signal rules.
 
-When continuing to the core objects, start with [Core Concepts Entry](../core/README.md) and [The Zhixu DSL](../concepts/core/zhixu.md).
+When continuing to the core objects, start with [Core Concepts Entry](../concepts/README.md) and [The Zhixu DSL](../concepts/core/zhixu.md).
 
 ## 5. From Rulebook to One Order
 
@@ -175,12 +176,12 @@ Back in the PV project, this can look like:
 
 ![Task detail area in the Order App](../../assets/screenshots/order-app-task-detail.png)
 
-*The Order App presents a handleable task as participant-readable deadline, input requirements, authorization source, and proof status; the screenshot comes from the local Order App demo, and the business thread above remains the PV project.*
+*The Order App presents a handleable task as participant-readable deadline, input requirements, authorization source, and proof status; the screenshot comes from a local Order App run against a real Product API, and the business thread above remains the PV project.*
 
 This means "the task is ready to handle," not "the business work is already complete." Completion must be proven later by follow-up authorized signals and evidence fingerprints.
 
 ## Read Next
 
-- [Core Concepts](../core/README.md): read the protocol objects by layer after the story is clear.
+- [Core Concepts](../concepts/README.md): read the protocol objects by layer after the story is clear.
 - [Plan and the Order Lifecycle](../concepts/lifecycle.md): on the second pass, use the same order to see how code modules and product surfaces divide the work.
 - [Glossary](../reference/glossary.md): consult it whenever you meet unfamiliar terms or key concept pairs.

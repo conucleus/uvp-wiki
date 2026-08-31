@@ -2,12 +2,13 @@
 title: Executor
 type: explanation
 audience: 协议读者
-preread: README.md
+preread: ../README.md
 status: verified
 ---
 
 # Executor
 
+> Prerequisite reading: [Core Concepts](../README.md)
 An Executor is whoever actually carries a stage at order runtime, produces business actions, or submits signals. It can be a person, an enterprise system, a supplier-deployed wallet, an adapter, an AI/MCP agent — or an independent Zhixu order.
 
 Keep Executor separate from Supplier:

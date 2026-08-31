@@ -56,7 +56,7 @@ release record or PRD trace
 - Store metadata 是平台 workflow 和材料状态，Identity Registry binding 是主体与钱包的链上对应记录；详见 [读模型边界](../concepts/protocol-boundaries.md#读模型边界)。
 - Product BFF database 是可重建读模型，plan/order/signal/hook 的 source of truth 是链上事件；详见 [事实源](../concepts/protocol-boundaries.md#事实源)。
 - Relayer 配置是广播配置，业务授权来自 order authorization 和签名；详见 [授权与签名](../concepts/protocol-boundaries.md#授权与签名)。
-- Demo fallback、fixture catalog、mock frontend mode 只能支撑 demo 或测试口径；完整边界见 [协议边界](../concepts/protocol-boundaries.md)。
+- 产品表面不存在 demo fallback、fixture catalog 或 mock frontend mode：空投影按设计返回空结果，没有可以打开的 demo profile；操作辅助不改变协议事实。完整边界见 [协议边界](../concepts/protocol-boundaries.md)。
 - Funding、USDC、escrow、guarantee、settlement adapter 属于 adapter/periphery；详见 [外围适配](../concepts/protocol-boundaries.md#外围适配)。
 
 ## 相关参考

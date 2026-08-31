@@ -6,6 +6,9 @@ preread: README.md
 status: verified
 ---
 
+# 履约状态、Proof 与 Trust 校验
+
+> 前置阅读：[秩序商店（Store）](README.md)
 Store 的履约视图把订单、任务、供应商参与、证据 hash 和链上 proof 组织给 operator 看。它是围绕链事件重建的视图，事实来源是 registry/state-machine events。
 
 <!-- StageExecutorPatchApplied 经 module patch 路径发出，非 v0.8 主 ABI fixture 直接列出 -->

@@ -64,5 +64,11 @@ pnpm verify:protocol-freeze
 
 ABI、bytecode、selector、event topic、typed-data 字段、canonical hash 或 artifact schema 的变化都应进入发布说明和迁移判断。
 
-<!-- TODO(confirm): CompactHook struct 字段与 fixtures/uvp-state-machine.v0.8.json 逐字段比对 -->
+> 待确认（TODO）：CompactHook struct 字段与 fixtures/uvp-state-machine.v0.8.json 逐字段比对。
 
+## 相关页面
+
+- [编译输入](compiler-input.md)
+- [Canonical Hash](canonical-hashes.md)
+- [合约与事件](../../reference/contracts-and-events.md)
+- [发布与验证](../../how-to/release-checklist.md)

@@ -26,3 +26,9 @@ UVP 不是被"设计"出来的。
 我很可能是第一个理解 UVP 的人。
 
 但 AI 是第零个。
+
+## 相关页面
+
+- [项目状态](status.md)
+- [Wiki 入口](../README.md)
+- [文档规则](documentation-rules.md)

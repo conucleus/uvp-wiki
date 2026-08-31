@@ -17,6 +17,8 @@ CHAIN_SERVICES_DATABASE_URL=memory://projection-store
 CHAIN_SERVICES_MIGRATIONS_AUTO_RUN=false
 ```
 
+Both `CHAIN_SERVICES_DATABASE_DRIVER` and `CHAIN_SERVICES_DATABASE_URL` are required in every environment — including local runs and unit-test setups. When either key is missing, startup fails with a configuration error that names the missing key. The three driver values are all explicit declarations of an intended profile; there is no implicit default and no demo mode.
+
 | Profile | Purpose | Constraints |
 | --- | --- | --- |
 | memory | Unit tests, temporary prototypes. | Supports test/prototype usage only. |
@@ -60,10 +62,12 @@ The Base Sepolia / testnet profile must reject:
 
 - memory/SQLite storage.
 - localhost RPC.
-- Demo fallback, E2E fixture controls, permissive authorization.
+- Permissive authorization.
 - Anvil default private keys.
 - A missing `UVPStateMachine` / `UVPIdentityRegistry` address manifest.
-- Broadcast disabled while still claiming staging readiness.
+- Broadcast disabled while still claiming staging readiness (non-local environments require an explicitly configured broadcast adapter; otherwise startup fails with a configuration error).
+
+Note that there is no demo fallback to reject: the Product API has no demo data source — an empty projection returns an empty array or `detail_unavailable` — and no `?fallback=demo` parameter or `UVP_PRODUCT_DEMO_MODE` key exists. The same holds for E2E fixture controls: the e2e-controls module and `UVP_PRODUCT_E2E_FIXTURES` have been removed, so fail-closed enforcement is about required explicit configuration, not about switching demo modes off.
 
 Readiness can say whether a service instance runs with the correct configuration; on-chain plan/order/signal/trust facts still come from events.
 
@@ -73,3 +77,10 @@ Readiness can say whether a service instance runs with the correct configuration
 - Store drafts, supplier metadata, audit, and notification delivery are workflow state.
 - PostgreSQL durability is runtime reliability, not canonical truth.
 - Diagnostics and audit output must be redacted.
+
+## Related Pages
+
+- [Chain Services](chain-services.md)
+- [Indexer and Projections](indexer-projections.md)
+- [Data Flow and Source of Truth](../data-flow-and-truth.md)
+- [Run Services and Frontends](../../how-to/run-services-and-apps.md)

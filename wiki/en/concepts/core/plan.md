@@ -2,12 +2,13 @@
 title: Plan
 type: explanation
 audience: 协议读者
-preread: README.md
+preread: ../README.md
 status: verified
 ---
 
 # Plan
 
+> Prerequisite reading: [Core Concepts](../README.md)
 A Plan is the immutable runtime rulebook a Zhixu compiles into for one chain. It carries only the hooks, dependency keys, selector bindings, and signal capabilities the state machine must know; supplier capability, recommendation tags, fulfillment materials, and matching logic are not part of a Plan.
 
 ## Who Uses It

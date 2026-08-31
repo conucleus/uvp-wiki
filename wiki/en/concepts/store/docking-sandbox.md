@@ -6,6 +6,9 @@ preread: README.md
 status: verified
 ---
 
+# Docking Sandbox
+
+> Prerequisite reading: [Zhixu Store](README.md)
 The Docking Sandbox lets the Nucleus trial-pair external orders, supplier signal maps, adapter workflows, or executor integrations. It handles configuration validation, proof checklists, and operator review material; formal publication and runtime integration still go through Zhixu publication, trust publication, order registration, signal authorization, and docking events.
 
 ## What it can do

@@ -8,6 +8,7 @@ status: verified
 
 # Store and Order App
 
+> Prerequisite reading: [Product DTO and User Surfaces](README.md)
 The Store, Order App, and executor-kit consume the same set of on-chain facts from different user perspectives. This page is an index; detailed boundaries of each surface live on their own pages.
 
 | Surface | One-line positioning | See |

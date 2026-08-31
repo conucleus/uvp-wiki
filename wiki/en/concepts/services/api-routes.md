@@ -7,7 +7,7 @@ status: verified
 
 # API Routes
 
-`src/api/routes/` is the entry point for Chain Services HTTP route modules. Routes are grouped by consumption surface: Product, Store, submission, evidence, governance, notification, diagnostics, and local test control. For user-facing route documentation, see [Product API Endpoints](../../reference/product-api-endpoints.md).
+`src/api/routes/` is the entry point for Chain Services HTTP route modules. Routes are grouped by consumption surface: Product, Store, submission, evidence, governance, notification, and diagnostics. For user-facing route documentation, see [Product API Endpoints](../../reference/product-api-endpoints.md).
 
 ## Route Module Ownership
 
@@ -27,7 +27,6 @@ Authoritative source: route registration under `uvp-chain-services/service/src`.
 | `notifications.ts` | Supplier notification profile, delivery ops. |
 | `diagnostics.ts` | Health/readiness/admin diagnostics. |
 | `admin-ops.ts` | Ops-only maintenance routes. |
-| `e2e-controls.ts` | Local/Product E2E fixture controls; must be disabled on testnet/production. |
 
 ## Route Shell
 
@@ -42,8 +41,8 @@ Authoritative source: route registration under `uvp-chain-services/service/src`.
 
 ## Design Rules
 
-- A new route must clearly belong to Product, Store, governance, ops, or local E2E.
+- A new route must clearly belong to Product, Store, governance, or ops.
 - Product routes must not expose Store admin workflows.
 - Store routes must not fabricate Product proof, Plan publication state, or identity bindings.
-- E2E controls are for local testing only; testnet/production profiles must fail closed — see [Storage, Migration, and Runtime Profile](storage-runtime.md) for the full checklist.
+- There are no local E2E fixture-control routes; the former `e2e-controls.ts` module has been removed. Testnet/production profiles fail closed on missing explicit configuration — see [Storage, Migration, and Runtime Profile](storage-runtime.md) for the full checklist.
 - Every public claim must be traceable to an event, hash, signature, DTO contract, or workflow audit.

@@ -2,12 +2,13 @@
 title: Source 因果链
 type: explanation
 audience: 协议读者
-preread: README.md
+preread: ../README.md
 status: verified
 ---
 
 # Source 因果链
 
+> 前置阅读：[核心概念](../README.md)
 `source` 是 signal 的因果推进线。它回答：“这个业务动作属于哪条推进线？”角色、Supplier 和钱包说明谁在行动；Source 说明这个动作进入哪条业务推进线。
 
 可以先把 source 当作一笔项目里的多条 lane：sales、solution、supply、payment、logistics、field、buyer 可以并行推进，也可以在某个阶段等待另一条 lane 的 proof 后交汇。这些 source 不是部门。一个钱包只要被授权，可以在多个 source 上提交 signal；同一个 Supplier 也可以参与多个 source。

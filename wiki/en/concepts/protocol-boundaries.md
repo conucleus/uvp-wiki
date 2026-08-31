@@ -6,7 +6,12 @@ preread: README.md
 status: verified
 ---
 
+# Protocol Boundaries
+
+> Prerequisite reading: [Core Concepts](README.md)
 This page is the single authoritative statement of UVP protocol boundaries. Everywhere else in this wiki, these boundaries are referenced with one sentence plus a link here, never restated in full. Protocol truth comes from code, `uvp-protocol/contracts/uvp-contracts/fixtures/`, chain events, and release records; if this page ever conflicts with the implementation, the implementation wins and this page gets fixed.
+
+One doctrinal sentence frames all the boundaries below: the system promises correspondence, not truth — every record must correspond to some principal's actual expression; fraud committed with a stolen key is the holder's intent, and the system must not add a judgment layer on top of it; what the system must never do is author content itself, fake success, or substitute silent defaults.
 
 ## Source of Truth
 
@@ -52,4 +57,6 @@ ABI, event topics, EIP-712 typed-data domains, canonical hash domains, artifact 
 
 ## Runtime Environment Discipline
 
-Staging/testnet profiles must fail closed: reject memory/SQLite storage, localhost RPC, demo fallbacks, E2E fixture controls, permissive authorization, and Anvil default keys; demo/mock modes exist only inside explicitly declared demo profiles. Private keys, RPC secrets, JWT secrets, and object-storage credentials appear only redacted — never in the repository, logs, or docs. Execution details: [Storage, Migration, and Runtime Profile](services/storage-runtime.md) and [Troubleshooting](../how-to/troubleshooting.md).
+Every runtime configuration is an explicit declaration; there are no demo or mock modes behind any profile. The Product API has no demo data source — an empty projection returns an empty array or `detail_unavailable`, and no `?fallback=demo` parameter or `UVP_PRODUCT_DEMO_MODE` key exists; frontends have no demo mode either — Store access level comes only from environment/login session. `CHAIN_SERVICES_DATABASE_DRIVER` and `CHAIN_SERVICES_DATABASE_URL` are required in every environment, and a missing value fails at startup with an error naming the key.
+
+Staging/testnet profiles must fail closed: reject memory/SQLite storage, localhost RPC, permissive authorization, and Anvil default private keys; every bootstrap entry requires an explicit deployer private key (`--private-key` or `UVP_ETH_DEPLOYER_PRIVATE_KEY`). Private keys, RPC secrets, JWT secrets, and object-storage credentials appear only redacted — never in the repository, logs, or docs. Execution details: [Storage, Migration, and Runtime Profile](services/storage-runtime.md) and [Troubleshooting](../how-to/troubleshooting.md).

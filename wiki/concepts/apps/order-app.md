@@ -8,6 +8,7 @@ status: verified
 
 # Order App
 
+> 前置阅读：[Order App 与 Executor Kit](order-app-vs-executor-kit.md)
 `uvp-order-app/app` 是普通参与者的订单履约界面。它和 executor-kit 一样是 signal producer，但默认读者是人：参与者打开任务、检查钱包责任、准备证据指纹、确认签名、提交并回看 proof。
 
 它不拥有订单事实。订单、signal、hook 和 proof 来自 `UVPStateMachine` 可重放事件；可选的名称解析来自 `UVPIdentityRegistry`。Order App 消费 Chain Services 暴露的 Product DTO 和 signal container。

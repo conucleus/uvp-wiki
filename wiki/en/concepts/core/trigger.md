@@ -2,12 +2,13 @@
 title: Trigger
 type: explanation
 audience: 协议读者
-preread: README.md
+preread: ../README.md
 status: verified
 ---
 
 # Trigger
 
+> Prerequisite reading: [Core Concepts](../README.md)
 A Trigger turns a ready condition into an actionable task. It is a special hook marker: after some receive hook becomes Ready, that stage's task can open, chain should emit `HookReady`, and only then can Product/Store/executor-kit project it into a task, notification, or adapter job.
 
 On a first pass, read `HookReady` as "this task can be handled now". It does not mean the business is complete; completion must be proven by subsequent authorized `SignalSubmitted` events and evidence fingerprints.

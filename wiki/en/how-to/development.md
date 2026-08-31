@@ -8,6 +8,7 @@ status: verified
 
 # Day-to-Day Development
 
+> Prerequisite reading: [Quick Start](quick-start.md)
 ## Workspace Commands
 
 Run from the repository root:
@@ -49,12 +50,16 @@ forge build
 forge test
 ```
 
-After changing a public interface, you must:
+## Fixed Flow After Changing a Public Interface
+
+After changing a public interface (ABI, event topic, EIP-712 domain, canonical hash, DTO schema, etc.), you must:
 
 1. Update or regenerate the fixture per the "ABI Fixture Drift" section in [Troubleshooting](troubleshooting.md).
 2. Run `pnpm verify:protocol-freeze`.
 3. Check the chain-services indexer, executor-kit, protocol-bindings, and deploy scripts.
 4. Explain the drift in a release note or PRD trace.
+
+For the full interface map and owners, see [Public Interfaces](../reference/public-interfaces.md).
 
 ## Where to Put New Features
 

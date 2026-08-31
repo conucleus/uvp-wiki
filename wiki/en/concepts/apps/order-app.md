@@ -8,6 +8,7 @@ status: verified
 
 # Order App
 
+> Prerequisite reading: [Order App vs Executor Kit](order-app-vs-executor-kit.md)
 `uvp-order-app/app` is the ordinary participant interface for order fulfillment. Like executor-kit it is a signal producer, but its default reader is human: participants open tasks, check wallet responsibility, prepare evidence fingerprints, confirm signatures, submit, and read proof back.
 
 It does not own order facts. Orders, signals, hooks, and proof come from replayable `UVPStateMachine` events; optional name resolution comes from `UVPIdentityRegistry`. The Order App consumes Product DTOs and signal containers exposed by Chain Services.

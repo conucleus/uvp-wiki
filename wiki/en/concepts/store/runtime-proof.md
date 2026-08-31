@@ -6,6 +6,9 @@ preread: README.md
 status: verified
 ---
 
+# Fulfillment Status, Proof, and Trust Checks
+
+> Prerequisite reading: [Zhixu Store](README.md)
 The Store's fulfillment view organizes orders, tasks, supplier participation, evidence hashes, and on-chain proof for operators. It is a view rebuilt around chain events; the source of truth is registry/state-machine events.
 
 <!-- StageExecutorPatchApplied is emitted via the module patch path, not listed directly in the v0.8 main ABI fixture -->

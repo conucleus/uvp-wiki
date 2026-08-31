@@ -31,11 +31,18 @@ participant signs EIP-712 payload
 
 Relayer key 只代表 gas payer，不代表业务主体。业务动作的 authority 来自 EIP-712 签名、order-level signal authorization、active executor overlay 或 selector patch authorization。
 
+## 广播适配器语义
+
+广播适配器是显式声明，不是缺省能力：
+
+- 非 local 环境、或 `UVP_STATE_MACHINE_RELAYER_BROADCAST_ENABLED=true` 时缺少广播适配器：启动即抛出配置错误——relayer 拒绝启动，不会半配置运行。
+- local 运行且未配置广播适配器时，submit 返回 `broadcastStatus: "not_attempted"`：不占 nonce，audit 把该次提交记为 skipped。这是显式的 local dry-run 语义，不是静默成功。
+- `broadcast_disabled` 不是 relayer 的能力档位；它只描述上述 local dry-run 语义。
+
 ## 可以做什么
 
 - 广播已签名 payload。
 - 处理 RPC error、nonce conflict、replacement、retry 和 confirmation。
-- 在 broadcast disabled profile 下记录 `broadcast_disabled`，用于本地或 staging 验证。
 - 输出 redacted diagnostics，帮助 release gate 判断 relayer runtime 是否配置正确。
 
 ## 权限边界
@@ -48,4 +55,4 @@ Relayer key 只代表 gas payer，不代表业务主体。业务动作的 author
 
 ## Testnet 约束
 
-Base Sepolia / testnet runtime 必须使用明确配置的 relayer gas-payer key env，并禁用 demo/permissive fallback。preflight 失败时服务应立即 fail-closed，不降级为内存模式，也不静默跳过广播。完整的 testnet fail-closed 清单见 [Storage、Migration 与 Runtime Profile](storage-runtime.md)。
+Base Sepolia / testnet runtime 必须使用明确配置的 relayer gas-payer key env。preflight 失败时服务应立即 fail-closed，不降级为内存模式，也不静默跳过广播。完整的 testnet fail-closed 清单见 [Storage、Migration 与 Runtime Profile](storage-runtime.md)。

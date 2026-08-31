@@ -103,11 +103,11 @@ Postgres, object storage, and APIs in this diagram are product runtime layers. T
 
 ## Architecture Rules
 
-- Contracts and chain events are the sole source of truth for plan, order, signal, hook, publication, and deployment cutover; see [Protocol Boundaries](protocol-boundaries.md#事实源).
-- Store, Product API, Order App, and executor-kit may only consume, project, display, relay, or submit authorized actions; see [Protocol Boundaries](protocol-boundaries.md#产品表面与服务边界).
-- Indexers and durable databases must be rebuildable from events and cannot become a protocol source of truth; see [Protocol Boundaries](protocol-boundaries.md#可重建性).
-- Periphery may implement funding, guarantee, payment, and agent adapters but must consume core interfaces; see [Protocol Boundaries](protocol-boundaries.md#外围适配).
-- Every cross-module change must check for drift in ABI, events, typed data, canonical hashes, DTOs, CLIs, and release evidence; see [Protocol Boundaries](protocol-boundaries.md#公共接口纪律).
+- Contracts and chain events are the sole source of truth for plan, order, signal, hook, publication, and deployment cutover; see [Protocol Boundaries](protocol-boundaries.md#source-of-truth).
+- Store, Product API, Order App, and executor-kit may only consume, project, display, relay, or submit authorized actions; see [Protocol Boundaries](protocol-boundaries.md#product-surfaces-and-service-boundaries).
+- Indexers and durable databases must be rebuildable from events and cannot become a protocol source of truth; see [Protocol Boundaries](protocol-boundaries.md#rebuildability).
+- Periphery may implement funding, guarantee, payment, and agent adapters but must consume core interfaces; see [Protocol Boundaries](protocol-boundaries.md#periphery-adapters).
+- Every cross-module change must check for drift in ABI, events, typed data, canonical hashes, DTOs, CLIs, and release evidence; see [Protocol Boundaries](protocol-boundaries.md#public-interface-discipline).
 
 ## Related Entries
 

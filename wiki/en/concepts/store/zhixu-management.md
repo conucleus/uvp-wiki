@@ -6,6 +6,9 @@ preread: README.md
 status: verified
 ---
 
+# Zhixu Catalog, Configuration, and Publication
+
+> Prerequisite reading: [Zhixu Store](README.md)
 The Zhixu Catalog is the Nucleus workbench for maintaining order design, compiler material, and Store-facing records. The Nucleus owns stages, fairness rules, exception handling, and supplier organization; the Store owns cataloging, review, search, version selection, and operating records.
 
 ## Nucleation workbench

@@ -2,12 +2,13 @@
 title: State Machine
 type: meta
 audience: 协议读者
-preread: concepts/lifecycle.md
+preread: ../lifecycle.md
 status: verified
 ---
 
 # State Machine
 
+> Prerequisite reading: [Plan and Order Lifecycle](../lifecycle.md)
 The state machine is UVP's core on-chain execution layer and event source: `UVPStateMachine.sol` receives signals submitted by authorized wallets, finds the affected hooks through the Plan's dependency index, evaluates them with a stack machine, and then emits `HookStatusChanged`, `HookReady`, or timer-related events. The ETH runtime authority is the deployed contract; this group of pages explains its runtime semantics.
 
 ## Component Responsibilities

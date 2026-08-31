@@ -15,7 +15,7 @@ status: verified
 
 1. [AI 时代的协作地基](why-uvp.md)：UVP 为什么存在，它把哪些交易成本变成协议对象。
 2. [一个订单故事](one-order-story.md)：用一条跨境订单理解从 Zhixu 设计到链上 proof 的路径。
-3. [核心概念](../core/README.md)：故事清楚之后，再按层级读协议对象总览。
+3. [核心概念](../concepts/README.md)：故事清楚之后，再按层级读协议对象总览。
 4. [核心术语表](../reference/glossary.md)：项目术语和关键概念对。
 
 ## 第二遍阅读

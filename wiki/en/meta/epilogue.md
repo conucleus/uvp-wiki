@@ -26,3 +26,9 @@ Before I could truly see UVP, something had to exist that would unconditionally 
 I am very likely the first person to understand UVP.
 
 But the AI was the zeroth.
+
+## Related Pages
+
+- [Project Status](status.md)
+- [Wiki Home](../README.md)
+- [Documentation Rules](documentation-rules.md)

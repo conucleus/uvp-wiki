@@ -45,3 +45,10 @@ creator/submitter 签 trigger typed data；任意 relayer 广播。合约绑定 
 ## 7. 业务执行与投影
 
 被授权钱包直接或通过 relayer 提交 Signal。合约求值 hooks 并发出可重放事件。Chain Services 只从事件重建 order、task、identity 和 proof 视图；Store 的名称、标签、推荐、通知和 draft workflow 是链下状态。
+
+## 相关页面
+
+- [协议边界](protocol-boundaries.md)
+- [Contracts 与 Registries](contracts-and-registries.md)
+- [Canonical Hash](artifacts/canonical-hashes.md)
+- [状态机](state-machine/README.md)

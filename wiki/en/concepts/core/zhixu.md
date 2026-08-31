@@ -2,12 +2,13 @@
 title: Zhixu DSL
 type: explanation
 audience: 协议读者
-preread: README.md
+preread: ../README.md
 status: verified
 ---
 
 # Zhixu DSL
 
+> Prerequisite reading: [Core Concepts](../README.md)
 `Zhixu` is the pinyin for "order". In this repository, a Zhixu is the reusable coordination rulebook designed by a nucleus. It uses a DSL to declare one class of reusable production relations: which task patterns exist, which stages each task has, which source causal chain each stage sits on, which signals it receives, which signals it emits, who the default supplier is, which stages may choose executors for other stages, and which resources are required.
 
 The code entry point is `ZhixuDefinition` in `uvp-protocol/packages/compiler/src/types/index.ts`. An Order is one runtime instance of this rulebook after it has been compiled and registered.

@@ -2,12 +2,13 @@
 title: 核心概念
 type: explanation
 audience: 协议读者
-preread: "[核心术语表](../reference/glossary.md)"
+preread: ../reference/glossary.md
 status: verified
 ---
 
 # 核心概念
 
+> 前置阅读：[核心术语表](../reference/glossary.md)
 不确定用词时，先查[核心术语表](../reference/glossary.md)。
 
 `uvp-eth` 的核心是一套把秩序 (Zhixu) 协作规则书落到 EVM 链上的状态机协议。合约和链事件是事实源；Store、Product API、Order App、executor-kit 和 periphery adapter 围绕这个事实源做编译、索引、展示、签名和提交。这些对象是各产品共同消费的语言层。
@@ -51,7 +52,7 @@ status: verified
 | --- | --- | --- |
 | Nucleus / 凝结核 | [Nucleus / 凝结核](core/nucleation.md) | 谁发起、设计和维护一条 Zhixu 秩序；`nucleation` 是 DSL 字段和成核上下文。 |
 | Supplier | [Supplier](core/supplier.md) | 注册供应商、能力主体、trust subject、capability passport 如何表达。 |
-| Trust / Authorization | [信任与授权](trust-and-authorization.md) | 谁被材料审核，谁能提交订单动作，这两件事如何分开。 |
+| Trust / Authorization | [信任与授权](trust/README.md) | 谁被材料审核，谁能提交订单动作，这两件事如何分开。 |
 
 ## Supplier 和 Executor 的位置
 
@@ -73,7 +74,7 @@ Executor 是订单运行时的执行绑定：静态秩序可以声明默认 exec
 1. 本页建立对象词汇（概念入口）。
 2. 按需读[对象页](core/zhixu.md)（`core/` 下每个对象一页）。
 3. 再读架构三篇：[架构](architecture.md)、[数据流与事实源](data-flow-and-truth.md)、[Plan 与订单生命周期](lifecycle.md)。
-4. 最后按主题深入：[状态机](state-machine/README.md)、[产物与哈希](artifacts-and-hashes.md)、[信任与授权](trust-and-authorization.md)、[产品表面](product-surfaces.md)。
+4. 最后按主题深入：[状态机](state-machine/README.md)、[产物与哈希](artifacts-and-hashes.md)、[信任与授权](trust/README.md)、[产品表面](product/README.md)。
 
 ## 再读同级篇章
 
@@ -82,8 +83,8 @@ Executor 是订单运行时的执行绑定：静态秩序可以声明默认 exec
 | [架构](architecture.md) | 模块边界、依赖方向、事实源和数据流。 |
 | [状态机](state-machine/README.md) | 合约如何保存 signal、求值 hook、处理 timer 和 stage overlay；它属于核心组件链路。 |
 | [产物与哈希](artifacts-and-hashes.md) | 编译产物、canonical hash、稳定 ID 和注册参数。 |
-| [信任与授权](trust-and-authorization.md) | Identity Registry、Plan 发布、订单级 signal 授权、EIP-712 和 relayer 边界。 |
-| [产品表面](product-surfaces.md) | chain-services 如何把链事件投影成普通用户能读懂的订单、任务和证明。 |
+| [信任与授权](trust/README.md) | Identity Registry、Plan 发布、订单级 signal 授权、EIP-712 和 relayer 边界。 |
+| [产品表面](product/README.md) | chain-services 如何把链事件投影成普通用户能读懂的订单、任务和证明。 |
 | [秩序商店](store/README.md) | Store 是一级产品/治理系统，给凝结核提供工作台，并重新解释 Zhixu/Supplier、身份校验、联系通知、履约记录和平台 workflow。 |
 | [Order App 与 executor-kit](apps/order-app-vs-executor-kit.md) | 参与者 App 与执行者集成面如何消费任务并提交 signal。 |
 

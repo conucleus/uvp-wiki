@@ -6,6 +6,9 @@ preread: README.md
 status: verified
 ---
 
+# Supplier Directory、能力与联系
+
+> 前置阅读：[秩序商店（Store）](README.md)
 Supplier Directory 是 Store 的链下工作台：维护 supplier 目录、名称、联系信息、能力标签、匹配特征和履约 proof。Identity Registry 只提供线下 subject 与钱包的对应，不能替 Store 证明能力——权威边界见 [README.md](README.md)「信息对象与权威来源」表与 [../protocol-boundaries.md](../protocol-boundaries.md)。
 
 ## 三类身份与标签来源

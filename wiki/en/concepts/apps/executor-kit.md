@@ -8,6 +8,7 @@ status: verified
 
 # Executor Kit
 
+> Prerequisite reading: [Order App vs Executor Kit](order-app-vs-executor-kit.md)
 `uvp-executor-kit/package` is the CLI/SDK for executors, enterprise systems, and supervised agents. It connects tasks, evidence, signatures, and submission actions to UVP on-chain fact sources.
 
 Executor Kit has two equally important signal-producer surfaces:
@@ -57,6 +58,18 @@ Key commands:
 - `uvp-executor chain-watch`: keep listening and persist jobs; key flags `--jobs-file`, others same as above.
 
 The chain watcher job identity must include the emitting state-machine address so that in multi-deployment environments a `HookReady` from contract A is never called back against contract B. Full command syntax: [CLI and configuration](../../reference/cli-and-config.md).
+
+## Reliability semantics
+
+Submission and retry behavior is explicit, never best-effort silent:
+
+- A signal that reaches `submitted` is non-terminal: it can be rescanned and reconciled until an on-chain event proves the final outcome.
+- Receipt waiting defaults to on (`waitForReceipt` defaults to `true`); turn it off only deliberately.
+- `chain-once` and `jobs retry` exit with code `1` when results contain errors or jobs that ended up failed/dead_letter, so schedulers and CI treat the run as failed instead of continuing silently.
+- Retry decisions use explicit error codes; uncoded errors are never auto-retried.
+- Product API callback delivery retries internally three times with exponential backoff before reporting failure.
+- When an action carries no business payload, the payload hash is encoded as the protocol constant `bytes32(0)` — zero means "no payload", it is not a missing value.
+- `--dry-run` remains an explicit test aid: it exercises scanning and preparation without submitting anything.
 
 ## Doctor and blocked reasons
 

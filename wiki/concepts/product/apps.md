@@ -8,6 +8,7 @@ status: verified
 
 # Store 与 Order App
 
+> 前置阅读：[Product DTO 与用户表面](README.md)
 Store、Order App 和 executor-kit 站在不同用户视角上消费同一套链上事实。本页是索引；各表面的详细边界见对应页面。
 
 | 表面 | 一句话定位 | 详见 |

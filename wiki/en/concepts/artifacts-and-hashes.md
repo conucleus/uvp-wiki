@@ -8,6 +8,7 @@ status: verified
 
 # Artifacts and Hashes
 
+> Prerequisite reading: [Compiler and Hook Core](compiler-and-hooks.md)
 The compiler deterministically turns Zhixu definitions into protocol artifacts and hash commitments; this group of pages explains which inputs enter the artifacts, how stable hashes are computed, and how on-chain artifacts compress into registration parameters.
 
 ## Pages in This Section

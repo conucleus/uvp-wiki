@@ -8,6 +8,7 @@ status: verified
 
 # 产物与哈希
 
+> 前置阅读：[Compiler 与 Hook Core](compiler-and-hooks.md)
 编译器把 Zhixu 定义确定性地产出为协议产物与哈希承诺；本组页面解释哪些输入进入产物、稳定哈希如何计算，以及链上产物如何压缩成注册参数。
 
 ## 本篇子项

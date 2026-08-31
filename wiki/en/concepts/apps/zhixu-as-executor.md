@@ -8,6 +8,7 @@ status: verified
 
 # Zhixu as an Execution Interface
 
+> Prerequisite reading: [Executor](../core/executor.md)
 One Zhixu can act as another Zhixu's stage executor. Executor here means an execution interface: it receives the stage task the local order opens, runs by its own rules, and maps the agreed signals back to the local order.
 
 ## Core model
@@ -37,7 +38,7 @@ This brings several benefits:
 
 ## YAML form
 
-<!-- TODO(confirm): verify receiveSignals/externalSignals/signalMap/supplierType keywords against hook-core parser -->
+> TODO(confirm): verify receiveSignals/externalSignals/signalMap/supplierType keywords against hook-core parser.
 
 A settlement stage can use another Zhixu as an execution interface like this:
 

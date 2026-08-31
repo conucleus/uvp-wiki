@@ -53,7 +53,7 @@ Compiler 的确定性保证各方得到同一个 plan hash。合约注册 compac
 
 以下都是 compile 期规则，不是运行时规则；运行时求值见 [Hook 求值](state-machine/evaluation.md)。
 
-<!-- TODO(confirm): 指令称八条细则，源页（components/semantics-and-compiler.md）实际仅七条 -->
+> 待确认（TODO）：指令称八条细则，源页（components/semantics-and-compiler.md）实际仅七条。
 
 - `stage.trigger` 必须引用本 stage 已存在的 `externalSignals` 或 `receiveSignals` key。
 - `externalSignals` 是 backend/executor 的直接输入契约，不编译成 Hook；只有 `receiveSignals` 会产生 Hook。

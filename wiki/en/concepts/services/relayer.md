@@ -31,11 +31,18 @@ participant signs EIP-712 payload
 
 The relayer key represents only the gas payer, never a business actor. Authority for business actions comes from EIP-712 signatures, order-level signal authorization, the active executor overlay, or selector patch authorization.
 
+## Broadcast Adapter Semantics
+
+A broadcast adapter is an explicit declaration, not a default:
+
+- When the environment is non-local, or `UVP_STATE_MACHINE_RELAYER_BROADCAST_ENABLED=true`, a missing broadcast adapter is a startup configuration error — the relayer refuses to start.
+- In a local run without a configured broadcast adapter, submit returns `broadcastStatus: "not_attempted"`: no nonce is reserved and the audit entry records the submission as skipped. This is explicit local dry-run semantics.
+- `broadcast_disabled` is no longer a capability tier of the relayer; it only describes these local dry-run semantics.
+
 ## What It Can Do
 
 - Broadcast signed payloads.
 - Handle RPC errors, nonce conflicts, replacements, retries, and confirmations.
-- Record `broadcast_disabled` under a broadcast-disabled profile for local or staging verification.
 - Emit redacted diagnostics that help the release gate judge whether the relayer runtime is configured correctly.
 
 ## Permission Boundaries
@@ -48,4 +55,4 @@ The relayer key represents only the gas payer, never a business actor. Authority
 
 ## Testnet Constraints
 
-The Base Sepolia / testnet runtime must use an explicitly configured relayer gas-payer key env and must disable demo/permissive fallbacks. When preflight fails, the service fails closed immediately — no degradation to memory mode, no silent skipping of broadcast. For the complete testnet fail-closed checklist, see [Storage, Migration, and Runtime Profile](storage-runtime.md).
+The Base Sepolia / testnet runtime must use an explicitly configured relayer gas-payer key env. When preflight fails, the service fails closed immediately — no degradation to memory mode, no silent skipping of broadcast. For the complete testnet fail-closed checklist, see [Storage, Migration, and Runtime Profile](storage-runtime.md).

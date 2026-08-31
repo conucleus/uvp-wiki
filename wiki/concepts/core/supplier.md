@@ -2,12 +2,13 @@
 title: Supplier
 type: explanation
 audience: 协议读者
-preread: README.md
+preread: ../README.md
 status: verified
 ---
 
 # Supplier
 
+> 前置阅读：[核心概念](../README.md)
 Supplier 是 Store 和凝结核组织的现实或数字能力主体，可以是个人、公司、报关行、物流商、AI 服务或企业系统。
 
 Store 在链下维护 supplier 的显示名称、联系方式、能力标签、适用角色与阶段、私有匹配特征、审核和推荐记录（见 [秩序商店](../store/README.md)）。这些数据表达 Store 自己的经营判断，不是 UVP 合约认证。

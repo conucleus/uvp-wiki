@@ -8,6 +8,7 @@ status: verified
 
 # Local Anvil 协议闭环
 
+> 前置阅读：[快速开始](../how-to/quick-start.md)
 这个教程验证最小链上语义闭环：
 
 ```text

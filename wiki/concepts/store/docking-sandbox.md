@@ -6,6 +6,9 @@ preread: README.md
 status: verified
 ---
 
+# Docking Sandbox
+
+> 前置阅读：[秩序商店（Store）](README.md)
 Docking Sandbox 用来让凝结核试拼外部秩序、supplier signal map、adapter workflow 或 executor integration。它负责配置验证、proof checklist 和 operator review 材料；正式发布和运行态对接继续走 Zhixu 发布、trust publication、order registration、signal authorization 和 docking events。
 
 ## 可以做什么

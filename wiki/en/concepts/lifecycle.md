@@ -45,3 +45,10 @@ The creator/submitter signs trigger typed data; any relayer broadcasts it. The c
 ## 7. Business Execution and Projection
 
 Authorized wallets submit Signals directly or through relayers. The contract evaluates hooks and emits replayable events. Chain Services rebuild order, task, identity, and proof views from events only; Store names, tags, recommendations, notifications, and draft workflows are off-chain state.
+
+## Related Pages
+
+- [Protocol Boundaries](protocol-boundaries.md)
+- [Contracts and Registries](contracts-and-registries.md)
+- [Canonical Hash](artifacts/canonical-hashes.md)
+- [State Machine](state-machine/README.md)

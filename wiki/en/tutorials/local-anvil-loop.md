@@ -8,6 +8,7 @@ status: verified
 
 # Local Anvil Protocol Loop
 
+> Prerequisite reading: [Quick Start](../how-to/quick-start.md)
 This tutorial verifies the smallest on-chain semantic loop:
 
 ```text
@@ -20,7 +21,7 @@ Zhixu -> HookPlan -> OnchainHookPlan -> commitPlan+finalizePlan / triggerOrderFr
 
 - `pnpm install` has already been run.
 - Foundry and Anvil are available.
-- No real private key is required. The script can use a local Anvil key.
+- An explicit deployer private key is required on every bootstrap entry — export `UVP_ETH_DEPLOYER_PRIVATE_KEY` (the script passes it through as `--private-key`). There is no built-in Anvil default key anymore; even locally you declare which key deploys.
 
 ## Contract-only Deployment
 
@@ -86,7 +87,7 @@ On success, you should see:
 - replay expected and observed values matching;
 - mismatches equal to 0.
 
-If there is a replay mismatch, first read the "Chain event replay mismatch" section in [Troubleshooting](../how-to/troubleshooting.md).
+If there is a replay mismatch, first read the "Chain event replay mismatch" section in [Troubleshooting](../how-to/troubleshooting.md). A non-zero mismatch count skips deployment activation and exits non-zero; evidence artifacts are still written for inspection.
 
 ## Continue With the Product Local Surface
 

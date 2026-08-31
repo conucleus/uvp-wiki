@@ -32,3 +32,5 @@ uvp-deploy/deploy/scripts/bootstrap-local-anvil.sh
 ```
 
 The address manifest must explicitly include the current `stateMachineDeployments[]`, `activeDeploymentId`, frozen modules, `UVPDeploymentRegistry`, and `UVPIdentityRegistry` (full requirements in `uvp-deploy/deploy/README.md`). Generated logs, temporary wallets, databases, and browser artifacts stay out of version control.
+
+If any check fails, locate the symptom in [Troubleshooting](troubleshooting.md) first, then decide whether it is an intentional public interface change.

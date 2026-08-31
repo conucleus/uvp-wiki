@@ -2,12 +2,13 @@
 title: Hook
 type: explanation
 audience: 协议读者
-preread: README.md
+preread: ../README.md
 status: verified
 ---
 
 # Hook
 
+> Prerequisite reading: [Core Concepts](../README.md)
 A Hook is the smallest rule by which the state machine decides "whether a stage condition holds". It is not an HTTP webhook or an external-system callback; it is a state-machine condition over an Order's event set. Each entry of a Zhixu stage's `receiveSignals` usually compiles into one `kind=receive` hook; if the stage docks with another Zhixu, `signalMap` also compiles into `kind=signalMap` hooks.
 
 A Hook is only a condition. Only when a hook marked as a [Trigger](trigger.md) becomes Ready does chain emit `HookReady`, and only then should Product/Store project it as a formally executable task.

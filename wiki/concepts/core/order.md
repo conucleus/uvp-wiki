@@ -2,12 +2,13 @@
 title: 订单 (Order)
 type: explanation
 audience: 协议读者
-preread: README.md
+preread: ../README.md
 status: verified
 ---
 
 # 订单 (Order)
 
+> 前置阅读：[核心概念](../README.md)
 Order 是“订单”。在协议里，它是从某个已注册 [Plan](plan.md) 分叉出来的一条独立事实流。Order 一旦开启并取得 `orderId`，协议只承诺它已经注册并可继续接收符合规则的事实；核心协议不为 Order 定义 `running`、`completed`、`cancelled` 等生命周期状态。
 
 ## 谁使用

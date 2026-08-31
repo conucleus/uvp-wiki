@@ -2,12 +2,13 @@
 title: Executor
 type: explanation
 audience: 协议读者
-preread: README.md
+preread: ../README.md
 status: verified
 ---
 
 # Executor
 
+> 前置阅读：[核心概念](../README.md)
 Executor 是某个订单运行时真正承接阶段、产生业务动作或提交 signal 的执行者。它可以是一个人、企业系统、供应商派出的钱包、adapter、AI/MCP agent，也可以是一条独立的 Zhixu 秩序。
 
 Executor 要和 Supplier 分开：

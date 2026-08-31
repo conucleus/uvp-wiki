@@ -33,7 +33,7 @@ Success criterion: build and test both pass. If the contract ABI, bytecode, even
 
 ## Run the Local Protocol Loop
 
-Prerequisites: Anvil is available and no real private key is needed. The full local loop (deploy contracts, compile Zhixu, register plan/order, submit signals, hook events, and replay verification) is covered in [Local Anvil Protocol Loop](../tutorials/local-anvil-loop.md).
+Prerequisites: Anvil is available and an explicit deployer private key is exported (`UVP_ETH_DEPLOYER_PRIVATE_KEY`; a throwaway local key is fine, but there is no built-in Anvil default key anymore). The full local loop (deploy contracts, compile Zhixu, register plan/order, submit signals, hook events, and replay verification) is covered in [Local Anvil Protocol Loop](../tutorials/local-anvil-loop.md).
 
 Success criterion: every item in that tutorial's "Success Criteria" section passes, with replay mismatch equal to 0.
 
@@ -46,6 +46,7 @@ Success criterion: every item in that tutorial's "Success Criteria" section pass
 | `pnpm build` | Build all packages. |
 | `pnpm lint` | Run lint for packages that provide a lint script. |
 | `pnpm verify:protocol-freeze` | Verify the v0.8 `UVPStateMachine`, v0.1 `UVPIdentityRegistry`, modules, `UVPDeploymentRegistry`, and EIP-712 fixtures. |
+| `pnpm no-spend:safety` | Run the deploy package's no-spend checks plus environment-file validation; spends no gas. |
 
 Verification: the corresponding command exits with code 0.
 

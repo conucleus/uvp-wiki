@@ -37,3 +37,10 @@ Periphery 场景可以展示资金、担保、清关、物流、AI/MCP 或企业
 - deployment registry record。
 
 部署状态不能写到仓库外的 sibling 部署仓作为 uvp-eth 的事实来源。
+
+## 相关页面
+
+- [协议边界（外围适配）](protocol-boundaries.md)
+- [部署与证据](../meta/deploy-release.md)
+- [模块地图](../reference/module-map.md)
+- [Contracts 与 Registries](contracts-and-registries.md)

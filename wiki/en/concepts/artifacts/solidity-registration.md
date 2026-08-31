@@ -63,3 +63,10 @@ pnpm verify:protocol-freeze
 ```
 
 Changes to ABI, bytecode, selectors, event topics, typed-data fields, canonical hashes, or artifact schemas should be captured in release notes and migration decisions.
+
+## Related Pages
+
+- [Compiler Input](compiler-input.md)
+- [Canonical Hash](canonical-hashes.md)
+- [Contracts and Events](../../reference/contracts-and-events.md)
+- [Release and Verification](../../how-to/release-checklist.md)

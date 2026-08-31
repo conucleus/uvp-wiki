@@ -8,6 +8,7 @@ status: verified
 
 # Zhixu 作为 Executor
 
+> 前置阅读：[Executor](../core/executor.md)
 一条 Zhixu 可以作为另一条 Zhixu 的 stage executor。这里的 executor 是执行接口：它接收本地秩序开放的阶段任务，按自己的规则运行，并把约定信号映射回本地秩序。
 
 ## 核心模型
@@ -37,7 +38,7 @@ local order 和 linked order 都是独立的 `UVPStateMachine` order。它们各
 
 ## YAML 形态
 
-<!-- TODO(confirm): 关键字与 hook-core parser 现状逐一对账（receiveSignals、externalSignals、signalMap、supplierType: zhixu） -->
+> 待确认（TODO）：关键字与 hook-core parser 现状逐一对账（receiveSignals、externalSignals、signalMap、supplierType: zhixu）。
 
 一个结算 stage 可以这样把另一条 Zhixu 作为执行接口：
 

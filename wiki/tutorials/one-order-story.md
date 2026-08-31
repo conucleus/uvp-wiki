@@ -8,6 +8,7 @@ status: verified
 
 # 一个订单故事
 
+> 前置阅读：[AI 时代的协作地基](why-uvp.md)
 这页先从一张真实生产关系图理解 UVP，再进入订单。先记住一句话：秩序 (Zhixu) 是一类协作的可复用规则书，订单 (Order) 是这份规则书的一次具体执行。
 
 本页的目标是建立业务直觉，不是解释全部工程对象。读完后，你应该能说清楚：谁在协作，谁实际执行某一步，什么声明会推动订单继续，以及这些声明为什么可追责。
@@ -98,7 +99,7 @@ UVP 的第一个核心动作，是把“生产关系 + 信号边界”写成计�
 
 Zhixu 是一份让计算机、链上合约、企业系统、AI agent、Store、Order App 和 executor-kit 理解同一套协作边界的标准语言。现实合同继续约定商业责任，Zhixu 负责把协作边界写成可执行的信号规则。
 
-继续读核心对象时，从 [核心概念入口](../core/README.md) 和 [秩序 (Zhixu) DSL](../concepts/core/zhixu.md) 开始。
+继续读核心对象时，从 [核心概念入口](../concepts/README.md) 和 [秩序 (Zhixu) DSL](../concepts/core/zhixu.md) 开始。
 
 ## 5. 从规则书到一次订单
 
@@ -175,12 +176,12 @@ Zhixu 里的阶段条件
 
 ![Order App 中的任务详情区域](../assets/screenshots/order-app-task-detail.png)
 
-*Order App 把可处理 task 展示成普通参与者能读懂的截止时间、输入要求、授权来源和 proof 状态；截图来自本地 Order App demo，业务主线仍以上面的光伏项目为准。*
+*Order App 把可处理 task 展示成普通参与者能读懂的截止时间、输入要求、授权来源和 proof 状态；截图来自对接真实 Product API 的本地 Order App，业务主线仍以上面的光伏项目为准。*
 
 这意味着“任务可以处理了”不等于“业务已经完成”。业务完成要等后续授权 signal 和证据指纹来证明。
 
 ## 接着读
 
-- [核心概念](../core/README.md)：在故事清楚之后，再按层级读协议对象。
+- [核心概念](../concepts/README.md)：在故事清楚之后，再按层级读协议对象。
 - [Plan 与订单生命周期](../concepts/lifecycle.md)：第二遍用同一条订单看代码模块和产品表面的分工。
 - [核心术语表](../reference/glossary.md)：遇到陌生术语和关键概念对时随时查。

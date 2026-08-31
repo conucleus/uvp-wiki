@@ -8,6 +8,7 @@ status: prototype
 
 # Source Modeling Examples
 
+> Prerequisite reading: [Source Causal Chain](source.md)
 This page collects advanced modeling examples for Source causal chains. Status is marked prototype: these examples are teaching-oriented modeling ideas, not yet audited example-by-example against implementations and product projections; for protocol semantics, [Source Causal Chain](source.md) is authoritative.
 
 ## Who Uses It

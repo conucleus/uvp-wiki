@@ -2,12 +2,13 @@
 title: Plan
 type: explanation
 audience: 协议读者
-preread: README.md
+preread: ../README.md
 status: verified
 ---
 
 # Plan
 
+> 前置阅读：[核心概念](../README.md)
 Plan 是 Zhixu 针对某条链编译出的不可变运行规则。它只承载状态机必须知道的 hooks、dependency keys、selector bindings 和 signal capabilities；供应商能力、推荐标签、履约材料与撮合逻辑不属于 Plan。
 
 ## 谁使用

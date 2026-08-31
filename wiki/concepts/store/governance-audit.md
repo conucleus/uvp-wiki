@@ -6,6 +6,9 @@ preread: README.md
 status: verified
 ---
 
+# Operator 权限、治理与 Audit
+
+> 前置阅读：[秩序商店（Store）](README.md)
 Store 里的权限和 audit 约束平台 workflow。Audit 记录证明某个 Store 操作发生过；凝结核的秩序设计、Store or external institution 材料审核和 state-machine 事件仍各自保留权威来源（统一见 [README.md](README.md)「信息对象与权威来源」表）。
 
 ## 三类权限

@@ -2,12 +2,13 @@
 title: Signal
 type: explanation
 audience: 协议读者
-preread: README.md
+preread: ../README.md
 status: verified
 ---
 
 # Signal
 
+> 前置阅读：[核心概念](../README.md)
 Signal 是订单状态机接受的最小业务输入。它代表“某个被授权的钱包，对某个订单，提交了某类动作或凭证指纹”。
 
 ## 谁使用
@@ -108,6 +109,14 @@ signalKey = keccak256(abi.encode(sourceId, signalId))
 | `submittedAt` | 链上记录时间。 |
 
 这条边界很重要：链提供可验证顺序和权限，不提供业务文件存储。
+
+### 编码约定：payloadHash = bytes32(0) 表示无载荷
+
+`payloadHash` 是必填的 `bytes32` 字段，但并非每次提交都有业务载荷。协议规定：
+
+- `payloadHash = bytes32(0)`（即 `0x0000…0000`）是合法的协议常量，含义是「本次 signal 没有对应载荷」，不是缺失数据或错误状态。
+- 有载荷时，`payloadHash` 必须是链下 payload 规范化后的哈希；投影与消费方据此区分「有证据」与「纯动作/状态类 signal」。
+- 这是编码约定而非占位兜底：提交侧在无载荷时应显式写 `bytes32(0)`；消费方读到零值时按「无载荷」展示，而不是当作未知或报错。
 
 ## 授权是链上检查项
 

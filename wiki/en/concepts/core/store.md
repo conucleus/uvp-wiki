@@ -2,12 +2,13 @@
 title: Zhixu Store
 type: explanation
 audience: 协议读者
-preread: README.md
+preread: ../README.md
 status: verified
 ---
 
 # Zhixu Store
 
+> Prerequisite reading: [Core Concepts](../README.md)
 This is the core-concept side view of the Store. For the full product entry see [Zhixu Store](../store/README.md), which is organized by Store workflows, authority boundaries, and operator tasks.
 
 The Zhixu Store is a centralized product and platform workflow workbench. It organizes nuclei, orders, suppliers, proofs, and material-review requests into interfaces humans can understand. It gives nuclei a stage, applies platform tags to objects, displays proof, initiates governance requests, and keeps audit records; nuclei, the Identity Registry, and on-chain events each retain their own sources of authority.

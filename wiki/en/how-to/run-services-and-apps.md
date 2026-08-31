@@ -32,7 +32,7 @@ pnpm --filter @uvp-eth/chain-services rebuild:indexer
 pnpm --filter @uvp-eth/chain-services dev:relayer
 ```
 
-Staging/testnet profiles must not use memory/SQLite, nor localhost RPC, nor demo/E2E fixture controls (background in [Protocol Boundaries](../concepts/protocol-boundaries.md)).
+Staging/testnet profiles must not use memory/SQLite, nor localhost RPC (background in [Protocol Boundaries](../concepts/protocol-boundaries.md)). `CHAIN_SERVICES_DATABASE_DRIVER` and `CHAIN_SERVICES_DATABASE_URL` are required in every environment; the service refuses to start when they are missing. There are no demo or E2E fixture modes anywhere in the service layer — whatever profile you declare is exactly what runs.
 
 ## Store Workbench
 
@@ -53,10 +53,9 @@ The Store write API should show errors on missing API base URL, `403`, `404`, `4
 
 ```bash
 pnpm --filter @uvp-eth/order-app dev
-pnpm --filter @uvp-eth/order-app dev:demo
 ```
 
-Connect to the real Product API:
+The Order App always talks to a real Product API; there is no demo script and no demo data source. Point it at your local instance:
 
 ```bash
 VITE_UVP_CHAIN_SERVICES_URL=http://127.0.0.1:8787 \
@@ -101,3 +100,5 @@ pnpm --filter @uvp-eth/executor-kit cli -- product tasks \
 ```
 
 Private keys are read only from environment variables explicitly named by `--private-key-env` (background in [Protocol Boundaries](../concepts/protocol-boundaries.md)).
+
+If a service fails to start or behaves unexpectedly, start with [Troubleshooting](troubleshooting.md) (common symptoms include Product API returning empty results or `detail_unavailable`, Order App showing no tasks, and Relayer not broadcasting).

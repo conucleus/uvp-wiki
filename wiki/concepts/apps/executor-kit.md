@@ -8,6 +8,7 @@ status: verified
 
 # Executor Kit
 
+> 前置阅读：[Order App 与 Executor Kit](order-app-vs-executor-kit.md)
 `uvp-executor-kit/package` 是 executor、企业系统和 supervised agent 的 CLI/SDK。它把任务、证据、签名和提交动作接到 UVP 链上事实源。
 
 Executor Kit 有两个同等重要的 signal producer 表面：
@@ -53,10 +54,22 @@ HookReady(orderId, hookId, stageId, hookName)
 
 关键命令：
 
-- `uvp-executor chain-once`：单轮扫描 `HookReady` 并生成 job 或 dry-run；要点 `--rpc-url`、`--state-machine`、`--config`、`--dry-run`。
+- `uvp-executor chain-once`：单轮扫描 `HookReady` 并生成 job 或 dry-run；要点 `--rpc-url`、`--state-machine`、`--config`、`--dry-run`（`--dry-run` 是显式测试辅助：只演练扫描与准备，不提交任何交易）。
 - `uvp-executor chain-watch`：持续监听并把 job 落盘；要点 `--jobs-file`、其余同上。
 
 chain watcher job identity 必须包含 emitting state-machine address，避免多部署环境里把 A 合约的 `HookReady` 回调到 B 合约。完整命令语法见 [CLI 与配置](../../reference/cli-and-config.md)。
+
+## 可靠性语义
+
+提交与重试行为都是显式的，不做静默 best-effort：
+
+- 到达 `submitted` 的 signal 不是终态：在链上事件证明最终结果之前，它可以被重扫与对账。
+- 收据等待默认开启（`waitForReceipt` 默认 `true`），只在明确需要时才关闭。
+- `chain-once` 与 `jobs retry` 在结果包含 error、或存在 failed/dead_letter job 时以退出码 1 结束；调度器和 CI 应据此把本轮视为失败，而不是继续。
+- 重试判定只认显式错误码：没有错误码的错误不会被自动重试。
+- Product API callback 内置 3 次指数退避重试，之后才报告失败；批量投递部分成功时按条目逐条记录结果。
+- 动作没有业务载荷时，payloadHash 编码为协议常量 `bytes32(0)`——零值表示「无载荷」，不是缺失数据。
+- `--dry-run` 始终是显式测试辅助：只演练扫描与准备，不提交任何交易。
 
 ## Doctor 和 blocked reason
 

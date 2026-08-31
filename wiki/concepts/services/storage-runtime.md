@@ -13,15 +13,16 @@ Storage 是可重建服务层的工作流和投影缓存。Chain Services 支持
 
 ```text
 CHAIN_SERVICES_DATABASE_DRIVER=memory|sqlite|postgres
-CHAIN_SERVICES_DATABASE_URL=memory://projection-store
-CHAIN_SERVICES_MIGRATIONS_AUTO_RUN=false
+CHAIN_SERVICES_DATABASE_URL=<按 driver 显式配置>
 ```
 
-| Profile | 用途 | 约束 |
-| --- | --- | --- |
-| memory | 单元测试、临时 prototype。 | 只支撑 test/prototype 口径。 |
-| SQLite | 本地 durable run、开发者自测。 | 适合个人 fork，不适合公共测试网服务。 |
-| PostgreSQL | Base Sepolia staging、长期服务、生产 profile。 | migration 显式管理，runtime fail-closed。 |
+`CHAIN_SERVICES_DATABASE_DRIVER` 与 `CHAIN_SERVICES_DATABASE_URL` 是全环境必填键——本地运行和单元测试也不例外；任一缺失时启动即失败，报错信息包含缺失键名。三个合法值都是对目标 profile 的显式声明：没有隐式默认值，也没有不配置驱动就能启动的模式。生产环境额外要求 `postgres` 并显式管理 migration，runtime fail-closed。
+
+| 合法的显式驱动值 |
+| --- |
+| `memory`：只支撑单元测试、临时 prototype 口径。 |
+| `sqlite`：本地 durable run、开发者自测；适合个人 fork，不适合公共测试网服务。 |
+| `postgres`：Base Sepolia staging、长期服务、生产 profile。 |
 
 ## 代码入口
 
@@ -58,10 +59,14 @@ Base Sepolia / testnet profile 必须拒绝：
 
 - memory/SQLite storage。
 - localhost RPC。
-- demo fallback、E2E fixture controls、permissive authorization。
+- permissive authorization。
 - Anvil default private keys。
 - 缺失 `UVPStateMachine` / `UVPIdentityRegistry` address manifest。
 - broadcast 关闭但仍声明 staging ready。
+
+非 local 环境（或 relayer broadcastEnabled=true）缺少广播适配器时，启动即以配置错误失败，不会半配置运行。
+
+这份清单里没有 demo fallback 和 E2E fixture controls：它们不是待拒绝的开关，而是已经不存在。Product API 没有 demo 数据源——空投影返回空数组、缺失明细返回 `detail_unavailable`，不存在 `?fallback=demo` 参数和 `UVP_PRODUCT_DEMO_MODE` 键；e2e-controls 模块与 `UVP_PRODUCT_E2E_FIXTURES` 也已删除。fail-closed 检查的对象是「缺显式配置」，不是「关闭某个 demo 模式」。
 
 Readiness 可以说明“这个服务实例是否按正确配置运行”；链上 plan/order/signal/trust 事实仍来自事件。
 
@@ -71,3 +76,10 @@ Readiness 可以说明“这个服务实例是否按正确配置运行”；链�
 - Store draft、supplier metadata、audit 和 notification delivery 是 workflow state。
 - PostgreSQL durable 是运行可靠性，不是 canonical truth。
 - diagnostics 和 audit output 必须 redacted。
+
+## 相关页面
+
+- [Chain Services](chain-services.md)
+- [Indexer 与投影](indexer-projections.md)
+- [数据流与事实源](../data-flow-and-truth.md)
+- [运行服务和前端](../../how-to/run-services-and-apps.md)

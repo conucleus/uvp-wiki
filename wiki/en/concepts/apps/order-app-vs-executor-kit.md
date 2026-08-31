@@ -8,6 +8,7 @@ status: verified
 
 # Order App vs Executor Kit
 
+> Prerequisite reading: [Executor](../core/executor.md)
 Order App and executor-kit are both entry points for signal producers, but they serve different users. Full Executor Kit documentation: [Executor Kit](executor-kit.md); docked Zhixu documentation: [Zhixu as an execution interface](zhixu-as-executor.md).
 
 ## Three execution entry points

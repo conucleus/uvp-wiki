@@ -2,12 +2,13 @@
 title: Signal
 type: explanation
 audience: 协议读者
-preread: README.md
+preread: ../README.md
 status: verified
 ---
 
 # Signal
 
+> Prerequisite reading: [Core Concepts](../README.md)
 A Signal is the smallest business input the order state machine accepts. It represents "some authorized wallet submitted some class of action or evidence fingerprint to some order".
 
 ## Who Uses It
@@ -102,7 +103,7 @@ The contract does not store plaintext contracts, invoices, logistics documents, 
 
 | Field | Meaning |
 | --- | --- |
-| `payloadHash` | Hash of the evidence or action payload. |
+| `payloadHash` | Hash of the evidence or action payload. The protocol constant `bytes32(0)` (`0x000...0`) means "no payload" — it is an explicit encoding of absence, not a missing value. |
 | `metadataURI` | If needed, may point to off-chain metadata in projections or adapters. |
 | `submitter` | The authorized wallet address. |
 | `submittedAt` | The on-chain record time. |

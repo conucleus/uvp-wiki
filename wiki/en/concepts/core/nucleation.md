@@ -2,12 +2,13 @@
 title: Nucleus / 凝结核
 type: explanation
 audience: 协议读者
-preread: README.md
+preread: ../README.md
 status: verified
 ---
 
 # Nucleus / 凝结核
 
+> Prerequisite reading: [Core Concepts](../README.md)
 A nucleus (凝结核) is the initiating, designing, and maintaining core of a Zhixu — the organizational origin that lets one class of coordination rules take shape, gain boundaries, and stay maintained over time; concrete order stages are executed by participants. Read it first as the originating organizer of a reusable operating model: a procurement operations team, an industry project organizer, a platform-side workflow designer, or any organization able to maintain such a rulebook long term.
 
 `Nucleus` is the subject name; `nucleation` is the nucleating process, context, and the DSL/API field name. `spec.nucleation.id` identifies the nucleus that initiates and maintains a class of order design. Executors in orders, Store admins, and Registry operators respectively carry runtime execution, platform workflow, and identity verification.
@@ -70,4 +71,4 @@ A Zhixu is the reusable rulebook designed by the nucleus. A Plan is the chain-ta
 
 Store is the workbench and showcase for nuclei. Store can help nuclei import orders, preview compilation, organize supplier profiles, display fulfillment proof, initiate publication requests, and maintain audit; on-chain plan/supplier/order/signal facts come from registry and state-machine events.
 
-For the Store-side product view see [Nucleation Workbench](../store/nucleation-workbench.md).
+For the Store-side product view see [Nucleation Workbench](../store/zhixu-management.md).

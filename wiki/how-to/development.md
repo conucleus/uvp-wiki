@@ -8,6 +8,7 @@ status: verified
 
 # 日常开发
 
+> 前置阅读：[快速开始](quick-start.md)
 ## Workspace 命令
 
 从仓库根目录运行：
@@ -49,12 +50,16 @@ forge build
 forge test
 ```
 
-改变 public interface 后必须：
+## 改变公共接口后的固定流程
+
+改变 public interface（ABI、event topic、EIP-712 domain、canonical hash、DTO schema 等）后必须：
 
 1. 按 [排障](troubleshooting.md) 中 "ABI Fixture Drift" 一节更新或重生成 fixture。
 2. 跑 `pnpm verify:protocol-freeze`。
 3. 检查 chain-services indexer、executor-kit、protocol-bindings、deploy scripts。
 4. 在 release note 或 PRD trace 中说明 drift。
+
+接口全景与各 owner 见[公共接口](../reference/public-interfaces.md)。
 
 ## 新功能放哪里
 

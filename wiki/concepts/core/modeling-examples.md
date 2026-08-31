@@ -8,6 +8,7 @@ status: prototype
 
 # Source 建模例子集
 
+> 前置阅读：[Source 因果链](source.md)
 本页收录 Source 因果链的进阶建模示例。status 标为 prototype：这些例子是教学性质的建模思路，尚未逐例对照实现与产品投影审计；协议语义以 [Source 因果链](source.md) 为准。
 
 ## 谁使用

@@ -15,7 +15,7 @@ This is not the concept encyclopedia. The first pass only needs to build the bus
 
 1. [Coordination Infrastructure for the AI Era](why-uvp.md): why UVP exists and which transaction costs it turns into protocol objects.
 2. [One Order Story](one-order-story.md): use one cross-border order to understand the path from Zhixu design to on-chain proof.
-3. [Core Concepts](../core/README.md): once the story is clear, read the protocol objects by layer.
+3. [Core Concepts](../concepts/README.md): once the story is clear, read the protocol objects by layer.
 4. [Glossary](../reference/glossary.md): project terms and key concept pairs.
 
 ## Second Pass

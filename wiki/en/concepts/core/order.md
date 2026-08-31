@@ -2,12 +2,13 @@
 title: Order
 type: explanation
 audience: 协议读者
-preread: README.md
+preread: ../README.md
 status: verified
 ---
 
 # Order
 
+> Prerequisite reading: [Core Concepts](../README.md)
 An Order is a run. In the protocol, it is an independent fact stream forked from a registered [Plan](plan.md). Once an Order is opened and has an `orderId`, the protocol only promises that it is registered and can keep accepting well-formed facts; the core protocol does not define Order lifecycle states like `running`, `completed`, or `cancelled`.
 
 ## Who Uses It

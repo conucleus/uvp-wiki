@@ -43,7 +43,7 @@ status: verified
 
 ## 只能作为操作辅助
 
-Relayer retry 状态、notification delivery 状态、Store draft、browser E2E fixture、本地 demo 数据都只能帮助操作。它们不能改变 Plan 发布状态、Order 是否存在、Signal 是否被接受或 Hook 是否 ready。
+Relayer retry 状态、notification delivery 状态、Store draft 都只能帮助操作。它们不能改变 Plan 发布状态、Order 是否存在、Signal 是否被接受或 Hook 是否 ready。governance 台账中 `executionMode: "simulated"` 的条目同样如此：reconcile 会跳过这些条目，staging-readiness 也将其视为未满足。
 
 ## Reorg 处理
 

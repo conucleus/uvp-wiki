@@ -58,6 +58,20 @@ selectorBindingHash = hashCanonical("uvp:onchain-stage-selector-binding:v1", ...
 
 对于 `bytes32,bytes32`，编译器字节拼接与 Solidity `abi.encode(sourceId, signalId)` 在字节内容上保持一致。
 
+## fileResources 缺省与 ZERO_HASH
+
+route 与 plan 的哈希公式里，`fileResources` 是可选输入。当 plan/route **未声明** `fileResources` 时，协议规定以 ZERO_HASH（32 字节全零 `0x0000…0000`）作为 `resourcesHash` 参与计算：
+
+```text
+resourcesHash = fileResources 未声明 ? ZERO_HASH : keccak256(canonicalJSON(fileResources))
+
+routeHash = hashCanonical("uvp:onchain-hook-route:v1", {
+  stageId, stageIdentifier, executorHash, resourcesHash
+})
+```
+
+`routeHash` 再进入链上 `planHash`（`uvp:onchain-hook-plan-artifact:v1`）的承诺范围。这是协议常量定义，不是实现细节的默认值：任何语言的重实现（TypeScript 见 `compileExecutorRoute()` / `onchainRouteHash()`，Rust 及其它编译器后端）都必须使用同一个 ZERO_HASH 常量表示「未声明」，不得改用空串哈希、省略字段或其它占位方式，否则同一份定义会算出不同的 routeHash/planHash，破坏跨实现的可复现性。
+
 ## Canonical JSON 规则
 
 Canonical hash 会对对象 key 排序，规范化数值，并把 domain 与 canonical JSON 一起哈希。开发时不要手写临时 JSON 来替代编译脚本，否则很容易得到不可复现的 hash。

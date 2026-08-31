@@ -2,12 +2,13 @@
 title: Nucleus / 凝结核
 type: explanation
 audience: 协议读者
-preread: README.md
+preread: ../README.md
 status: verified
 ---
 
 # Nucleus / 凝结核
 
+> 前置阅读：[核心概念](../README.md)
 凝结核 (Nucleus) 是秩序 (Zhixu) 的发起、设计和维护核心，是让一类协作规则开始成形、获得边界、持续维护的组织原点；具体订单阶段由参与方执行。先把它理解成可复用运营模型的 originating organizer：采购运营团队、行业项目组织者、平台侧 workflow 设计者，或其他能长期维护这份规则书的组织。
 
 `Nucleus` 是主体名；`nucleation` 是成核过程、成核上下文和 DSL/API 字段名。`spec.nucleation.id` 标识发起并维护某类秩序设计的凝结核。订单里的 executor、Store admin 和 Registry operator 分别承担运行时执行、平台 workflow 与身份核验。
@@ -80,4 +81,4 @@ Nucleus / 凝结核
 
 Store 是凝结核的工作台和展示场。Store 可以帮助凝结核导入秩序、编译预览、组织供应商资料、展示履约 proof、发起 publication request、维护 audit；链上 plan/supplier/order/signal 事实来自 registry 和 state-machine 事件。
 
-Store 侧的产品视角见 [凝结核工作台](../store/nucleation-workbench.md)。
+Store 侧的产品视角见 [凝结核工作台](../store/zhixu-management.md)。

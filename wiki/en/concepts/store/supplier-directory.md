@@ -6,6 +6,9 @@ preread: README.md
 status: verified
 ---
 
+# Supplier Directory, Capability, and Contact
+
+> Prerequisite reading: [Zhixu Store](README.md)
 The Supplier Directory is the Store's off-chain workbench: it maintains the supplier directory, names, contact details, capability tags, matching features, and fulfillment proof. The Identity Registry only provides the offline subject-to-wallet mapping and cannot certify capability on the Store's behalf — for the authority boundary see the [README.md](README.md) "Information objects and authority sources" table and [../protocol-boundaries.md](../protocol-boundaries.md).
 
 ## Three classes of identity and tag sources

@@ -8,6 +8,7 @@ status: verified
 
 # 事件投影
 
+> 前置阅读：[Indexer 与投影](../services/indexer-projections.md)
 事件投影把链上事件变成产品可读状态。它是可重建 view；删除 indexer 数据库后，理论上应能从链事件重建同样的 projection。
 
 ## ChainEvent

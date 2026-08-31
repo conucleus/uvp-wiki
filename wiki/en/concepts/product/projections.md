@@ -8,6 +8,7 @@ status: verified
 
 # Event Projections
 
+> Prerequisite reading: [Indexer and Projections](../services/indexer-projections.md)
 Event projections turn on-chain events into product-readable state. They are rebuildable views; if the indexer database is deleted, the same projection should in principle be reconstructable from chain events.
 
 ## ChainEvent

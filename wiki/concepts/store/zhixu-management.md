@@ -6,6 +6,9 @@ preread: README.md
 status: verified
 ---
 
+# Zhixu Catalog、配置与发布
+
+> 前置阅读：[秩序商店（Store）](README.md)
 Zhixu Catalog 是凝结核维护秩序设计、编译材料和 Store 展示资料的工作台。凝结核负责 stage、公平规则、异常处理与供应商组织；Store 负责目录、审核、搜索、版本选择和运营记录。
 
 ## 凝结核工作台

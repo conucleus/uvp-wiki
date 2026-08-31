@@ -2,12 +2,13 @@
 title: Core Concepts
 type: explanation
 audience: 协议读者
-preread: "[Core Glossary](../reference/glossary.md)"
+preread: ../reference/glossary.md
 status: verified
 ---
 
 # Core Concepts
 
+> Prerequisite reading: [Glossary](../reference/glossary.md)
 When unsure about terminology, check the [Core Glossary](../reference/glossary.md) first.
 
 The core of `uvp-eth` is a state-machine protocol that lands Zhixu (order) coordination rulebooks on the EVM chain. Contracts and chain events are the source of truth; Store, Product API, Order App, executor-kit, and periphery adapters compile, index, display, sign, and submit around that source of truth. These objects are the language layer consumed jointly by every product.
@@ -51,7 +52,7 @@ The engineering implementation then breaks this relationship into compiled artif
 | --- | --- | --- |
 | Nucleus / 凝结核 | [Nucleus / 凝结核](core/nucleation.md) | Who initiates, designs, and maintains a Zhixu; `nucleation` is the DSL field and nucleation context. |
 | Supplier | [Supplier](core/supplier.md) | How registered suppliers, capability subjects, trust subjects, and capability passports are expressed. |
-| Trust / Authorization | [Trust and Authorization](trust-and-authorization.md) | Who passes material review, who can submit order actions, and how those two are separated. |
+| Trust / Authorization | [Trust and Authorization](trust/README.md) | Who passes material review, who can submit order actions, and how those two are separated. |
 
 ## Where Supplier and Executor Sit
 
@@ -73,7 +74,7 @@ The same objects carry different emphasis in different sections:
 1. This page establishes the object vocabulary (concept entries).
 2. Read [object pages](core/zhixu.md) as needed (one page per object under `core/`).
 3. Then read the three architecture chapters: [Architecture](architecture.md), [Data Flow and Source of Truth](data-flow-and-truth.md), and [Plan and Order Lifecycle](lifecycle.md).
-4. Finally go deeper by topic: [State Machine](state-machine/README.md), [Artifacts and Hashes](artifacts-and-hashes.md), [Trust and Authorization](trust-and-authorization.md), [Product Surfaces](product-surfaces.md).
+4. Finally go deeper by topic: [State Machine](state-machine/README.md), [Artifacts and Hashes](artifacts-and-hashes.md), [Trust and Authorization](trust/README.md), [Product Surfaces](product/README.md).
 
 ## Sibling Chapters
 
@@ -82,8 +83,8 @@ The same objects carry different emphasis in different sections:
 | [Architecture](architecture.md) | Module boundaries, dependency direction, source of truth, and data flow. |
 | [State Machine](state-machine/README.md) | How the contract stores signals, evaluates hooks, and handles timers and stage overlays; part of the core component chain. |
 | [Artifacts and Hashes](artifacts-and-hashes.md) | Compiled artifacts, canonical hashes, stable IDs, and registration parameters. |
-| [Trust and Authorization](trust-and-authorization.md) | Identity Registry, Plan publication, order-level signal authorization, EIP-712, and the relayer boundary. |
-| [Product Surfaces](product-surfaces.md) | How chain-services project chain events into orders, tasks, and proofs ordinary users can read. |
+| [Trust and Authorization](trust/README.md) | Identity Registry, Plan publication, order-level signal authorization, EIP-712, and the relayer boundary. |
+| [Product Surfaces](product/README.md) | How chain-services project chain events into orders, tasks, and proofs ordinary users can read. |
 | [Zhixu Store](store/README.md) | The Store is a first-class product/governance system that gives nuclei a workbench, and reinterprets Zhixu/Supplier, identity verification, contact notifications, fulfillment records, and platform workflow. |
 | [Order App and executor-kit](apps/order-app-vs-executor-kit.md) | How the participant app and the executor integration surface consume tasks and submit signals. |
 

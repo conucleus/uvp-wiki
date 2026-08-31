@@ -7,7 +7,7 @@ status: verified
 
 # API Routes
 
-`src/api/routes/` 是 Chain Services 的 HTTP route module 入口。路由按消费面分组：Product、Store、submission、evidence、governance、notification、diagnostics 和本地测试控制。面向用户的路由文档见 [Product API 端点速查](../../reference/product-api-endpoints.md)。
+`src/api/routes/` 是 Chain Services 的 HTTP route module 入口。路由按消费面分组：Product、Store、submission、evidence、governance、notification 和 diagnostics。面向用户的路由文档见 [Product API 端点速查](../../reference/product-api-endpoints.md)。
 
 ## Route module 归属
 
@@ -27,7 +27,6 @@ status: verified
 | `notifications.ts` | supplier notification profile、delivery ops。 |
 | `diagnostics.ts` | health/readiness/admin diagnostics。 |
 | `admin-ops.ts` | ops-only maintenance route。 |
-| `e2e-controls.ts` | local/product E2E fixture controls；testnet/production 必须禁用。 |
 
 ## Route shell
 
@@ -42,8 +41,8 @@ status: verified
 
 ## 设计规则
 
-- 新 route 要明确属于 Product、Store、governance、ops 还是 local E2E。
+- 新 route 要明确属于 Product、Store、governance 还是 ops。
 - Product route 不应暴露 Store admin workflow。
 - Store route 不应伪造 Product proof、Plan 发布状态或 identity binding。
-- E2E controls 只能用于本地测试；testnet/production profile 必须 fail-closed，完整清单见 [Storage、Migration 与 Runtime Profile](storage-runtime.md)。
+- 不存在 local E2E fixture-control route；原 `e2e-controls.ts` 模块已删除。testnet/production profile 对缺失显式配置 fail-closed，完整清单见 [Storage、Migration 与 Runtime Profile](storage-runtime.md)。
 - 所有 public claim 都要能追溯到 event、hash、signature、DTO contract 或 workflow audit。

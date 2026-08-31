@@ -2,12 +2,13 @@
 title: Source Causal Chain
 type: explanation
 audience: 协议读者
-preread: README.md
+preread: ../README.md
 status: verified
 ---
 
 # Source Causal Chain
 
+> Prerequisite reading: [Core Concepts](../README.md)
 `source` is a signal's causal progression line. It answers: "which line of progress does this business action belong to?" Roles, Suppliers, and wallets say who is acting; Source says which business line the action enters.
 
 Think of sources as lanes in one project: sales, solution, supply, payment, logistics, field, and buyer can advance in parallel, or wait at some stage for another lane's proof before converging. These sources are not departments. One wallet, once authorized, can submit signals on multiple sources; one Supplier may also participate in several sources.

@@ -6,6 +6,9 @@ preread: ../protocol-boundaries.md
 status: verified
 ---
 
+# Zhixu Store
+
+> Prerequisite reading: [Protocol Boundaries](../protocol-boundaries.md)
 The Store is the off-chain product workbench between the Nucleus, suppliers, operators, and ordinary execution interfaces. It provides catalog, compile preview, supplier profiles, capability tags, search and matching, proof views, notifications, review flows, and audit, but it does not promote these commercial judgments into UVP protocol facts. Terminology follows the [glossary](../../reference/glossary.md).
 
 ```text

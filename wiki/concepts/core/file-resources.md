@@ -2,12 +2,13 @@
 title: File Resources
 type: explanation
 audience: 协议读者
-preread: README.md
+preread: ../README.md
 status: verified
 ---
 
 # File Resources
 
+> 前置阅读：[核心概念](../README.md)
 `fileResources` 是阶段资源句柄。它描述一个 stage 需要引用哪些链下对象、协议文件、证据模板、验收标准或资源 manifest。链上事实来自授权 signal、hash、metadata URI 和事件；文件明文留在链下。
 
 ## 谁使用
@@ -104,3 +105,9 @@ Order App 和 executor-kit 把它翻译成“需要上传什么证据、hash 是
 - `fileResources` 表示资源要求，业务完成看 signal/proof。
 - 对象存储可访问性是辅助条件，链上 proof 看事件和 hash。
 - resource patch 和 executor patch 是两个授权动作。
+
+## 相关页面
+
+- [Evidence、Proof 与 File Resource](../services/evidence-proof.md)
+- [产物与哈希](../artifacts-and-hashes.md)
+- [Stage Overlay](../state-machine/stage-overlay.md)

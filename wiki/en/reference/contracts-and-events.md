@@ -99,4 +99,4 @@ For operating steps see [Troubleshooting](../how-to/troubleshooting.md).
 
 ## Funding Boundary
 
-The current contract modules' core boundary focuses on the state machine, the thin identity registry, and the deployment registry. Funding, escrow, custody, settlement, release, refund, dispute-payment, ERC20, or USDC contracts belong to adapter/periphery work; future funding-related work must have independent authorization, event mapping, tests, and PRD, and consume `UVPStateMachine` signals. For the complete boundary see [Protocol Boundaries: Periphery Adapters](../concepts/protocol-boundaries.md#外围适配).
+The current contract modules' core boundary focuses on the state machine, the thin identity registry, and the deployment registry. Funding, escrow, custody, settlement, release, refund, dispute-payment, ERC20, or USDC contracts belong to adapter/periphery work; future funding-related work must have independent authorization, event mapping, tests, and PRD, and consume `UVPStateMachine` signals. For the complete boundary see [Protocol Boundaries: Periphery Adapters](../concepts/protocol-boundaries.md#periphery-adapters).

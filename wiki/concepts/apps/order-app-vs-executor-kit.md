@@ -8,6 +8,7 @@ status: verified
 
 # Order App 与 Executor Kit
 
+> 前置阅读：[Executor](../core/executor.md)
 Order App 和 executor-kit 都是 signal producer 的入口，但用户不同。Executor Kit 的完整说明见 [Executor Kit](executor-kit.md)，docked Zhixu 说明见 [Zhixu 作为 Executor](zhixu-as-executor.md)。
 
 ## 三种执行入口

@@ -2,12 +2,13 @@
 title: Supplier
 type: explanation
 audience: 协议读者
-preread: README.md
+preread: ../README.md
 status: verified
 ---
 
 # Supplier
 
+> Prerequisite reading: [Core Concepts](../README.md)
 A Supplier is a real-world or digital capability subject organized by Store and nuclei — an individual, company, customs broker, logistics provider, AI service, or enterprise system.
 
 Store maintains the supplier's display name, contacts, capability tags, applicable roles and stages, private matching features, review and recommendation records off-chain (see [Zhixu Store](../store/README.md)). This data expresses Store's own business judgment, not UVP contract certification.

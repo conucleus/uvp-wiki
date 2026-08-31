@@ -52,3 +52,5 @@ Confirm each item before broadcasting:
 - [ ] Ordinary CI does not read deployment secrets.
 - [ ] Local deployment entries accept loopback RPCs only.
 - [ ] Address manifests and summaries are kept as public technical records of the run; private keys, raw RPC URLs, database contents, and unfiltered logs stay out of version control.
+
+If deployment fails or smoke verification reports mismatches, start with [Troubleshooting](troubleshooting.md) (including the "Base Sepolia RPC slow or timeout" section); after it passes, continue to [Release and Verification](release-checklist.md) to register the address manifest.

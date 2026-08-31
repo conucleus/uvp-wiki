@@ -6,6 +6,9 @@ preread: ../protocol-boundaries.md
 status: verified
 ---
 
+# 秩序商店（Store）
+
+> 前置阅读：[协议边界（不变量总纲）](../protocol-boundaries.md)
 秩序商店是凝结核、供应商、operator 和普通执行界面之间的链下产品工作台。它提供目录、编译预览、供应商资料、能力标签、搜索匹配、proof 视图、通知、审核流程和 audit，但不把这些商业判断提升为 UVP 协议事实。术语以 [../../reference/glossary.md](../../reference/glossary.md) 为准。
 
 ```text

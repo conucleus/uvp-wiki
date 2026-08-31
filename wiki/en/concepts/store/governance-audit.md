@@ -6,6 +6,9 @@ preread: README.md
 status: verified
 ---
 
+# Operator Permissions, Governance, and Audit
+
+> Prerequisite reading: [Zhixu Store](README.md)
 Permissions and audit in the Store constrain platform workflow. Audit records prove that a Store action happened; the Nucleus's order design, Store or external institution material review, and state-machine events each keep their own authority sources (see the [README.md](README.md) "Information objects and authority sources" table).
 
 ## Three permission classes

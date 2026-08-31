@@ -6,6 +6,9 @@ preread: README.md
 status: verified
 ---
 
+# Contact and Notifications
+
+> Prerequisite reading: [Zhixu Store](README.md)
 The Store can maintain contact and notification workflows because real fulfillment needs to reach a person, a system, or an adapter. Contact and notifications are operational workflow; on-chain business actions are expressed by authorized signals.
 
 ## Organizable information
@@ -43,4 +46,4 @@ The following are the actual states of the `NotificationDeliveryStatus` enum in 
 
 The earlier design's `acknowledged` (the other side confirmed receipt) and `suppressed` (not sent due to revoked/blocked/policy) remain aspirational states and are not yet implemented.
 
-<!-- TODO(confirm): are acknowledged/suppressed still on the roadmap? If abandoned, remove them from the design material. -->
+> TODO(confirm): are acknowledged/suppressed still on the roadmap? If abandoned, remove them from the design material.
