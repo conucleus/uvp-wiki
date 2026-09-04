@@ -14,8 +14,8 @@ The Compiler and Hook Core are the entry point through which protocol semantics 
 `uvp-protocol/packages/hook-core` is responsible for:
 
 - Parsing `source::condition`.
-- Supporting `&`, `|`, `~`, delay, and the empty-header wrappers `::OUTSIDE@(…)`, `::MERGE@(…)`, `::ANCHOR@(task.stage.signal)`; bare `OUTSIDE` / `ANCHOR` have been removed, and `OUTSOURCE` is fully retired (parse-time error).
-- Stage `externalSignals` are kept by the compiler as direct input contracts for backend/executor and are never compiled into Hooks.
+- Supporting `&`, `|`, `~`, delay, and cross-source `::ANCHOR(@source::task.stage.signal)` subscriptions; the old `::OUTSIDE@`, `::MERGE@`, and `::ANCHOR@` wrappers and `OUTSOURCE` are retired (parse-time error).
+- Generating receive Hooks only from stage `receiveSignals`; there is no parallel `externalSignals` or trigger-wrapper semantics that bypass the AST.
 - Interpreting `~A` as "the A signal has not yet appeared in the current order's event set". Once a signal appears it never disappears, so this is monotonic existence logic.
 - Extracting positive, negative, and timer dependencies.
 - Providing a local evaluator shared by the compiler and the reference runtime.
@@ -27,7 +27,7 @@ Hook Core output remains platform-neutral semantics with no Solidity ABI.
 `uvp-protocol/packages/compiler` is responsible for:
 
 - Loading YAML/JSON Zhixu.
-- Validating stages, triggers, receiveSignals, selectedStages, and executor reachability.
+- Validating stages, `receiveSignals`, `mint`, `selectedStages`, executor reachability, and dock route/interface commitments.
 - Generating the `OnchainHookPlanArtifact`.
 - Generating Solidity `commitPlan`/`finalizePlan` parameters.
 - Computing `planId`, `planHash`, and hook/stage/source/signal/dependency/route ids.
@@ -53,10 +53,10 @@ The compiler's determinism guarantees every party derives the same plan hash. Co
 
 All of the following are compile-time rules, not runtime rules; for runtime evaluation see [Hook Evaluation](state-machine/evaluation.md).
 
-- `stage.trigger` must reference an existing `externalSignals` or `receiveSignals` key of the same stage.
-- `externalSignals` are the direct input contract of backend/executor and are not compiled into hooks; only `receiveSignals` produce hooks.
-- A receive hook only emits `HookReady` when Ready if its `trigger=true`.
-- `signalMap` hooks currently have `trigger=false`.
-- The `signalMap` of `supplierType=zhixu` must include `str` and `cmp`, and the same map must reference a single source.
+- `receiveSignals` keys are receive-hook names for the stage and values are their canonical expressions; `stage.trigger` and `externalSignals` are not read.
+- An Order entry is explicit in `orderTriggerKind`: `none`, `mint`, or `dock`; whether Ready is externally emitted is a separate `emitReady` boolean.
+- `mint: per-fact` is only for a birth stage: each fact satisfying its anchor mints one new Order; a dock birth must carry complete dock route/interface proof.
+- `supplierType=zhixu` must provide `zhixuExecutorConfig`, whose target is a versioned peer UID and whose `inputMap`/`signalMap` use target interface port names; it does not use `supplierID`.
+- A `signalMap` output mapping must include `str` and `cmp`; `err` is optional but recommended, and one map must reference a single source.
 - Hook expressions evaluate under monotonic existence logic: `A` means the signal has appeared, `~A` means it has not yet appeared; once a signal appears it never disappears.
 - Hook expressions must have a positive anchor; a pure-absence condition cannot become an advancing hook.

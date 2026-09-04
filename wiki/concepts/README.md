@@ -95,8 +95,8 @@ Executor 是订单运行时的执行绑定：静态秩序可以声明默认 exec
 - Relayer 可以代付或转发交易，但不能替参与方生成业务签名。
 - Supplier identity（材料审核）与订单 signal 授权分层。
 - Executor/resource patch 只影响单个 Order，Plan 保持静态版本。
-- `supplierType=zhixu` 通过 proof 校验、docking link 和授权 signal 映射推动 local order。
-- Trigger hook Ready 打开可处理任务；链上订单身份由 trigger order 入口创建。
+- `supplierType=zhixu` 通过 proof 校验、`openDockedOrder`、docking events 和授权 signal 映射推动 local order。
+- 带 `emitReady=true` 的 receive Hook Ready 打开可处理任务；链上订单身份由 trigger order 入口创建，并按 `(planId, orderId)` 解析。
 - `fileResources` 是资源句柄，业务文件明文留在链下。
 - Store metadata 组织对象与目录；plan/supplier identity 来自 registry events。
 - Store admin 负责平台 workflow；凝结核负责秩序内部治理；Identity Registry operator 负责身份核验与 binding。

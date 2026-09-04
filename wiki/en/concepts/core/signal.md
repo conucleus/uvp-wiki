@@ -21,7 +21,7 @@ A successful submission writes an immutable `SignalRecord` and emits `SignalSubm
 
 ## Where Authority Comes From
 
-A signal's validity is decided by contract authorization checks over `(orderId, signalKey, submitter)`; only hashes go on chain, and business meaning is interpreted by the Zhixu, stage protocol, and Product DTO.
+A signal's validity is decided by contract authorization checks over `(planId, orderId, signalKey, submitter)`; only hashes go on chain, and business meaning is interpreted by the Zhixu, stage protocol, and Product DTO. `orderId` is not a global primary key; every read must retain its `planId`.
 
 ## Where Signals Sit in the DSL
 
@@ -37,8 +37,6 @@ For example, a buyer commitment stage:
 ```yaml
 buyer_commit:
   source: buyer
-  trigger:
-    - OFFER_READY
   receiveSignals:
     OFFER_READY: commercial::master.commercial_offer.cmp
   sendSignals:
@@ -91,9 +89,9 @@ Within one order, a given `signalKey` can be successfully submitted only once:
 
 - The first submission writes the `SignalRecord` and emits `SignalSubmitted`.
 - Later duplicate submissions revert with `SignalAlreadyExists`.
-- The first successful write is the final on-chain fact of that `(orderId, sourceId, signalId)`; there is no overwrite, revocation, or admin rewrite entry point.
+- The first successful write is the final on-chain fact of that `(planId, orderId, sourceId, signalId)`; there is no overwrite, revocation, or admin rewrite entry point.
 
-The `idempotencyKey` is kept in events and projections so the service layer can identify request origin; but the contract-level deduplication key is `(orderId, sourceId, signalId)`.
+The `idempotencyKey` is kept in events and projections so the service layer can identify request origin; but the contract-level deduplication key is `(planId, orderId, sourceId, signalId)`.
 
 If the first submission was wrong, create a new Order from the Zhixu and resubmit. The original Signal cannot be modified, and the old Order remains as auditable fact.
 
@@ -115,7 +113,7 @@ This boundary matters: chain provides verifiable ordering and permissions, not b
 Product API may show a task to some participant, but whether submission succeeds is finally checked by the contract:
 
 ```text
-orderId + signalKey + submitter
+planId + orderId + signalKey + submitter
 ```
 
 Authorization can come from explicit grants at Order creation or from a valid Executor patch dynamically delegating within the Plan-predeclared `sendSignals` scope; see [Signal Authorization](../trust/signal-authorization.md). Both paths are checked by the contract; even if the UI shows a button, submission without valid authorization will be rejected.

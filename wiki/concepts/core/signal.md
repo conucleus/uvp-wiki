@@ -21,7 +21,7 @@ Signal 是订单状态机接受的最小业务输入。它代表“某个被授�
 
 ## 权威来自哪里
 
-signal 的有效性由合约按 `(orderId, signalKey, submitter)` 授权检查决定；payload 只上哈希，业务含义由 Zhixu、stage protocol 和 Product DTO 解释。
+signal 的有效性由合约按 `(planId, orderId, signalKey, submitter)` 授权检查决定；payload 只上哈希，业务含义由 Zhixu、stage protocol 和 Product DTO 解释。`orderId` 不是全局主键，任何读取都必须保留所属 `planId`。
 
 ## Signal 在 DSL 里的位置
 
@@ -37,8 +37,6 @@ Zhixu stage 里有两处和 signal 直接相关：
 ```yaml
 buyer_commit:
   source: buyer
-  trigger:
-    - OFFER_READY
   receiveSignals:
     OFFER_READY: commercial::master.commercial_offer.cmp
   sendSignals:
@@ -91,9 +89,9 @@ signalKey = keccak256(abi.encode(sourceId, signalId))
 
 - 第一次提交会写入 `SignalRecord` 并发出 `SignalSubmitted`。
 - 后续重复提交会因为 `SignalAlreadyExists` 回滚。
-- 第一次成功写入就是该 `(orderId, sourceId, signalId)` 的最终链上事实，不提供覆盖、撤销或管理员改写入口。
+- 第一次成功写入就是该 `(planId, orderId, sourceId, signalId)` 的最终链上事实，不提供覆盖、撤销或管理员改写入口。
 
-`idempotencyKey` 会保存在事件和投影里，方便服务层识别请求来源；但合约语义上的去重键是 `(orderId, sourceId, signalId)`。
+`idempotencyKey` 会保存在事件和投影里，方便服务层识别请求来源；但合约语义上的去重键是 `(planId, orderId, sourceId, signalId)`。
 
 首次提交错误时，应从 Zhixu 创建新的 Order 重新提交。原 Signal 不可修改，旧 Order 仍作为可审计事实保留。
 
@@ -123,7 +121,7 @@ signalKey = keccak256(abi.encode(sourceId, signalId))
 Product API 可以把某个任务显示给某个参与方，但最终能否提交仍由合约检查：
 
 ```text
-orderId + signalKey + submitter
+planId + orderId + signalKey + submitter
 ```
 
 授权可以来自 Order 创建时的显式授权，也可以来自有效 Executor patch 对 Plan 预声明 `sendSignals` 范围的动态委任，详见 [Signal 授权](../trust/signal-authorization.md)。两种路径都由合约检查；即使 UI 显示了按钮，没有有效授权仍会被拒绝。

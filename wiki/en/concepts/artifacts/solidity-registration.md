@@ -7,7 +7,7 @@ status: verified
 
 # On-chain Registration Parameters
 
-`OnchainHookPlanArtifact` is not yet the final transaction parameter set. The compiler further converts it into the compact structures required by `UVPStateMachine.commitPlan()` and `UVPStateMachine.finalizePlan()`.
+`OnchainHookPlanArtifact` is not yet the final transaction parameter set. The compiler further converts it into the compact structures required by `UVPStateMachine.commitPlan()` and `UVPStateMachine.finalizePlan()`. The current `uvp.onchainHookPlan.v2` also commits `planId`, `planHash`, dock route/interface roots, selector bindings, and signal capabilities.
 
 ## CompactHook
 
@@ -18,7 +18,7 @@ struct CompactHook {
     bytes32 hookId;
     bytes32 stageId;
     bytes32 hookName;
-    bool trigger;
+    uint8 flags; // ORDER_TRIGGER_MINT=1, ORDER_TRIGGER_DOCK=2, EMIT_READY=4
     Instruction[] instructions;
     bytes32[] dependencyKeys;
 }
@@ -63,6 +63,12 @@ pnpm verify:protocol-freeze
 ```
 
 Changes to ABI, bytecode, selectors, event topics, typed-data fields, canonical hashes, or artifact schemas should be captured in release notes and migration decisions.
+
+CompactHook, event, selector, and EIP-712 fields are pinned by
+`fixtures/uvp-state-machine.v0.9.json`, the module fixtures, and
+`pnpm verify:protocol-freeze`. A change must update bindings, indexers,
+executor-kit, and bootstrap together; updating one fixture in isolation is not
+an accepted migration.
 
 ## Related Pages
 

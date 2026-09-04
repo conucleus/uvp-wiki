@@ -74,8 +74,8 @@ sendSignals:
 At runtime events like these appear:
 
 ```text
-StageExecutorPatchApplied(orderId, selectorStageId, targetStageId, selector, executor, ...)
-StageExecutorActivated(orderId, targetStageId, executor, ...)
+StageExecutorPatchApplied(planId, orderId, selectorStageId, targetStageId, selector, executor, ...)
+StageExecutorActivated(planId, orderId, targetStageId, executor, ...)
 ```
 
 The active executor overlay affects only this Order and never modifies the Plan. The patch automatically delegates the current-order signal capability compiled from the target stage's `sendSignals` to the active executor, so wallets appearing only at runtime can be chosen; they can only submit Plan-predeclared signals and cannot expand capability scope via patches. Changing executor affects only signals not yet first-written; existing facts stay unchanged.
@@ -86,7 +86,7 @@ One Zhixu can act as another Zhixu's stage executor: it receives the execution i
 
 ## Runtime Path of Docked Zhixu
 
-The skeleton of docked execution: after the local trigger becomes Ready the docking workflow starts, the linked order executes independently and produces str/cmp/err proof, and after validation `linkDockedOrder`/`submitDockedSignal` or an authorized submitter maps it back into local signals. On-chain orderId can coexist with Product/Store/adapter workflow numbers, while runtime proof returns to on-chain events; see [Zhixu as Executor](../apps/zhixu-as-executor.md) for the detailed path.
+The skeleton of docked execution is: after the local dock entrance emits `HookReady`, the docking module calls `openDockedOrder` with committed route/interface proofs to atomically create the linked Order; the linked Order executes independently and produces str/cmp/err proof, then `submitDockedInput` / `submitDockedSignal` deliver inputs and outputs. On-chain `(planId, orderId)` can coexist with Product/Store/adapter workflow numbers, while runtime proof returns to on-chain events; see [Zhixu as Executor](../apps/zhixu-as-executor.md) for the detailed path.
 
 ## Protocol Meaning of signalMap
 

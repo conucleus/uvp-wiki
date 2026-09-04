@@ -59,4 +59,4 @@ Capability passport 先展示身份、能力资料、可用阶段和 proof，再
 
 ## 作为 Zhixu Supplier
 
-当 supplier 的 `supplierType=zhixu` 时，它表示一条可被其他秩序调用的 peer 秩序能力：Store 展示其 peer Zhixu 凝结核与 active Plan version、可接受的 local stage 输入、输出 `str/cmp/err` signalMap，以及 `DockedOrderLinked`、`DockedSignalMapped`、`DockedSignalSubmitted` 等 docking proof 与历史履约记录。local order 必须在 order registration、后续授权路径或 docking 事件路径中明确允许 mapped signal 推进。接入流程与字段细节见 [Zhixu 作为执行接口](../apps/zhixu-as-executor.md)。
+当 supplier 的 `supplierType=zhixu` 时，它表示一条可被其他秩序调用的 peer 秩序能力：Store 展示其 peer Zhixu UID、版本化 Plan、可接受的 local stage 输入、目标接口 port，以及输出 `str/cmp/err` signalMap。docking proof 以 `DockOpened`、`DockInputSubmitted`、`DockOutputSubmitted`、`DockTerminal` 等事件和两边订单的 signal/proof 表达；不能依赖旧的私有 Docked 事件名。local order 必须在 order registration、后续授权路径或 docking 事件路径中明确允许 mapped signal 推进。接入流程与字段细节见 [Zhixu 作为执行接口](../apps/zhixu-as-executor.md)。

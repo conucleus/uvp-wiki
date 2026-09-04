@@ -33,7 +33,13 @@ struct Instruction {
 | `Or` | Holds if any input holds. |
 | `Delay` | Compute the due time from a positive anchor. |
 
-Besides `wait/ready/cxl`, core evaluation can also return `needs_more`: the `::MERGE@(...)` and `::ANCHOR@(...)` entry points use per-event delivery semantics — the expression itself does not aggregate a verdict, but hands each contributing event to the state machine for lineage and pairing rules; therefore these two hook kinds are not yet supported in on-chain HookPlans, and the compiler rejects them explicitly at compile time.
+Besides `wait/ready/cxl`, cloud subscription routing can expose a "not yet
+converged" intermediate state, but it is not an on-chain `Instruction[]`
+evaluation result. Cross-source subscriptions uniformly use
+`::ANCHOR(@source::task.stage.signal)`; the routing layer delivers facts by
+source class, and `mint: per-fact` determines whether a fact derives an order.
+The old `::OUTSIDE@`, `::MERGE@`, and `::ANCHOR@(…)` wrappers are retired and
+rejected by the compiler.
 
 ## Example
 
@@ -89,7 +95,15 @@ struct EvalValue {
 
 ## Submission and Dedup
 
-`submitSignal()` deduplicates by `(orderId, sourceId, signalId)`: for the same `signalKey` only the first submission writes a `SignalRecord` (first-writer-wins), while a duplicate submission reverts with `SignalAlreadyExists`. On submission the contract also checks whether the submitter holds an explicit order-level authorization, or is the wallet currently delegated by the active executor overlay; when neither holds, the submission is rejected. For the authorization model, see [Signal Authorization](../trust/signal-authorization.md).
+`submitSignal()` deduplicates by `(planId, orderId, sourceId, signalId)`: within
+one order scope only the first submission writes a `SignalRecord`
+(first-writer-wins), while a duplicate submission reverts with
+`SignalAlreadyExists`. The contract also checks whether the submitter holds an
+explicit order-level authorization, or is the wallet currently delegated by the
+active executor overlay; when neither holds, the submission is rejected. Every
+replay oracle, index, and Product API must carry `planId` and must not merge
+orders across plans by bare `orderId`. For the authorization model, see
+[Signal Authorization](../trust/signal-authorization.md).
 
 ## The Contract Is the Authority
 

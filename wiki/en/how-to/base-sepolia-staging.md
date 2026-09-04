@@ -25,7 +25,7 @@ UVP_BASE_SEPOLIA_BROADCAST_CONFIRMATION=I_UNDERSTAND_THIS_BROADCASTS_BASE_SEPOLI
 pnpm deploy:base-sepolia
 ```
 
-This entry deploys `UVPStateMachine`, the six frozen modules, `UVPDeploymentRegistry`, and `UVPIdentityRegistry`, records the deployment, and publishes the current Plan. The output address manifest uses `uvp-eth.addresses.v5`.
+This entry deploys `UVPStateMachine`, the six frozen modules, `UVPDeploymentRegistry`, and `UVPIdentityRegistry`, records the deployment, and publishes the current Plan. The output address manifest uses `uvp-eth.addresses.v1`.
 
 ## Deploy and Run the Protocol Smoke
 

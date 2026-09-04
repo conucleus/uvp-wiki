@@ -15,7 +15,7 @@ A relayer can help broadcast transactions, but it cannot make business decisions
 
 ```text
 name = UVPStateMachine
-version = 0.8
+version = 0.9
 ```
 
 The primary type for signal submission is:
@@ -27,6 +27,7 @@ UVPStateMachineSignal
 The fields include:
 
 ```text
+planId
 orderId
 sourceId
 signalId

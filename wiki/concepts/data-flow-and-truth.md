@@ -27,8 +27,8 @@ status: verified
 | 部署版本是否 active | `UVPDeploymentRegistry` 的 cutover 事件。 |
 | stage executor overlay 是否应用 | Stage Patch Module 的 `StageExecutorPatchApplied` 与 StateMachine 的 `StageExecutorActivated`。 |
 | stage resource manifest 是否更新 | `StageResourcePatchApplied`。 |
-| linked Zhixu 关系是否存在 | Docking Module 的 `DockedOrderLinked`。 |
-| docked signal 是否映射、提交 | `DockedSignalMapped` / `DockedSignalSubmitted`。 |
+| linked Zhixu 关系是否存在 | Docking Module 的 `DockOpened`（含 local/linked plan 与 order）。 |
+| docked input/output 是否映射、提交 | `DockInputSubmitted` / `DockOutputSubmitted` / `DockTerminal`。 |
 
 ## 可以缓存但必须可重建
 
@@ -38,7 +38,7 @@ status: verified
 | `StateMachineTaskProjection` | 从 `HookReady`、授权、stage overlay、signal 事件重建。 |
 | Product proof rows | 从事件 provenance 生成。 |
 | supplier identity projection | 从 Identity Registry 事件重建。 |
-| stage patch 与 docking projection | 从 `StageExecutorPatchApplied`、`StageResourcePatchApplied`、`DockedOrderLinked`、`DockedSignalMapped`、`DockedSignalSubmitted` 事件族重建。 |
+| stage patch 与 docking projection | 从 `StageExecutorPatchApplied`、`StageResourcePatchApplied`、`DockOpened`、`DockInputSubmitted`、`DockOutputSubmitted`、`DockTerminal` 事件族重建。 |
 | Store catalog 状态 | 可以合并 metadata；Plan 发布与身份绑定状态必须来自链事件。 |
 
 ## 只能作为操作辅助

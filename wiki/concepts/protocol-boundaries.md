@@ -31,7 +31,7 @@ Store metadata 是读模型：供应商能力、标签、声誉、搜索排序�
 
 - 业务签名只能来自被授权参与方的钱包；relayer 可以广播交易、代付 gas，但不生成业务签名。
 - Signal 提交受订单级 `SignalSubmitterAuthorized` 与 active executor overlay 约束，签名采用 EIP-712 typed data。
-- 同一个 `(orderId, sourceId, signalId)` 只允许一次成功写入（first-writer-wins）；重复提交因 `SignalAlreadyExists` 回滚。技术细节见 [Signal](core/signal.md) 与 [EIP-712 与 Relayer](trust/eip712-relayer.md)。
+- 同一个 `(planId, orderId, sourceId, signalId)` 只允许一次成功写入（first-writer-wins）；重复提交因 `SignalAlreadyExists` 回滚。技术细节见 [Signal](core/signal.md) 与 [EIP-712 与 Relayer](trust/eip712-relayer.md)。
 
 ## Plan 生命周期
 

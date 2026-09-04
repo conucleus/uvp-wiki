@@ -23,7 +23,7 @@ The most important translation is from DSL stage to Product task:
 ```text
 stage.receiveSignals
   -> compiled Hook
-  -> trigger=true
+  -> emitReady=true
   -> HookReady
   -> ProductTaskDTO
   -> user or executor submits a Signal

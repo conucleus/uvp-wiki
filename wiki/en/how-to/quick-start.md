@@ -45,7 +45,7 @@ Success criterion: every item in that tutorial's "Success Criteria" section pass
 | `pnpm test` | Test all packages. |
 | `pnpm build` | Build all packages. |
 | `pnpm lint` | Run lint for packages that provide a lint script. |
-| `pnpm verify:protocol-freeze` | Verify the v0.8 `UVPStateMachine`, v0.1 `UVPIdentityRegistry`, modules, `UVPDeploymentRegistry`, and EIP-712 fixtures. |
+| `pnpm verify:protocol-freeze` | Verify the v0.9 `UVPStateMachine`, v2.0 docking module, the remaining frozen modules, `UVPDeploymentRegistry`, and EIP-712 fixtures. |
 | `pnpm no-spend:safety` | Run the deploy package's no-spend checks plus environment-file validation; spends no gas. |
 
 Verification: the corresponding command exits with code 0.

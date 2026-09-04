@@ -52,7 +52,7 @@ triggerOrderFromSignalFor(trigger, authorizations, signature)
 | resource overlay | `StageResourcePatchApplied`。 |
 | task projection | chain-services 从 `HookReady` 和授权事件重建。 |
 | proof rows | event provenance。 |
-| docking relation | `DockedOrderLinked`、`DockedSignalMapped`、`DockedSignalSubmitted`，以及两边订单各自的 signal/proof。 |
+| docking relation | `DockOpened`、`DockInputSubmitted`、`DockOutputSubmitted`、`DockTerminal`，以及两边订单各自的 signal/proof。 |
 
 ## Order 和 Product Order
 
@@ -68,4 +68,4 @@ Product task ID、Store docking session ID、adapter job ID 都是工作流索�
 
 Order 不需要被“关闭”才能保持一致性。业务方可以停止继续写入，也可以从同一个 Zhixu 重新创建新的 Order。Signal 采用 first-writer-wins，去重与不可覆盖语义见 [Signal](signal.md)；如果首次写入的业务事实有误，核心协议不覆盖或删除旧事实，而是创建新的 Order 重新执行，并由上层产品把两条事实流的业务关系展示清楚。
 
-如果某个 stage 由另一条 Zhixu 承接，通常会形成 local order 和 linked order 之间的信号绑定：`linkDockedOrder` 记录对接关系与 signal binding，linked proof 校验通过后由 `submitDockedSignal` 或授权 submitter 把 linked signal 映射进本地订单。完整运行时路径见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md)；Store/Product 只保存 sandbox、contact、review 和展示状态，运行态 proof 以两边订单的链上事件为准。
+如果某个 stage 由另一条 Zhixu 承接，通常会形成 local order 和 linked order 之间的信号绑定：docking module 的 `openDockedOrder` 在 route/interface proof 通过后原子记录对接关系和 linked order，随后由 `submitDockedInput` / `submitDockedSignal` 传递输入与输出。完整运行时路径见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md)；Store/Product 只保存 sandbox、contact、review 和展示状态，运行态 proof 以两边订单的链上事件为准。

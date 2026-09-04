@@ -45,7 +45,7 @@ product tasks
 Chain-native mode 直接看链上 `HookReady`：
 
 ```text
-HookReady(orderId, hookId, stageId, hookName)
+HookReady(planId, orderId, hookId, stageId, hookName)
   -> watcher job
   -> handler decides payload hash and signal
   -> authorized wallet signs/submits

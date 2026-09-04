@@ -23,7 +23,7 @@ chain events
 ```text
 stage.receiveSignals
   -> compiled Hook
-  -> trigger=true
+  -> emitReady=true
   -> HookReady
   -> ProductTaskDTO
   -> 用户或 executor 提交 Signal

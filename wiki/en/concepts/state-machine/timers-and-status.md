@@ -33,13 +33,13 @@ Status enum:
 After the contract evaluates a hook, if its status changes, it emits:
 
 ```text
-HookStatusChanged(orderId, hookId, previousStatus, nextStatus, dueAt)
+HookStatusChanged(planId, orderId, hookId, previousStatus, nextStatus, dueAt)
 ```
 
-If a hook becomes `Ready` and `trigger=true`, the contract also emits once:
+If a hook becomes `Ready` and its compiled artifact has `emitReady=true`, the contract also emits once:
 
 ```text
-HookReady(orderId, hookId, stageId, hookName)
+HookReady(planId, orderId, hookId, stageId, hookName)
 ```
 
 `readyEmitted` ensures that the same hook in the same order will not create duplicate tasks.
@@ -49,7 +49,7 @@ HookReady(orderId, hookId, stageId, hookName)
 EVM contracts cannot run themselves automatically at some future time. After entering `Wait`, an external keeper, executor, or script must call, after the due time:
 
 ```solidity
-pokeTimer(orderId, hookId)
+pokeTimer(planId, orderId, hookId)
 ```
 
 The contract checks:

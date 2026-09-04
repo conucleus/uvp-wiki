@@ -9,7 +9,7 @@ status: verified
 # 秩序 (Zhixu) DSL
 
 > 前置阅读：[核心概念](../README.md)
-`Zhixu` 是“秩序”的拼音。在本仓库里，秩序 (Zhixu) 是凝结核设计出的可复用协作规则书。它用 DSL 声明一类可复用的生产关系：有哪些任务模式、每个任务有哪些阶段、阶段在哪条 source 因果链上、接收什么 signal、发出什么 signal、默认 supplier 是谁、哪些阶段能为其他阶段选择 executor、需要哪些资源。
+`Zhixu` 是“秩序”的拼音。在本仓库里，秩序 (Zhixu) 是凝结核设计出的可复用协作规则书。它用 DSL 声明一类可复用的生产关系：有哪些任务模式、每个任务有哪些阶段、阶段在哪条 source 因果链上、接收什么 signal、发出什么 signal、是否按事实代铸订单、默认 executor 是谁、哪些阶段能为其他阶段选择 executor、需要哪些资源，以及可选的 dock interface。
 
 代码入口是 `uvp-protocol/packages/compiler/src/types/index.ts` 的 `ZhixuDefinition`。订单 (Order) 是这份规则书编译、注册之后的一次运行实例。
 
@@ -46,23 +46,38 @@ spec:
   taskPatterns:
     - name: master
       stages:
+        - name: intake
+          source: customer
+          mint: per-fact
+          receiveSignals:
+            REQUESTED: "::ANCHOR(@customer::request.submit.requested)"
+          sendSignals: [str, cmp, err]
+          executor:
+            supplierType: organization
+            supplierID: "{{ .intake_executor_uid }}"
         - name: supplier_sourcing
           source: supply
-          trigger: ["SCOPE_READY"]
           receiveSignals:
-            SCOPE_READY: solution::master.technical_scope.cmp
+            SCOPE_READY: customer::master.intake.cmp
           sendSignals: [str, cmp, err]
           executor:
             supplierType: zhixu
-            supplierID: "{{ .supplier_sourcing_zhixu_uid }}"
             zhixuExecutorConfig:
+              schemaVersion: uvp.dock.v1
+              target:
+                zhixu: supplier-sourcing
+                version: "1"
+              order:
+                idPolicy: derived-v1
+              inputMap:
+                start: intake
               signalMap:
-                str: sourcing::source.start.str
-                cmp: sourcing::source.close.cmp
-                err: sourcing::source.close.err
+                str: start
+                cmp: complete
+                err: failed
 ```
 
-这段示例说明三件事：本地秩序的 `master.supplier_sourcing` 阶段由 `solution::master.technical_scope.cmp` 触发；该阶段把另一条 `supplier-sourcing` 秩序作为执行接口；linked 秩序的输出经 proof 校验和授权 submitter 映射后推动本地秩序继续运行。`signalMap` 的协议语义与运行时对接详见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md) 和 [Executor](executor.md)。
+这段示例说明三件事：`mint: per-fact` 阶段通过 `ANCHOR(@...)` 订阅事实并按事实纯函数代铸一个订单；普通阶段通过 `receiveSignals` 继续推进；委托阶段把另一条 Zhixu 作为执行接口，并以目标端口名配置 `inputMap/signalMap`。linked 秩序的输出经 proof 校验和授权 submitter 映射后推动本地秩序继续运行。`signalMap` 的协议语义与运行时对接详见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md) 和 [Executor](executor.md)。
 
 ## 顶层字段
 
@@ -70,7 +85,7 @@ spec:
 | --- | --- |
 | `apiVersion` | DSL 版本，目前是 `uvp/v0`。 |
 | `kind` | 当前 DSL 顶层对象固定为 `Zhixu`。 |
-| `metadata.name` | 可读名称，也会参与计划身份。 |
+| `metadata.name` | 必填的非空可读名称，也会参与计划身份。 |
 | `metadata.uid` | 稳定 Zhixu ID。没有时会回退到名称。 |
 | `metadata.labels` | 业务分类、行业、demo 标签。链上权限由 order authorization 和 overlay 决定。 |
 | `metadata.annotations.version` | 计划版本。版本变化会进入 `planId`。 |
@@ -84,8 +99,7 @@ spec:
 | --- | --- |
 | `name` | 阶段名称。和 task pattern 名拼成 `stageIdentifier`。 |
 | `source` | 该阶段 signal 所属的因果链；用户角色由 Product/authorization 另行解释。 |
-| `trigger` | 阶段入口 key；引用 `receiveSignals` 时由 Hook Ready 形成任务，引用 `externalSignals` 时由 backend/executor 直接接收。详见 [Trigger](trigger.md)。 |
-| `externalSignals` | backend/executor 接收的原始外部事实名称；不会自动生成 Hook 或 UVP signal。 |
+| `mint` | 可选的出生策略，目前唯一取值为 `per-fact`；声明后每个订阅事实最多代铸一个订单。 |
 | `receiveSignals` | hook key 到 Hook DSL 表达式的映射。 |
 | `sendSignals` | 阶段完成后可能发出的 signal 名称。 |
 | `executor` | 默认执行者配置，指向 supplier 或另一条 Zhixu。 |
@@ -94,18 +108,17 @@ spec:
 
 编译器把 `taskPattern.name + "." + stage.name` 变成 `stageIdentifier`。例如 `master.supplier_sourcing` 会被哈希为链上的 `stageId`。
 
-## `trigger`、`externalSignals` 和 `receiveSignals`
+## `receiveSignals` 与 `mint`
 
-`externalSignals` 定义 backend/executor 的直接输入，`receiveSignals` 定义 Hook 条件，`trigger` 必须引用两者之一：
+`receiveSignals` 定义 Hook 条件。普通表达式在当前订单上下文中求值；跨源订阅使用空标头的 `::ANCHOR(@source::task.stage.signal)`，由事实路由层逐事件投递。阶段是否是出生阶段只由 `mint: per-fact` 声明决定，不再通过 `trigger` 或 `externalSignals` 声明入口：
 
 ```yaml
-trigger:
-  - SCOPE_READY
+mint: per-fact
 receiveSignals:
-  SCOPE_READY: solution::master.technical_scope.cmp
+  REQUESTED: "::ANCHOR(@customer::request.submit.requested)"
 ```
 
-如果 `trigger` 引用的 key 不存在，编译器会报错。只有被 stage `trigger` 标记的 receive Hook Ready 后会发 `HookReady`；external signal 不生成 Hook，其他 Hook 可以用于内部依赖、signalMap 或观察。
+`mint` 只能取 `per-fact`，出生阶段必须包含至少一个 `ANCHOR(@...)` 订阅，并使用静态的 individual/organization executor；编译器会拒绝自环和无界的跨源代铸环。没有 `mint` 的阶段可以用普通 `source::condition` hook，也可以用 `ANCHOR(@...)` 做通道监听；其订单身份由现有订单路由或执行器自报创建。旧的 `trigger`、`externalSignals`、`::OUTSIDE@`、`::MERGE@` 和旧 `::ANCHOR@(…)` 形态均已退役，编译器会显式拒绝。
 
 ## `selectedStages`
 
@@ -126,9 +139,9 @@ selectedStages:
 | --- | --- |
 | `individual` | 个体执行者。 |
 | `organization` | 组织、企业系统、服务商或团队。 |
-| `zhixu` | 另一条 Zhixu 作为执行接口对接。 |
+| `zhixu` | 另一条 Zhixu 作为执行接口对接；目标身份放在 `zhixuExecutorConfig.target`。 |
 
-`supplierID` 是 Store/治理/部署材料中解析的 supplier 或 peer 秩序标识。订单里的 active executor 钱包由订单注册授权或 `StageExecutorPatchApplied` 运行时事件决定。
+`supplierID` 只适用于 `individual`/`organization` executor。`supplierType=zhixu` 时禁止 `supplierID`，必须提供 `zhixuExecutorConfig`：它固定 dock schema、目标 Zhixu/version、派生订单策略，以及本地输入到目标入口端口的 `inputMap` 和本地输出到目标端口的 `signalMap`。目标 definition/artifact/interface 身份由发布系统提供的 `uvp.dock.resolution.v1` manifest 解析；不能用显示名称代替 UID。订单里的 active executor 钱包由订单注册授权或 `StageExecutorPatchApplied` 运行时事件决定。
 
 ## `fileResources`
 

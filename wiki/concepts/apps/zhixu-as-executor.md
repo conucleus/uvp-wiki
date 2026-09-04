@@ -16,8 +16,9 @@ status: verified
 ```text
 local Zhixu / local order
   -> stage.executor.supplierType = zhixu
-  -> signalMap declares linked signal mapping
-  -> local trigger opens execution
+  -> zhixuExecutorConfig.target selects an immutable peer UID/version
+  -> inputMap/signalMap bind local hooks/signals to target port names
+  -> local receive hook becomes ready and opens execution
   -> linked Zhixu / linked order runs with its own plan and authorization
   -> linked proof is checked
   -> authorized mapped signal is submitted to local order
@@ -38,73 +39,81 @@ local order 和 linked order 都是独立的 `UVPStateMachine` order。它们各
 
 ## YAML 形态
 
-> 待确认（TODO）：关键字与 hook-core parser 现状逐一对账（receiveSignals、externalSignals、signalMap、supplierType: zhixu）。
-
 一个结算 stage 可以这样把另一条 Zhixu 作为执行接口：
 
 ```yaml
 - name: fiat_bridge
   source: settlement
-  trigger:
-    - ROUTE_FIAT
   receiveSignals:
     ROUTE_FIAT: settlement::payment.route.use_fiat_bridge
   executor:
     supplierType: zhixu
-    supplierID: "{{ .fiat_payout_bridge_zhixu_uid }}"
     zhixuExecutorConfig:
+      schemaVersion: uvp.dock.v1
+      target:
+        zhixu: fiat-payout-bridge
+        version: "1"
+      order:
+        idPolicy: derived-v1
+      inputMap:
+        ROUTE_FIAT: payout
       signalMap:
-        str: fiat_bridge::payout.start.str
-        cmp: fiat_bridge::payout.close.cmp
-        err: fiat_bridge::payout.close.err
+        str: payout_started
+        cmp: payout_completed
+        err: payout_failed
 ```
 
 本地 stage 的 source 是 `settlement`；`str/cmp/err` 各字段的确切语义见下文 [signalMap 的协议含义](#signalmap-的协议含义)。
 
-如果这个对接阶段由订单外部的 Product/registrar workflow 直接打开，而不是等待上一条业务 signal，应把 link stage entrance 声明为 `externalSignals`：
+对接阶段的入口仍然必须是本地 `receiveSignals` hook；如果它订阅另一个域的事实，使用 `::ANCHOR(@source::task.stage.signal)`。不存在独立的 `trigger` 或 `externalSignals` 入口字段：
 
 ```yaml
 - name: dock_customs_clearance
   source: customs
-  trigger:
-    - LINK_READY
-  externalSignals:
-    - LINK_READY
+  receiveSignals:
+    LINK_READY: "::ANCHOR(@customs::clearance.entry.ready)"
   executor:
     supplierType: zhixu
-    supplierID: "{{ .customs_clearance_zhixu_uid }}"
     zhixuExecutorConfig:
+      schemaVersion: uvp.dock.v1
+      target:
+        zhixu: customs-clearance
+        version: "1"
+      order:
+        idPolicy: derived-v1
+      inputMap:
+        LINK_READY: entrance
       signalMap:
-        str: customs_peer::clearance.start.str
-        cmp: customs_peer::clearance.close.cmp
-        err: customs_peer::clearance.close.err
+        str: started
+        cmp: completed
+        err: failed
 ```
 
-`LINK_READY` 只是打开本地对接 workflow 的 trigger。linked order 的开始、完成或失败仍然通过 `signalMap`、docking link、proof 校验和授权 mapped signal 回填到本地 order。
+`LINK_READY` 是本地订阅 hook 的名称；linked order 的开始、完成或失败仍然通过 `signalMap`、docking link、proof 校验和授权 mapped signal 回填到本地 order。
 
 ## signalMap 的协议含义
 
 `signalMap` 是 local stage 接受 linked Zhixu 输出的语义契约。
 
-| 字段 | 语义 |
+| 本地 signal key | 语义 |
 | --- | --- |
 | `str` | linked Zhixu 开始或已接收委托的信号。当前 compiler 要求必须存在。 |
 | `cmp` | linked Zhixu 完成的信号。当前 compiler 要求必须存在。 |
 | `err` | linked Zhixu 失败、拒绝或异常的信号。可选但大多数真实 workflow 应配置。 |
 
-编译器会为 `signalMap` 生成 `kind=signalMap` hook（`trigger=false`，不直接变成 Product task），校验表达式能被 hook-core 解析，并校验引用的本地 stage/signal 是否存在；同一个 signalMap 必须引用同一个 source。
+`signalMap` 的 key 必须是本地 stage 的 `sendSignals`，value 必须是目标端口名；`inputMap` 的 key 必须是本地 `receiveSignals` hook，value 必须是目标入口端口名。编译器会校验 target UID/version、端口方向、恰好一个 entrance、端口名字符集及接口/route roots；`signalMap` 不再承载 Hook DSL。`str` 和 `cmp` 是必填映射，`err` 可选。
 
 ## Docked 运行时路径
 
 ```text
-local order 某个 trigger hook Ready
+local order 某个 receive hook Ready
   -> Product/Store 创建 local stage task
   -> Store 选择或确认 peer Zhixu 版本
   -> Product/adapter 注册或定位 linked order
   -> linked order 按自己的 Plan、授权、executor 执行
   -> linked order 产生 str/cmp/err proof
   -> adapter 或 Product workflow 校验 proof 和 signalMap
-  -> linkDockedOrder / submitDockedSignal 或授权 submitter 映射 local signal
+  -> openDockedOrder / submitDockedInput / submitDockedSignal 或授权 submitter 映射 local signal
   -> local order 对应 hook Ready / Cancelled / next stage
 ```
 
@@ -117,11 +126,11 @@ local order 某个 trigger hook Ready
 | 问题 | 证明来源 |
 | --- | --- |
 | local stage 为什么开放执行 | local order 的 `HookReady`。 |
-| link stage 的外部入口是谁打开的 | backend/executor 对 `LINK_READY` 的验签、去重和规范化记录，或上一条业务 signal 的 proof。 |
+| link stage 的入口为何有效 | local `HookReady` / `DockOpened` proof，以及目标 entrance port 的 interface/route membership proof。 |
 | linked Zhixu 使用哪个计划 | linked order 的 `OrderRegistered` 和 linked plan projection。 |
 | linked Zhixu 的 Plan 是否可用 | linked StateMachine 的 `PlanCommitted/PlanFinalized` projection。 |
 | linked order 如何推进 | linked order 的 `SignalSubmitted` / hook proof。 |
-| local order 如何继续 | local order 上的 mapped signal，来源可以是授权 submitter 或 `DockedSignalSubmitted`。 |
+| local order 如何继续 | local order 上的 mapped signal，来源可以是授权 submitter 或 `DockOutputSubmitted`。 |
 
 Store 可以把这些 proof 拼成一张履约卡片；状态真相仍来自两边各自的链上事件。
 
@@ -131,13 +140,13 @@ Store 应把 docked Zhixu 管成一个可审核 workflow：
 
 ```text
 选择 local stage
-  -> 搜索可用 peer Zhixu / supplierType=zhixu subject
+  -> 搜索可用 peer Zhixu UID/version
   -> 检查 linked plan publication 和 active version
-  -> 校验 signalMap 与 source/signal 是否匹配
+  -> 校验 inputMap/signalMap 与目标端口及 interface/route roots 是否匹配
   -> 保存 docking session draft
   -> operator review
   -> 发布或绑定到 local order workflow
-  -> linkDockedOrder 记录 local/linked relation
+  -> openDockedOrder 记录 local/linked relation
   -> submitDockedSignal 或授权 submitter 映射 local signal
 ```
 

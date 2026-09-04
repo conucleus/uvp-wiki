@@ -52,7 +52,7 @@ At creation the contract:
 | Resource overlay | `StageResourcePatchApplied`. |
 | Task projection | Rebuilt by chain-services from `HookReady` and authorization events. |
 | Proof rows | Event provenance. |
-| Docking relation | `DockedOrderLinked`, `DockedSignalMapped`, `DockedSignalSubmitted`, plus each side's own signal/proof. |
+| Docking relation | `DockOpened`, `DockInputSubmitted`, `DockOutputSubmitted`, `DockTerminal`, plus each side's own signal/proof. |
 
 ## Order and Product Order
 
@@ -68,4 +68,4 @@ One Order may contain multiple [source causal chains](source.md). In cross-borde
 
 An Order does not need to be "closed" to stay consistent. A business party can stop writing further facts, or create a new Order from the same Zhixu. Signals use first-writer-wins; for deduplication and non-overwritable semantics see [Signal](signal.md). If the first-written business fact was wrong, the core protocol neither overwrites nor deletes old facts: instead a new Order is created to re-execute, and upper-layer products clearly present the business relationship between the two fact streams.
 
-If a stage is carried by another Zhixu, a signal binding between the local order and the linked order usually forms: `linkDockedOrder` records the docking relation and signal binding, and once linked proof validation passes, `submitDockedSignal` or an authorized submitter maps the linked signal into the local order. For the full runtime path see [Zhixu as Executor](../apps/zhixu-as-executor.md); Store/Product only keep sandbox, contact, review, and display state — runtime proof follows on-chain events of both orders.
+If a stage is carried by another Zhixu, a signal binding between the local order and the linked order usually forms: after route/interface proofs pass, the docking module's `openDockedOrder` atomically records the relation and linked order, then `submitDockedInput` / `submitDockedSignal` deliver inputs and outputs. For the full runtime path see [Zhixu as Executor](../apps/zhixu-as-executor.md); Store/Product only keep sandbox, contact, review, and display state — runtime proof follows on-chain events of both orders.

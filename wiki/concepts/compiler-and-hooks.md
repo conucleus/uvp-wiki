@@ -14,8 +14,8 @@ Compiler 和 Hook Core 是协议语义进入链上前的入口。它们不处理
 `uvp-protocol/packages/hook-core` 负责：
 
 - 解析 `source::condition`。
-- 支持 `&`、`|`、`~`、delay，以及空标头 wrapper `::OUTSIDE@(…)`、`::MERGE@(…)`、`::ANCHOR@(task.stage.signal)`；裸 `OUTSIDE` / `ANCHOR` 已删除，`OUTSOURCE` 整体退役（解析期报错）。
-- Stage 的 `externalSignals` 由 compiler 保留为 backend/executor 直接输入契约，不会编译成 Hook。
+- 支持 `&`、`|`、`~`、delay，以及跨 source 的 `::ANCHOR(@source::task.stage.signal)` 订阅；旧的 `::OUTSIDE@`、`::MERGE@`、`::ANCHOR@` wrapper 和 `OUTSOURCE` 已退役（解析期报错）。
+- 只为 stage 的 `receiveSignals` 生成 receive Hook；不存在一套绕过 AST 的 `externalSignals` 或 trigger wrapper 语义。
 - 把 `~A` 解释为“A signal 尚未出现在当前订单事件集中”。signal 一旦出现就不会消失，所以这里是单调存在逻辑。
 - 抽取 positive、negative、timer dependencies。
 - 提供本地 evaluator，供 compiler 和 reference runtime 共享。
@@ -27,7 +27,7 @@ Hook Core 的输出仍然是平台中立语义，不含 Solidity ABI。
 `uvp-protocol/packages/compiler` 负责：
 
 - 加载 YAML/JSON Zhixu。
-- 校验 stage、trigger、receiveSignals、selectedStages、executor reachability。
+- 校验 stage、`receiveSignals`、`mint`、`selectedStages`、executor reachability，以及 dock route/interface commitment。
 - 生成 `OnchainHookPlanArtifact`。
 - 生成 Solidity `commitPlan`/`finalizePlan` 参数。
 - 计算 `planId`、`planHash`、hook/stage/source/signal/dependency/route id。
@@ -55,10 +55,10 @@ Compiler 的确定性保证各方得到同一个 plan hash。合约注册 compac
 
 > 待确认（TODO）：指令称八条细则，源页（components/semantics-and-compiler.md）实际仅七条。
 
-- `stage.trigger` 必须引用本 stage 已存在的 `externalSignals` 或 `receiveSignals` key。
-- `externalSignals` 是 backend/executor 的直接输入契约，不编译成 Hook；只有 `receiveSignals` 会产生 Hook。
-- receive hook 的 `trigger=true` 才会在 Ready 时发出 `HookReady`。
-- `signalMap` hook 当前 `trigger=false`。
-- `supplierType=zhixu` 的 `signalMap` 必须包含 `str` 和 `cmp`，并且同一个 map 引用同一个 source。
+- `receiveSignals` 的 key 是本 stage 的 receive hook 名称，value 是该 hook 的规范化表达式；不再读取 `stage.trigger` 或 `externalSignals`。
+- Hook 的订单入口由 `orderTriggerKind` 明确表达：`none`、`mint` 或 `dock`；Ready 事件是否对外发出由独立的 `emitReady` 布尔值表达。
+- `mint: per-fact` 只能用于出生 stage：每个满足锚点的事实铸造一个新订单；docking 出生必须带完整 dock route/interface proof。
+- `supplierType=zhixu` 必须提供 `zhixuExecutorConfig`，其中 target 是版本化的 peer UID，`inputMap`/`signalMap` 使用目标接口端口名；它不使用 `supplierID`。
+- `signalMap` 的输出映射必须包含 `str` 和 `cmp`，`err` 可选但建议配置，并且同一个 map 引用同一个 source。
 - Hook 表达式按单调存在逻辑求值：`A` 表示 signal 已出现，`~A` 表示 signal 尚未出现；signal 出现后不会消失。
 - Hook 表达式必须有正向锚点；纯缺席条件不能成为可推进 hook。

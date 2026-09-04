@@ -33,13 +33,13 @@ struct HookRuntime {
 合约评估 hook 后，如果状态发生变化，会发出：
 
 ```text
-HookStatusChanged(orderId, hookId, previousStatus, nextStatus, dueAt)
+HookStatusChanged(planId, orderId, hookId, previousStatus, nextStatus, dueAt)
 ```
 
-如果 hook 变成 `Ready`，并且它是 `trigger=true`，合约还会发出一次：
+如果 hook 变成 `Ready`，并且其编译产物带有 `emitReady=true`，合约还会发出一次：
 
 ```text
-HookReady(orderId, hookId, stageId, hookName)
+HookReady(planId, orderId, hookId, stageId, hookName)
 ```
 
 `readyEmitted` 确保同一个订单里的同一个 hook 不会重复创建任务。
@@ -49,7 +49,7 @@ HookReady(orderId, hookId, stageId, hookName)
 EVM 合约不能自己在未来某个时间自动运行。进入 `Wait` 后，需要外部 keeper、executor 或脚本在到期后调用：
 
 ```solidity
-pokeTimer(orderId, hookId)
+pokeTimer(planId, orderId, hookId)
 ```
 
 合约会检查：

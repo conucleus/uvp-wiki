@@ -9,17 +9,17 @@ status: verified
 # Hook
 
 > Prerequisite reading: [Core Concepts](../README.md)
-A Hook is the smallest rule by which the state machine decides "whether a stage condition holds". It is not an HTTP webhook or an external-system callback; it is a state-machine condition over an Order's event set. Each entry of a Zhixu stage's `receiveSignals` usually compiles into one `kind=receive` hook; if the stage docks with another Zhixu, `signalMap` also compiles into `kind=signalMap` hooks.
+A Hook is the smallest rule by which the state machine decides "whether a stage condition holds". It is not an HTTP webhook or an external-system callback; it is a state-machine condition over an Order's event set. Each entry of a Zhixu stage's `receiveSignals` compiles into one `kind=receive` hook; if the stage docks with another Zhixu, `inputMap`/`signalMap` are committed as dock route/interface data rather than extra pseudo-hooks.
 
-A Hook is only a condition. Only when a hook marked as a [Trigger](trigger.md) becomes Ready does chain emit `HookReady`, and only then should Product/Store project it as a formally executable task.
+A Hook is only a condition. When a hook with `emitReady=true` becomes Ready, the chain emits `HookReady`; `orderTriggerKind` further states whether that Ready opens a mint or dock entry. Product/Store should project only confirmed `HookReady` events as formally executable tasks.
 
 ## Who Uses It
 
-Nuclei declare hook conditions in stage `receiveSignals`; the compiler normalizes them into the Plan; the state machine evaluates them over order events; Product/Store/executor-kit follow `HookReady` to create tasks and notifications.
+Nuclei declare hook conditions in stage `receiveSignals`; the compiler normalizes them into the Plan; the state machine evaluates them over order events; Product/Store/executor-kit follow `HookReady` to create tasks and notifications. Cross-source facts enter the routing layer through `::ANCHOR(@source::task.stage.signal)`, while `mint: per-fact` determines whether each fact derives an order.
 
 ## What It Produces
 
-Hook evaluation produces `HookStatusChanged` transitions; the first time a hook with `isTrigger=true` becomes Ready it emits `HookReady`, which is the projection basis for Product tasks, Store intents, and adapter jobs.
+Hook evaluation produces `HookStatusChanged` transitions; the first time a hook with `emitReady=true` becomes Ready it emits `HookReady`, which is the projection basis for Product tasks, Store intents, and adapter jobs. `orderTriggerKind` is `none`, `mint`, or `dock`.
 
 ## Where Authority Comes From
 
@@ -27,7 +27,7 @@ The authoritative form of hook conditions is on-chain `UVPStateMachine.StoredHoo
 
 ## Hook Expressions
 
-Hook expressions use the `source::condition` form. `parseHookExpression()` requires both a source and a condition; the only exceptions are cross-source entry wrappers, which must use an empty header (`::OUTSIDE@(...)`, `::MERGE@(...)`, `::ANCHOR@(task.stage.signal)`):
+Normal Hook expressions use the `source::condition` form. `parseHookExpression()` requires both a source and a condition; cross-source subscriptions use the empty-header `::ANCHOR(@source::task.stage.signal)` form:
 
 ```text
 source::condition
@@ -50,9 +50,7 @@ The parsed node types are exactly these:
 | Node | Meaning |
 | --- | --- |
 | `signal` | Waits for some `task.stage.signal` to appear. |
-| `external` | The `::OUTSIDE@(...)` fork entry: driven by target-source signal events, the runtime derives independent orders for it. |
-| `merge` | The `::MERGE@(source::a.cmp, ...)` multi-source observation entry: events are delivered lane by lane and aggregation is adjudicated by the state machine; core evaluation always returns `needs_more`. Rejected at on-chain HookPlan compile time (`MERGE@`/`ANCHOR@` delivery exists only in cloud runtime); see [Hook Evaluation](../state-machine/evaluation.md). |
-| `anchor` | The `::ANCHOR@(task.stage.signal)` anchored convergence entry: child-order backflow is delivered event by event along lineage, and the target must be a bare three-segment signal. Rejected at on-chain HookPlan compile time (`MERGE@`/`ANCHOR@` delivery exists only in cloud runtime); see [Hook Evaluation](../state-machine/evaluation.md). |
+| `subscription` | The `::ANCHOR(@source::task.stage.signal)` cross-source fact subscription, routed event by event by source class; `mint: per-fact` determines whether each fact derives an order. |
 | `not` | Absence condition: some signal has not appeared; if it later appears, branches depending on the absence are cancelled. |
 | `and` | All conditions satisfied. |
 | `or` | Any branch satisfied. |
@@ -62,26 +60,27 @@ The parser rejects conditions without positive anchors and rejects `OR` branches
 
 ## What Is Stored in the HookPlan
 
-The compiler generates one hook per `receiveSignals`; a stage's `externalSignals` remain backend/executor input contracts and produce no hooks. If the executor is `supplierType=zhixu`, extra hooks are generated for `signalMap`. In the current implementation, `signalMap` hooks have `trigger=false`: they explain the output relation of docked Zhixu and do not directly become Product tasks.
+The compiler generates one `kind=receive` hook per `receiveSignals`; there are no stage-level `trigger` or `externalSignals` fields. For `supplierType=zhixu`, `inputMap`/`signalMap` describe target dock ports and cannot carry Hook DSL; they are committed as dock route/interface roots and do not generate pseudo-`signalMap` hooks.
 
 A readable hook typically contains:
 
 | Field | Meaning |
 | --- | --- |
 | `hookId` | Platform-neutral string shaped like `stageIdentifier#hookName`. |
-| `kind` | `receive` or `signalMap`. |
+| `kind` | Currently `receive`; dock input/output mappings are route/interface commitments. |
 | `stageIdentifier` | Which stage this hook belongs to. |
 | `hookName` | Hook name, often from a receive signal or signal map. |
-| `isTrigger` | Whether Ready emits `HookReady`. |
+| `orderTriggerKind` | `none`, `mint`, or `dock`; states whether Ready opens a mint or dock entry. |
+| `emitReady` | Whether Ready emits `HookReady`. |
 | `rawExpression` | Original expression. |
 | `normalizedExpression` | Expression normalized by the compiler. |
 | `ast` | The hook condition AST. |
 | `dependencies` | Dependent source/signal/timer entries. |
 | `route` | Executor or dispatch routing info. |
 
-## What Trigger Means
+## Ready and Order Entry
 
-Only hooks with `isTrigger=true` emit `HookReady` the first time they become `Ready` in the contract. Product task creation, Store notifications, and executor-kit watchers all follow `HookReady`; UI drafts or temporary backend state serve display only.
+Only hooks with `emitReady=true` emit `HookReady` the first time they become `Ready` in the contract. `orderTriggerKind` is `none`, `mint`, or `dock`. Product task creation, Store notifications, and executor-kit watchers all follow `HookReady`; UI drafts or temporary backend state serve display only.
 
 For detailed semantics see [Trigger](trigger.md).
 

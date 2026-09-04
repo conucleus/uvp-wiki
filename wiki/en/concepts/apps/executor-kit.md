@@ -45,7 +45,7 @@ Normal output hides low-level protocol internals; `--verbose` is for debugging t
 Chain-native mode watches on-chain `HookReady` directly:
 
 ```text
-HookReady(orderId, hookId, stageId, hookName)
+HookReady(planId, orderId, hookId, stageId, hookName)
   -> watcher job
   -> handler decides payload hash and signal
   -> authorized wallet signs/submits

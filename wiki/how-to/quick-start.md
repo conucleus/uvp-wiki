@@ -51,7 +51,7 @@ indexer、executor 和部署脚本同步。
 | `pnpm test` | 所有 package 的 test。 |
 | `pnpm build` | 所有 package 的 build。 |
 | `pnpm lint` | 有 lint 脚本的 package 执行 lint。 |
-| `pnpm verify:protocol-freeze` | 校验 v0.8 `UVPStateMachine`、v0.1 `UVPIdentityRegistry`、modules、`UVPDeploymentRegistry` 和 EIP-712 fixture。 |
+| `pnpm verify:protocol-freeze` | 校验 v0.9 `UVPStateMachine`、v2.0 docking module、其余冻结 modules、`UVPDeploymentRegistry` 和 EIP-712 fixture。 |
 
 验证方式：对应命令退出码为 0。
 

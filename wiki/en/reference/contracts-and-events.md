@@ -29,8 +29,8 @@ The `UVPStateMachine` public boundary includes:
 - signed `triggerOrderFromOutsideFor` / `triggerOrderFromSignalFor`;
 - `submitSignal`;
 - `submitSignalFor`;
-- `linkDockedOrder` / `linkDockedOrderFor`;
-- `submitDockedSignal`;
+- `openDockedOrder`, which atomically creates the linked order and docking relation through the docking module;
+- the docking module's `submitDockedInput` / `submitDockedSignal`;
 - `applyStageExecutorPatch` / `applyStageExecutorPatchFor`;
 - `applyStageResourcePatch` / `applyStageResourcePatchFor`;
 - EIP-712 digest helpers;
@@ -40,7 +40,9 @@ The `UVPStateMachine` public boundary includes:
 - stage overlay view helpers;
 - event topics, function selectors, ABI hash, bytecode hash.
 
-Changing any of this must update the fixture and review adapters.
+Changing any of this must update the fixture and review adapters. Current Order identity is resolved as
+`(planId, orderId)`; indexers, replay, Product DTOs, and adapters must not infer the Plan from a bare global
+`orderId`.
 
 ## Stable Events
 
@@ -59,10 +61,13 @@ PlanRegistered
 OrderRegistered
 OrderTriggered
 OrderLinked
+OrderMaterialized
+StageMaterialized
 SignalSubmitted
-DockedOrderLinked
-DockedSignalMapped
-DockedSignalSubmitted
+DockOpened
+DockInputSubmitted
+DockOutputSubmitted
+DockTerminal
 StageExecutorPatchApplied
 StageResourcePatchApplied
 StageExecutorActivated

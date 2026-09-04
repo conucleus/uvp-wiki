@@ -29,8 +29,8 @@ status: verified
 - signed `triggerOrderFromOutsideFor` / `triggerOrderFromSignalFor`；
 - `submitSignal`；
 - `submitSignalFor`；
-- `linkDockedOrder` / `linkDockedOrderFor`；
-- `submitDockedSignal`；
+- state-machine module 通过 `openDockedOrder` 原子创建 linked order 和 docking relation；
+- docking module 的 `submitDockedInput` / `submitDockedSignal`；
 - `applyStageExecutorPatch` / `applyStageExecutorPatchFor`；
 - `applyStageResourcePatch` / `applyStageResourcePatchFor`；
 - EIP-712 digest helpers；
@@ -40,7 +40,8 @@ status: verified
 - stage overlay view helpers；
 - event topics、function selectors、ABI hash、bytecode hash。
 
-改变这些内容必须更新 fixture 并审查 adapter。
+改变这些内容必须更新 fixture 并审查 adapter。当前订单身份按 `(planId, orderId)` 解析；任何
+indexer、replay、Product DTO 或 adapter 都不得只用全局 `orderId` 推断所属 Plan。
 
 ## Stable Events
 
@@ -59,10 +60,13 @@ PlanRegistered
 OrderRegistered
 OrderTriggered
 OrderLinked
+OrderMaterialized
+StageMaterialized
 SignalSubmitted
-DockedOrderLinked
-DockedSignalMapped
-DockedSignalSubmitted
+DockOpened
+DockInputSubmitted
+DockOutputSubmitted
+DockTerminal
 StageExecutorPatchApplied
 StageResourcePatchApplied
 StageExecutorActivated

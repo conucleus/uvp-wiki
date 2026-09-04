@@ -25,7 +25,7 @@ UVP_BASE_SEPOLIA_BROADCAST_CONFIRMATION=I_UNDERSTAND_THIS_BROADCASTS_BASE_SEPOLI
 pnpm deploy:base-sepolia
 ```
 
-该入口部署 `UVPStateMachine`、六个冻结 modules、`UVPDeploymentRegistry` 和 `UVPIdentityRegistry`，登记 deployment，并发布当前 Plan。输出地址清单使用 `uvp-eth.addresses.v5`。
+该入口部署 `UVPStateMachine`、六个冻结 modules、`UVPDeploymentRegistry` 和 `UVPIdentityRegistry`，登记 deployment，并发布当前 Plan。输出地址清单使用 `uvp-eth.addresses.v1`。
 
 ## 部署并运行协议 Smoke
 

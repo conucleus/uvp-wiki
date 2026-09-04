@@ -95,8 +95,8 @@ The same objects carry different emphasis in different sections:
 - Relayers may sponsor or forward transactions, but must not generate business signatures for participants.
 - Supplier identity (material review) and order-level signal authorization are layered separately.
 - Executor/resource patches affect only a single Order; Plans stay static versions.
-- `supplierType=zhixu` drives the local order through proof validation, docking links, and authorized signal mapping.
-- Trigger hooks that become Ready open actionable tasks; on-chain order identity is created by the trigger order entry point.
+- `supplierType=zhixu` drives the local order through proof validation, `openDockedOrder`, docking events, and authorized signal mapping.
+- A receive Hook with `emitReady=true` opens an actionable task when Ready; on-chain order identity is created by the trigger order entry point and resolved as `(planId, orderId)`.
 - `fileResources` are resource handles; business file plaintext stays off-chain.
 - Store metadata organizes objects and catalogs; plan/supplier identity comes from registry events.
 - Store admins own platform workflow; nuclei own governance inside their Zhixu; Identity Registry operators own identity verification and binding.

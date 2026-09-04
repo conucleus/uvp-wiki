@@ -33,7 +33,7 @@ Store metadata is a read model: supplier capabilities, tags, reputation, search 
 
 - Business signatures come only from authorized participants' wallets; a relayer may broadcast transactions and pay gas but never creates business signatures.
 - Signal submission is gated by order-level `SignalSubmitterAuthorized` and the active executor overlay, signed as EIP-712 typed data.
-- Each `(orderId, sourceId, signalId)` accepts exactly one successful write (first-writer-wins); duplicate submissions revert with `SignalAlreadyExists`. Details: [Signal](core/signal.md) and [EIP-712 and Relayer](trust/eip712-relayer.md).
+- Each `(planId, orderId, sourceId, signalId)` accepts exactly one successful write (first-writer-wins); duplicate submissions revert with `SignalAlreadyExists`. Details: [Signal](core/signal.md) and [EIP-712 and Relayer](trust/eip712-relayer.md).
 
 ## Plan Lifecycle
 

@@ -27,8 +27,8 @@ The main data flow advances along "compiled artifacts -> Plan registration -> or
 | Whether a deployment version is active | `UVPDeploymentRegistry` cutover events. |
 | Whether the stage executor overlay was applied | Stage Patch Module's `StageExecutorPatchApplied` and the StateMachine's `StageExecutorActivated`. |
 | Whether the stage resource manifest was updated | `StageResourcePatchApplied`. |
-| Whether a linked Zhixu relationship exists | Docking Module's `DockedOrderLinked`. |
-| Whether docked signals were mapped and submitted | `DockedSignalMapped` / `DockedSignalSubmitted`. |
+| Whether a linked Zhixu relationship exists | Docking Module's `DockOpened` (including both local/linked Plan and Order identities). |
+| Whether docked input/output was mapped and submitted | `DockInputSubmitted` / `DockOutputSubmitted` / `DockTerminal`. |
 
 ## Cacheable but Must Be Rebuildable
 
@@ -38,7 +38,7 @@ The main data flow advances along "compiled artifacts -> Plan registration -> or
 | `StateMachineTaskProjection` | Rebuilt from `HookReady`, authorizations, stage overlays, and signal events. |
 | Product proof rows | Generated from event provenance. |
 | Supplier identity projection | Rebuilt from Identity Registry events. |
-| Stage patch and docking projections | Rebuilt from the `StageExecutorPatchApplied`, `StageResourcePatchApplied`, `DockedOrderLinked`, `DockedSignalMapped`, and `DockedSignalSubmitted` event families. |
+| Stage patch and docking projections | Rebuilt from the `StageExecutorPatchApplied`, `StageResourcePatchApplied`, `DockOpened`, `DockInputSubmitted`, `DockOutputSubmitted`, and `DockTerminal` event families. |
 | Store catalog state | May merge metadata; Plan publication and identity-binding status must come from chain events. |
 
 ## Operational Aids Only

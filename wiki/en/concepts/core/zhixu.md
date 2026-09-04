@@ -9,7 +9,7 @@ status: verified
 # Zhixu DSL
 
 > Prerequisite reading: [Core Concepts](../README.md)
-`Zhixu` is the pinyin for "order". In this repository, a Zhixu is the reusable coordination rulebook designed by a nucleus. It uses a DSL to declare one class of reusable production relations: which task patterns exist, which stages each task has, which source causal chain each stage sits on, which signals it receives, which signals it emits, who the default supplier is, which stages may choose executors for other stages, and which resources are required.
+`Zhixu` is the pinyin for "order". In this repository, a Zhixu is the reusable coordination rulebook designed by a nucleus. It uses a DSL to declare one class of reusable production relations: which task patterns exist, which stages each task has, which source causal chain each stage sits on, which signals it receives, which signals it emits, whether facts mint orders, who the default executor is, which stages may choose executors for other stages, which resources are required, and (optionally) which dock interface is published.
 
 The code entry point is `ZhixuDefinition` in `uvp-protocol/packages/compiler/src/types/index.ts`. An Order is one runtime instance of this rulebook after it has been compiled and registered.
 
@@ -46,23 +46,38 @@ spec:
   taskPatterns:
     - name: master
       stages:
+        - name: intake
+          source: customer
+          mint: per-fact
+          receiveSignals:
+            REQUESTED: "::ANCHOR(@customer::request.submit.requested)"
+          sendSignals: [str, cmp, err]
+          executor:
+            supplierType: organization
+            supplierID: "{{ .intake_executor_uid }}"
         - name: supplier_sourcing
           source: supply
-          trigger: ["SCOPE_READY"]
           receiveSignals:
-            SCOPE_READY: solution::master.technical_scope.cmp
+            SCOPE_READY: customer::master.intake.cmp
           sendSignals: [str, cmp, err]
           executor:
             supplierType: zhixu
-            supplierID: "{{ .supplier_sourcing_zhixu_uid }}"
             zhixuExecutorConfig:
+              schemaVersion: uvp.dock.v1
+              target:
+                zhixu: supplier-sourcing
+                version: "1"
+              order:
+                idPolicy: derived-v1
+              inputMap:
+                start: intake
               signalMap:
-                str: sourcing::source.start.str
-                cmp: sourcing::source.close.cmp
-                err: sourcing::source.close.err
+                str: start
+                cmp: complete
+                err: failed
 ```
 
-This example shows three things: the local order's `master.supplier_sourcing` stage is triggered by `solution::master.technical_scope.cmp`; the stage delegates to another `supplier-sourcing` Zhixu as its execution interface; and after proof validation and authorized submitter mapping, the linked order's output drives the local order forward. For the protocol semantics of `signalMap` and its runtime docking, see [Zhixu as Executor](../apps/zhixu-as-executor.md) and [Executor](executor.md).
+This example shows three things: a `mint: per-fact` stage subscribes to an `ANCHOR(@...)` fact and deterministically mints at most one order per fact; a normal stage advances through `receiveSignals`; and a delegated stage docks another Zhixu as its execution interface with target-port `inputMap`/`signalMap` entries. After proof validation and authorized submitter mapping, the linked order's output drives the local order forward. For the protocol semantics of `signalMap` and its runtime docking, see [Zhixu as Executor](../apps/zhixu-as-executor.md) and [Executor](executor.md).
 
 ## Top-Level Fields
 
@@ -70,7 +85,7 @@ This example shows three things: the local order's `master.supplier_sourcing` st
 | --- | --- |
 | `apiVersion` | DSL version, currently `uvp/v0`. |
 | `kind` | The DSL top-level object is fixed to `Zhixu`. |
-| `metadata.name` | Human-readable name; also participates in plan identity. |
+| `metadata.name` | Required non-empty human-readable name; also participates in plan identity. |
 | `metadata.uid` | Stable Zhixu ID. Falls back to the name when absent. |
 | `metadata.labels` | Business classification, industry, demo tags. On-chain permissions are decided by order authorization and overlays. |
 | `metadata.annotations.version` | Plan version. Version changes enter `planId`. |
@@ -84,8 +99,7 @@ This example shows three things: the local order's `master.supplier_sourcing` st
 | --- | --- |
 | `name` | Stage name. Combined with the task pattern name into `stageIdentifier`. |
 | `source` | The causal chain this stage's signals belong to; user roles are interpreted separately by Product/authorization. |
-| `trigger` | Stage entry key; referencing `receiveSignals` forms tasks from Hook Ready, referencing `externalSignals` receives directly from backend/executor. See [Trigger](trigger.md). |
-| `externalSignals` | Raw external fact names received by backend/executor; no Hook or UVP signal is generated automatically. |
+| `mint` | Optional birth policy; the only value is `per-fact`, which mints at most one order per subscribed fact. |
 | `receiveSignals` | Mapping from hook key to Hook DSL expression. |
 | `sendSignals` | Signal names the stage may emit after completion. |
 | `executor` | Default executor configuration pointing to a supplier or another Zhixu. |
@@ -94,18 +108,17 @@ This example shows three things: the local order's `master.supplier_sourcing` st
 
 The compiler turns `taskPattern.name + "." + stage.name` into `stageIdentifier`. For example, `master.supplier_sourcing` is hashed into the on-chain `stageId`.
 
-## `trigger`, `externalSignals`, and `receiveSignals`
+## `receiveSignals` and `mint`
 
-`externalSignals` define direct inputs for backend/executor, `receiveSignals` define Hook conditions, and `trigger` must reference one of them:
+`receiveSignals` define Hook conditions. A normal expression is evaluated in the current order context; a cross-source subscription uses the empty-header `::ANCHOR(@source::task.stage.signal)` form and is delivered event by event by the routing layer. Whether a stage is a birth stage is determined only by `mint: per-fact`, not by `trigger` or `externalSignals` declarations:
 
 ```yaml
-trigger:
-  - SCOPE_READY
+mint: per-fact
 receiveSignals:
-  SCOPE_READY: solution::master.technical_scope.cmp
+  REQUESTED: "::ANCHOR(@customer::request.submit.requested)"
 ```
 
-If a `trigger` references a missing key, the compiler reports an error. Only receive hooks marked by the stage `trigger` emit `HookReady` when Ready; external signals generate no hooks, while other hooks can serve internal dependencies, signalMap, or observation.
+`mint` accepts only `per-fact`; a birth stage must contain at least one `ANCHOR(@...)` subscription and use a static individual/organization executor. The compiler rejects self-loops and unbounded cross-source re-mint cycles. A stage without `mint` may use a normal `source::condition` hook or an `ANCHOR(@...)` channel listener; its order identity comes from existing order routing or an executor's self-reported order. The retired `trigger`, `externalSignals`, `::OUTSIDE@`, `::MERGE@`, and old `::ANCHOR@(…)` forms are rejected explicitly.
 
 ## `selectedStages`
 
@@ -126,9 +139,9 @@ Only stages with a selector binding may change the executor of the corresponding
 | --- | --- |
 | `individual` | Individual executor. |
 | `organization` | Organization, enterprise system, service provider, or team. |
-| `zhixu` | Another Zhixu docked as the execution interface. |
+| `zhixu` | Another Zhixu docked as the execution interface; its identity is in `zhixuExecutorConfig.target`. |
 
-`supplierID` is the supplier or peer-order identifier resolved in Store/governance/deployment materials. The active executor wallet in an order is decided by order registration authorization or the `StageExecutorPatchApplied` runtime event.
+`supplierID` is allowed only for `individual`/`organization` executors. For `supplierType=zhixu`, `supplierID` is forbidden and `zhixuExecutorConfig` is required. That config fixes the dock schema, target Zhixu/version, derived order policy, and `inputMap`/`signalMap` from local signals to target ports. The published `uvp.dock.resolution.v1` manifest resolves target definition/artifact/interface identity; a display name must not substitute for the target UID. The active executor wallet in an order is decided by order registration authorization or the `StageExecutorPatchApplied` runtime event.
 
 ## `fileResources`
 

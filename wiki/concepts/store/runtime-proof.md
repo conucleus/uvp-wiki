@@ -11,7 +11,7 @@ status: verified
 > 前置阅读：[秩序商店（Store）](README.md)
 Store 的履约视图把订单、任务、供应商参与、证据 hash 和链上 proof 组织给 operator 看。它是围绕链事件重建的视图，事实来源是 registry/state-machine events。
 
-<!-- StageExecutorPatchApplied 经 module patch 路径发出，非 v0.8 主 ABI fixture 直接列出 -->
+<!-- StageExecutorPatchApplied 经 module patch 路径发出；ABI/事件版本以当前冻结 fixture 为准。 -->
 
 ## 视图来源
 
@@ -33,7 +33,7 @@ Store 的履约视图把订单、任务、供应商参与、证据 hash 和链�
 - revoked plan/supplier 的 historical proof；
 - indexer syncing/rebuild 状态；
 - evidence hash 和 metadata URI，不展示业务文件明文。
-- trigger hook、ready time、assigned executor、blocked reason；
+- receive hook、ready time、assigned executor、blocked reason；
 - local/linked order proof chain，当 stage 由 peer Zhixu 执行时。
 
 ## Proof 卡片最低字段
@@ -56,4 +56,4 @@ Store 的履约视图把订单、任务、供应商参与、证据 hash 和链�
 - notification delivered 是联系状态；signal submitted 看 `SignalSubmitted`。
 - Store note 或 operator review 是运营记录；业务完成看 signal/proof（contact 不等于履约，见 [../protocol-boundaries.md](../protocol-boundaries.md)）。
 - local DB row 是可重建读模型，读模型与权威来源的对应关系见 [README.md](README.md)「信息对象与权威来源」表。
-- linked order complete 要通过 local order 上的授权 mapped signal 或 `DockedSignalSubmitted` 才能推动 local order。
+- linked order complete 要通过 local order 上的授权 mapped signal 或 `DockOutputSubmitted` 才能推动 local order；关系、输入、输出、终止状态分别以 docking module 事件为准。

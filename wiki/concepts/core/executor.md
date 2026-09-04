@@ -74,8 +74,8 @@ sendSignals:
 运行时会出现类似事件：
 
 ```text
-StageExecutorPatchApplied(orderId, selectorStageId, targetStageId, selector, executor, ...)
-StageExecutorActivated(orderId, targetStageId, executor, ...)
+StageExecutorPatchApplied(planId, orderId, selectorStageId, targetStageId, selector, executor, ...)
+StageExecutorActivated(planId, orderId, targetStageId, executor, ...)
 ```
 
 active executor overlay 只影响这个 Order，不修改 Plan。Patch 会把 Plan 从目标 stage `sendSignals` 编译出的 current-order signal capability 自动委任给 active executor，因此运行时才出现的钱包也能被选择；它只能提交 Plan 预声明的 signal，不能借 patch 扩张能力范围。换人只影响尚未首次写入的 Signal，既有事实不变。
@@ -86,7 +86,7 @@ active executor overlay 只影响这个 Order，不修改 Plan。Patch 会把 Pl
 
 ## Docked Zhixu 的运行时路径
 
-Docked 运行的骨架是：local trigger Ready 后启动对接 workflow，linked order 独立执行并产生 str/cmp/err proof，校验通过后由 `linkDockedOrder`/`submitDockedSignal` 或授权 submitter 映射回 local signal。链上 orderId 与 Product/Store/adapter 工作流编号可以并存，运行态 proof 仍回到链上事件；详细路径见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md)。
+Docked 运行的骨架是：local dock entrance HookReady 后，docking module 通过已提交的 route/interface proof 调用 `openDockedOrder`，原子创建 linked order；linked order 独立执行并产生 str/cmp/err proof，再由 `submitDockedInput` / `submitDockedSignal` 传递输入和输出。链上 `(planId, orderId)` 与 Product/Store/adapter 工作流编号可以并存，运行态 proof 仍回到链上事件；详细路径见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md)。
 
 ## signalMap 的协议含义
 

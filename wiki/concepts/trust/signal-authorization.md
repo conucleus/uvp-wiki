@@ -29,7 +29,7 @@ struct SignalAuthorization {
 _signalAuthorizations[orderId][signalKey][submitter]
 ```
 
-提交 signal 时，合约检查 `orderId + signalKey + submitter` 是否存在有效显式授权或动态 executor 委任。
+提交 signal 时，合约检查 `planId + orderId + signalKey + submitter` 是否存在有效显式授权或动态 executor 委任。
 
 ## Executor Patch 动态委任
 
@@ -65,7 +65,7 @@ metadataHash = keccak256("uvp:product-bff:authorization:v3:...")
 
 订单由签名过的 `triggerOrderFromOutsideFor()` / `triggerOrderFromSignalFor()` 创建：合约把订单绑定到 finalized `planId`，记录 trigger fact 或 trigger-origin link，并可同时写入上述 order-level signal authorizations。
 
-`externalSignals` 是 backend/executor 的直接输入契约，不是一个固定的链上 `OUTSIDE` signal。backend 先完成验签、去重、落库和规范化；如果 EVM adapter 需要把规范化事实提交到状态机，授权必须绑定到实际的 `entry.source` 与 `entry.signalName`：
+外部事实由 backend/executor 规范化为具体的 `source`/`signal` 后，再按当前 Plan 的 `receiveSignals` 或 trigger 入口处理；它不是一个固定的链上 `OUTSIDE` signal。backend 先完成验签、去重、落库和规范化；如果 EVM adapter 需要把规范化事实提交到状态机，授权必须绑定到实际的 `entry.source` 与 `entry.signalName`：
 
 ```text
 sourceId = keccak256(entry.source)
@@ -73,9 +73,9 @@ signalId = keccak256(entry.signalName)
 submitter = participant/business submitter address
 ```
 
-业务提交者签署对应的 trigger 或 signal typed data；registrar/relayer 只负责广播。广播地址不会因此获得业务提交权限。
+业务提交者签署对应的 trigger 或 signal typed data；registrar/relayer 只负责广播。广播地址不会因此获得业务提交权限。授权键和事件都必须保留 `(planId, orderId)`，不能仅按裸 `orderId` 归属事实。
 
-docked Zhixu 的跨源入口必须使用显式的空标头 wrapper（`::OUTSIDE@(...)`、`::MERGE@(...)` 或 `::ANCHOR@(task.stage.signal)`），并对实际的 source/signal 建立同样的订单级授权。linked order 后续的 `str/cmp/err` 映射仍按 `signalMap`、docking link 和 mapped signal 授权检查。
+docked Zhixu 的跨源入口由 `orderTriggerKind: dock` 和已提交的 dock route/interface commitment 表达；跨 source 条件使用 `::ANCHOR(@source::task.stage.signal)` 订阅，并对实际的 source/signal 建立同样的订单级授权。linked order 后续的 `str/cmp/err` 映射仍按 `signalMap`、docking relation 和 mapped signal 授权检查。
 
 ## 授权和任务展示
 

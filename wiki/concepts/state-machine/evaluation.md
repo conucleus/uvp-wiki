@@ -33,8 +33,11 @@ struct Instruction {
 | `Or` | 任一输入成立即成立。 |
 | `Delay` | 基于正向锚点计算到期时间。 |
 
-除 `wait/ready/cxl` 之外，核心求值还可能返回 `needs_more`：`::MERGE@(...)` 与
-`::ANCHOR@(...)` 入口采用逐事件投递语义，表达式本身不聚合裁决，而是把每个贡献事件交给状态机按血缘与配对规则处理；因此这两类 hook 在链上 HookPlan 中暂不支持，编译期会显式拒绝。
+除 `wait/ready/cxl` 之外，云侧订阅路由还会表达“尚未收敛”的中间态，但它
+不是链上 `Instruction[]` 的求值结果。跨源订阅统一使用
+`::ANCHOR(@source::task.stage.signal)`；路由层按 source 类逐事件投递，
+`mint: per-fact` 决定是否从事实代铸订单。旧 `::OUTSIDE@`、`::MERGE@` 和
+`::ANCHOR@(…)` wrapper 已退役，编译器会拒绝。
 
 ## 示例
 
@@ -90,7 +93,12 @@ struct EvalValue {
 
 ## 提交与去重
 
-`submitSignal()` 按 `(orderId, sourceId, signalId)` 去重：同一 `signalKey` 只有第一次提交会写入 `SignalRecord`（first-writer-wins）。提交时合约检查 submitter 是否持有显式订单级授权，或是否是当前 active executor overlay 委任的钱包；两者都不满足时提交被拒绝。授权模型详见 [Signal 授权](../trust/signal-authorization.md)。
+`submitSignal()` 按 `(planId, orderId, sourceId, signalId)` 去重：同一订单
+作用域内的 `signalKey` 只有第一次提交会写入 `SignalRecord`（first-writer-wins）。
+提交时合约检查 submitter 是否持有显式订单级授权，或是否是当前 active
+executor overlay 委任的钱包；两者都不满足时提交被拒绝。授权模型详见
+[Signal 授权](../trust/signal-authorization.md)。任何 replay oracle、索引和
+Product API 都必须携带 `planId`，不能用 bare `orderId` 跨 plan 归并。
 
 ## 合约是权威实现
 

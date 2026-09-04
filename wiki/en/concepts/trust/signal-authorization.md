@@ -29,7 +29,7 @@ The contract stores it as:
 _signalAuthorizations[orderId][signalKey][submitter]
 ```
 
-When a signal is submitted, the contract checks whether `orderId + signalKey + submitter` has valid explicit authorization or dynamic executor delegation.
+When a signal is submitted, the contract checks whether `planId + orderId + signalKey + submitter` has valid explicit authorization or dynamic executor delegation.
 
 ## Dynamic Delegation from Executor Patch
 
@@ -65,7 +65,7 @@ metadataHash = keccak256("uvp:product-bff:authorization:v3:...")
 
 An order is created through signed `triggerOrderFromOutsideFor()` / `triggerOrderFromSignalFor()`: the contract binds the order to the finalized `planId`, records either the trigger fact or a trigger-origin link, and can at the same time write the order-level signal authorizations described above.
 
-`externalSignals` is a direct backend/executor input contract, not a fixed on-chain `OUTSIDE` signal. The backend first verifies signatures, deduplicates, persists, and normalizes the fact. If an EVM adapter needs to submit that normalized fact to the state machine, authorization must bind to the actual `entry.source` and `entry.signalName`:
+External facts are normalized by the backend/executor into a concrete `source`/`signal`, then handled through the current Plan's `receiveSignals` or trigger entry; they are not a fixed on-chain `OUTSIDE` signal. The backend first verifies signatures, deduplicates, persists, and normalizes the fact. If an EVM adapter needs to submit that normalized fact to the state machine, authorization must bind to the actual `entry.source` and `entry.signalName`:
 
 ```text
 sourceId = keccak256(entry.source)
@@ -73,9 +73,9 @@ signalId = keccak256(entry.signalName)
 submitter = participant/business submitter address
 ```
 
-The business submitter signs the corresponding trigger or signal typed data; the registrar/relayer is only responsible for broadcasting. The broadcasting address does not gain business-submission authority by doing so.
+The business submitter signs the corresponding trigger or signal typed data; the registrar/relayer is only responsible for broadcasting. The broadcasting address does not gain business-submission authority by doing so. Authorization keys and events must retain `(planId, orderId)` and must not assign facts to a Plan from a bare `orderId`.
 
-A docked Zhixu cross-source entry must use an explicit empty-header wrapper (`::OUTSIDE@(...)`, `::MERGE@(...)`, or `::ANCHOR@(task.stage.signal)`), with the same order-level authorization established for the actual source/signal. The later `str/cmp/err` mapping for a linked order still follows `signalMap`, docking links, and mapped-signal authorization checks.
+A docked Zhixu cross-source entry is expressed by `orderTriggerKind: dock` plus committed dock route/interface proofs; cross-source conditions use the `::ANCHOR(@source::task.stage.signal)` subscription, with the same order-level authorization established for the actual source/signal. The later `str/cmp/err` mapping for a linked order still follows `signalMap`, the docking relation, and mapped-signal authorization checks.
 
 ## Authorization and Task Display
 

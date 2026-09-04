@@ -26,7 +26,7 @@ This page explains project terms in plain language first, then gives the code an
 | [Source](../concepts/core/source.md) | The causal namespace a signal belongs to, answering which business-progression line an action enters. | `source`, `sourceId`, `signalKey`. |
 | [Signal](../concepts/core/signal.md) | The smallest business fact the state machine accepts for an Order. | `submitSignal()`, `SignalSubmitted`, `SignalRecord`. |
 | [Hook](../concepts/core/hook.md) | A state-machine condition; not an HTTP webhook, nor a callback. | `CompiledHook`, `HookStatusChanged`. |
-| [Trigger](../concepts/core/trigger.md) | A hook mark that opens an executable task via `HookReady`. | stage `trigger`, `HookReady`. |
+| [Trigger](../concepts/core/trigger.md) | Order-entry semantics: `orderTriggerKind` expresses mint/dock/none, while `emitReady` independently controls whether an actionable `HookReady` is emitted. | `orderTriggerKind`, `emitReady`, `HookReady`. |
 | [File Resource](../concepts/core/file-resources.md) | A handle for off-chain materials such as stage protocols, evidence templates, and resource manifests; not plaintext file storage. | `fileResources`, resource patch, metadata URI/hash. |
 | OnchainHookPlan | The compact on-chain artifact for EVM registration and material review. | `OnchainHookPlanArtifact`, compact hooks, dependency indexes, selector bindings. |
 | HookPlan IR | The compiler-internal intermediate shape; no longer a public Store/import/deploy flow. | Used internally by `compileZhixuOnchainHookPlan()`. |
@@ -40,7 +40,7 @@ This page explains project terms in plain language first, then gives the code an
 | [Publisher](../concepts/lifecycle.md) | The registered account or mechanism allowed to register Plans. | plan publisher allowlist; `commitPlan()` commit + `finalizePlan()` finalization (only a finalized Plan can create an Order). |
 | [Registrar](../concepts/lifecycle.md) | The account or mechanism that creates trigger orders: the order creator signs trigger typed data to create the Order (the current contracts have no registrar allowlist). | `triggerOrderFromOutsideFor()` / `triggerOrderFromSignalFor()`. |
 | [Registry Boundary](../concepts/contracts-and-registries.md) | One `UVPIdentityRegistry` address is one identity-resolution domain. Initially Store operates one; multiple independent regulated entities may be configured in the future. StateMachine does not read it. | `registryAddress`, `bindingId`, `UVPIdentityRegistry.owner()`. |
-| [HookReady](../concepts/state-machine/README.md) | The event emitted after a trigger hook becomes ready, meaning a Product task can open. | `HookReady(orderId, hookId, stageId, hookName)`. |
+| [HookReady](../concepts/state-machine/README.md) | The event emitted after a receive hook with `emitReady=true` becomes ready, meaning a Product task can open. | `HookReady(planId, orderId, hookId, stageId, hookName)`. |
 | [Stage Overlay](../concepts/state-machine/stage-overlay.md) | An order-level runtime overlay of executor or resources; it does not change the Plan. | executor/resource patch events. |
 | [Stage Patch](../concepts/state-machine/stage-overlay.md) | A controlled order action that applies an executor or resource overlay; "patch" here is not a code patch. | `StageExecutorPatchApplied`, `StageResourcePatchApplied`. |
 | Selector Binding | A Plan rule declaring which target stage a given stage may patch. | selector stage id, target stage id, binding key. |

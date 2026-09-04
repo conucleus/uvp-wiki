@@ -26,7 +26,7 @@ status: verified
 | [Source](../concepts/core/source.md) | signal 所属的因果命名空间，回答“这个动作进入哪条业务推进线”。 | `source`、`sourceId`、`signalKey`。 |
 | [Signal](../concepts/core/signal.md) | 状态机为某个 Order 接受的最小业务事实。 | `submitSignal()`、`SignalSubmitted`、`SignalRecord`。 |
 | [Hook](../concepts/core/hook.md) | 状态机条件；不是 HTTP webhook，也不是回调。 | `CompiledHook`、`HookStatusChanged`。 |
-| [Trigger](../concepts/core/trigger.md) | 会通过 `HookReady` 打开可执行任务的 hook 标记。 | stage `trigger`、`HookReady`。 |
+| [Trigger](../concepts/core/trigger.md) | 订单入口语义：`orderTriggerKind` 表达 mint/dock/none，`emitReady` 独立控制是否发出可执行任务的 `HookReady`。 | `orderTriggerKind`、`emitReady`、`HookReady`。 |
 | [File Resource](../concepts/core/file-resources.md) | 阶段协议、证据模板、资源清单等链下材料的句柄，不是明文文件存储。 | `fileResources`、resource patch、metadata URI/hash。 |
 | OnchainHookPlan | 面向 EVM 注册和材料审核的紧凑链上产物。 | `OnchainHookPlanArtifact`、compact hooks、dependency indexes、selector bindings。 |
 | HookPlan IR | 编译器内部中间形态，不再是 Store/import/deploy 的公开流程。 | `compileZhixuOnchainHookPlan()` 内部使用。 |
@@ -40,7 +40,7 @@ status: verified
 | [Publisher](../concepts/lifecycle.md) | 被允许注册 Plan 的注册账户或机制。 | plan publisher allowlist、`commitPlan()` 提交 + `finalizePlan()` 定稿（仅 finalized Plan 可创建 Order）。 |
 | [Registrar](../concepts/lifecycle.md) | 创建 trigger order 的账户或机制：订单创建者签名 trigger typed data 创建 Order（现行合约没有 registrar allowlist）。 | `triggerOrderFromOutsideFor()` / `triggerOrderFromSignalFor()`。 |
 | [Registry Boundary](../concepts/contracts-and-registries.md) | 一个 `UVPIdentityRegistry` 地址就是一个身份解析域。首期由 Store 运营一个，未来可配置多个独立合规主体。StateMachine 不读取它。 | `registryAddress`、`bindingId`、`UVPIdentityRegistry.owner()`。 |
-| [HookReady](../concepts/state-machine/README.md) | trigger hook ready 后发出的事件，表示 Product task 可以打开。 | `HookReady(orderId, hookId, stageId, hookName)`。 |
+| [HookReady](../concepts/state-machine/README.md) | 带有 `emitReady=true` 的 receive hook ready 后发出的事件，表示 Product task 可以打开。 | `HookReady(planId, orderId, hookId, stageId, hookName)`。 |
 | [Stage Overlay](../concepts/state-machine/stage-overlay.md) | Order 运行时对 executor 或 resource 的订单级覆盖，不改变 Plan。 | executor/resource patch events。 |
 | [Stage Patch](../concepts/state-machine/stage-overlay.md) | 受控的订单动作，用来应用 executor 或 resource overlay；这里的 patch 不是代码补丁。 | `StageExecutorPatchApplied`、`StageResourcePatchApplied`。 |
 | [Selector Binding](../concepts/state-machine/stage-overlay.md) | Plan 里声明“某个 stage 可以 patch 哪个目标 stage”的规则。 | selector stage id、target stage id、binding key。 |
