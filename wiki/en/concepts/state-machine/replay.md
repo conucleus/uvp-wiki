@@ -24,15 +24,13 @@ Chain events are mapped into inputs the reducer understands:
 
 ## Reducer State
 
-The states used by the reference runtime are:
+The hook states used by the reference runtime (aligned with the on-chain oracle):
 
 | State | Meaning |
 | --- | --- |
 | `init` | Initial. |
 | `wait` | Waiting for dependencies or a timer. |
-| `reg` | The hook is ready. |
-| `dispatched` | Execution has been dispatched. |
-| `fail` | Execution failed. |
+| `ready` | The hook is ready. |
 | `cxl` | Cancelled. |
 
 ## Why Replay Is Needed

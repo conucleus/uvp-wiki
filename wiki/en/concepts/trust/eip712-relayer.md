@@ -15,7 +15,7 @@ A relayer can help broadcast transactions, but it cannot make business decisions
 
 ```text
 name = UVPStateMachine
-version = 0.9
+version = 0.10
 ```
 
 The primary type for signal submission is:

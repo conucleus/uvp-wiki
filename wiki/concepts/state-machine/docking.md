@@ -12,7 +12,7 @@ local order 把某个 stage 交给另一条 linked Zhixu / linked order 执行�
 linked order 中已经发生的 signal 映射回 local order。
 
 这不是 Store sandbox 草稿，也不是普通后端联动。正式运行态要落到
-`UVPDockingModule` 的 v2.0 事件和 proof 上；合约只接受已经通过
+`UVPDockingModule` 的 v2.1 事件和 proof 上；合约只接受已经通过
 `dockRoutesRoot`、`dockInterfaceRoot` 和各自 Merkle proof 的 route/interface。
 
 ## 状态机对象

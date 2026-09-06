@@ -24,15 +24,13 @@ status: verified
 
 ## Reducer 状态
 
-Reference runtime 使用的状态包括：
+Reference runtime 使用的 hook 状态（与链上 oracle 口径一致）：
 
 | 状态 | 含义 |
 | --- | --- |
 | `init` | 初始。 |
 | `wait` | 等待依赖或 timer。 |
-| `reg` | hook 已就绪。 |
-| `dispatched` | 已调度执行。 |
-| `fail` | 执行失败。 |
+| `ready` | hook 已就绪。 |
 | `cxl` | 已取消。 |
 
 ## 为什么需要 Replay

@@ -13,7 +13,7 @@ order, then map a signal that already happened in the linked order back into the
 local order.
 
 This is not a Store sandbox draft and not a normal backend integration. The
-formal runtime path must land in the v2.0 `UVPDockingModule` events and proof;
+formal runtime path must land in the v2.1 `UVPDockingModule` events and proof;
 the contract accepts only routes/interfaces covered by their committed
 `dockRoutesRoot`, `dockInterfaceRoot`, and Merkle proofs.
 

@@ -65,7 +65,7 @@ pnpm verify:protocol-freeze
 ABI、bytecode、selector、event topic、typed-data 字段、canonical hash 或 artifact schema 的变化都应进入发布说明和迁移判断。
 
 CompactHook、事件、selector 和 EIP-712 字段已经由
-`fixtures/uvp-state-machine.v0.9.json`、各 module fixture 以及
+`fixtures/uvp-state-machine.v0.10.json`、各 module fixture 以及
 `pnpm verify:protocol-freeze` 固定；变更必须同步 bindings、indexer、executor
 和 bootstrap，不能只更新单侧 fixture。
 
