@@ -1,6 +1,13 @@
+---
+title: 链上注册参数
+type: reference
+audience: 工程贡献者
+status: verified
+---
+
 # 链上注册参数
 
-`OnchainHookPlanArtifact` 还不是最终交易参数。编译器会把它进一步转换为 `UVPStateMachine.registerPlan()` 需要的紧凑结构。
+`OnchainHookPlanArtifact` 还不是最终交易参数。编译器把它压缩成紧凑结构后，CompactHook 等参数构成 `commitPlan()` 的提交载荷，metadata 在 `finalizePlan()` 中一次冻结；旧的单步入口 `registerPlan` 已不存在。当前 `uvp.onchainHookPlan.v2` 还承诺 `planId`、`planHash`、dock route/interface roots、selector bindings 和 signal capabilities。
 
 ## CompactHook
 
@@ -11,7 +18,7 @@ struct CompactHook {
     bytes32 hookId;
     bytes32 stageId;
     bytes32 hookName;
-    bool trigger;
+    uint8 flags; // ORDER_TRIGGER_MINT=1, ORDER_TRIGGER_DOCK=2, EMIT_READY=4
     Instruction[] instructions;
     bytes32[] dependencyKeys;
 }
@@ -56,3 +63,15 @@ pnpm verify:protocol-freeze
 ```
 
 ABI、bytecode、selector、event topic、typed-data 字段、canonical hash 或 artifact schema 的变化都应进入发布说明和迁移判断。
+
+CompactHook、事件、selector 和 EIP-712 字段已经由
+`fixtures/uvp-state-machine.v0.10.json`、各 module fixture 以及
+`pnpm verify:protocol-freeze` 固定；变更必须同步 bindings、indexer、executor
+和 bootstrap，不能只更新单侧 fixture。
+
+## 相关页面
+
+- [编译输入](compiler-input.md)
+- [Canonical Hash](canonical-hashes.md)
+- [合约与事件](../../reference/contracts-and-events.md)
+- [发布与验证](../../how-to/release-checklist.md)

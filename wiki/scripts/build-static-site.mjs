@@ -65,6 +65,22 @@ function ensureDir(filePath) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
 }
 
+function stripFrontMatter(markdown) {
+  const match = markdown.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/);
+  return match ? markdown.slice(match[0].length) : markdown;
+}
+
+function parseFrontMatter(markdown) {
+  const match = markdown.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
+  const fields = {};
+  if (!match) return fields;
+  for (const line of match[1].split(/\r?\n/)) {
+    const entry = line.match(/^([A-Za-z][A-Za-z0-9_-]*):\s*(.+)$/);
+    if (entry) fields[entry[1]] = entry[2].trim();
+  }
+  return fields;
+}
+
 function escapeHtml(value) {
   return value
     .replaceAll("&", "&amp;")
@@ -502,7 +518,30 @@ function renderSeoHead({ documentTitle, description, outputRel, altOutputRel, la
   ].join("\n");
 }
 
-function renderPage({ title, description, body, nav, rootRel, sourceRel, outputRel, altOutputRel, language }) {
+function prereadBadge(preread, sourceRel, rootRel, sourceSet) {
+  const dir = path.posix.dirname(sourceRel.replaceAll(path.sep, "/"));
+  const resolved = path.posix.normalize(path.posix.join(dir === "." ? "" : dir, preread));
+  if (!resolved.endsWith(".md") || !sourceSet.has(resolved)) return null;
+  const href = `${rootRel}${outputRelForMarkdown(resolved)}`;
+  const label = escapeHtml(path.posix.basename(resolved).replace(/\.md$/, ""));
+  return `<a class="doc-badge doc-badge-preread" href="${href}" title="preread: ${escapeHtml(preread)}">preread: ${label}</a>`;
+}
+
+function renderDocBadges(fields, sourceRel, rootRel, sourceSet) {
+  const badges = [];
+  if (fields.type) badges.push(`<span class="doc-badge" data-badge="type">${escapeHtml(fields.type)}</span>`);
+  if (fields.status) {
+    badges.push(`<span class="doc-badge doc-badge-status" data-status="${escapeHtml(fields.status)}">${escapeHtml(fields.status)}</span>`);
+  }
+  if (fields.audience) badges.push(`<span class="doc-badge" data-badge="audience">${escapeHtml(fields.audience)}</span>`);
+  if (fields.preread) {
+    const preread = prereadBadge(fields.preread, sourceRel, rootRel, sourceSet);
+    if (preread) badges.push(preread);
+  }
+  return badges.length ? `<div class="doc-badges">${badges.join("")}</div>` : "";
+}
+
+function renderPage({ title, description, body, nav, rootRel, sourceRel, outputRel, altOutputRel, language, badges }) {
   const documentTitle = title === "UVP Wiki" ? "UVP Wiki" : `${title} · UVP Wiki`;
   const seoHead = renderSeoHead({ documentTitle, description, outputRel, altOutputRel, language });
   const mermaidScript = body.includes('class="mermaid"')
@@ -547,6 +586,7 @@ ${seoHead}
           <div class="doc-meta">${sourceMeta}</div>
           ${languageSwitch}
         </div>
+        ${badges}
         <div class="doc-content">
 ${body}
         </div>
@@ -613,6 +653,30 @@ function copyPublicFiles() {
   fs.cpSync(publicRoot, outputRoot, { recursive: true, force: true });
 }
 
+function writeLlmsTxt(pages) {
+  const lines = [
+    "# UVP Wiki",
+    "",
+    "> zh 为源，en 为全量镜像。每条附原始 Markdown（含 front-matter）路径，可从站点根 /md/<path> 获取。",
+    "",
+  ];
+  const sorted = [...pages].sort((a, b) => a.sourceRel.localeCompare(b.sourceRel));
+  for (const page of sorted) {
+    lines.push(`- [${page.title}](${publicUrlForOutputRel(page.outputRel)}) · md/${page.sourceRel}`);
+  }
+  fs.writeFileSync(path.join(outputRoot, "llms.txt"), `${lines.join("\n")}\n`);
+}
+
+function copyMarkdownSources() {
+  const mdRoot = path.join(outputRoot, "md");
+  for (const file of markdownFiles) {
+    const rel = path.relative(wikiRoot, file);
+    const dest = path.join(mdRoot, rel);
+    ensureDir(dest);
+    fs.copyFileSync(file, dest);
+  }
+}
+
 function build() {
   walk(wikiRoot);
   const sourceSet = new Set(markdownFiles.map((file) => path.relative(wikiRoot, file)));
@@ -634,24 +698,31 @@ function build() {
   for (const file of markdownFiles) {
     const rel = path.relative(wikiRoot, file);
     const language = languageForSourceRel(rel);
-    const markdown = fs.readFileSync(file, "utf8");
+    const fullText = fs.readFileSync(file, "utf8");
+    const frontMatter = parseFrontMatter(fullText);
+    const markdown = stripFrontMatter(fullText);
     const outputRel = outputRelForMarkdown(rel);
     const rootRel = currentRootRel(outputRel);
     const body = markdownToHtml(markdown);
-    const title = pageTitle(markdown, rel);
+    const title = pageTitle(markdown, frontMatter.title || rel);
     const description = pageDescription(markdown, rel, language);
     const navItems = navByLanguage.get(language.code) || navByLanguage.get(languageConfigs.zh.code) || [];
     const nav = renderNav(navItems, outputRel, rootRel);
     const altOutputRel = alternateOutputRel(rel, sourceSet);
+    const badges = renderDocBadges(frontMatter, rel, rootRel, sourceSet);
     const outPath = path.join(outputRoot, outputRel);
     ensureDir(outPath);
-    fs.writeFileSync(outPath, renderPage({ title, description, body, nav, rootRel, sourceRel: rel, outputRel, altOutputRel, language }));
+    fs.writeFileSync(outPath, renderPage({ title, description, body, nav, rootRel, sourceRel: rel, outputRel, altOutputRel, language, badges }));
     sitemapPages.push({
       outputRel,
+      sourceRel: rel,
+      title,
       lastmod: fs.statSync(file).mtime.toISOString().slice(0, 10),
     });
   }
 
+  copyMarkdownSources();
+  writeLlmsTxt(sitemapPages);
   writeRobotsTxt();
   writeSitemapXml(sitemapPages);
 

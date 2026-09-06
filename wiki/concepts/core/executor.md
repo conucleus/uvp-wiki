@@ -1,5 +1,14 @@
+---
+title: Executor
+type: explanation
+audience: 协议读者
+preread: ../README.md
+status: verified
+---
+
 # Executor
 
+> 前置阅读：[核心概念](../README.md)
 Executor 是某个订单运行时真正承接阶段、产生业务动作或提交 signal 的执行者。它可以是一个人、企业系统、供应商派出的钱包、adapter、AI/MCP agent，也可以是一条独立的 Zhixu 秩序。
 
 Executor 要和 Supplier 分开：
@@ -10,6 +19,18 @@ Executor 要和 Supplier 分开：
 | Executor | 当前订单、当前阶段实际由谁执行或提交 signal。 | `UVPStateMachine` order authorization、stage executor overlay、EIP-712 签名。 |
 
 Supplier 是能力主体和 trust subject；Executor 是运行时绑定和 signal submitter。一个 Supplier 可以派出多个 executor 钱包；一个 Executor 也可能代表一个 supplier、一个 adapter，或一条可独立运行的 Zhixu。
+
+## 谁使用
+
+凝结核在 stage 上声明静态 executor 和 `selectedStages`；control stage 在运行中通过 executor patch 选择 active executor；Product/Store/executor-kit 依据 active executor 路由任务、展示履约说明并组织签名提交。
+
+## 产生什么结果
+
+订单注册时写入 order-level signal authorization；executor patch 运行时产生 `StageExecutorPatchApplied` 和 `StageExecutorActivated`，把 Plan 预声明的 signal capability 委任给当前钱包；active executor 的提交成为链上 signal/proof。
+
+## 权威来自哪里
+
+谁能提交 signal 由 `UVPStateMachine` order authorization、stage executor overlay 和 EIP-712 签名决定；Supplier 的能力资料只是 Store 链下判断（见 [Supplier](supplier.md)），不构成提交权。
 
 ## Executor 怎么被选出来
 
@@ -53,81 +74,27 @@ sendSignals:
 运行时会出现类似事件：
 
 ```text
-StageExecutorPatchApplied(orderId, selectorStageId, targetStageId, selector, executor, ...)
-StageExecutorActivated(orderId, targetStageId, executor, ...)
+StageExecutorPatchApplied(planId, orderId, selectorStageId, targetStageId, selector, executor, ...)
+StageExecutorActivated(planId, orderId, targetStageId, executor, ...)
 ```
 
 active executor overlay 只影响这个 Order，不修改 Plan。Patch 会把 Plan 从目标 stage `sendSignals` 编译出的 current-order signal capability 自动委任给 active executor，因此运行时才出现的钱包也能被选择；它只能提交 Plan 预声明的 signal，不能借 patch 扩张能力范围。换人只影响尚未首次写入的 Signal，既有事实不变。
 
 ## Zhixu 也可以是 Executor
 
-一条 Zhixu 可以作为另一条 Zhixu 的 stage executor。它接收本地秩序开放的执行接口，按自己的 plan、授权和 proof 路径运行，再通过 `signalMap` 把约定信号映射回本地秩序。
-
-典型例子是跨境供货：
-
-- 本地采购秩序负责需求确认、寻源、付款路径、物流和验收。
-- 结算 stage 可以选择 `payment-settlement` 这条 Zhixu 作为 executor。
-- `payment-settlement` 内部的 `fiat_bridge` stage 又可以选择 `fiat-payout-bridge` 这条 Zhixu 作为 executor。
-
-本地 stage 的写法是：
-
-```yaml
-executor:
-  supplierType: zhixu
-  supplierID: "{{ .fiat_payout_bridge_zhixu_uid }}"
-  zhixuExecutorConfig:
-    signalMap:
-      str: fiat_bridge::payout.start.str
-      cmp: fiat_bridge::payout.close.cmp
-      err: fiat_bridge::payout.close.err
-```
-
-这表达的是：
-
-1. local Plan 声明这个 stage 的 executor 类型是 `zhixu`。
-2. `supplierID` 指向 Store/Identity Registry 可以识别的 peer Zhixu 或其 supplier subject。
-3. `signalMap` 声明 local stage 如何等待或解释 linked Zhixu 输出信号。
-4. 编译器会为 `signalMap` 生成 `kind=signalMap` hook，`str` 和 `cmp` 必须存在，且同一个 signalMap 必须引用同一个 source。
-5. linked 秩序的创建、通知、proof 校验和 local signal 映射由 Store/Product/adapter/executor-kit 工作流组织。
-6. 运行态对接可以落到 `linkDockedOrder`、`DockedOrderLinked`、`DockedSignalMapped`、`submitDockedSignal`、`DockedSignalSubmitted`。
-7. local order 和 linked order 各自以自己的 `UVPStateMachine` 事件为事实源。
-
-Docked Zhixu 的工程模型是：linked 秩序独立运行，Store/Product 或 adapter 观察 linked proof，再用链上 docking link 和授权 signal 映射推动 local order。这个桥接动作留下 local order 上的 signal proof。
+一条 Zhixu 可以作为另一条 Zhixu 的 stage executor：它接收本地秩序开放的执行接口，按自己的 plan、授权和 proof 路径运行，再通过 `signalMap` 把约定信号映射回本地秩序。典型例子是跨境供货里结算 stage 选择 `payment-settlement`，其内部又可以选择 `fiat-payout-bridge` 作为 executor。完整模型、DSL 写法和约束见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md)。
 
 ## Docked Zhixu 的运行时路径
 
-```text
-local order 某个 trigger hook Ready
-  -> Product/Store 创建 local stage task
-  -> Store 选择或确认 peer Zhixu 版本
-  -> Product/adapter 注册或定位 linked order
-  -> linked order 按自己的 Plan、授权、executor 执行
-  -> linked order 产生 str/cmp/err proof
-  -> adapter 或 Product workflow 校验 proof 和 signalMap
-  -> linkDockedOrder / submitDockedSignal 或授权 submitter 映射 local signal
-  -> local order 对应 hook Ready / Cancelled / next stage
-```
-
-这里可以出现两个编号体系：
-
-- 链上 local `orderId` 和 linked `orderId` 由各自的 trigger order 入口创建。
-- Product task、Store docking session、adapter job 可以有自己的执行编号；运行态 proof 仍回到链上 order/signal/docking events。
+Docked 运行的骨架是：local dock entrance HookReady 后，docking module 通过已提交的 route/interface proof 调用 `openDockedOrder`，原子创建 linked order；linked order 独立执行并产生 str/cmp/err proof，再由 `submitDockedInput` / `submitDockedSignal` 传递输入和输出。链上 `(planId, orderId)` 与 Product/Store/adapter 工作流编号可以并存，运行态 proof 仍回到链上事件；详细路径见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md)。
 
 ## signalMap 的协议含义
 
-`signalMap` 是 local stage 接受 linked Zhixu 输出的语义契约。
-
-| 字段 | 语义 |
-| --- | --- |
-| `str` | linked Zhixu 开始或已接收委托的信号。当前 compiler 要求必须存在。 |
-| `cmp` | linked Zhixu 完成的信号。当前 compiler 要求必须存在。 |
-| `err` | linked Zhixu 失败、拒绝或异常的信号。可选但大多数真实 workflow 应配置。 |
-
-编译器会校验 `signalMap` 表达式能被 hook-core 解析，并校验引用的本地 stage/signal 是否存在。
+`signalMap` 是 local stage 接受 linked Zhixu 输出的语义契约：`str` 与 `cmp` 为 compiler 必填，`err` 可选但建议配置，且同一个 signalMap 必须引用同一个 source。字段级语义表与编译器校验规则见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md)。
 
 ## Executor Kit 的位置
 
-`uvp-executor-kit` 是 Executor 的集成工具箱，详见 [Executor Kit](../../execution/executor-kit.md)。它有两个同等重要的入口：
+`uvp-executor-kit` 是 Executor 的集成工具箱，详见 [Executor Kit](../apps/executor-kit.md)。它有两个同等重要的入口：
 
 - Chain-native：监听 `HookReady`，按 handler 路由并提交授权 signal。
 - Product API：读取 task/signal container，准备证据、签名、提交并读取 proof。

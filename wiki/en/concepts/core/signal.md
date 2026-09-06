@@ -1,23 +1,42 @@
+---
+title: Signal
+type: explanation
+audience: 协议读者
+preread: ../README.md
+status: verified
+---
+
 # Signal
 
-A Signal is the smallest business input accepted by the order state machine. It represents “an authorized wallet submitted a certain kind of action or evidence fingerprint for a certain Order.”
+> Prerequisite reading: [Core Concepts](../README.md)
+A Signal is the smallest business input the order state machine accepts. It represents "some authorized wallet submitted some class of action or evidence fingerprint to some order".
 
-## Where Signal Sits in the DSL
+## Who Uses It
 
-Zhixu stages have two fields directly related to signal:
+Authorized submitters (participant wallets, executors, adapters) submit signals; contracts validate and record them; Product/Store/executor-kit project `SignalSubmitted` into task completion status and proof rows.
+
+## What It Produces
+
+A successful submission writes an immutable `SignalRecord` and emits `SignalSubmitted`; it drives [Hook](hook.md) evaluation for hooks depending on that signal and may trigger `HookStatusChanged` or `HookReady`.
+
+## Where Authority Comes From
+
+A signal's validity is decided by contract authorization checks over `(planId, orderId, signalKey, submitter)`; only hashes go on chain, and business meaning is interpreted by the Zhixu, stage protocol, and Product DTO. `orderId` is not a global primary key; every read must retain its `planId`.
+
+## Where Signals Sit in the DSL
+
+Two places in a Zhixu stage relate directly to signals:
 
 | Field | Meaning |
 | --- | --- |
-| `receiveSignals` | Which input signals the current stage is waiting for. Each key compiles into one hook. |
-| `sendSignals` | Which output signals the current stage may emit after it runs. |
+| `receiveSignals` | Which input signals the stage waits for. Each key compiles into one [Hook](hook.md). |
+| `sendSignals` | Which output signals the stage may emit after execution. |
 
 For example, a buyer commitment stage:
 
 ```yaml
 buyer_commit:
   source: buyer
-  trigger:
-    - OFFER_READY
   receiveSignals:
     OFFER_READY: commercial::master.commercial_offer.cmp
   sendSignals:
@@ -26,17 +45,17 @@ buyer_commit:
     - err
 ```
 
-The meaning is: after the commercial offer is complete, the buyer commitment stage becomes ready; that stage may later emit `cmp`, `cxl`, or `err` for downstream hooks to consume.
+The meaning: once the commercial offer completes, the buyer commitment stage is ready; that stage may subsequently emit `cmp`, `cxl`, or `err` for later hooks to consume.
 
 ## From Text Name to On-chain Key
 
-In the Hook DSL, a signal is usually written as:
+In Hook DSL a signal is usually written as:
 
 ```text
 task.stage.signal
 ```
 
-On chain, it becomes three stable identifiers:
+In the contract it becomes three stable identifiers:
 
 ```text
 sourceId = keccak256(source)
@@ -44,59 +63,61 @@ signalId = keccak256(signalName)
 signalKey = keccak256(abi.encode(sourceId, signalId))
 ```
 
-`source` describes the causal context, meaning which traceable chain this action belongs to. Roles, Suppliers, or system entry points may be part of the submitter or business interpretation, but the on-chain signal key is determined by `source` and `signalName`. `signalName` is the specific action name, and the contract ultimately deduplicates and resolves dependencies by `signalKey`.
+`source` denotes the causal context — which traceable lane this action enters; see [Source Causal Chain](source.md). Roles, suppliers, or system entry points can be part of the submitter or business interpretation, but the on-chain signal key is decided by `source` and `signalName`. `signalName` names the concrete action; the contract deduplicates and looks up dependencies by `signalKey`.
 
-## Common Signal Naming Conventions
+## Common Signal Name Convention
 
-`str`, `cmp`, `err`, `cxl`, `pass`, and `fail` are common signal conventions in the current DSL and product semantics:
+The common name convention includes str, cmp, err, cxl, pass, fail, plus reject for veto scenarios:
 
 | Name | Common meaning |
 | --- | --- |
-| `str` | start, the executor starts or accepts the task. |
-| `cmp` | complete, the stage is complete. |
-| `err` | error, the stage has an exception. |
-| `cxl` | cancel, cancellation. |
-| `pass` | verification passed. |
-| `fail` | verification failed. |
-| `reject` | business rejection. |
+| `str` | start — the executor starts or takes the job. |
+| `cmp` | complete — the stage finished. |
+| `err` | error — the stage hit an exception. |
+| `cxl` | cancel — cancelled. |
+| `pass` | Validation passed. |
+| `fail` | Validation failed. |
+| `reject` | Business rejection. |
 
-The exact meaning is still interpreted by the Zhixu, stage protocol, Product DTO, and business evidence. The contract only recognizes `signalId` and authorization.
+Concrete meaning is still interpreted by the Zhixu, stage protocol, Product DTO, and business evidence. The contract only recognizes `signalId` and authorization.
 
 ## First Writer Wins
 
-Within a single Order, the same `signalKey` can only be successfully submitted once:
+For the protocol boundary overview, see [Protocol Boundaries](../protocol-boundaries.md).
 
-- The first submission writes a `SignalRecord` and emits `SignalSubmitted`.
+Within one order, a given `signalKey` can be successfully submitted only once:
+
+- The first submission writes the `SignalRecord` and emits `SignalSubmitted`.
 - Later duplicate submissions revert with `SignalAlreadyExists`.
-- The first successful write is the final on-chain fact for that `(orderId, sourceId, signalId)`; there is no overwrite, revocation, or administrator rewrite entry point.
+- The first successful write is the final on-chain fact of that `(planId, orderId, sourceId, signalId)`; there is no overwrite, revocation, or admin rewrite entry point.
 
-`idempotencyKey` is stored in events and projections to help services identify the request source; but the contract-level deduplication key is `(orderId, sourceId, signalId)`.
+The `idempotencyKey` is kept in events and projections so the service layer can identify request origin; but the contract-level deduplication key is `(planId, orderId, sourceId, signalId)`.
 
-If the first submission is wrong, the remedy is not to edit that Signal. Create a new Order from the Zhixu and submit again; the old Order remains as auditable history.
+If the first submission was wrong, create a new Order from the Zhixu and resubmit. The original Signal cannot be modified, and the old Order remains as auditable fact.
 
-## Payloads Are Hashes Only
+## Payload Stores Hashes Only
 
-The contract does not store plaintext business data such as contracts, invoices, shipping records, vehicle photos, or approval files. Business evidence should stay off chain; on chain only stores:
+The contract does not store plaintext contracts, invoices, logistics documents, vehicle records, photos, or approval files. Business evidence belongs off-chain; on chain only:
 
 | Field | Meaning |
 | --- | --- |
-| `payloadHash` | The hash of the evidence or action payload. |
-| `metadataURI` | If needed, a reference to off-chain metadata from a projection or adapter. |
+| `payloadHash` | Hash of the evidence or action payload. The protocol constant `bytes32(0)` (`0x000...0`) means "no payload" — it is an explicit encoding of absence, not a missing value. |
+| `metadataURI` | If needed, may point to off-chain metadata in projections or adapters. |
 | `submitter` | The authorized wallet address. |
-| `submittedAt` | The on-chain timestamp. |
+| `submittedAt` | The on-chain record time. |
 
-This boundary matters: the chain provides verifiable ordering and permissions, not business file storage.
+This boundary matters: chain provides verifiable ordering and permissions, not business file storage.
 
-## Authorization Is Checked On Chain
+## Authorization Is an On-chain Check
 
-The Product API may show a task to a participant, but whether they can actually submit it is still checked by the contract:
+Product API may show a task to some participant, but whether submission succeeds is finally checked by the contract:
 
 ```text
-orderId + signalKey + submitter
+planId + orderId + signalKey + submitter
 ```
 
-Authority may come from explicit Order-creation authorization or from an executor patch dynamically delegating the Plan-declared `sendSignals` scope. Both paths are enforced by the contract; a UI button cannot create authority.
+Authorization can come from explicit grants at Order creation or from a valid Executor patch dynamically delegating within the Plan-predeclared `sendSignals` scope; see [Signal Authorization](../trust/signal-authorization.md). Both paths are checked by the contract; even if the UI shows a button, submission without valid authorization will be rejected.
 
-## Signal Protocol Boundary
+## The Protocol Boundary of Signals
 
-A signal means “an authorized action happened.” Internal supplier workflows, procurement processes, financing processes, or AI reasoning steps may be stored in evidence, metadata URIs, or supplier systems; UVP’s core validation boundary is authorization, signature, payload hash, and event proof.
+A signal means "an authorized action happened". Supplier internal workflows, procurement processes, financing processes, or AI reasoning can live in evidence, metadata URIs, or supplier systems; the UVP core verifies only authorization, signatures, payload hashes, and event proofs. For the site-wide invariants — on-chain source of truth, no plaintext on chain, relayers do not sign — see [Protocol Boundaries](../protocol-boundaries.md).

@@ -1,5 +1,14 @@
+---
+title: Product DTO
+type: reference
+audience: 产品与前端工程师
+preread: README.md
+status: verified
+---
+
 # Product DTO
 
+> 前置阅读：[Product DTO 与用户表面](README.md)
 Product DTO 是面向普通用户和产品前端的稳定合同。它把协议字段翻译成订单、任务、证明、参与方和信任状态。
 
 ## ProductOrderDTO
@@ -7,7 +16,7 @@ Product DTO 是面向普通用户和产品前端的稳定合同。它把协议�
 `productOrderFromStateMachine()` 把 `StateMachineOrderProjection` 映射为 `ProductOrderDTO`。常见内容：
 
 | 字段 | 来源 |
-| --- | --- | --- |
+| --- | --- |
 | order identity | `orderId`、chain、contract、deployment。 |
 | plan proof | `planId`、`planHash`、plan registration event。 |
 | status | 从 projection status 映射。 |
@@ -57,3 +66,12 @@ Order 不承载业务生命周期状态：
 | `submitted` | `submitted` |
 | `cancelled` | `blocked` |
 | unknown | `blocked` |
+
+DTO 字段与状态映射以 `@uvp-eth/product-dto` 包类型定义为准。
+
+## 相关页面
+
+- [Product 表面入口](README.md)
+- [Signal Container](signal-container.md)
+- [事件投影](projections.md)
+- [Product API 端点速查](../../reference/product-api-endpoints.md)

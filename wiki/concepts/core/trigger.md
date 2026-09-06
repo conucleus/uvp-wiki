@@ -1,87 +1,109 @@
-# Trigger
+---
+title: Ready 与订单入口
+type: explanation
+audience: 协议读者
+preread: ../README.md
+status: verified
+---
 
-Trigger 把一个 ready condition 变成可执行任务。它是一种特殊 hook 标记：某个 receive hook Ready 后，这个 stage 的任务可以打开，链上应发出 `HookReady`，Product/Store/executor-kit 才能把它投影成任务、通知或 adapter job。
+# Ready 与订单入口
 
-第一遍可以把 `HookReady` 理解成“这个任务可以处理了”。它不表示业务已经完成；业务完成要等后续授权 `SignalSubmitted` 事件和证据指纹来证明。
+> 前置阅读：[核心概念](../README.md)
 
-Trigger 是 Hook 的一个编译标记，来自秩序 stage 的 `trigger` 数组。每个 key 独立指向一个 `receiveSignals` hook；任意一个 key 到达都能产生自己的 `HookReady`，但不会压制同一 stage 中其他 trigger hook 后续 ready。Projection 以 `hookId` 为任务／proof 身份，因此多个 trigger key 可以形成多个可独立审计的 task。每个 hook 使用 `~`、`&`、`|` 和显式 duration delay（例如 `+5s`），由 Hook DSL parser/compiler 校验。
+当前 DSL 不再有 stage 级 `trigger` 或 `externalSignals` 字段。每个
+`receiveSignals` 条目都是一个 Hook；编译器通过 `orderTriggerKind` 和
+`emitReady` 标记该 Hook 的订单入口角色。
 
-```yaml
-trigger:
-  - START
-receiveSignals:
-  START: buyer::order.confirm.cmp
-```
+## 三种入口角色
 
-编译后，`START` 这个 receive hook 会带上 `trigger=true`。如果它第一次变成 Ready，`UVPStateMachine` 会发出：
+| `orderTriggerKind` | 语义 |
+| --- | --- |
+| `none` | 普通订单内 Hook；Ready 只更新状态并可被后续流程消费。 |
+| `mint` | 出生阶段入口；`mint: per-fact` 从每条 `ANCHOR(@...)` 订阅事实按纯函数代铸一个订单。 |
+| `dock` | 对接阶段入口；Ready 后可按已提交的 dock route/interface commitments 打开 linked order。 |
 
-```text
-HookReady(orderId, hookId, stageId, hookName)
-```
+`emitReady=true` 的 Hook 第一次变成 Ready 时发出一次 `HookReady`。事件固定
+携带 `(planId, orderId, hookId, stageId, hookName)`；`planId` 必须和订单一起
+保留，不能从 bare `orderId` 推导。`emitReady=false` 的内部 Hook 仍可求值，
+但不会产生 `HookReady`。
 
-## 为什么必须指定 Trigger
+## 普通阶段与出生阶段
 
-一个 stage 可能有多个 hook：有的用于等待输入，有的用于 signalMap，有的用于失败路径或内部条件。Trigger 的作用是把“条件成立”提升为“这个 hook 对应的任务可以打开或领取”。
-
-产品上可以把 Trigger 理解为：
-
-- Product task 可以创建或变成 ready。
-- Store 可以产生联系或通知 intent。
-- executor-kit chain watcher 可以领取或路由 job。
-- adapter 可以分配外部执行编号、工单号或linked Zhixu启动请求。
-
-编号边界：链上 `orderId` 由 `triggerOrderFromOutsideFor` 或 `triggerOrderFromSignalFor` 这类 trigger order 入口创建。Trigger 还可以触发 Product task ID、Store docking session ID、外部工单号或 linked order 创建流程；这些都是工作流编号，local order 的身份和推进 proof 仍看链上 `orderId`、trigger link 和 signal/docking events。
-
-## 编译和合约语义
-
-当前 compiler 要求 `stage.trigger` 里的每个名字必须引用本 stage 已存在的 `receiveSignals` key。也就是说，Trigger 必须绑定在一个 receive hook 上。
-
-```text
-stage.receiveSignals.START
-  -> compiled hook trigger=true
-  -> StoredHook.trigger=true
-  -> HookStatus Ready
-  -> HookReady emitted once
-```
-
-合约有 `readyEmitted` 标记，同一个 hook 的 `HookReady` 只会发出一次。`trigger=false` 的 hook 仍然可以变成 Ready，但不会发出 `HookReady`，也不应直接创建 Product task。
-
-## 和 docked Zhixu 的关系
-
-当 local order 某个 stage 由另一个秩序执行时，local stage 的 Trigger 表示“现在可以把这个 stage 交给 peer 秩序或 adapter 执行”。后续 linked 秩序的 `str`、`cmp`、`err` 通过 `signalMap` 和授权 submitter 或 docking events 映射回 local order。
-
-如果 Product、registrar 或 operator workflow 从订单外部打开这个对接阶段，建议给这个 link stage 一个显式入口：
+普通阶段使用订单内表达式：
 
 ```yaml
-trigger:
-  - LINK_READY
-receiveSignals:
-  LINK_READY: ::OUTSIDE
+- name: review
+  source: buyer
+  receiveSignals:
+    READY: seller::purchase.submit.cmp
+  sendSignals: [str, cmp, err]
+```
+
+出生阶段显式声明 `mint: per-fact`，并且只能以跨源订阅作为入口：
+
+```yaml
+- name: intake
+  source: customer
+  mint: per-fact
+  receiveSignals:
+    REQUESTED: "::ANCHOR(@customer::request.submit.requested)"
+  sendSignals: [str, cmp, err]
+```
+
+`mint` 目前只有 `per-fact` 一个取值。出生阶段必须使用静态的
+`individual`/`organization` executor；编译器拒绝自环和无界的跨源代铸环。
+同一事实重复投递只会命中同一派生订单，不会产生第二个订单。
+
+## Dock 入口
+
+`supplierType: zhixu` 阶段通过 `zhixuExecutorConfig` 描述 dock，不使用
+`supplierID`、`triggerEntrance` 或 Hook DSL 形式的 `signalMap`：
+
+```yaml
 executor:
   supplierType: zhixu
-  supplierID: "{{ .peer_zhixu_uid }}"
   zhixuExecutorConfig:
+    schemaVersion: uvp.dock.v1
+    target:
+      zhixu: customs-clearance
+      version: "1"
+    order:
+      idPolicy: derived-v1
+    inputMap:
+      READY: entrance
     signalMap:
-      str: peer::task.start.str
-      cmp: peer::task.close.cmp
-      err: peer::task.close.err
+      str: started
+      cmp: completed
+      err: failed
 ```
 
-这里的 `::OUTSIDE` 是空 source 上的外部入口 signal，用来打开本地 stage 的 docking workflow。它必须由业务 submitter 签 trigger typed data；registrar/relayer 只负责广播。`signalMap` 负责解释 linked order 输出，不会自己发出 `HookReady`。
+`inputMap` 的 key 必须是本地 `receiveSignals` hook，value 必须是目标入口端口
+名；`signalMap` 的 key 必须是本地 `sendSignals`，value 必须是目标输出端口名。
+目标 UID/version、端口方向、接口 root、route root 和入口数量都在编译期验证。
+
+## 旧字段迁移
+
+以下写法已退役并由编译器明确拒绝：
+
+- `stage.trigger` 和 `stage.externalSignals`；
+- executor 的 `triggerEntrance`；
+- `supplierType: zhixu` 与 `supplierID` 并用；
+- 把 `signalMap` value 写成 `source::task.stage.signal` Hook DSL；
+- `::OUTSIDE@(...)`、`::MERGE@(...)`、旧 `::ANCHOR@(…)` wrapper。
+
+需要跨源事实时，改用 `::ANCHOR(@source::task.stage.signal)`；需要从事实出生
+订单时，再在阶段上声明 `mint: per-fact`。
+
+## 运行与证明
 
 ```text
-local stage trigger Ready
-  -> Store/Product 启动 docking workflow
-  -> linked order 执行
-  -> linked order proof 被校验
-  -> submitDockedSignal 或授权 submitter 向 local order 提交映射 signal
+receive hook evaluates
+  -> HookStatusChanged
+  -> (if emitReady) HookReady(planId, orderId, hookId, stageId, hookName)
+  -> Product/Store projects a task or dock workflow
+  -> authorized signal / dock event supplies the next fact
 ```
 
-每一次跨秩序推进都要回到链上 signal、proof 和可重放事件。
-
-## 边界检查
-
-- Trigger 是编译到 HookPlan 和合约里的 hook 标记，不是 UI 手动按钮。
-- 链上 orderId 来自 trigger order 入口。
-- Trigger Ready 通常表示任务可领取或可处理，业务完成看后续 signal/proof。
-- `signalMap` hook 当前不触发 `HookReady`；它用于 docked Zhixu 输出映射。
+`HookReady` 只表示任务或对接入口可处理，不表示业务完成。完成、失败和取消
+必须通过授权 `SignalSubmitted` 或 docking module 的 proof 事件表达；未知或
+重试状态不得被 UI 当成成功。

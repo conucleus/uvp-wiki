@@ -1,3 +1,10 @@
+---
+title: Resource Patch
+type: explanation
+audience: 工程贡献者
+status: verified
+---
+
 # Resource Patch
 
 Resource patch is another kind of Stage Overlay runtime change. It overrides or supplements the resource manifest for a target stage of one Order, so the order can bind new off-chain resource handles without modifying the Plan.
@@ -19,26 +26,26 @@ selector stage
 
 Resource patch is constrained by at least these checks:
 
-- selector stage and target stage must have a `StageSelectorBinding`.
-- the selector must have order-level internal patch authorization.
-- the target stage business signal has not been submitted yet.
+- Selector stage and target stage must have a `StageSelectorBinding`.
+- The selector must have order-level internal patch authorization.
+- The target stage business signal has not been submitted yet.
 - `resourceKey`, `manifestHash`, `policyHash`, and `patchHash` must be nonzero.
-- patch nonce must increase.
+- Patch nonce must increase.
 
-The chain stores only hashes, URIs, and events. It does not store contracts, invoices, logistics files, vehicle materials, or other business plaintext.
+The chain stores only hashes, URIs, and events. It does not store contracts, invoices, logistics files, vehicle materials, or other business plaintext. The selector binding is likewise a public-interface constraint frozen when the Plan is published; resource patches can only consume it, never bypass or rewrite it. For the public-interface boundary, see [Contracts and Events](../../reference/contracts-and-events.md).
 
-## Code Entry
+## Code Entry Points
 
 | Code | Meaning |
 | --- | --- |
 | `UVPStagePatchModule.sol` | `applyStageResourcePatch`, `applyStageResourcePatchFor`, patch digest, and events. |
-| `protocol-bindings/src/index.ts` | stage resource patch typed data, call builder, signer recovery. |
+| `protocol-bindings/src/index.ts` | Stage resource patch typed data, call builder, signer recovery. |
 | `uvp-chain-services/service/src/stage-patches/` | Product API prepare/submit resource patch. |
 | `uvp-protocol/packages/protocol-bindings/src/index.ts` | `ResourceManifestV1` hash and validation helpers. |
 
 ## Boundaries
 
-- Resource patch and Executor patch are different actions; their fields and signed payloads cannot be mixed.
+- Resource patch and executor patch are different actions; their fields and signed payloads cannot be mixed.
 - Resource patch does not prove business completion; completion still comes from an authorized business signal.
 - Resource patch does not put file plaintext on chain; file content is linked through object storage, manifest URI, hashes, and proof.
 

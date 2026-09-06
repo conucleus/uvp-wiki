@@ -1,0 +1,79 @@
+---
+title: Operator 权限、治理与 Audit
+type: explanation
+audience: Store operator、governance/audit 角色
+preread: README.md
+status: verified
+---
+
+# Operator 权限、治理与 Audit
+
+> 前置阅读：[秩序商店（Store）](README.md)
+Store 里的权限和 audit 约束平台 workflow。Audit 记录证明某个 Store 操作发生过；凝结核的秩序设计、Store or external institution 材料审核和 state-machine 事件仍各自保留权威来源（统一见 [README.md](README.md)「信息对象与权威来源」表）。
+
+## 三类权限
+
+| 权限域 | 例子 | 边界 |
+| --- | --- | --- |
+| 凝结核工作台权限 | 导入 Zhixu、维护设计材料、组织 supplier requirements、提交发布材料。 | 不自动获得 trust publication 或 order signal authorization。 |
+| Store 平台权限 | review、catalog tag、visibility、publication request、revocation request、audit export。 | 不替凝结核设计内部规则，不判定链上 trust。 |
+| 链上业务权限 | register order、submit signal、stage patch、resource patch。 | 由合约、EIP-712、order authorization 和 active overlay 决定。 |
+
+## 敏感动作
+
+- draft import、compile preview、Product Schema save；
+- design/fairness/material review；
+- change platform catalog tags、risk label、visibility、active recommendation；
+- create/update supplier profile、contact metadata、platform capability tags；
+- save docking session、approve signalMap review material；
+- request plan/supplier publication or revocation；
+- inspect failed governance broadcast or index state；
+- mark revoked plan/supplier as hidden from new-order creation。
+
+这些动作可以被审计；chain publication、supplier identity 和业务完成分别来自 registry 或 state-machine 事件。
+
+## 权限和确认
+
+Store 应区分 read、nucleation_operator、operator、reviewer、governance_admin、auditor 等能力。敏感动作需要明确确认对象，例如 Nucleus ID / nucleation id、Draft ID、Plan ID、Plan Hash、Supplier subject、revocation reason。
+
+| 能力 | 可做什么 |
+| --- | --- |
+| read | 搜索、查看 proof、查看 public metadata。 |
+| nucleation_operator | 维护自己凝结核下的 draft、设计材料、supplier requirements。 |
+| operator | 编辑平台 metadata、supplier profile、contact、docking sandbox。 |
+| reviewer | review 发布材料、capability 材料、fairness/透明性材料。 |
+| governance_admin | 发起或确认 identity binding register/revoke request。 |
+| auditor | 查看 audit trail、导出 review/proof 包。 |
+
+## Audit 边界
+
+| Audit 能证明 | Audit 不能证明（须看链上事件） |
+| --- | --- |
+| 某个 Store principal 发起、审批或确认了一个 workflow 动作。 | plan 已经 published。 |
+| 某个 metadata 字段、platform tag 或 contact 被修改。 | supplier 已经 trusted。 |
+| 某个凝结核提交了设计材料或发布材料。 | Store reviewer 已完成审核，或 publisher 已签名发布。 |
+| 某个 governance request 被创建或广播尝试。 | tx 已经被链接受并 index。 |
+| 某个 docking session 被保存或 review。 | linked order proof 已经映射到 local order。 |
+
+Public claim 只有在对应链事件被观察到后才成立。
+
+## Governance Handoff
+
+Store 的治理动作应委托给已有 governance service 或管理员流程。它不直接持有私钥，不绕过 admin header，不把 review approval 说成 chain publication，也不把 Store reviewer 写成 Identity Registry。
+
+Store 面向凝结核与平台运营组织这些对象：nucleation identity、设计材料、版本历史；Zhixu draft、compile preview、review、version；fairness / transparency / exception policy material；supplier directory、凝结核内部适配关系、平台 capability tags；order search 和 proof drilldown；identity binding register/revoke request。这些对象的状态归属以 [README.md](README.md)「信息对象与权威来源」表为准。
+
+## 为什么 Store 是中心化必要组件
+
+去中心化合约只能验证哈希、签名、事件顺序和授权。现实世界的"哪个凝结核维护这条秩序""这条 Zhixu 的公平性材料是否完整""这家报关行联系方式是什么""这个版本是否推荐使用"需要中心化产品界面组织。Store 就是这层组织能力的产品化入口；可信和可执行仍要回到 Store or external institution publication 与 state-machine events，边界总述见 [协议边界](../protocol-boundaries.md)。
+
+## Audit 行应包含什么
+
+- actor、role、session id；
+- object type 和 object id；
+- nucleation id、draft id、plan id、supplier subject 等关键引用；
+- before/after hash 或字段摘要；
+- reason、review note、fairness/material checklist reference；
+- related tx hash、governance request id 或 proof reference；
+- createdAt、broadcastAt、indexedAt；
+- failure reason 和 retry count。

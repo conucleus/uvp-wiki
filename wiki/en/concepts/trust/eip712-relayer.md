@@ -1,6 +1,13 @@
+---
+title: EIP-712 and Relayer
+type: explanation
+audience: 工程贡献者
+status: verified
+---
+
 # EIP-712 and Relayer
 
-A relayer can help broadcast transactions, but it cannot make business decisions on behalf of a participant. Business actions must be signed by the wallet of the authorized submitter.
+A relayer can help broadcast transactions, but it cannot make business decisions on behalf of a participant. Business actions must be signed by the wallet of the authorized submitter; "the relayer is not a source of rights" is one of the protocol invariants — see [Protocol Boundaries](../protocol-boundaries.md) for the overview.
 
 ## Typed Data
 
@@ -8,7 +15,7 @@ A relayer can help broadcast transactions, but it cannot make business decisions
 
 ```text
 name = UVPStateMachine
-version = 0.4
+version = 0.10
 ```
 
 The primary type for signal submission is:
@@ -20,6 +27,7 @@ UVPStateMachineSignal
 The fields include:
 
 ```text
+planId
 orderId
 sourceId
 signalId

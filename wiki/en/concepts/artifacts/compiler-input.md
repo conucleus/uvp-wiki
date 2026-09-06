@@ -1,3 +1,10 @@
+---
+title: Compiler Input
+type: reference
+audience: 工程贡献者
+status: verified
+---
+
 # Compiler Input
 
 The compiler input is `ZhixuDefinition`. The compiler does more than move strings around; it first validates whether the definition can produce deterministic protocol artifacts.
@@ -25,6 +32,8 @@ The compiler input is `ZhixuDefinition`. The compiler does more than move string
 Before hashing, the compiler rejects these shapes:
 
 - Missing required `metadata`, `spec`, `taskPatterns`, or stages.
+- Missing `executor.supplierID` on an executor route — `supplierID` is compile-time required.
+- Missing or empty `metadata.annotations.version` — the plan version is compile-time required.
 - `selectedStages` pointing to a stage that does not exist.
 - Executor routes that cannot be reached by a static executor or selector.
 - Invalid hook expression format.
@@ -37,3 +46,10 @@ These errors must surface at compile time, not at contract registration or order
 ## Source Zhixu Also Participates in Hashing
 
 `OnchainHookPlanArtifact`’s `planHash` includes the canonicalized source Zhixu. That means a source definition change that affects protocol semantics changes the plan hash. The compiled artifact should not be handwritten JSON; it must be reproducibly generated from the source definition by script.
+
+## Related Pages
+
+- [Compiler and Hook Core](../compiler-and-hooks.md)
+- [Canonical Hash](canonical-hashes.md)
+- [On-chain Registration Parameters](solidity-registration.md)
+- [Version Matrix](../../reference/version-matrix.md)

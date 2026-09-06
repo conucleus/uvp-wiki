@@ -216,6 +216,43 @@ a:hover {
   font-weight: 720;
 }
 
+.doc-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.doc-badge {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1;
+  padding: 5px 10px;
+}
+
+.doc-badge-status[data-status="verified"] {
+  background: #e8f4ec;
+  border-color: #bfe0cb;
+  color: #1f7a46;
+}
+
+.doc-badge-status[data-status="prototype"] {
+  background: #fdf3e2;
+  border-color: #f0d9ae;
+  color: #9a6b16;
+}
+
+.doc-badge-preread {
+  text-decoration: none;
+}
+
+.doc-badge-preread:hover {
+  background: var(--panel-muted);
+  color: var(--brand-dark);
+}
+
 .doc-content {
   font-size: 16px;
   line-height: 1.72;
@@ -370,7 +407,8 @@ a:hover {
 
 @media (max-width: 900px) {
   .site-shell {
-    display: block;
+    display: flex;
+    flex-direction: column;
   }
 
   .mobile-header {
@@ -388,12 +426,16 @@ a:hover {
   }
 
   .site-sidebar {
-    height: auto;
-    max-height: 48vh;
+    order: 2;
     position: static;
+    height: auto;
+    max-height: none;
+    border-right: 0;
+    border-top: 1px solid var(--line);
   }
 
   .site-main {
+    order: 1;
     padding: 20px 14px 48px;
   }
 

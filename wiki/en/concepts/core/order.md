@@ -1,60 +1,71 @@
+---
+title: Order
+type: explanation
+audience: 协议读者
+preread: ../README.md
+status: verified
+---
+
 # Order
 
-An Order is an independent fact stream forked from a registered Plan. Once opened and assigned an `orderId`, the protocol promises only that it is registered and can continue accepting rule-compliant facts. Core does not define Order lifecycle states such as `running`, `completed`, or `cancelled`.
+> Prerequisite reading: [Core Concepts](../README.md)
+An Order is a run. In the protocol, it is an independent fact stream forked from a registered [Plan](plan.md). Once an Order is opened and has an `orderId`, the protocol only promises that it is registered and can keep accepting well-formed facts; the core protocol does not define Order lifecycle states like `running`, `completed`, or `cancelled`.
+
+## Who Uses It
+
+A registrar creates orders through the trigger order entry; participants, executors, and adapters submit authorized signals to it; Product/Store/executor-kit project it into task, notification, and proof views.
+
+## What It Produces
+
+Creation emits `OrderRegistered`, `OrderTriggered`, `OrderMaterialized`, `StageMaterialized`, and other events; running continuously produces signal records, hook runtime, executor/resource overlays, and proof rows, forming a replayable event stream.
+
+## Where Authority Comes From
+
+All Order facts come from `UVPStateMachine` events: whether a signal is valid, whether a hook is ready, and whether an executor overlay applies are all decided by on-chain events; Product DTOs are read models only.
 
 ## Order Creation
 
-An Order is created against a previously registered Plan through a trigger-order entrypoint:
+An order binds to a registered Plan through the trigger order entry:
 
 ```text
 triggerOrderFromOutsideFor(trigger, authorizations, signature)
 triggerOrderFromSignalFor(trigger, authorizations, signature)
 ```
 
-During creation, the contract:
+At creation the contract:
 
-- checks that the registrar transaction sender is allowed;
-- verifies the trigger typed-data signature and recovers the business submitter;
-- checks that the plan exists;
-- writes order-level signal authorization;
-- records the trigger fact or trigger-origin link;
-- materializes the ready trigger stage;
-- emits `OrderRegistered`, `OrderTriggered`, `OrderMaterialized`, `StageMaterialized`, and `SignalSubmitterAuthorized`.
+- Checks that the registrar transaction sender is allowed.
+- Verifies the trigger typed-data signature and recovers the business submitter.
+- Checks that the plan exists and is still endorsed by the official domain.
+- Writes order-level signal authorizations.
+- Records the trigger fact or trigger-origin link.
+- Materializes ready trigger stages.
+- Emits `OrderRegistered`, `OrderTriggered`, `OrderMaterialized`, `StageMaterialized`, and `SignalSubmitterAuthorized`.
 
 ## Dynamic Facts Inside an Order
 
 | Fact | Source |
 | --- | --- |
-| signal records | `SignalSubmitted`. |
-| hook runtime | `HookStatusChanged`, `HookReady`, `TimerPoked`. |
-| executor overlay | `StageExecutorPatchApplied`, `StageExecutorActivated`. |
-| resource overlay | `StageResourcePatchApplied`. |
-| task projection | Rebuilt by chain-services from `HookReady` and authorization events. |
-| proof rows | Event provenance. |
-| docking relation | `DockedOrderLinked`, `DockedSignalMapped`, `DockedSignalSubmitted`, plus each side’s own signal/proof records. |
+| Signal records | `SignalSubmitted`. |
+| Hook runtime | `HookStatusChanged`, `HookReady`, `TimerPoked`. |
+| Executor overlay | `StageExecutorPatchApplied`, `StageExecutorActivated`. |
+| Resource overlay | `StageResourcePatchApplied`. |
+| Task projection | Rebuilt by chain-services from `HookReady` and authorization events. |
+| Proof rows | Event provenance. |
+| Docking relation | `DockOpened`, `DockInputSubmitted`, `DockOutputSubmitted`, `DockTerminal`, plus each side's own signal/proof. |
 
 ## Order and Product Order
 
-The on-chain Order is a protocol fact container. `ProductOrderDTO` is the product view. Its Order status only says `registered`; stage readiness, pending work, and business outcomes are represented separately by hooks, tasks, and signals and must not be promoted into an Order terminal state.
+The on-chain Order is the protocol fact container. The `ProductOrderDTO` is a product view whose Order status only expresses `registered`; whether a stage is ready, whether a task is pending, and whether some business goal is complete are expressed separately by hooks, tasks, and signals and must not be rolled up into an Order terminal state.
 
-Product task IDs, Store docking session IDs, and adapter job IDs are workflow indexes. The on-chain identity of the Order is still `orderId`, and its facts come from `UVPStateMachine` events.
+Product task IDs, Store docking session IDs, and adapter job IDs are workflow indexes. The identity of the on-chain Order remains `orderId`; concrete facts come from `UVPStateMachine` events.
 
-## An Order Can Branch and Converge
+## Orders Can Fork and Converge
 
-An Order can contain multiple source causal chains. For example, in cross-border supply, supply, payment, logistics, on-site delivery, and buyer acceptance all progress independently and converge at specific hooks. Its dynamics come from authorized signals entering the same replayable event stream, not from a mutable aggregate lifecycle state.
+One Order may contain multiple [source causal chains](source.md). In cross-border supply, supply, payment, logistics, field delivery, and buyer acceptance each advance and converge at specific hooks. An Order's dynamism does not come from a mutable overall status but from different authorized signals written into one replayable event stream under contract rules.
 
-## No Close or Rewrite Entry Point
+## No Close or Correction Entry Point
 
-An Order does not need to be “closed” to remain consistent. Business participants may stop writing or create a new Order from the same Zhixu. Signals are first-writer-wins. If the first write is wrong, core does not overwrite or delete it; participants create a new Order and the product layer explains the relationship between the two auditable fact streams.
+An Order does not need to be "closed" to stay consistent. A business party can stop writing further facts, or create a new Order from the same Zhixu. Signals use first-writer-wins; for deduplication and non-overwritable semantics see [Signal](signal.md). If the first-written business fact was wrong, the core protocol neither overwrites nor deletes old facts: instead a new Order is created to re-execute, and upper-layer products clearly present the business relationship between the two fact streams.
 
-If a stage is taken over by another Zhixu, it usually creates signal binding between the local Order and the linked Order:
-
-```text
-local order
-  -> trigger hook ready
-  -> linked Zhixu order executes
-  -> linked proof checked
-  -> authorized mapped signal submitted to local order
-```
-
-The current contract already exposes runtime docking on a public event surface: `linkDockedOrder` records the local/linked order relationship and signal binding, and `submitDockedSignal` maps an existing signal from the linked Order onto the local Order. Store/Product may keep the sandbox, contacts, operator review, and display state; runtime proof is still determined by the chain events of both Orders.
+If a stage is carried by another Zhixu, a signal binding between the local order and the linked order usually forms: after route/interface proofs pass, the docking module's `openDockedOrder` atomically records the relation and linked order, then `submitDockedInput` / `submitDockedSignal` deliver inputs and outputs. For the full runtime path see [Zhixu as Executor](../apps/zhixu-as-executor.md); Store/Product only keep sandbox, contact, review, and display state — runtime proof follows on-chain events of both orders.
