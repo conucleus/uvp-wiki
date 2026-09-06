@@ -32,7 +32,7 @@ Minimal contents:
 | `stageId` | Corresponding stage. |
 | `actionKind` | `submit_signal`, `stage_executor_patch`, or `stage_resource_patch`. |
 | `requiredInputs` | Inputs the user or system must provide. |
-| `requiredEvidence` | Required evidence or credential references. |
+| `evidenceSpec` | Publisher-configured structured evidence requirements (key/label/inputKind/accept, ...); the sole source of task evidence rules — absent spec means no evidence slots. |
 | `acceptedActor` | Accepted wallet, supplier subject, trust status. |
 | `typedData` | EIP-712 data to sign. |
 | `payloadHash` | Business payload fingerprint. |

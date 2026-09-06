@@ -32,7 +32,7 @@ task -> evidence/input -> prepare typed data -> business signature -> submit -> 
 | `stageId` | 对应 stage。 |
 | `actionKind` | `submit_signal`、`stage_executor_patch` 或 `stage_resource_patch`。 |
 | `requiredInputs` | 用户或系统需要提供的输入。 |
-| `requiredEvidence` | 必需证据或凭证引用。 |
+| `evidenceSpec` | 发布者配置的结构化证据要求（key/label/inputKind/accept 等）；任务证据规则的唯一来源，缺失即无凭证槽位。 |
 | `acceptedActor` | 被接受的钱包、supplier subject、trust status。 |
 | `typedData` | 待签 EIP-712 数据。 |
 | `payloadHash` | 业务 payload 指纹。 |
