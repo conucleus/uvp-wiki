@@ -16,7 +16,7 @@ One Zhixu can act as another Zhixu's stage executor. Executor here means an exec
 ```text
 local Zhixu / local order
   -> stage.executor.supplierType = zhixu
-  -> zhixuExecutorConfig.target selects an immutable peer UID/version
+  -> zhixuExecutorConfig.target selects an immutable peer UID
   -> inputMap/signalMap bind local hooks/signals to target port names
   -> local receive hook becomes ready and opens execution
   -> linked Zhixu / linked order runs with its own plan and authorization
@@ -52,7 +52,6 @@ A settlement stage can use another Zhixu as an execution interface like this:
       schemaVersion: uvp.dock.v1
       target:
         zhixu: fiat-payout-bridge
-        version: "1"
       order:
         idPolicy: derived-v1
       inputMap:
@@ -78,7 +77,6 @@ The docking stage still needs a local `receiveSignals` hook. When it subscribes 
       schemaVersion: uvp.dock.v1
       target:
         zhixu: customs-clearance
-        version: "1"
       order:
         idPolicy: derived-v1
       inputMap:
@@ -101,7 +99,7 @@ The `signalMap` is the semantic contract through which the local stage accepts t
 | `cmp` | Signal that the linked Zhixu completed. Currently required by the compiler. |
 | `err` | Signal that the linked Zhixu failed, rejected, or hit an exception. Optional, but most real workflows should configure it. |
 
-The `signalMap` keys must be local stage `sendSignals` and its values must be target output-port names. The `inputMap` keys must be local `receiveSignals` hook names and its values must be target input-port names. The compiler validates target UID/version, port direction, exactly one entrance, port-name syntax, and interface/route roots; `signalMap` no longer carries Hook DSL. `str` and `cmp` mappings are required; `err` is optional.
+The `signalMap` keys must be local stage `sendSignals` and its values must be target output-port names. The `inputMap` keys must be local `receiveSignals` hook names and its values must be target input-port names. The compiler validates target UID, port direction, exactly one entrance, port-name syntax, and interface/route roots; `signalMap` no longer carries Hook DSL. `str` and `cmp` mappings are required; `err` is optional.
 
 ## Docked runtime path
 
@@ -140,7 +138,7 @@ The Store should run docked Zhixu as an auditable workflow:
 
 ```text
 choose local stage
-  -> search available peer Zhixu UID/version
+  -> search available peer Zhixu UID
   -> check linked plan publication and active version
   -> validate inputMap/signalMap against target ports and interface/route roots
   -> save docking session draft

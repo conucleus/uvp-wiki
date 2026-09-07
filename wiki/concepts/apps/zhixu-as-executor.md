@@ -16,7 +16,7 @@ status: verified
 ```text
 local Zhixu / local order
   -> stage.executor.supplierType = zhixu
-  -> zhixuExecutorConfig.target selects an immutable peer UID/version
+  -> zhixuExecutorConfig.target selects an immutable peer UID
   -> inputMap/signalMap bind local hooks/signals to target port names
   -> local receive hook becomes ready and opens execution
   -> linked Zhixu / linked order runs with its own plan and authorization
@@ -52,7 +52,6 @@ local order 和 linked order 都是独立的 `UVPStateMachine` order。它们各
       schemaVersion: uvp.dock.v1
       target:
         zhixu: fiat-payout-bridge
-        version: "1"
       order:
         idPolicy: derived-v1
       inputMap:
@@ -78,7 +77,6 @@ local order 和 linked order 都是独立的 `UVPStateMachine` order。它们各
       schemaVersion: uvp.dock.v1
       target:
         zhixu: customs-clearance
-        version: "1"
       order:
         idPolicy: derived-v1
       inputMap:
@@ -101,7 +99,7 @@ local order 和 linked order 都是独立的 `UVPStateMachine` order。它们各
 | `cmp` | linked Zhixu 完成的信号。当前 compiler 要求必须存在。 |
 | `err` | linked Zhixu 失败、拒绝或异常的信号。可选但大多数真实 workflow 应配置。 |
 
-`signalMap` 的 key 必须是本地 stage 的 `sendSignals`，value 必须是目标端口名；`inputMap` 的 key 必须是本地 `receiveSignals` hook，value 必须是目标入口端口名。编译器会校验 target UID/version、端口方向、恰好一个 entrance、端口名字符集及接口/route roots；`signalMap` 不再承载 Hook DSL。`str` 和 `cmp` 是必填映射，`err` 可选。
+`signalMap` 的 key 必须是本地 stage 的 `sendSignals`，value 必须是目标端口名；`inputMap` 的 key 必须是本地 `receiveSignals` hook，value 必须是目标入口端口名。编译器会校验 target UID、端口方向、恰好一个 entrance、端口名字符集及接口/route roots；`signalMap` 不再承载 Hook DSL。`str` 和 `cmp` 是必填映射，`err` 可选。
 
 ## Docked 运行时路径
 
@@ -140,7 +138,7 @@ Store 应把 docked Zhixu 管成一个可审核 workflow：
 
 ```text
 选择 local stage
-  -> 搜索可用 peer Zhixu UID/version
+  -> 搜索可用 peer Zhixu UID
   -> 检查 linked plan publication 和 active version
   -> 校验 inputMap/signalMap 与目标端口及 interface/route roots 是否匹配
   -> 保存 docking session draft

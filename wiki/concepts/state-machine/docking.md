@@ -68,7 +68,7 @@ local stage 的入口由 `receiveSignals` Hook 产生；跨源事实使用
 DSL，编译器会拒绝。
 
 linked Zhixu 的 `supplierType: zhixu` 配置必须将 `inputMap` 和 `signalMap`
-写成目标端口名，并由 `uvp.dock.resolution.v1` manifest 解析目标 UID/version、
+写成目标端口名，并由 `uvp.dock.resolution.v1` manifest 解析目标 UID、
 artifact/interface roots。`signalMap` 不再承载 Hook DSL，也不会凭配置自动
 完成 local 业务。
 

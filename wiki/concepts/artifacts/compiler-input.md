@@ -15,7 +15,7 @@ status: verified
 | --- | --- |
 | `metadata.name` | 计划可读名称和缺省标识输入。 |
 | `metadata.uid` | Zhixu 稳定标识。 |
-| `metadata.annotations.version` | 计划版本。 |
+| `metadata.annotations` | 自由注解，不参与身份或哈希推导（PRD_101：无原生版本语义）。 |
 | `spec.platform` | 平台目标，参与哈希。 |
 | `taskPatterns[].name` | stage 标识的一部分。 |
 | `stages[].name` | stage 标识的一部分。 |

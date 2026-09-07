@@ -73,7 +73,7 @@ compiler.
 
 The `supplierType: zhixu` configuration must express `inputMap` and `signalMap`
 as target port names. The `uvp.dock.resolution.v1` manifest resolves target
-UID/version and artifact/interface roots. `signalMap` no longer carries Hook DSL
+UID and artifact/interface roots. `signalMap` no longer carries Hook DSL
 and does not complete local business work merely by being configured.
 
 ## Depth and Idempotency

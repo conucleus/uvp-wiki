@@ -70,7 +70,6 @@ executor:
     schemaVersion: uvp.dock.v1
     target:
       zhixu: customs-clearance
-      version: "1"
     order:
       idPolicy: derived-v1
     inputMap:
@@ -83,7 +82,7 @@ executor:
 
 `inputMap` keys must be local `receiveSignals` Hook names and values must be
 target input-port names; `signalMap` keys must be local `sendSignals` and values
-must be target output-port names. The compiler validates target UID/version,
+must be target output-port names. The compiler validates target UID,
 port direction, interface root, route root, and the single-entrance invariant.
 
 ## Retired fields

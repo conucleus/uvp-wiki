@@ -66,7 +66,6 @@ executor:
     schemaVersion: uvp.dock.v1
     target:
       zhixu: customs-clearance
-      version: "1"
     order:
       idPolicy: derived-v1
     inputMap:
@@ -79,7 +78,7 @@ executor:
 
 `inputMap` 的 key 必须是本地 `receiveSignals` hook，value 必须是目标入口端口
 名；`signalMap` 的 key 必须是本地 `sendSignals`，value 必须是目标输出端口名。
-目标 UID/version、端口方向、接口 root、route root 和入口数量都在编译期验证。
+目标 UID、端口方向、接口 root、route root 和入口数量都在编译期验证。
 
 ## 旧字段迁移
 

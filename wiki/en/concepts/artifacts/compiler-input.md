@@ -15,7 +15,7 @@ The compiler input is `ZhixuDefinition`. The compiler does more than move string
 | --- | --- |
 | `metadata.name` | Human-readable plan name and default identifier input. |
 | `metadata.uid` | Stable Zhixu identifier. |
-| `metadata.annotations.version` | Plan version. |
+| `metadata.annotations` | Free-form annotations; never part of identity or hash derivation (PRD_101: no native version semantics). |
 | `spec.platform` | Platform target, participates in hashing. |
 | `taskPatterns[].name` | Part of the stage identifier. |
 | `stages[].name` | Part of the stage identifier. |
@@ -33,7 +33,6 @@ Before hashing, the compiler rejects these shapes:
 
 - Missing required `metadata`, `spec`, `taskPatterns`, or stages.
 - Missing `executor.supplierID` on an executor route — `supplierID` is compile-time required.
-- Missing or empty `metadata.annotations.version` — the plan version is compile-time required.
 - `selectedStages` pointing to a stage that does not exist.
 - Executor routes that cannot be reached by a static executor or selector.
 - Invalid hook expression format.

@@ -33,8 +33,6 @@ kind: Zhixu
 metadata:
   name: cross-border-procurement
   uid: zhixu-cross-border-procurement-v1
-  annotations:
-    version: "1"
 spec:
   platform:
     type: blockchain
@@ -66,7 +64,6 @@ spec:
               schemaVersion: uvp.dock.v1
               target:
                 zhixu: supplier-sourcing
-                version: "1"
               order:
                 idPolicy: derived-v1
               inputMap:
@@ -88,7 +85,7 @@ spec:
 | `metadata.name` | 必填的非空可读名称，也会参与计划身份。 |
 | `metadata.uid` | 稳定 Zhixu ID。没有时会回退到名称。 |
 | `metadata.labels` | 业务分类、行业、demo 标签。链上权限由 order authorization 和 overlay 决定。 |
-| `metadata.annotations.version` | 计划版本。版本变化会进入 `planId`。 |
+| `metadata.annotations` | 自由注解，不参与身份或哈希推导（PRD_101：Zhixu 无原生版本语义，`version` 键不再特殊对待）。 |
 | `spec.platform` | 目标平台。EVM track 使用 `type=blockchain`、`provider=eth`，可显式写 `network=base`。不写 `network` 时保持当前主网默认路径。 |
 | `spec.nucleation.id` | 秩序的发起核、设计者或组织域标识。详见 [Nucleus / 凝结核](nucleation.md)。 |
 | `spec.taskPatterns` | 任务模式列表，里面包含 stages。 |
@@ -141,7 +138,7 @@ selectedStages:
 | `organization` | 组织、企业系统、服务商或团队。 |
 | `zhixu` | 另一条 Zhixu 作为执行接口对接；目标身份放在 `zhixuExecutorConfig.target`。 |
 
-`supplierID` 只适用于 `individual`/`organization` executor。`supplierType=zhixu` 时禁止 `supplierID`，必须提供 `zhixuExecutorConfig`：它固定 dock schema、目标 Zhixu/version、派生订单策略，以及本地输入到目标入口端口的 `inputMap` 和本地输出到目标端口的 `signalMap`。目标 definition/artifact/interface 身份由发布系统提供的 `uvp.dock.resolution.v1` manifest 解析；不能用显示名称代替 UID。订单里的 active executor 钱包由订单注册授权或 `StageExecutorPatchApplied` 运行时事件决定。
+`supplierID` 只适用于 `individual`/`organization` executor。`supplierType=zhixu` 时禁止 `supplierID`，必须提供 `zhixuExecutorConfig`：它固定 dock schema、目标 Zhixu UID、派生订单策略，以及本地输入到目标入口端口的 `inputMap` 和本地输出到目标端口的 `signalMap`。目标 definition/artifact/interface 身份由发布系统提供的 `uvp.dock.resolution.v1` manifest 解析；不能用显示名称代替 UID。订单里的 active executor 钱包由订单注册授权或 `StageExecutorPatchApplied` 运行时事件决定。
 
 ## `fileResources`
 

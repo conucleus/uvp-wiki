@@ -33,8 +33,6 @@ kind: Zhixu
 metadata:
   name: cross-border-procurement
   uid: zhixu-cross-border-procurement-v1
-  annotations:
-    version: "1"
 spec:
   platform:
     type: blockchain
@@ -66,7 +64,6 @@ spec:
               schemaVersion: uvp.dock.v1
               target:
                 zhixu: supplier-sourcing
-                version: "1"
               order:
                 idPolicy: derived-v1
               inputMap:
@@ -88,7 +85,7 @@ This example shows three things: a `mint: per-fact` stage subscribes to an `ANCH
 | `metadata.name` | Required non-empty human-readable name; also participates in plan identity. |
 | `metadata.uid` | Stable Zhixu ID. Falls back to the name when absent. |
 | `metadata.labels` | Business classification, industry, demo tags. On-chain permissions are decided by order authorization and overlays. |
-| `metadata.annotations.version` | Plan version. Version changes enter `planId`. |
+| `metadata.annotations` | Free-form annotations; never part of identity or hash derivation (PRD_101: the `version` key is no longer special). |
 | `spec.platform` | Target platform. The EVM track uses `type=blockchain`, `provider=eth`, optionally `network=base`. Omitting `network` keeps the current mainnet default path. |
 | `spec.nucleation.id` | Identifier of the initiating nucleus, designer, or organizational domain of the order. See [Nucleus / 凝结核](nucleation.md). |
 | `spec.taskPatterns` | Task pattern list containing stages. |
