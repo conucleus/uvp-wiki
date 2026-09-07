@@ -56,7 +56,7 @@ All of the following are compile-time rules, not runtime rules; for runtime eval
 - `receiveSignals` keys are receive-hook names for the stage and values are their canonical expressions; `stage.trigger` and `externalSignals` are not read.
 - An Order entry is explicit in `orderTriggerKind`: `none`, `mint`, or `dock`; whether Ready is externally emitted is a separate `emitReady` boolean.
 - `mint: per-fact` is only for a birth stage: each fact satisfying its anchor mints one new Order; a dock birth must carry complete dock route/interface proof.
-- `supplierType=zhixu` must provide `zhixuExecutorConfig`, whose target is a versioned peer UID and whose `inputMap`/`signalMap` use target interface port names; it does not use `supplierID`.
-- A `signalMap` output mapping must include `str` and `cmp`; `err` is optional but recommended, and one map must reference a single source.
+- `supplierType=zhixu` must provide `zhixuExecutorConfig`, whose `target.zhixu` is the peer definition's `metadata.name` (slug) or `null` for runtime selection — the DSL shell carries no derived identity — whose `interface`/`order.mode` select the target interface and order mode, and whose `inputMap`/`signalMap` use target interface port names; it does not use `supplierID`.
+- `inputMap`/`signalMap` must include at least one non-empty map (no specific business signals are forced); the bound ports must reference a single target source.
 - Hook expressions evaluate under monotonic existence logic: `A` means the signal has appeared, `~A` means it has not yet appeared; once a signal appears it never disappears.
 - Hook expressions must have a positive anchor; a pure-absence condition cannot become an advancing hook.

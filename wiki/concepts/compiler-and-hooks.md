@@ -58,7 +58,7 @@ Compiler 的确定性保证各方得到同一个 plan hash。合约注册 compac
 - `receiveSignals` 的 key 是本 stage 的 receive hook 名称，value 是该 hook 的规范化表达式；不再读取 `stage.trigger` 或 `externalSignals`。
 - Hook 的订单入口由 `orderTriggerKind` 明确表达：`none`、`mint` 或 `dock`；Ready 事件是否对外发出由独立的 `emitReady` 布尔值表达。
 - `mint: per-fact` 只能用于出生 stage：每个满足锚点的事实铸造一个新订单；docking 出生必须带完整 dock route/interface proof。
-- `supplierType=zhixu` 必须提供 `zhixuExecutorConfig`，其中 target 是版本化的 peer UID，`inputMap`/`signalMap` 使用目标接口端口名；它不使用 `supplierID`。
-- `signalMap` 的输出映射必须包含 `str` 和 `cmp`，`err` 可选但建议配置，并且同一个 map 引用同一个 source。
+- `supplierType=zhixu` 必须提供 `zhixuExecutorConfig`，其中 `target.zhixu` 是 peer 定义的 `metadata.name`（slug）或 `null`（运行时选择），DSL 壳不携带派生身份；`interface`/`order.mode` 选定目标接口与订单方式，`inputMap`/`signalMap` 使用目标接口端口名；它不使用 `supplierID`。
+- `inputMap`/`signalMap` 至少一张非空（不强制特定业务信号），被绑定端口必须引用同一个目标 source。
 - Hook 表达式按单调存在逻辑求值：`A` 表示 signal 已出现，`~A` 表示 signal 尚未出现；signal 出现后不会消失。
 - Hook 表达式必须有正向锚点；纯缺席条件不能成为可推进 hook。

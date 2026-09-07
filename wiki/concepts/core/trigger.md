@@ -63,22 +63,26 @@ status: verified
 executor:
   supplierType: zhixu
   zhixuExecutorConfig:
-    schemaVersion: uvp.dock.v1
     target:
       zhixu: customs-clearance
+    interface: clearance_service
     order:
-      idPolicy: derived-v1
+      mode: new
     inputMap:
-      READY: entrance
+      READY: execute        # mode=new：恰好一条 input 绑定（出生锚）
     signalMap:
       str: started
       cmp: completed
       err: failed
 ```
 
-`inputMap` 的 key 必须是本地 `receiveSignals` hook，value 必须是目标入口端口
-名；`signalMap` 的 key 必须是本地 `sendSignals`，value 必须是目标输出端口名。
-目标 UID、端口方向、接口 root、route root 和入口数量都在编译期验证。
+`inputMap` 的 key 必须是本地 `receiveSignals` 通道，value 必须是目标接口
+input 端口名；`signalMap` 的 key 必须是本地 `sendSignals`，value 必须是目标
+接口 output 端口名。两张 map 至少一张非空。目标 name（slug 形态，与
+`metadata.name` 同规则）、接口存在、端口方向、`order.mode ∈ 目标接口 orderModes`、
+接口 root、route root 和 `mode=new` 的唯一 input 绑定都在编译期验证。
+`mode=existing` 不创建子订单，
+只连接既有目标订单（云轨语义；链上编译期显式拒绝）。
 
 ## 旧字段迁移
 

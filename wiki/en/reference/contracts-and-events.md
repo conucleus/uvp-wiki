@@ -29,7 +29,7 @@ The `UVPStateMachine` public boundary includes:
 - signed `triggerOrderFromOutsideFor` / `triggerOrderFromSignalFor`;
 - `submitSignal`;
 - `submitSignalFor`;
-- `openDockedOrder`, which atomically creates the linked order and docking relation through the docking module;
+- the docking module's `openDockedOrder` (`order.mode=new`; the v2 request body carries the interface-name dimension), which atomically creates the linked order and docking relation;
 - the docking module's `submitDockedInput` / `submitDockedSignal`;
 - `applyStageExecutorPatch` / `applyStageExecutorPatchFor`;
 - `applyStageResourcePatch` / `applyStageResourcePatchFor`;
@@ -67,7 +67,6 @@ SignalSubmitted
 DockOpened
 DockInputSubmitted
 DockOutputSubmitted
-DockTerminal
 StageExecutorPatchApplied
 StageResourcePatchApplied
 StageExecutorActivated

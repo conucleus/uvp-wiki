@@ -29,7 +29,7 @@ status: verified
 - signed `triggerOrderFromOutsideFor` / `triggerOrderFromSignalFor`；
 - `submitSignal`；
 - `submitSignalFor`；
-- state-machine module 通过 `openDockedOrder` 原子创建 linked order 和 docking relation；
+- docking module 通过 `openDockedOrder`（`order.mode=new`，请求体 v2 含接口名维度）原子创建 linked order 和 docking relation；
 - docking module 的 `submitDockedInput` / `submitDockedSignal`；
 - `applyStageExecutorPatch` / `applyStageExecutorPatchFor`；
 - `applyStageResourcePatch` / `applyStageResourcePatchFor`；
@@ -66,7 +66,6 @@ SignalSubmitted
 DockOpened
 DockInputSubmitted
 DockOutputSubmitted
-DockTerminal
 StageExecutorPatchApplied
 StageResourcePatchApplied
 StageExecutorActivated

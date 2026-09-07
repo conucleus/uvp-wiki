@@ -13,26 +13,27 @@ The compiler input is `ZhixuDefinition`. The compiler does more than move string
 
 | Field | Purpose |
 | --- | --- |
-| `metadata.name` | Human-readable plan name and default identifier input. |
-| `metadata.uid` | Stable Zhixu identifier. |
+| `metadata.name` | Required slug (`^[a-z][a-z0-9_-]{0,99}$`); enters canonical content and planId derivation, and is the key for referencing target definitions across tracks. |
+| `metadata.uid` | Not a DSL field: an occurrence in the source definition is loudly rejected as an unknown field; definition identity is track-split — chain track derived from content (`zx-<32hex>`, chain-track internal), cloud track unique name + database primary key. |
+| `metadata.labels` | Part of the definition content; the chain track's identity derivation includes labels (chain-track internal), the cloud track stores them as content only. |
 | `metadata.annotations` | Free-form annotations; never part of identity or hash derivation (PRD_101: no native version semantics). |
 | `spec.platform` | Platform target, participates in hashing. |
 | `taskPatterns[].name` | Part of the stage identifier. |
 | `stages[].name` | Part of the stage identifier. |
 | `stages[].source` | Input to hook source and `sourceId`. |
 | `stages[].receiveSignals` | Generates receive hooks. |
-| `stages[].trigger` | Determines which hooks emit `HookReady` when ready. |
+| `stages[].mint` | Birth-stage declaration (the materialization seat for per-fact minting and dock birth anchors). |
 | `stages[].executor` | Executor route and reachability. |
 | `stages[].selectedStages` | Selector binding and executor closure. |
 | `stages[].sendSignals` | Outbound signal description. |
 | `stages[].fileResources` | Product resource requirements and resource patch input. |
+| `spec.dockInterface` | Named interface map, compiled into the dock interface commitment (interface roots). |
 
 ## What the Compiler Rejects
 
 Before hashing, the compiler rejects these shapes:
 
 - Missing required `metadata`, `spec`, `taskPatterns`, or stages.
-- Missing `executor.supplierID` on an executor route — `supplierID` is compile-time required.
 - `selectedStages` pointing to a stage that does not exist.
 - Executor routes that cannot be reached by a static executor or selector.
 - Invalid hook expression format.

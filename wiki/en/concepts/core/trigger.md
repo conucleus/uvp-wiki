@@ -67,23 +67,29 @@ Hook-DSL-shaped `signalMap` values:
 executor:
   supplierType: zhixu
   zhixuExecutorConfig:
-    schemaVersion: uvp.dock.v1
     target:
       zhixu: customs-clearance
+    interface: clearance_service
     order:
-      idPolicy: derived-v1
+      mode: new
     inputMap:
-      READY: entrance
+      READY: execute     # mode=new: exactly one input binding (the birth anchor)
     signalMap:
       str: started
       cmp: completed
       err: failed
 ```
 
-`inputMap` keys must be local `receiveSignals` Hook names and values must be
-target input-port names; `signalMap` keys must be local `sendSignals` and values
-must be target output-port names. The compiler validates target UID,
-port direction, interface root, route root, and the single-entrance invariant.
+`inputMap` keys must be local `receiveSignals` channels and values must be
+input-port names of the target interface; `signalMap` keys must be local
+`sendSignals` and values must be output-port names of the target interface. At
+least one of the two maps must be non-empty. The target name (slug shape, same
+rule as `metadata.name`), interface existence, port direction,
+`order.mode ∈ the target interface's orderModes`, the interface root, the route
+root, and the single input binding of `mode=new` are all validated at compile
+time. `mode=existing` creates no child order; it only attaches an existing
+target order (a cloud-track semantic; rejected explicitly at on-chain compile
+time).
 
 ## Retired fields
 

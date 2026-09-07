@@ -13,9 +13,11 @@ order, then map a signal that already happened in the linked order back into the
 local order.
 
 This is not a Store sandbox draft and not a normal backend integration. The
-formal runtime path must land in the v2.1 `UVPDockingModule` events and proof;
-the contract accepts only routes/interfaces covered by their committed
-`dockRoutesRoot`, `dockInterfaceRoot`, and Merkle proofs.
+formal runtime path must land in the `UVPDockingModule` (abiVersion 3.0,
+preimage v2) events and proof; the contract accepts only routes/interfaces
+covered by their committed `dockRoutesRoot`, `dockInterfaceRoot`, and Merkle
+proofs, and every binding/route hash carries an `interfaceNameId`
+(keccak of the interface name) dimension.
 
 ## State-Machine Objects
 
@@ -23,18 +25,21 @@ the contract accepts only routes/interfaces covered by their committed
 | --- | --- |
 | local order | The current order, identified by `(localPlanId, localOrderId)`, waiting for a peer Zhixu's output to move a local stage forward. |
 | linked order | Another Zhixu order docked into this one, identified by `(targetPlanId, linkedOrderId)`, with its own plan, authorization, signals, and proof. |
-| dock instance | One concrete docking relation containing local stage, route, target plan/order, source seam, input/output roots, and depth. |
-| input binding | A binding from a local Hook to a target entrance/signal port, deduplicated by `inputBindingHash`. |
-| output binding | A mapping from a target output port to a local source/signal, deduplicated by `outputBindingHash`. |
+| dock instance | One concrete docking relation containing local stage, route, target plan/order, interface, mode, source seam, input/output roots, and depth. |
+| input binding | A binding from a local Hook to a target interface input port, deduplicated by `inputBindingHash`. |
+| output binding | A mapping from a target interface output port to a local source/signal, deduplicated by `outputBindingHash`. |
 
 ## Chain Events
 
 | Event | Meaning |
 | --- | --- |
-| `DockOpened` | Atomically records the dock instance, local/target plan/order, route, depth, and opener. |
-| `DockInputSubmitted` | Records an entrance or signal input delivered to the linked order under a binding. |
+| `DockOpened` | Atomically records the dock instance, local/target plan/order, `interfaceNameId`, route, depth, and opener. |
+| `DockInputSubmitted` | Records an input delivered to the linked order under a binding. |
 | `DockOutputSubmitted` | Records a linked output mapped back to the local order under a binding. |
-| `DockTerminal` | Records that the dock reached a success/failure/cancelled terminal state. |
+
+Dock outputs carry no terminal semantics: there is no dock-level terminal event,
+and whether a local stage finishes is driven only by the local stage/order's own
+completion semantics.
 
 `UVPStateMachineLens.getActiveDock`, `dockInputDelivered`,
 `dockOutputDelivered`, `dockByLocalRoute`, and `dockByTargetOrder` are the
@@ -45,22 +50,41 @@ authoritative views for the active relation. The old
 
 ```text
 local stage HookReady(planId, orderId, hookId, ...)
-  -> Store/Product or adapter selects a published target Zhixu/version
-  -> openDockedOrder validates route/interface roots, permit, identity, and depth
-  -> one transaction creates the linked order and submits the entrance input
+  -> Store/Product or adapter selects a published target Zhixu by definition name
+  -> openDockedOrder (OpenDockRequestV2) validates route/interface roots, permit, identity, and depth
+  -> one transaction creates the linked order and submits the birth-anchor input (the single input binding of a mode=new route)
   -> the linked order runs under its own Plan, authorization, and executor
   -> submitDockedInput delivers later local signal inputs as needed
   -> linked SignalSubmitted appears
   -> submitDockedSignal submits the output binding
   -> local order receives mapped SignalSubmitted and DockOutputSubmitted proof
-  -> local hooks continue evaluation; terminal output emits DockTerminal
+  -> local hooks continue evaluation
 ```
 
 Every cross-plan reference must retain `planId`. An `orderId` is not a global key
 and cannot be used alone to look up or merge docks, signals, or proofs.
-`dockInstanceId` also includes the local plan namespace in its preimage;
-`linkedOrderId` is derived from the dock instance and target definition identity,
-preventing cross-plan preemption.
+`dockInstanceId` also includes the local plan namespace, the mode word, and
+`interfaceNameId` in its preimage; `linkedOrderId` is derived from the dock
+instance and target definition identity, preventing cross-plan preemption.
+
+## Mode Boundaries: new / existing / dynamic selection
+
+- `order.mode=new`: fully supported on-chain. Each route carries exactly one
+  input binding (the birth anchor); `openDockedOrder` creates the child order,
+  registers the link, and writes the birth-anchor fact in one transaction. The
+  entrance permit typed-data is `UVPDockEntrancePermitV2` (with
+  `interfaceNameId`; EIP-712 domain version "3").
+- `order.mode=existing`: not supported on-chain. The on-chain compilation
+  boundary rejects it loudly (the error states that on-chain targets do not
+  support existing — serve the route from a cloud runtime or bind an interface
+  with order mode "new"); no silent fallback.
+- `target: null` (dynamic selection): the compiled artifact carries the local
+  declaration surface as `unresolvedDockRoutes`
+  (`uvp.dockRoute.unresolved.v1`); the on-chain compilation/deserialization
+  boundary rejects it loudly with `UNRESOLVED_DOCK_TARGET`. The cloud runtime
+  reads dock route selection records to fill in the target (resolved by name,
+  validated against the local interface/port declaration, with the instance
+  established on DB natural keys).
 
 ## Subscriptions and Entries
 
@@ -71,17 +95,23 @@ declares `mint: per-fact`. The old `stage.trigger`, `externalSignals`,
 `::ANCHOR@(…)` wrappers are not part of the current DSL and are rejected by the
 compiler.
 
-The `supplierType: zhixu` configuration must express `inputMap` and `signalMap`
-as target port names. The `uvp.dock.resolution.v1` manifest resolves target
-UID and artifact/interface roots. `signalMap` no longer carries Hook DSL
-and does not complete local business work merely by being configured.
+The `supplierType: zhixu` configuration declares the target interface name and
+`order.mode`, and expresses `inputMap`/`signalMap` as target interface port
+names; at least one of the two maps must be non-empty. Resolution has two
+layers: the core linker looks names up in the `uvp.dock.resolution.v2`
+manifest's name directory and performs structural validation; the chain
+track's publication surface embeds the target definition in full in the same
+schema, and the TS compiler recomputes the content-derived identity
+(`zx-<32hex>`) and artifact/interface roots as a content-addressing check
+(chain-track internal). `signalMap` does not carry Hook DSL and does not
+complete local business work merely by being configured.
 
 ## Depth and Idempotency
 
 The parent's real dock depth is authoritative. A new instance has
-`parentDepth + 1` and cannot exceed frozen `MAX_DOCK_DEPTH=8`. Open, entrance
-input, linked-order registration, and `DockOpened` complete in one EVM
-transaction; any failure rolls everything back. After dock identity, route,
+`parentDepth + 1` and cannot exceed frozen `MAX_DOCK_DEPTH=8`. Open,
+birth-anchor input, linked-order registration, and `DockOpened` complete in one
+EVM transaction; any failure rolls everything back. After dock identity, route,
 endpoint, and permit checks pass, a repeated open returns `false` without
 consuming the permit nonce. Repeated input/output returns an idempotent result
 or an explicit conflict.
@@ -90,8 +120,8 @@ or an explicit conflict.
 
 - The local and linked orders are independent on-chain orders, each with `(planId, orderId)`, authorization, events, and lifecycle.
 - The linked Zhixu has its own plan publication, order registration, signal authorization, and proof.
-- A Store docking session is only trial composition and review material; formal proof comes from `DockOpened`, `DockInputSubmitted`, `DockOutputSubmitted`, `DockTerminal`, and events on both orders.
-- `submitDockedSignal` maps a signal that already exists in the linked order and satisfies the binding; it does not create business facts for the linked order.
+- A Store docking session is only trial composition and review material; formal proof comes from `DockOpened`, `DockInputSubmitted`, `DockOutputSubmitted`, and events on both orders.
+- `submitDockedSignal` maps a signal that already exists in the linked order and satisfies the binding; it does not create business facts for the linked order and never forces a terminal state on either side.
 - Unknown, pending, reverted, and retryable states must remain distinct in adapters/Store and must not be rendered as success or silently dropped.
 
 For the canonical narrative from the executor's perspective, see [Docked Zhixu / Zhixu as Executor](../apps/zhixu-as-executor.md).
