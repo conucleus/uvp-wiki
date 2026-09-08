@@ -73,7 +73,7 @@ Users with budget or strong verifiability needs may store extremely small resour
 
 Static `fileResources` come from the order stage and are the Plan's compile-time default resource description. If some order or stage needs to replace or supplement resources at runtime, use the resource overlay; the Plan stays a static version.
 
-The target model of PRD87 (docs/product/prd-87-native-resource-manifest-and-access.md) is:
+The target model of the resource overlay is:
 
 ```text
 StageResourcePatch

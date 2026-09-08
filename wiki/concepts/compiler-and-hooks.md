@@ -14,7 +14,7 @@ Compiler 和 Hook Core 是协议语义进入链上前的入口。它们不处理
 `uvp-protocol/packages/hook-core` 负责：
 
 - 解析 `source::condition`。
-- 支持 `&`、`|`、`~`、delay，以及跨 source 的 `::ANCHOR(@source::task.stage.signal)` 订阅；旧的 `::OUTSIDE@`、`::MERGE@`、`::ANCHOR@` wrapper 和 `OUTSOURCE` 已退役（解析期报错）。
+- 支持 `&`、`|`、`~`、delay，以及跨 source 的 `::ANCHOR(@source::task.stage.signal)` 订阅；订阅是跨源事实的唯一 wrapper 形态，`::OUTSIDE@`、旧 `::ANCHOR@(…)` 等其余 wrapper 与 `OUTSOURCE` 都在解析期报错。
 - 只为 stage 的 `receiveSignals` 生成 receive Hook；不存在一套绕过 AST 的 `externalSignals` 或 trigger wrapper 语义。
 - 把 `~A` 解释为“A signal 尚未出现在当前订单事件集中”。signal 一旦出现就不会消失，所以这里是单调存在逻辑。
 - 抽取 positive、negative、timer dependencies。
@@ -38,12 +38,12 @@ Hook Core 的输出仍然是平台中立语义，不含 Solidity ABI。
 | --- | --- | --- |
 | uvp-core | Hook DSL、AST、求值、依赖提取、正向锚点与 canonical semantic version 的规范实现。 | Solidity ABI、钱包授权、Product task 语言由后续层处理。 |
 | hook-core | 对 uvp-core 语义的 TypeScript adapter 和版本断言，不另立语义。 | 不得形成与 uvp-core 分叉的解析／求值规则。 |
-| compiler | 秩序 input schema、OnchainHookPlan、register 参数（commitPlan+finalizePlan）、canonical hash；调用 uvp-core 语义，HookPlan 仅为内部 IR。 | 订单参与者选择、supplier identity 判断、linked order 注册、支付/escrow 逻辑由产品、registry 或 periphery 处理。 |
+| compiler | 秩序 input schema、OnchainHookPlan、register 参数（commitPlan+finalizePlan）、canonical hash；调用 uvp-core 语义，HookPlan 仅为内部 IR。 | 订单参与者选择、supplier identity 判断、linked order 注册、支付/资金托管逻辑由产品、registry 或 periphery 处理。 |
 | artifact/hash | `planId`、`planHash`、`hookId`、`sourceId`、`signalId`、`signalKey` 的稳定边界。 | Store draft 状态和 Product DB primary key 属于读模型。 |
 
 ## Compiler 的输入输出边界
 
-Compiler 的输出是确定性的计划产物和注册参数。订单参与者、钱包授权、合约部署、supplier identity、escrow 或 funding 由后续的 Product、registry、deployment 或 periphery 层处理。Compiler 只回答一个问题：这份静态 Zhixu 能否被确定性地编译成 EVM 可注册计划。
+Compiler 的输出是确定性的计划产物和注册参数。订单参与者、钱包授权、合约部署、supplier identity、资金托管或 funding 由后续的 Product、registry、deployment 或 periphery 层处理。Compiler 只回答一个问题：这份静态 Zhixu 能否被确定性地编译成 EVM 可注册计划。
 
 ## 为什么它是架构核心
 

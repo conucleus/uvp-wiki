@@ -36,7 +36,7 @@ A File Resource is a verifiable resource handle — fileType, object namespace, 
 
 Proof verifier boundaries:
 
-- Whether goods were actually delivered is judged by business participants, evidence, and the dispute/review system.
+- Whether goods were actually delivered is judged by business participants, evidence, and their own review processes.
 - Identity Registry publication expresses only the binding between an offline subject and an on-chain account; it does not certify supplier capability or reputation, which remain Store off-chain business data.
 - Object-handle accessibility cannot generate `SignalSubmitted`.
 - Hash alignment is a proof condition; hook readiness comes from state-machine events.

@@ -21,7 +21,7 @@ Zhixu -> HookPlan -> OnchainHookPlan -> commitPlan+finalizePlan / triggerOrderFr
 
 - `pnpm install` has already been run.
 - Foundry and Anvil are available.
-- An explicit deployer private key is required on every bootstrap entry — export `UVP_ETH_DEPLOYER_PRIVATE_KEY` (the script passes it through as `--private-key`). There is no built-in Anvil default key anymore; even locally you declare which key deploys.
+- An explicit deployer private key is required on every bootstrap entry — export `UVP_ETH_DEPLOYER_PRIVATE_KEY` (the key travels through the environment or a key file and never through argv; a `--private-key` argument is explicitly rejected). There is no built-in Anvil default key anymore; even locally you declare which key deploys, and a funded local Anvil key is fine.
 
 ## Contract-only Deployment
 

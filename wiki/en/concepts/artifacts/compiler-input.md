@@ -16,7 +16,7 @@ The compiler input is `ZhixuDefinition`. The compiler does more than move string
 | `metadata.name` | Required slug (`^[a-z][a-z0-9_-]{0,99}$`); enters canonical content and planId derivation, and is the key for referencing target definitions across tracks. |
 | `metadata.uid` | Not a DSL field: an occurrence in the source definition is loudly rejected as an unknown field; definition identity is track-split — chain track derived from content (`zx-<32hex>`, chain-track internal), cloud track unique name + database primary key. |
 | `metadata.labels` | Part of the definition content; the chain track's identity derivation includes labels (chain-track internal), the cloud track stores them as content only. |
-| `metadata.annotations` | Free-form annotations; never part of identity or hash derivation (PRD_101: no native version semantics). |
+| `metadata.annotations` | Free-form annotations; never part of identity or hash derivation (no native version semantics). |
 | `spec.platform` | Platform target, participates in hashing. |
 | `taskPatterns[].name` | Part of the stage identifier. |
 | `stages[].name` | Part of the stage identifier. |

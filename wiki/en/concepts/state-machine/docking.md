@@ -91,9 +91,9 @@ instance and target definition identity, preventing cross-plan preemption.
 The local stage entry is produced by a `receiveSignals` Hook. A cross-source
 fact uses `::ANCHOR(@source::task.stage.signal)`; a birth stage additionally
 declares `mint: per-fact`. The old `stage.trigger`, `externalSignals`,
-`triggerEntrance`, `::OUTSIDE@(...)`, `::MERGE@(...)`, and old
-`::ANCHOR@(…)` wrappers are not part of the current DSL and are rejected by the
-compiler.
+`triggerEntrance`, and wrapper forms other than the subscription
+(`::OUTSIDE@(...)`, the old `::ANCHOR@(…)`) are not part of the current DSL
+and are rejected by the compiler.
 
 The `supplierType: zhixu` configuration declares the target interface name and
 `order.mode`, and expresses `inputMap`/`signalMap` as target interface port

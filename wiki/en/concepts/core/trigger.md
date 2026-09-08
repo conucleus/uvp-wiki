@@ -99,7 +99,7 @@ The compiler explicitly rejects:
 - executor `triggerEntrance`;
 - combining `supplierType: zhixu` with `supplierID`;
 - putting `source::task.stage.signal` Hook DSL in a `signalMap` value;
-- `::OUTSIDE@(...)`, `::MERGE@(...)`, and the old `::ANCHOR@(…)` wrappers.
+- wrapper forms other than the subscription (e.g. `::OUTSIDE@(...)` or the old `::ANCHOR@(…)`).
 
 For a cross-source fact, use `::ANCHOR(@source::task.stage.signal)`; to mint an
 order from that fact, additionally declare `mint: per-fact` on the stage.

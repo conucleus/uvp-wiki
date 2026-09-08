@@ -84,7 +84,7 @@ spec:
 | `metadata.name` | 必填 slug（`^[a-z][a-z0-9_-]{0,99}$`）；DSL 内引用目标定义的键（`target.zhixu` 即目标的 `metadata.name`）。名字到实体的解析由各轨权威完成：云轨按唯一 name 注册查得，链轨由发布面解析到内容派生身份。 |
 | `metadata.uid` | 不是 DSL 字段：出现即按未知字段响亮拒绝。DSL 壳不携带任何派生身份；身份方案按轨分治（链轨内容派生、云轨数据库权威）。 |
 | `metadata.labels` | 业务分类、行业、demo 标签；是定义内容的一部分（链轨身份派生包含 labels——链轨内幕；云轨仅作内容）。链上权限由 order authorization 和 overlay 决定。 |
-| `metadata.annotations` | 自由注解，永不参与身份或哈希推导（PRD_101：Zhixu 无原生版本语义，`version` 键无特殊待遇）。 |
+| `metadata.annotations` | 自由注解，永不参与身份或哈希推导（Zhixu 无原生版本语义，`version` 键无特殊待遇）。 |
 | `spec.platform` | 目标平台。EVM track 使用 `type=blockchain`、`provider=eth`，可显式写 `network=base`。不写 `network` 时保持当前主网默认路径。 |
 | `spec.nucleation.id` | 秩序的发起核、设计者或组织域标识。详见 [Nucleus / 凝结核](nucleation.md)。 |
 | `spec.taskPatterns` | 任务模式列表，里面包含 stages。 |
@@ -114,7 +114,7 @@ receiveSignals:
   REQUESTED: "::ANCHOR(@customer::request.submit.requested)"
 ```
 
-`mint` 只能取 `per-fact`，出生阶段必须包含至少一个 `ANCHOR(@...)` 订阅，并使用静态的 individual/organization executor；编译器会拒绝自环和无界的跨源代铸环。没有 `mint` 的阶段可以用普通 `source::condition` hook，也可以用 `ANCHOR(@...)` 做通道监听；其订单身份由现有订单路由或执行器自报创建。旧的 `trigger`、`externalSignals`、`::OUTSIDE@`、`::MERGE@` 和旧 `::ANCHOR@(…)` 形态均已退役，编译器会显式拒绝。
+`mint` 只能取 `per-fact`，出生阶段必须包含至少一个 `ANCHOR(@...)` 订阅，并使用静态的 individual/organization executor；编译器会拒绝自环和无界的跨源代铸环。没有 `mint` 的阶段可以用普通 `source::condition` hook，也可以用 `ANCHOR(@...)` 做通道监听；其订单身份由现有订单路由或执行器自报创建。旧的 `trigger`、`externalSignals`，以及订阅以外的 wrapper 形态（`::OUTSIDE@`、旧 `::ANCHOR@(…)`）均已退役，编译器会显式拒绝。
 
 ## `selectedStages`
 

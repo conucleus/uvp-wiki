@@ -55,31 +55,111 @@ Executor patch 处理订单级 executor selection、handoff 和 replacement。Re
 
 ## Store Console
 
+Store Console 同样位于 chain-services，按能力（capability）授权：钱包先经 challenge/verify 建立会话，后续请求以会话凭证标识身份；`store.read` 是匿名可用的公开读能力，写操作各自要求对应的 `store.*` 能力（如 `store.draft.review`、`store.version.activate`、`store.supplier.review`、`store.docking.create`、`store.listing.manage`）。
+
+会话与身份：
+
 ```text
+POST /store/auth/challenge
+POST /store/auth/verify
+POST /store/auth/logout
+GET  /store/auth/session
+GET  /store/auth/addresses
+POST /store/auth/addresses/revoke
 GET  /store/session
+```
+
+目录、订单与运营读：
+
+```text
 GET  /store/search
 GET  /store/audit
 GET  /store/runtime/summary
 GET  /store/zhixus
 GET  /store/zhixus/:zhixuId
+GET  /store/zhixus/:zhixuId/orders
 GET  /store/orders/:orderId/candidates
-POST /store/docking-sessions
-GET  /store/docking-sessions/:sessionId
-POST /store/docking-sessions/:sessionId/validate
-POST /store/docking-sessions/:sessionId/save-draft-map
+GET  /store/orders/:orderId/observation
+GET  /store/orders/:orderId/replay
+GET  /store/orders/:orderId/audit-summary
+GET  /store/closure/dry-run
+```
+
+Zhixu 草稿、Product Schema 与版本：
+
+```text
 POST /store/zhixu-drafts/import
 GET  /store/zhixu-drafts/:draftId
 POST /store/zhixu-drafts/:draftId/compile-preview
 POST /store/zhixu-drafts/:draftId/submit-review
+GET  /store/zhixu-drafts/:draftId/product-schema
+PUT  /store/zhixu-drafts/:draftId/product-schema
+POST /store/zhixu-drafts/:draftId/product-schema/validate
+GET  /store/product-schemas/:planId/:planHash
+GET  /store/zhixu-series/:seriesId/versions
+POST /store/zhixu-series/:seriesId/versions/:versionId/activate
+POST /store/zhixu-series/:seriesId/versions/:versionId/deprecate
+```
+
+供应商目录：
+
+```text
 GET  /store/suppliers
-GET  /store/suppliers/:supplierId
 POST /store/suppliers
+GET  /store/suppliers/:supplierId
+GET  /store/suppliers/:supplierId/audits
 POST /store/suppliers/:supplierId/review
 POST /store/suppliers/:supplierId/request-identity-registration
 POST /store/suppliers/:supplierId/request-identity-revocation
+POST /store/suppliers/:supplierId/notification-profile
+POST /store/suppliers/:supplierId/notification-profile/prepare
 ```
 
-Store 写接口需要 operator/admin 身份。Draft、docking session、供应商名称、能力标签、匹配资料与审核记录属于 Store 的链下事实。Identity Registry 投影只提供 `subjectId` 与钱包的公开对应关系。
+Docking 工作台：
+
+```text
+POST /store/docking-sessions
+GET  /store/docking-sessions/:sessionId
+POST /store/docking-sessions/:sessionId/validate
+POST /store/docking-sessions/:sessionId/save-draft-map
+```
+
+Listing 与页面装饰：
+
+```text
+POST /store/listings/import
+GET  /store/listings
+GET  /store/listings/:listingId
+POST /store/listings/:listingId/anchor-verification
+POST /store/listings/:listingId/review
+POST /store/listings/:listingId/delist
+POST /store/listings/:listingId/relist
+GET  /store/decoration/:planId
+PUT  /store/decoration/:planId
+GET  /store/decoration/:planId/versions/:version
+POST /store/decoration/:planId/versions/:version/restore
+GET  /store/publishers/:publisherId/delegations
+POST /store/publishers/delegations
+POST /store/publishers/delegations/:delegationId/revoke
+```
+
+入驻申请与评估：
+
+```text
+POST /store/join-applications
+GET  /store/join-applications
+GET  /store/join-applications/:applicationId
+POST /store/join-applications/:applicationId/review-start
+POST /store/join-applications/:applicationId/approve
+POST /store/join-applications/:applicationId/reject
+POST /store/join-applications/:applicationId/revoke
+GET  /store/compliance/capabilities
+POST /store/compliance/access-preview
+GET  /store/risk/capabilities
+POST /store/risk/assess
+```
+
+Draft、docking session、listing、装饰、供应商名称、能力标签、匹配资料与审核记录属于 Store 的链下事实。Identity Registry 投影只提供 `subjectId` 与钱包的公开对应关系。
 
 ## Readiness
 

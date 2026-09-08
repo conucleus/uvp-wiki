@@ -54,17 +54,18 @@ pnpm --filter @uvp-eth/executor-kit cli -- product submit task_123 \
   --private-key-env UVP_PARTICIPANT_PRIVATE_KEY
 ```
 
-Chain watcher dry-run（`--dry-run` 仍是显式测试辅助：只演练扫描与准备，不提交任何交易）：
+Chain watcher dry-run（`--dry-run` 仍是显式测试辅助：只演练扫描与准备，不提交任何交易）。示例 config 的 `stateMachines[]` 已声明被扫描的 state machine，因此不再传 `--state-machine`——两者并存会被直接拒绝，扫描集合必须只在一处声明：
 
 ```bash
 pnpm --filter @uvp-eth/executor-kit cli -- chain-once \
   --rpc-url http://127.0.0.1:8545 \
-  --state-machine 0x0000000000000000000000000000000000000001 \
   --chain-id 31337 \
   --config uvp-executor-kit/package/fixtures/state-machine-executor.config.json \
   --wallet-address 0x0000000000000000000000000000000000000002 \
   --dry-run
 ```
+
+`--state-machine` 只在 config 未声明 `stateMachines[]` 时使用（二选一，同时给出即报错）。
 
 `chain-once` 与 `jobs retry` 的退出码语义：扫描结果包含 error，或存在 failed/dead_letter job 时，进程以退出码 1 结束。调度器和 CI 应把非零退出视为本轮失败，而不是静默继续。
 

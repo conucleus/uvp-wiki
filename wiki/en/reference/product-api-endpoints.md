@@ -55,31 +55,111 @@ Executor patches handle order-level executor selection, handoff, and replacement
 
 ## Store Console
 
+The Store Console also lives in chain-services and is authorized by capability: a wallet first establishes a session via challenge/verify, later requests identify themselves with the session credential; `store.read` is the anonymous public read capability, and each write requires its own `store.*` capability (e.g. `store.draft.review`, `store.version.activate`, `store.supplier.review`, `store.docking.create`, `store.listing.manage`).
+
+Sessions and identity:
+
 ```text
+POST /store/auth/challenge
+POST /store/auth/verify
+POST /store/auth/logout
+GET  /store/auth/session
+GET  /store/auth/addresses
+POST /store/auth/addresses/revoke
 GET  /store/session
+```
+
+Catalog, order, and operations reads:
+
+```text
 GET  /store/search
 GET  /store/audit
 GET  /store/runtime/summary
 GET  /store/zhixus
 GET  /store/zhixus/:zhixuId
+GET  /store/zhixus/:zhixuId/orders
 GET  /store/orders/:orderId/candidates
-POST /store/docking-sessions
-GET  /store/docking-sessions/:sessionId
-POST /store/docking-sessions/:sessionId/validate
-POST /store/docking-sessions/:sessionId/save-draft-map
+GET  /store/orders/:orderId/observation
+GET  /store/orders/:orderId/replay
+GET  /store/orders/:orderId/audit-summary
+GET  /store/closure/dry-run
+```
+
+Zhixu drafts, product schemas, and versions:
+
+```text
 POST /store/zhixu-drafts/import
 GET  /store/zhixu-drafts/:draftId
 POST /store/zhixu-drafts/:draftId/compile-preview
 POST /store/zhixu-drafts/:draftId/submit-review
+GET  /store/zhixu-drafts/:draftId/product-schema
+PUT  /store/zhixu-drafts/:draftId/product-schema
+POST /store/zhixu-drafts/:draftId/product-schema/validate
+GET  /store/product-schemas/:planId/:planHash
+GET  /store/zhixu-series/:seriesId/versions
+POST /store/zhixu-series/:seriesId/versions/:versionId/activate
+POST /store/zhixu-series/:seriesId/versions/:versionId/deprecate
+```
+
+Supplier directory:
+
+```text
 GET  /store/suppliers
-GET  /store/suppliers/:supplierId
 POST /store/suppliers
+GET  /store/suppliers/:supplierId
+GET  /store/suppliers/:supplierId/audits
 POST /store/suppliers/:supplierId/review
 POST /store/suppliers/:supplierId/request-identity-registration
 POST /store/suppliers/:supplierId/request-identity-revocation
+POST /store/suppliers/:supplierId/notification-profile
+POST /store/suppliers/:supplierId/notification-profile/prepare
 ```
 
-Store write endpoints require operator/admin identity. Drafts, docking sessions, supplier names, capability tags, matching profiles, and review records are Store off-chain facts. The Identity Registry projection only provides the public correspondence between `subjectId` and wallets.
+Docking workbench:
+
+```text
+POST /store/docking-sessions
+GET  /store/docking-sessions/:sessionId
+POST /store/docking-sessions/:sessionId/validate
+POST /store/docking-sessions/:sessionId/save-draft-map
+```
+
+Listings and page decoration:
+
+```text
+POST /store/listings/import
+GET  /store/listings
+GET  /store/listings/:listingId
+POST /store/listings/:listingId/anchor-verification
+POST /store/listings/:listingId/review
+POST /store/listings/:listingId/delist
+POST /store/listings/:listingId/relist
+GET  /store/decoration/:planId
+PUT  /store/decoration/:planId
+GET  /store/decoration/:planId/versions/:version
+POST /store/decoration/:planId/versions/:version/restore
+GET  /store/publishers/:publisherId/delegations
+POST /store/publishers/delegations
+POST /store/publishers/delegations/:delegationId/revoke
+```
+
+Join applications and assessments:
+
+```text
+POST /store/join-applications
+GET  /store/join-applications
+GET  /store/join-applications/:applicationId
+POST /store/join-applications/:applicationId/review-start
+POST /store/join-applications/:applicationId/approve
+POST /store/join-applications/:applicationId/reject
+POST /store/join-applications/:applicationId/revoke
+GET  /store/compliance/capabilities
+POST /store/compliance/access-preview
+GET  /store/risk/capabilities
+POST /store/risk/assess
+```
+
+Drafts, docking sessions, listings, decoration, supplier names, capability tags, matching profiles, and review records are Store off-chain facts. The Identity Registry projection only provides the public correspondence between `subjectId` and wallets.
 
 ## Readiness
 

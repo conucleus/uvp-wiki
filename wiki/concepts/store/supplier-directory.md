@@ -29,7 +29,7 @@ Capability passport 先展示身份、能力资料、可用阶段和 proof，再
 | --- | --- | --- |
 | Identity | display name、subject id、wallet、组织说明、metadata URI；Registry binding status、revocation reason、proof rows。 | Store metadata + `UVPIdentityRegistry` projection。 |
 | Nucleus fit / usage | 可服务的 Zhixu、stage、role slot、resource/evidence 类型；被哪些凝结核组织进哪些 Zhixu。 | 凝结核组织语义。 |
-| Capability | logistics、customs、inspection、payment、dispute-review、document-verification 等 catalog tags；可承接 stage、支持的 Product task intent、是否可做 selector。 | Store metadata + audit。 |
+| Capability | logistics、customs、inspection、pricing、quality-review、document-verification 等 catalog tags；可承接 stage、支持的 Product task intent、是否可做 selector。 | Store metadata + audit。 |
 | Contact / Operations | 联系人、通知渠道、SLA、可用区域与时段、升级路径、operational notes。 | Store metadata；不进链上明文。 |
 | Participation / Runtime | recent orders、open tasks、historical proof、failure/timeout history、active executor records。 | `UVPStateMachine` / Product projection。 |
 | Docking | peer Zhixu subject、supported signalMap、adapter endpoints、sandbox sessions。 | Store workflow + proof；身份绑定看 Identity Registry。 |

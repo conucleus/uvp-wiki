@@ -25,14 +25,16 @@ Product DTOs are stable contracts for ordinary users and product frontends. They
 | proof | Generated from event provenance. |
 | trust | Merged from the identity projection. |
 
-Funding fields are intentionally expressed as not yet integrated:
+The money surface is currently expressed as a placeholder; no real funds move. When a Plan declares a payment-type capability plugin, the order DTO carries a `settlementPreview`:
 
 ```text
-totalAmount.display = "funding custody not integrated"
-fundingStatus = "funding custody is not integrated into this interface"
+settlementPreview.label = "稳定币模块占位" (stablecoin module placeholder)
+settlementPreview.adapterStatus = "placeholder"
+settlementPreview.disclaimer = "当前不托管、不划转、不释放、不退款任何资金，只记录付款条件和证明。"
+(no custody, transfer, release, or refund of any funds; only payment conditions and proof are recorded)
 ```
 
-This means the core UVP protocol is not a payment provider. USDC, escrow, or guarantees should be integrated by a periphery adapter.
+This means the core UVP protocol is not a payment provider. Stablecoins, settlement custody, or guarantees should be integrated by a periphery adapter.
 
 ## ProductTaskDTO
 

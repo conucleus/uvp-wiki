@@ -92,7 +92,7 @@ input 端口名；`signalMap` 的 key 必须是本地 `sendSignals`，value 必�
 - executor 的 `triggerEntrance`；
 - `supplierType: zhixu` 与 `supplierID` 并用；
 - 把 `signalMap` value 写成 `source::task.stage.signal` Hook DSL；
-- `::OUTSIDE@(...)`、`::MERGE@(...)`、旧 `::ANCHOR@(…)` wrapper。
+- 订阅以外的 wrapper 形态（如 `::OUTSIDE@(...)` 与旧 `::ANCHOR@(…)`）。
 
 需要跨源事实时，改用 `::ANCHOR(@source::task.stage.signal)`；需要从事实出生
 订单时，再在阶段上声明 `mint: per-fact`。

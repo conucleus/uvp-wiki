@@ -84,7 +84,7 @@ This example shows three things: a `mint: per-fact` stage subscribes to an `ANCH
 | `metadata.name` | Required slug (`^[a-z][a-z0-9_-]{0,99}$`); the key for referencing target definitions inside the DSL (`target.zhixu` is the target's `metadata.name`). Resolving the name to an entity is each track's authority: the cloud track looks it up by unique registered name, the chain track's publication surface resolves it to the content-derived identity. |
 | `metadata.uid` | Not a DSL field: any occurrence is loudly rejected as an unknown field. The DSL shell carries no derived identity; identity schemes are track-split (chain track content-derived, cloud track database-authoritative). |
 | `metadata.labels` | Business classification, industry, demo tags; part of the definition content (the chain track's identity derivation includes labels — a chain-track internal; the cloud track stores them as content only). On-chain permissions are decided by order authorization and overlays. |
-| `metadata.annotations` | Free-form annotations; never part of identity or hash derivation (PRD_101: no native version semantics). |
+| `metadata.annotations` | Free-form annotations; never part of identity or hash derivation (Zhixu has no native version semantics; the `version` key gets no special treatment). |
 | `spec.platform` | Target platform. The EVM track uses `type=blockchain`, `provider=eth`, optionally `network=base`. Omitting `network` keeps the current mainnet default path. |
 | `spec.nucleation.id` | Identifier of the initiating nucleus, designer, or organizational domain of the order. See [Nucleus / 凝结核](nucleation.md). |
 | `spec.taskPatterns` | Task pattern list containing stages. |
@@ -114,7 +114,7 @@ receiveSignals:
   REQUESTED: "::ANCHOR(@customer::request.submit.requested)"
 ```
 
-`mint` accepts only `per-fact`; a birth stage must contain at least one `ANCHOR(@...)` subscription and use a static individual/organization executor. The compiler rejects self-loops and unbounded cross-source re-mint cycles. A stage without `mint` may use a normal `source::condition` hook or an `ANCHOR(@...)` channel listener; its order identity comes from existing order routing or an executor's self-reported order. The retired `trigger`, `externalSignals`, `::OUTSIDE@`, `::MERGE@`, and old `::ANCHOR@(…)` forms are rejected explicitly.
+`mint` accepts only `per-fact`; a birth stage must contain at least one `ANCHOR(@...)` subscription and use a static individual/organization executor. The compiler rejects self-loops and unbounded cross-source re-mint cycles. A stage without `mint` may use a normal `source::condition` hook or an `ANCHOR(@...)` channel listener; its order identity comes from existing order routing or an executor's self-reported order. The retired `trigger`, `externalSignals`, and wrapper forms other than the subscription (`::OUTSIDE@`, the old `::ANCHOR@(…)`) are rejected explicitly.
 
 ## `selectedStages`
 

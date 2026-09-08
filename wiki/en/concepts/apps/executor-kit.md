@@ -54,7 +54,7 @@ HookReady(planId, orderId, hookId, stageId, hookName)
 
 Key commands:
 
-- `uvp-executor chain-once`: scan `HookReady` once and produce a job or dry-run; key flags `--rpc-url`, `--state-machine`, `--config`, `--dry-run`.
+- `uvp-executor chain-once`: scan `HookReady` once and produce a job or dry-run; key flags `--rpc-url`, `--config`, `--dry-run`. The scanned state machines are declared either via `--state-machine` or via the config's `stateMachines[]` — passing both is rejected.
 - `uvp-executor chain-watch`: keep listening and persist jobs; key flags `--jobs-file`, others same as above.
 
 The chain watcher job identity must include the emitting state-machine address so that in multi-deployment environments a `HookReady` from contract A is never called back against contract B. Full command syntax: [CLI and configuration](../../reference/cli-and-config.md).
@@ -66,8 +66,8 @@ Submission and retry behavior is explicit, never best-effort silent:
 - A signal that reaches `submitted` is non-terminal: it can be rescanned and reconciled until an on-chain event proves the final outcome.
 - Receipt waiting defaults to on (`waitForReceipt` defaults to `true`); turn it off only deliberately.
 - `chain-once` and `jobs retry` exit with code `1` when results contain errors or jobs that ended up failed/dead_letter, so schedulers and CI treat the run as failed instead of continuing silently.
-- Retry decisions use explicit error codes; uncoded errors are never auto-retried.
-- Product API callback delivery retries internally three times with exponential backoff before reporting failure.
+- Retry decisions honor explicit error codes first; uncoded failures are then classified by well-known error text — RPC/network conditions (timeouts, 429/502/503/504, disconnects, fetch failed), insufficient funds, and nonce conflicts are retryable, while duplicate signals (`SignalAlreadyExists`) and authorization reverts are not; anything unrecognized falls back to the conservative non-retryable lane instead of guessing.
+- Product API callback delivery retries internally three times with exponential backoff before reporting failure; partial batch success records results per item.
 - When an action carries no business payload, the payload hash is encoded as the protocol constant `bytes32(0)` — zero means "no payload", it is not a missing value.
 - `--dry-run` remains an explicit test aid: it exercises scanning and preparation without submitting anything.
 

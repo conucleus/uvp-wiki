@@ -74,7 +74,7 @@ fileResources:
 
 静态 `fileResources` 来自秩序 stage，是 Plan 编译时的默认资源说明。运行中如果某个订单、某个 stage 需要替换或补充资源，应使用 resource overlay，Plan 仍保持静态版本。
 
-PRD87（docs/product/prd-87-native-resource-manifest-and-access.md）里的目标模型是：
+资源 overlay 的目标模型是：
 
 ```text
 StageResourcePatch

@@ -25,7 +25,7 @@ status: verified
 | Product submit domain | `0.10` | Product signal submit EIP-712 domain。 |
 | Order-link domain | `0.8` | linked-order trigger EIP-712 domain。 |
 | Patch/resource domains | `0.1` | executor/resource patch EIP-712 domains。 |
-| Docking module ABI | `3.0` | preimage v2 open/input/output boundary（接口名叶、mode word；EIP-712 domain version `3`；无 terminal 边界）。 |
+| Docking module ABI | `4.0` | 统一 Zhixu DockRoute：open/input/output 绑定（接口名叶、mode word）；order mode new 唯一支持，existing 模式在哈希重算处显式拒绝；EIP-712 domain version `4`。 |
 | Plan metadata module ABI | `0.4` | plan metadata/dock 接口端口校验（含接口名维度）。 |
 | StateMachine lens ABI | `0.3` | dock/order/hook 只读视图。 |
 | Deployment manifest | `uvp-eth.addresses.v1` | 部署地址清单 schema。 |

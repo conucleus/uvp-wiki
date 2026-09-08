@@ -49,7 +49,7 @@ Product API may prepare typed data, verify signatures, call the relayer, and ret
 
 ## Periphery Adapters
 
-Funding, USDC, escrow, guarantee, settlement, payments, logistics, and enterprise-system adapters belong to periphery (`uvp-periphery/`): they run around the core state machine, consuming `UVPStateMachine`, optional Identity Registry name resolution, Product DTO, or executor-kit interfaces — they must not turn funding, guarantee, payment, release, refund, or dispute state into new core facts.
+Funding, USDC, settlement custody, guarantee, payments, logistics, and enterprise-system adapters belong to periphery (`uvp-periphery/`): they run around the core state machine, consuming `UVPStateMachine`, optional Identity Registry name resolution, Product DTO, or executor-kit interfaces — they must not turn funding, guarantee, payment, release, refund, or disputed-payout state into new core facts.
 
 ## Public Interface Discipline
 
@@ -59,4 +59,4 @@ ABI, event topics, EIP-712 typed-data domains, canonical hash domains, artifact 
 
 Every runtime configuration is an explicit declaration; there are no demo or mock modes behind any profile. The Product API has no demo data source — an empty projection returns an empty array or `detail_unavailable`, and no `?fallback=demo` parameter or `UVP_PRODUCT_DEMO_MODE` key exists; frontends have no demo mode either — Store access level comes only from environment/login session. `CHAIN_SERVICES_DATABASE_DRIVER` and `CHAIN_SERVICES_DATABASE_URL` are required in every environment, and a missing value fails at startup with an error naming the key.
 
-Staging/testnet profiles must fail closed: reject memory/SQLite storage, localhost RPC, permissive authorization, and Anvil default private keys; every bootstrap entry requires an explicit deployer private key (`--private-key` or `UVP_ETH_DEPLOYER_PRIVATE_KEY`). Private keys, RPC secrets, JWT secrets, and object-storage credentials appear only redacted — never in the repository, logs, or docs. Execution details: [Storage, Migration, and Runtime Profile](services/storage-runtime.md) and [Troubleshooting](../how-to/troubleshooting.md).
+Staging/testnet profiles must fail closed: reject memory/SQLite storage, localhost RPC, permissive authorization, and Anvil default private keys; every bootstrap entry requires an explicit deployer private key (the `UVP_ETH_DEPLOYER_PRIVATE_KEY` environment variable, or a key file via `--private-key-file` / `UVP_ETH_DEPLOYER_PRIVATE_KEY_FILE`; keys never travel through argv, and a `--private-key` argument is explicitly rejected). Private keys, RPC secrets, JWT secrets, and object-storage credentials appear only redacted — never in the repository, logs, or docs. Execution details: [Storage, Migration, and Runtime Profile](services/storage-runtime.md) and [Troubleshooting](../how-to/troubleshooting.md).

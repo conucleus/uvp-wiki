@@ -16,7 +16,7 @@ status: verified
 | `metadata.name` | 必填 slug（`^[a-z][a-z0-9_-]{0,99}$`）；进入 canonical 内容与 planId 派生，也是跨轨引用目标定义的键。 |
 | `metadata.uid` | 不是 DSL 字段：源定义出现 `metadata.uid` 按未知字段响亮拒绝；定义身份分轨——链轨由内容派生（`zx-<32hex>`，链轨内幕），云轨为唯一 name + 数据库主键。 |
 | `metadata.labels` | 定义内容的一部分；链轨身份派生包含 labels（链轨内幕），云轨仅作内容。 |
-| `metadata.annotations` | 自由注解，永不参与身份或哈希推导（PRD_101：无原生版本语义）。 |
+| `metadata.annotations` | 自由注解，永不参与身份或哈希推导（无原生版本语义）。 |
 | `spec.platform` | 平台目标，参与哈希。 |
 | `taskPatterns[].name` | stage 标识的一部分。 |
 | `stages[].name` | stage 标识的一部分。 |

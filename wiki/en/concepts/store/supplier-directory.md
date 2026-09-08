@@ -29,7 +29,7 @@ The capability passport shows identity, capability profile, servable stages, and
 | --- | --- | --- |
 | Identity | Display name, subject id, wallet, organization notes, metadata URI; Registry binding status, revocation reason, proof rows. | Store metadata + `UVPIdentityRegistry` projection. |
 | Nucleus fit / usage | Servable Zhixu, stages, role slots, resource/evidence types; which Nuclei organized this supplier into which Zhixu. | Nucleus organization semantics. |
-| Capability | Catalog tags such as logistics, customs, inspection, payment, dispute review, document verification; servable stages, supported Product task intents, selector eligibility. | Store metadata + audit. |
+| Capability | Catalog tags such as logistics, customs, inspection, pricing, quality review, document verification; servable stages, supported Product task intents, selector eligibility. | Store metadata + audit. |
 | Contact / Operations | Contacts, notification channels, SLAs, available regions and hours, escalation paths, operational notes. | Store metadata; never on-chain plaintext. |
 | Participation / Runtime | Recent orders, open tasks, historical proof, failure/timeout history, active executor records. | `UVPStateMachine` / Product projection. |
 | Docking | Peer Zhixu subjects, supported signalMaps, adapter endpoints, sandbox sessions. | Store workflow + proof; identity bindings look at the Identity Registry. |

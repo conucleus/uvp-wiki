@@ -102,4 +102,4 @@ forge test
 
 ## Funding Boundary
 
-当前合约模块的 core boundary 聚焦 state machine、薄身份 registry 和 deployment registry。funding、escrow、custody、settlement、release、refund、dispute-payment、ERC20 或 USDC 合约属于 adapter/periphery 工作；未来资金相关工作必须有独立的 authorization、event mapping、tests 和 PRD，并消费 `UVPStateMachine` signal。完整边界见 [协议边界：外围适配](../concepts/protocol-boundaries.md#外围适配)。
+当前合约模块的 core boundary 聚焦 state machine、薄身份 registry 和 deployment registry。funding、资金托管、custody、settlement、release、refund、争议赔付、ERC20 或 USDC 合约属于 adapter/periphery 工作；未来资金相关工作必须有独立的 authorization、event mapping、tests 和 PRD，并消费 `UVPStateMachine` signal。完整边界见 [协议边界：外围适配](../concepts/protocol-boundaries.md#外围适配)。

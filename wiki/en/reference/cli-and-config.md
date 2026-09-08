@@ -57,17 +57,18 @@ pnpm --filter @uvp-eth/executor-kit cli -- product submit task_123 \
   --private-key-env UVP_PARTICIPANT_PRIVATE_KEY
 ```
 
-Chain watcher dry-run (`--dry-run` remains an explicit test aid; it never submits):
+Chain watcher dry-run (`--dry-run` remains an explicit test aid; it never submits). The example config already declares the scanned state machines in `stateMachines[]`, so `--state-machine` is not passed — the two coexisting is rejected outright, and the scan set must be declared in exactly one place:
 
 ```bash
 pnpm --filter @uvp-eth/executor-kit cli -- chain-once \
   --rpc-url http://127.0.0.1:8545 \
-  --state-machine 0x0000000000000000000000000000000000000001 \
   --chain-id 31337 \
   --config uvp-executor-kit/package/fixtures/state-machine-executor.config.json \
   --wallet-address 0x0000000000000000000000000000000000000002 \
   --dry-run
 ```
+
+Use `--state-machine` only when the config does not declare `stateMachines[]` (pick one of the two; passing both is an error).
 
 `chain-once` and `jobs retry` exit `1` when scan results contain errors or jobs that ended up failed/dead_letter, so schedulers and CI treat the run as failed instead of silently continuing.
 
