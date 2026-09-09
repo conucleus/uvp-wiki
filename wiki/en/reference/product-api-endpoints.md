@@ -29,6 +29,30 @@ GET /product/me/activity-feed
 
 Plan publication status comes from the `UVPStateMachine.PlanRegistered` projection. Tasks come from `HookReady`; executor wallets come from Plan-declared signal capabilities and order-level `SignalSubmitterAuthorized`. Role names are display only.
 
+### Access policy: pure on-chain facts are public, business records require identity
+
+`GET /product/orders/:orderId/timeline` and `GET /product/orders/:orderId/proof` are projections of pure on-chain facts. **Anonymous readability is by design** (whitepaper §7: chain events are the publicly replayable truth; off-chain projections are rebuildable from events and create no facts) — not a missing auth gate.
+
+In contrast, business-record endpoints always require a session identity (whitepaper §7.2, minimal business visibility): `GET /product/submissions/:submissionId` and `GET /product/order-triggers/:triggerId` require a wallet session (or an explicit dev identity in local development); the invite preview `GET /product/invites/:inviteId` additionally requires the one-time invite token (hash-compared), and its response is a minimal field set — contact info is masked and money amounts are visible only to the draft creator or accepted participants.
+
+## Product BFF (drafts, invites, and order triggers)
+
+```text
+POST /product/order-drafts
+GET  /product/order-drafts/:draftId
+PATCH /product/order-drafts/:draftId
+POST /product/order-drafts/:draftId/prepare-trigger
+POST /product/order-drafts/:draftId/trigger
+GET  /product/order-triggers/:triggerId
+GET  /product/orders/:draftId/participants
+POST /product/orders/:draftId/invites
+GET  /product/invites/:inviteId
+POST /product/invites/:inviteId/accept
+POST /product/invites/:inviteId/reject
+```
+
+Business records (order triggers, invite preview) require a session identity / invite token per the policy above; `triggerId` is a non-enumerable random id. Draft reads and participant lists are limited to the creator or accepted participants.
+
 ## Submission and Evidence
 
 ```text

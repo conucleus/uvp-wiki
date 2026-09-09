@@ -29,6 +29,30 @@ GET /product/me/activity-feed
 
 Plan 发布状态来自 `UVPStateMachine.PlanRegistered` 投影。任务来自 `HookReady`，执行钱包来自 Plan 声明的 signal capability 与订单级 `SignalSubmitterAuthorized`。角色名称只负责展示。
 
+### 访问口径：纯链上事实公开，业务档案凭身份
+
+`GET /product/orders/:orderId/timeline` 与 `GET /product/orders/:orderId/proof` 是纯链上事实的投影，**匿名可读是设计口径**（白皮书 §7：链上事件是公开可回放真相，链下投影可从事件重建、不造事实），不是漏配的鉴权缺口。
+
+与之相对，业务档案端点一律要求会话身份（白皮书 §7.2 业务面最小可见）：`GET /product/submissions/:submissionId`、`GET /product/order-triggers/:triggerId` 要求钱包会话（或 local 开发的显式 dev 身份）；邀请预览 `GET /product/invites/:inviteId` 除会话身份外还必须携带一次性 invite token（哈希比对），且响应只含最小字段集——联系方式脱敏、金额仅对创建者/已接受参与者可见。
+
+## Product BFF（草稿、邀请与订单触发）
+
+```text
+POST /product/order-drafts
+GET  /product/order-drafts/:draftId
+PATCH /product/order-drafts/:draftId
+POST /product/order-drafts/:draftId/prepare-trigger
+POST /product/order-drafts/:draftId/trigger
+GET  /product/order-triggers/:triggerId
+GET  /product/orders/:draftId/participants
+POST /product/orders/:draftId/invites
+GET  /product/invites/:inviteId
+POST /product/invites/:inviteId/accept
+POST /product/invites/:inviteId/reject
+```
+
+业务档案（order-triggers、邀请预览）按上节口径要求会话身份/invite token；`triggerId` 为不可枚举随机 id。草稿读取与参与者名单限创建者或已接受参与者。
+
 ## Submission 与 Evidence
 
 ```text
