@@ -29,7 +29,7 @@ Implementations: `planIdForPublisher()` in `uvp-protocol/packages/compiler/src/o
 hashCanonical("uvp:hook-plan-artifact:v1", payload)
 ```
 
-This is the domain of the historical public artifact. HookPlan is now only an internal compiler IR and no longer a public Store/import/deploy flow; see [Compiler Input](compiler-input.md). The payload used to include the canonicalized source Zhixu, compiler information, platform information, hooks, dependencies, and routes.
+This is the domain of the compiler-internal hook-plan IR. HookPlan is an internal compiler artifact, not a public Store/import/deploy flow; see [Compiler Input](compiler-input.md). The payload carries the canonicalized source Zhixu, compiler information, platform information, hooks, dependencies, and routes.
 
 ## On-chain planHash
 
