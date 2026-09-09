@@ -191,7 +191,7 @@ Drafts, docking sessions, listings, decoration, supplier names, capability tags,
 GET /product/staging/readiness
 ```
 
-This endpoint outputs a redacted summary of deployment, indexing, storage, role inputs, and Product state; it returns `503 not_ready` when conditions are insufficient.
+This endpoint outputs a redacted summary of deployment, indexing, storage, role inputs, and Product state; it returns `503 not_ready` when conditions are insufficient. The summary includes the deployment inventory, role-input posture, and participant wallets of sample tasks — operational detail that requires governance admin credentials (same gate as `/admin/diagnostics`; public aggregate health lives at `/healthz` and `/readyz`).
 
 ## Related Pages
 

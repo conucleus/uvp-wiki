@@ -191,7 +191,7 @@ Draft、docking session、listing、装饰、供应商名称、能力标签、�
 GET /product/staging/readiness
 ```
 
-该接口输出脱敏的部署、索引、存储、角色输入与 Product 状态摘要；条件不足时返回 `503 not_ready`。
+该接口输出脱敏的部署、索引、存储、角色输入与 Product 状态摘要；条件不足时返回 `503 not_ready`。摘要含部署清单、角色输入姿态与样本任务的参与者钱包，属于运营细节——要求治理 admin 凭据（与 `/admin/diagnostics` 同门；公共聚合健康位走 `/healthz`、`/readyz`）。
 
 ## 相关页面
 
