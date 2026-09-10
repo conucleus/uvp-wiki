@@ -66,7 +66,7 @@ spec:
               order:
                 mode: new
               inputMap:
-                start: intake
+                SCOPE_READY: intake   # key 必须是本 stage 声明的 receiveSignals 通道（D005），value 是目标接口 input 端口名
               signalMap:
                 str: start
                 cmp: complete
@@ -141,20 +141,14 @@ selectedStages:
 
 ## `fileResources`
 
-`fileResources` 记录阶段协议、证据要求、验收标准或资源句柄。一个阶段可以指向链下 protocol 文件、manifest URI 或对象存储资源，并带上哈希：
+`fileResources` 记录阶段协议、证据要求、验收标准或资源句柄。一个阶段可以指向链下 protocol 文件或对象存储资源，`fileType` 取值是闭集 `local` / `http` / `txcloud` / `plain_text`（详见 [File Resources](file-resources.md)）：
 
 ```yaml
 fileResources:
   sourcing_contract:
-    fileType: manifest
-    resourceRole: stage_protocol
-    resourceType: document
-    mediaType: application/json
-    manifest:
-      manifestURI: "urn:uvp:resource-manifest:supplier-sourcing:v1"
-      manifestHash: "0x3002..."
-      policyHash: "0x7120..."
-      visibility: protected
+    fileType: http
+    httpFile:
+      url: "https://example.com/protocols/supplier-sourcing-v1.json"
 ```
 
 这些业务文件不进链。链上只记录哈希、URI 或 resource patch 事件。

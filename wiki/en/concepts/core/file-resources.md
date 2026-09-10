@@ -23,7 +23,7 @@ Static declarations enter the Plan's resource description; runtime replacement o
 
 Whether resources satisfy requirements is finally decided by authorized signals and proof, not by the files themselves; only hashes, URIs, or patch events are stored on chain, and plaintext always stays off-chain.
 
-The current compiler type defines it as a loose handle:
+The current compiler's TS shell defines it as a loose handle:
 
 ```ts
 interface FileResourceLike {
@@ -32,42 +32,40 @@ interface FileResourceLike {
 }
 ```
 
-This means `fileResources`' first responsibility is "a resolvable resource reference". The concrete storage backend can be object storage, an external URI, content-addressed storage, or a later manifest format.
+This loose interface is only the shell shape — it is **not** a semantic open-endedness promise: the `fileType` closed set is enforced by the Go cloud-side compile entries (`v0.IsValidFileResourceType`, one shared set across /compile, /validate, order-level resource patch, and /signal) and the TS chain-track precheck (`FILE_TYPES`, same set); Rust `uvp-core` passes `file_resources` through as opaque JSON values and does not validate `fileType`. Legal values are the closed set `local` / `http` / `txcloud` / `plain_text` (see the table below); invented values outside the set are rejected at compile time. `fileResources`' first responsibility is "a resolvable resource reference" — the storage backend is determined by the handle type, and the DSL offers no arbitrary storage-backend extension point.
 
 ## Resource Handles
 
-A stage can use `fileResources` to point to off-chain protocol files, evidence templates, or resource manifests:
+A stage can use `fileResources` to point to off-chain protocol files, evidence templates, or object-storage resources, with verification info attached:
 
 ```yaml
 fileResources:
   stage_protocol:
-    fileType: manifest
-    resourceRole: stage_protocol
-    resourceType: document
-    mediaType: application/json
-    manifest:
-      manifestURI: "urn:uvp:resource-manifest:payment-settlement:v1"
-      manifestHash: "0x3002..."
-      policyHash: "0x7120..."
-      visibility: protected
-      accessPolicy: buyer_supplier_executor
+    fileType: http
+    httpFile:
+      url: "https://example.com/protocols/payment-settlement-v1.json"
+  evidence_bucket:
+    fileType: txcloud
+    txCloudFile:
+      bucket: "evidence-bucket"
+      region: "ap-guangzhou"
+      objectKey: "protocols/payment-settlement-v1.json"
 ```
 
 This YAML gives Store, Product API, executor-kit, or adapters one resource handle: they can display the protocol, compute hashes, surface evidence requirements, and check acceptance rules. Only hashes, URIs, or patch events are stored on chain.
 
 ## What fileType Means
 
-`fileType` indicates the handle type. Common shapes include:
+`fileType` indicates the handle type; legal values are the DSL closed set (the Go cloud-side compile entries and the TS chain-track precheck reject values outside the set at compile time, by one shared collection):
 
 | fileType | Meaning |
 | --- | --- |
-| `manifest` | Points to a canonicalized resource manifest, suited to production resource bundles. |
-| `uri` | Points to a resolvable metadata URI with hash verification. |
-| `ipfs` / `arweave` | Content-addressed storage handles. |
-| `object_storage` | Off-chain object storage handle; production must not expose plaintext bucket keys or credentials. |
-| `onchain` | A few tiny public resources stored directly on chain or referenced as on-chain-readable data — costly but feasible. |
+| `local` | Local file-path handle (`localFile.path`); suited to fixtures and development samples. |
+| `http` | HTTP/HTTPS file URL handle (`httpFile.url`). |
+| `txcloud` | Off-chain object-storage (Tencent Cloud COS) handle (`txCloudFile` bucket/region/objectKey); production must not expose plaintext credentials. |
+| `plain_text` | Inline plaintext (base64); local fixtures or development samples only, never a production evidence carrier. |
 
-Users with budget or strong verifiability needs may store extremely small resources directly on chain; most contracts, invoices, logistics documents, photos, reports, and vehicle-condition evidence should never go on chain in plaintext — use content hashes, encrypted objects, metadata URIs, or resource manifests instead.
+There is no `manifest` / `uri` / `ipfs` / `arweave` / `object_storage` / `onchain` fileType — and no DSL handle for storing resources directly on chain. Contracts, invoices, logistics documents, photos, reports, and vehicle-condition evidence should never go on chain in plaintext; when a verifiable reference is needed, express it via a handle plus a content hash, or keep only hashes and metadata URIs on chain.
 
 ## Relation to StageResourcePatch
 

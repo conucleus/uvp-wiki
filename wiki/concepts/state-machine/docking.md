@@ -12,7 +12,7 @@ local order 把某个 stage 交给另一条 linked Zhixu / linked order 执行�
 linked order 中已经发生的 signal 映射回 local order。
 
 这不是 Store sandbox 草稿，也不是普通后端联动。正式运行态要落到
-`UVPDockingModule`（abiVersion 3.0，preimage v2）的事件和 proof 上；合约只接受
+`UVPDockingModule`（abiVersion 4.1，preimage v2）的事件和 proof 上；合约只接受
 已经通过 `dockRoutesRoot`、`dockInterfaceRoot` 和各自 Merkle proof 的
 route/interface，绑定与路由哈希都带 `interfaceNameId`（keccak(接口名)）维度。
 

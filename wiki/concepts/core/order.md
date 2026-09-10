@@ -13,7 +13,7 @@ Order 是“订单”。在协议里，它是从某个已注册 [Plan](plan.md) 
 
 ## 谁使用
 
-registrar 用 trigger order 入口创建订单；参与方、executor 和 adapter 向它提交授权 signal；Product/Store/executor-kit 把它投影成任务、通知和 proof 视图。
+任何持钥人都可以经开放出生入口创建订单（按 EIP-712 签名提交 trigger typed data，订单 `creator` 归属先到先得——合约不设发送者准入名单）；参与方、executor 和 adapter 向它提交授权 signal；Product/Store/executor-kit 把它投影成任务、通知和 proof 视图。
 
 ## 产生什么结果
 
@@ -25,16 +25,16 @@ Order 的全部事实来自 `UVPStateMachine` 事件：signal 是否有效、hoo
 
 ## Order 创建
 
-订单通过 trigger order 入口绑定一个已注册 Plan：
+订单经以下入口绑定一个已注册 Plan（`triggerOrderFromOutsideFor` 在 `UVPStateMachine` 上；`triggerOrderFromSignalFor` 在 order-link 模块合约 `UVPOrderLinkModule` 上，状态机内部只有模块可调的 `triggerOrderFromSignalFromModule`）：
 
 ```text
-triggerOrderFromOutsideFor(trigger, authorizations, signature)
-triggerOrderFromSignalFor(trigger, authorizations, signature)
+UVPStateMachine.triggerOrderFromOutsideFor(trigger, authorizations, signature)
+UVPOrderLinkModule.triggerOrderFromSignalFor(trigger, authorizations, signature)
 ```
 
 创建时合约会：
 
-- 检查 registrar 交易发送者是否被允许。
+- 校验 deadline、非零 submitter，并在 plan 声明了 capability 词表时要求出生事实键 `(sourceId, signalId)` 命中 relation-0 声明（否则 revert `InvalidSignalCapability`）——开放提交不设发送者准入，`creator` 归属先到先得。
 - 校验 trigger typed data 签名并恢复业务 submitter。
 - 检查 plan 是否存在且仍被官方域认可。
 - 写入订单级 signal 授权。

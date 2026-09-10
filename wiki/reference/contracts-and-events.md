@@ -26,7 +26,8 @@ status: verified
 - constructor args；
 - module 配置与一次 `freezeModules`；
 - signed `commitPlan` 与一次 `finalizePlan`；
-- signed `triggerOrderFromOutsideFor` / `triggerOrderFromSignalFor`；
+- signed `triggerOrderFromOutsideFor`（状态机上的开放出生入口）；
+- order-link 模块合约 `UVPOrderLinkModule` 上的 signed `triggerOrderFromSignalFor`（订单间派生建单；状态机内部只有该模块可调用的 `triggerOrderFromSignalFromModule`）；
 - `submitSignal`；
 - `submitSignalFor`；
 - docking module 通过 `openDockedOrder`（`order.mode=new`，请求体 v2 含接口名维度）原子创建 linked order 和 docking relation；

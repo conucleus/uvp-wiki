@@ -13,7 +13,7 @@ An Order is a run. In the protocol, it is an independent fact stream forked from
 
 ## Who Uses It
 
-A registrar creates orders through the trigger order entry; participants, executors, and adapters submit authorized signals to it; Product/Store/executor-kit project it into task, notification, and proof views.
+Any keyholder can create orders through the open birth entry (an EIP-712-signed trigger typed-data submission; order `creator` attribution is first-come-first-served — the contract has no sender allowlist); participants, executors, and adapters submit authorized signals to it; Product/Store/executor-kit project it into task, notification, and proof views.
 
 ## What It Produces
 
@@ -25,16 +25,16 @@ All Order facts come from `UVPStateMachine` events: whether a signal is valid, w
 
 ## Order Creation
 
-An order binds to a registered Plan through the trigger order entry:
+An order binds to a registered Plan through the following entries (`triggerOrderFromOutsideFor` lives on `UVPStateMachine`; `triggerOrderFromSignalFor` lives on the order-link module contract `UVPOrderLinkModule` — on the state machine itself only the module-callable `triggerOrderFromSignalFromModule` exists):
 
 ```text
-triggerOrderFromOutsideFor(trigger, authorizations, signature)
-triggerOrderFromSignalFor(trigger, authorizations, signature)
+UVPStateMachine.triggerOrderFromOutsideFor(trigger, authorizations, signature)
+UVPOrderLinkModule.triggerOrderFromSignalFor(trigger, authorizations, signature)
 ```
 
 At creation the contract:
 
-- Checks that the registrar transaction sender is allowed.
+- Verifies the deadline and a non-zero submitter, and — when the plan declares a capability vocabulary — requires the birth fact key `(sourceId, signalId)` to hit a relation-0 declaration (otherwise reverts `InvalidSignalCapability`); open submission has no sender allowlist, and `creator` attribution is first-come-first-served.
 - Verifies the trigger typed-data signature and recovers the business submitter.
 - Checks that the plan exists and is still endorsed by the official domain.
 - Writes order-level signal authorizations.

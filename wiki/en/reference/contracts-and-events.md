@@ -26,7 +26,8 @@ The `UVPStateMachine` public boundary includes:
 - constructor args;
 - module configuration and one-time `freezeModules`;
 - signed `commitPlan` and one-time `finalizePlan`;
-- signed `triggerOrderFromOutsideFor` / `triggerOrderFromSignalFor`;
+- signed `triggerOrderFromOutsideFor` (the open birth entry on the state machine);
+- signed `triggerOrderFromSignalFor` on the order-link module contract `UVPOrderLinkModule` (order-to-order derived creation; on the state machine itself only the module-callable `triggerOrderFromSignalFromModule` exists);
 - `submitSignal`;
 - `submitSignalFor`;
 - the docking module's `openDockedOrder` (`order.mode=new`; the v2 request body carries the interface-name dimension), which atomically creates the linked order and docking relation;

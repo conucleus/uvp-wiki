@@ -66,7 +66,7 @@ spec:
               order:
                 mode: new
               inputMap:
-                start: intake
+                SCOPE_READY: intake   # the key must be a receiveSignals channel declared by this stage (D005); the value is the target interface's input port name
               signalMap:
                 str: start
                 cmp: complete
@@ -141,20 +141,14 @@ Only stages with a selector binding may change the executor of the corresponding
 
 ## `fileResources`
 
-`fileResources` record stage protocols, evidence requirements, acceptance criteria, or resource handles. A stage can point to off-chain protocol files, manifest URIs, or object storage resources with hashes:
+`fileResources` record stage protocols, evidence requirements, acceptance criteria, or resource handles. A stage can point to off-chain protocol files or object-storage resources; `fileType` values are the closed set `local` / `http` / `txcloud` / `plain_text` (see [File Resources](file-resources.md)):
 
 ```yaml
 fileResources:
   sourcing_contract:
-    fileType: manifest
-    resourceRole: stage_protocol
-    resourceType: document
-    mediaType: application/json
-    manifest:
-      manifestURI: "urn:uvp:resource-manifest:supplier-sourcing:v1"
-      manifestHash: "0x3002..."
-      policyHash: "0x7120..."
-      visibility: protected
+    fileType: http
+    httpFile:
+      url: "https://example.com/protocols/supplier-sourcing-v1.json"
 ```
 
 These business files never go on chain. Only hashes, URIs, or resource patch events are recorded on chain.

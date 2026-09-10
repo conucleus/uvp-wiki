@@ -13,7 +13,7 @@ order, then map a signal that already happened in the linked order back into the
 local order.
 
 This is not a Store sandbox draft and not a normal backend integration. The
-formal runtime path must land in the `UVPDockingModule` (abiVersion 3.0,
+formal runtime path must land in the `UVPDockingModule` (abiVersion 4.1,
 preimage v2) events and proof; the contract accepts only routes/interfaces
 covered by their committed `dockRoutesRoot`, `dockInterfaceRoot`, and Merkle
 proofs, and every binding/route hash carries an `interfaceNameId`
