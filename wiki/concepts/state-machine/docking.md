@@ -12,7 +12,7 @@ local order 把某个 stage 交给另一条 linked Zhixu / linked order 执行�
 linked order 中已经发生的 signal 映射回 local order。
 
 这不是 Store sandbox 草稿，也不是普通后端联动。正式运行态要落到
-`UVPDockingModule`（abiVersion 4.1，preimage v2）的事件和 proof 上；合约只接受
+`UVPDockingModule`（abiVersion 4.2，preimage v2）的事件和 proof 上；合约只接受
 已经通过 `dockRoutesRoot`、`dockInterfaceRoot` 和各自 Merkle proof 的
 route/interface，绑定与路由哈希都带 `interfaceNameId`（keccak(接口名)）维度。
 
@@ -67,7 +67,7 @@ dock instance 和 target definition 身份派生，防止跨 plan 抢占。
 - `order.mode=new`：链上完整支持。每条 route 恰好一条 input 绑定（出生锚），
   `openDockedOrder` 在一笔交易内创建子订单、登记 link 并写入出生锚事实；
   entrance permit 的 typed-data 是 `UVPDockEntrancePermitV2`（含
-  `interfaceNameId`，EIP-712 域 version "3"）。
+  `interfaceNameId`，EIP-712 域 version "4"）。
 - `order.mode=existing`：链上不支持。on-chain 编译边界显式拒绝（错误说明
   on-chain target 不支持 existing，需由云轨承接或改用 new 接口），不静默降级。
 - `target: null`（动态选择）：编译产物以 `unresolvedDockRoutes`

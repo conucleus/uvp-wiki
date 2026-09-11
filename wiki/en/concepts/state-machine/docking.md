@@ -13,7 +13,7 @@ order, then map a signal that already happened in the linked order back into the
 local order.
 
 This is not a Store sandbox draft and not a normal backend integration. The
-formal runtime path must land in the `UVPDockingModule` (abiVersion 4.1,
+formal runtime path must land in the `UVPDockingModule` (abiVersion 4.2,
 preimage v2) events and proof; the contract accepts only routes/interfaces
 covered by their committed `dockRoutesRoot`, `dockInterfaceRoot`, and Merkle
 proofs, and every binding/route hash carries an `interfaceNameId`
@@ -73,7 +73,7 @@ instance and target definition identity, preventing cross-plan preemption.
   input binding (the birth anchor); `openDockedOrder` creates the child order,
   registers the link, and writes the birth-anchor fact in one transaction. The
   entrance permit typed-data is `UVPDockEntrancePermitV2` (with
-  `interfaceNameId`; EIP-712 domain version "3").
+  `interfaceNameId`; EIP-712 domain version "4").
 - `order.mode=existing`: not supported on-chain. The on-chain compilation
   boundary rejects it loudly (the error states that on-chain targets do not
   support existing — serve the route from a cloud runtime or bind an interface

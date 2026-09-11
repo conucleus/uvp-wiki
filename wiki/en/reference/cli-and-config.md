@@ -18,7 +18,7 @@ pnpm verify:protocol-freeze
 pnpm no-spend:safety
 ```
 
-`no-spend:safety` runs the deploy package's no-spend checks plus `scripts/validate-environments.mjs`, which validates every declared environment file against the environment schema before any deployment flow runs.
+`no-spend:safety` runs the deploy package's no-spend checks plus `scripts/validate-environments.ts`, which validates every declared environment file against the environment schema before any deployment flow runs.
 
 ## executor-kit CLI
 
