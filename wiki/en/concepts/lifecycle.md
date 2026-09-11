@@ -20,7 +20,7 @@ An order passes through seven steps from static Zhixu to on-chain fact. The six-
 
 ## 1. Author and Compile
 
-Store or developers write the Zhixu; the Compiler generates hooks, selector bindings, signal capabilities, `hooksHash`, `metadataHash`, and the runtime `planHash`. Compilation only validates rule structure; it does not certify real-world supplier capability.
+Store or developers write the Zhixu; the Compiler generates hooks, selector bindings, signal capabilities, `hooksHash`, `metadataHash`, the dock roots, and the runtime `planHash`. Compilation only validates rule structure; it does not certify real-world supplier capability.
 
 ## 2. Configure and Freeze the StateMachine
 
@@ -28,7 +28,7 @@ Deploy the StateMachine and six modules, then call `freezeModules()` once addres
 
 ## 3. Sign and Commit the Plan
 
-The publisher signs `publisher + hooksHash + metadataHash + deadline`. Any relayer calls `commitPlan`; the contract verifies the hash of the full hooks and the publisher signature, and derives `planId = hash(publisher, planHash)`.
+The publisher signs the PlanCommit (`publisher + hooksHash + metadataHash + dockRoutesRoot + dockInterfaceRoot + deadline`). Any relayer calls `commitPlan`; the contract verifies the hash of the full hooks and the publisher signature, and derives `planId = hash(publisher, planHash)` — `planHash` covers hooks, metadata, and the two dock roots.
 
 ## 4. Freeze Metadata Once
 

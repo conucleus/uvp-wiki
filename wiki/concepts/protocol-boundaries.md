@@ -47,7 +47,7 @@ Product API 可以准备 typed data、验证签名、调用 relayer 并返回 pr
 
 ## 外围适配
 
-funding、USDC、escrow、guarantee、settlement、支付、物流和企业系统 adapter 都属于 periphery 语境（`uvp-periphery/`）：它们围绕核心状态机运行，消费 `UVPStateMachine`、可选的 Identity Registry 名称解析、Product DTO 或 executor-kit 接口，但不得把资金、担保、付款、释放、退款、争议等状态改造成新的核心事实源。
+funding、USDC、资金托管、guarantee、settlement、支付、物流和企业系统 adapter 都属于 periphery 语境（`uvp-periphery/`）：它们围绕核心状态机运行，消费 `UVPStateMachine`、可选的 Identity Registry 名称解析、Product DTO 或 executor-kit 接口，但不得把资金、担保、付款、释放、退款、争议赔付等状态改造成新的核心事实源。
 
 ## 公共接口纪律
 
@@ -57,7 +57,7 @@ ABI、event topic、EIP-712 typed data domain、canonical hash domain、artifact
 
 每个运行时配置都是显式声明；任何 profile 背后都不存在 demo 或 mock 模式。Product API 没有 demo 数据源——空投影返回空数组、缺失明细返回 `detail_unavailable`，不存在 `?fallback=demo` 参数和 `UVP_PRODUCT_DEMO_MODE` 键；前端同样没有 demo 模式，Store 访问级别只来自环境变量与登录会话。`CHAIN_SERVICES_DATABASE_DRIVER` 与 `CHAIN_SERVICES_DATABASE_URL` 全环境必填，缺失即启动失败，报错信息包含键名。
 
-Staging/testnet profile 必须 fail-closed：拒绝 memory/SQLite 存储、localhost RPC、permissive authorization 与 Anvil 默认私钥；所有 bootstrap 入口都要求显式部署私钥（`--private-key` 或 `UVP_ETH_DEPLOYER_PRIVATE_KEY`）。私钥、RPC secret、JWT secret、object storage credential 只写 redacted 口径，不进仓库、日志或文档。
+Staging/testnet profile 必须 fail-closed：拒绝 memory/SQLite 存储、localhost RPC、permissive authorization 与 Anvil 默认私钥；所有 bootstrap 入口都要求显式部署私钥（环境变量 `UVP_ETH_DEPLOYER_PRIVATE_KEY`，或 key file `--private-key-file` / `UVP_ETH_DEPLOYER_PRIVATE_KEY_FILE`；私钥绝不经 argv 传递，`--private-key` 传参被显式拒绝）。私钥、RPC secret、JWT secret、object storage credential 只写 redacted 口径，不进仓库、日志或文档。
 
 本页同时固定一条「对应」原则：系统承诺对应而非真实——每条记录必须对应某个主体的真实表达。持钥者以私钥作假，是其本意的行使，系统不得另设裁决层代为裁决；相应地，系统绝不代笔内容、不冒充成功、不以静默缺省顶替人的决定。
 

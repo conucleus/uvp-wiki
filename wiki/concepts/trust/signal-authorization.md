@@ -63,7 +63,7 @@ metadataHash = keccak256("uvp:product-bff:authorization:v3:...")
 
 ## Initial Trigger
 
-订单由签名过的 `triggerOrderFromOutsideFor()` / `triggerOrderFromSignalFor()` 创建：合约把订单绑定到 finalized `planId`，记录 trigger fact 或 trigger-origin link，并可同时写入上述 order-level signal authorizations。
+订单由签名过的 `triggerOrderFromOutsideFor()`（`UVPStateMachine` 开放出生入口）或 `triggerOrderFromSignalFor()`（order-link 模块合约 `UVPOrderLinkModule` 的派生建单入口）创建：合约把订单绑定到 finalized `planId`，记录 trigger fact 或 trigger-origin link，并可同时写入上述 order-level signal authorizations。
 
 外部事实由 backend/executor 规范化为具体的 `source`/`signal` 后，再按当前 Plan 的 `receiveSignals` 或 trigger 入口处理；它不是一个固定的链上 `OUTSIDE` signal。backend 先完成验签、去重、落库和规范化；如果 EVM adapter 需要把规范化事实提交到状态机，授权必须绑定到实际的 `entry.source` 与 `entry.signalName`：
 

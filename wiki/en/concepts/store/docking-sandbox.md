@@ -37,8 +37,9 @@ Formal order publication goes through [Zhixu Catalog, Configuration, and Publica
 | localPlanId / localStage | The stage in the local Zhixu that will be opened to external execution interfaces. |
 | nucleationId | The Nucleus that started this trial pairing. |
 | executorType | `zhixu`, enterprise adapter, MCP agent, manual supplier. |
-| peerZhixu | Target Zhixu subject, active plan, trust status. |
-| signalMap | `str/cmp/err` mapping and source validation result. |
+| peerZhixu | The target Zhixu's definition name (the cloud track's unique registered name), active plan, trust status. |
+| interface / orderMode | The selected target interface name and its allowed order modes (new/existing; the trial pairing checks `order.mode ∈ orderModes`). |
+| inputMap / signalMap | The local-channel/signal to target-interface port-name mappings and their source validation result (at least one non-empty map). |
 | resourceNeeds | Resource handles, manifests, and evidence requirements on both local and linked sides. |
 | contact | Peer operator, adapter endpoint, notification policy. |
 | proofChecklist | Proof requirements for linked-order registration, linked signals, and local mapped signals. |
@@ -46,4 +47,4 @@ Formal order publication goes through [Zhixu Catalog, Configuration, and Publica
 
 ## Special checks for `supplierType=zhixu`
 
-The `signalMap` must contain at least `str` and `cmp`, one map should reference a single linked source, and its values must be published interface port names. The peer Zhixu's versioned plan publication must be visible, and linked-order relations and business facts must resolve into `DockOpened`, `DockInputSubmitted`, `DockOutputSubmitted`, and `DockTerminal` events rather than private lifecycle fields. Before the local order can advance, an authorized mapped signal or `DockOutputSubmitted` must appear on the local order. For full onboarding material and flow see [Zhixu as an execution interface](../apps/zhixu-as-executor.md).
+At least one of `inputMap`/`signalMap` must be non-empty, its values must be published interface port names, and the bound ports must come from a single linked source; a `mode=new` route carries exactly one input binding (the birth anchor). The peer Zhixu's versioned plan publication must be visible, and linked-order relations and business facts must resolve into `DockOpened`, `DockInputSubmitted`, `DockOutputSubmitted`, and other state-machine/docking events (a `mode=existing` docking only attaches an existing target order and produces no new child order) rather than private lifecycle fields. Before the local order can advance, an authorized mapped signal or `DockOutputSubmitted` must appear on the local order. For full onboarding material and flow see [Zhixu as an execution interface](../apps/zhixu-as-executor.md).

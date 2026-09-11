@@ -16,7 +16,8 @@ One Zhixu can act as another Zhixu's stage executor. Executor here means an exec
 ```text
 local Zhixu / local order
   -> stage.executor.supplierType = zhixu
-  -> zhixuExecutorConfig.target selects an immutable peer UID/version
+  -> zhixuExecutorConfig.target references the peer definition's metadata.name (slug) or is null (runtime selection); the DSL shell carries no derived identity
+  -> interface selects the target interface; order.mode declares new (child order) or existing (attach)
   -> inputMap/signalMap bind local hooks/signals to target port names
   -> local receive hook becomes ready and opens execution
   -> linked Zhixu / linked order runs with its own plan and authorization
@@ -49,14 +50,13 @@ A settlement stage can use another Zhixu as an execution interface like this:
   executor:
     supplierType: zhixu
     zhixuExecutorConfig:
-      schemaVersion: uvp.dock.v1
       target:
-        zhixu: fiat-payout-bridge
-        version: "1"
+        zhixu: fiat-payout-bridge   # the target definition's metadata.name (slug)
+      interface: payout_service
       order:
-        idPolicy: derived-v1
+        mode: new
       inputMap:
-        ROUTE_FIAT: payout
+        ROUTE_FIAT: payout       # mode=new: exactly one input binding (birth anchor)
       signalMap:
         str: payout_started
         cmp: payout_completed
@@ -75,14 +75,13 @@ The docking stage still needs a local `receiveSignals` hook. When it subscribes 
   executor:
     supplierType: zhixu
     zhixuExecutorConfig:
-      schemaVersion: uvp.dock.v1
       target:
         zhixu: customs-clearance
-        version: "1"
+      interface: clearance_service
       order:
-        idPolicy: derived-v1
+        mode: new
       inputMap:
-        LINK_READY: entrance
+        LINK_READY: execute      # the birth anchor (single input binding)
       signalMap:
         str: started
         cmp: completed
@@ -97,11 +96,11 @@ The `signalMap` is the semantic contract through which the local stage accepts t
 
 | Local signal key | Meaning |
 | --- | --- |
-| `str` | Signal that the linked Zhixu started or accepted the delegation. Currently required by the compiler. |
-| `cmp` | Signal that the linked Zhixu completed. Currently required by the compiler. |
+| `str` | Signal that the linked Zhixu started or accepted the delegation. Commonly used but not required. |
+| `cmp` | Signal that the linked Zhixu completed. Commonly used but not required. |
 | `err` | Signal that the linked Zhixu failed, rejected, or hit an exception. Optional, but most real workflows should configure it. |
 
-The `signalMap` keys must be local stage `sendSignals` and its values must be target output-port names. The `inputMap` keys must be local `receiveSignals` hook names and its values must be target input-port names. The compiler validates target UID/version, port direction, exactly one entrance, port-name syntax, and interface/route roots; `signalMap` no longer carries Hook DSL. `str` and `cmp` mappings are required; `err` is optional.
+The `signalMap` keys must be local stage `sendSignals` and its values must be output-port names of the target interface. The `inputMap` keys must be local `receiveSignals` channel names and its values must be input-port names of the target interface. At least one of the two maps must be non-empty — whether `str/cmp/err` are needed is decided by the actual workflow, and the compiler does not require any particular business signal. The compiler validates the target reference (name-slug shape, same rule as `metadata.name`), interface existence and port direction, `order.mode ∈ interface orderModes`, the single input binding of `mode=new`, port-name syntax, and interface/route roots; `signalMap` does not carry Hook DSL.
 
 ## Docked runtime path
 
@@ -126,7 +125,7 @@ A complete docked Zhixu proof covers at least:
 | Question | Proof source |
 | --- | --- |
 | Why did the local stage open for execution? | The local order's `HookReady`. |
-| Why is the link-stage entrance valid? | Local `HookReady` / `DockOpened` proof plus interface/route membership proof for the target entrance port. |
+| Why is the link-stage entrance valid? | Local `HookReady` / `DockOpened` proof plus interface/route membership proof for the target input port. |
 | Which plan did the linked Zhixu use? | The linked order's `OrderRegistered` and linked plan projection. |
 | Is the linked Zhixu's Plan usable? | The linked StateMachine's `PlanCommitted/PlanFinalized` projection. |
 | How did the linked order advance? | The linked order's `SignalSubmitted` / hook proof. |
@@ -140,9 +139,9 @@ The Store should run docked Zhixu as an auditable workflow:
 
 ```text
 choose local stage
-  -> search available peer Zhixu UID/version
+  -> search available peer Zhixu by definition name
   -> check linked plan publication and active version
-  -> validate inputMap/signalMap against target ports and interface/route roots
+  -> validate inputMap/signalMap against the target interface's declared ports
   -> save docking session draft
   -> operator review
   -> publish or bind into the local order workflow

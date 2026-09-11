@@ -17,7 +17,7 @@ Publishers sign to publish Plans; registrars create Orders against finalized Pla
 
 ## What It Produces
 
-A successful publication produces `planHash`, `planId`, and permanently frozen on-chain hooks/metadata; every Order afterwards references this immutable identity, and rule changes can only be expressed by publishing a new Plan.
+A successful publication produces `planHash`, `planId`, and permanently frozen on-chain hooks/metadata plus the dock-root commitments; every Order afterwards references this immutable identity, and rule changes can only be expressed by publishing a new Plan.
 
 ## Where Authority Comes From
 
@@ -26,17 +26,25 @@ A Plan's authority comes from the publisher's EIP-712 signature, the hash checks
 ## Identity and Hashes (Quick Reference)
 
 ```text
-hooksHash    = keccak256(abi.encode(hooks))
-metadataHash = keccak256(abi.encode(selectorBindings, signalCapabilities))
-planHash     = hash("uvp.plan.runtime.v1", hooksHash, metadataHash)
-planId       = hash("uvp.plan.id.v1", publisher, planHash)
+hooksHash        = keccak256(abi.encode(hooks))
+metadataHash     = keccak256(abi.encode(selectorBindings, signalCapabilities))
+planHash         = keccak256(abi.encode(
+                     keccak256("uvp.plan.runtime.v2"),  // domain
+                     hooksHash,
+                     metadataHash,
+                     dockRoutesRoot,
+                     dockInterfaceRoot))
+planId           = keccak256(abi.encode(
+                     keccak256("uvp.plan.id.v1"),       // domain
+                     publisher,
+                     planHash))
 ```
 
-The compiler's own artifact hashes remain for tracing source artifacts but no longer impersonate the on-chain `planHash`. Putting the publisher inside `planId` prevents different publishers from fighting over global names for identical content.
+The `planHash` preimage is a four-tuple: hooks, metadata, and the two dock roots (routes and interface). When a Plan declares no docks, both roots enter the formula as the empty Merkle root; the formula itself does not change. The compiler's own artifact hashes remain for tracing source artifacts but no longer impersonate the on-chain `planHash`. Putting the publisher inside `planId` prevents different publishers from fighting over global names for identical content.
 
 ## Two-step Freezing
 
-1. The publisher makes an EIP-712 signature over `publisher + hooksHash + metadataHash + deadline`; any relayer calls `commitPlan`, submitting the full hooks at once.
+1. The publisher makes an EIP-712 signature over the PlanCommit (`publisher + hooksHash + metadataHash + dockRoutesRoot + dockInterfaceRoot + deadline`); any relayer calls `commitPlan`, submitting the full hooks at once.
 2. Any caller submits selector bindings and signal capabilities; `finalizePlan` verifies `metadataHash` and the Metadata Module writes them in one shot, permanently frozen.
 
 A pending Plan cannot create Orders. After finalize, neither hooks nor metadata can change; if rules change, publish a new Plan.

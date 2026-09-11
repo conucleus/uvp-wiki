@@ -28,11 +28,9 @@ It reads no environment variables, stores no private keys, submits no transactio
 | Product DTO | product-dto | chain-services, Store, Order App, executor-kit, periphery adapter | Update DTO tests, route tests, frontend/API consumers, and ordinary-user copy. |
 | Product API | chain-services | Store, Order App, executor-kit Product API mode, MCP adapter | Update the API reference, route tests, browser E2E, and failure language. |
 | Deployment manifest | uvp-deploy/deploy | chain-services, staging scripts, release records | Commit only curated manifest/evidence; local generated address files are not committed by default. |
-| Release evidence schema | uvp-deploy/deploy | release owner, audit, PRD101 evidence pack | Keep it no-secret, redacted, and auditable; do not treat raw logs or object bytes as release records. |
+| Release evidence schema | uvp-deploy/deploy | release owner, audit, release-evidence consumers | Keep it no-secret, redacted, and auditable; do not treat raw logs or object bytes as release records. |
 | Store Console HTTP API | chain-services (`uvp-chain-services/service/src/api/routes/`) | Store workbench, operator scripts | Routes, error codes, proof rows, and authz semantics must stay in sync with the DTO; update Store frontend consumers and route tests. |
 | CLI and runtime configuration | executor-kit, chain-services config, deploy scripts | executors, release owner, staging operator | Private keys are read only from explicitly named env vars; staging/profile configuration must fail closed; update the CLI reference and profile tests. |
-
-> TODO(confirm): which PRD does PRD101 refer to? No prd-101 found under docs/product.
 
 ## Drift Checklist
 
@@ -57,7 +55,7 @@ release record or PRD trace
 - The Product BFF database is a rebuildable read model; the source of truth for plan/order/signal/hook is chain events; see [Sources of Truth](../concepts/protocol-boundaries.md#source-of-truth).
 - Relayer configuration is broadcast configuration; business authorization comes from order authorization and signatures; see [Authorization and Signatures](../concepts/protocol-boundaries.md#authorization-and-signatures).
 - There is no demo fallback, fixture catalog, or mock frontend mode in any product surface — empty projections return empty results by design, and no demo profile exists to switch on; operational aids never change protocol truth; for the complete boundary see [Protocol Boundaries](../concepts/protocol-boundaries.md).
-- Funding, USDC, escrow, guarantee, and settlement adapters belong to adapter/periphery; see [Periphery Adapters](../concepts/protocol-boundaries.md#periphery-adapters).
+- Funding, USDC, settlement-custody, guarantee, and payment adapters belong to adapter/periphery; see [Periphery Adapters](../concepts/protocol-boundaries.md#periphery-adapters).
 
 ## Related References
 

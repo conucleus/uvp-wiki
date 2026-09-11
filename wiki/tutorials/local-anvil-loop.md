@@ -21,7 +21,7 @@ Zhixu -> HookPlan -> OnchainHookPlan -> commitPlan+finalizePlan / triggerOrderFr
 
 - 已运行 `pnpm install`。
 - Foundry 和 Anvil 可用。
-- 不需要真实私钥。脚本可使用本地 Anvil key。
+- 每个 bootstrap 入口都需要显式部署私钥：导出 `UVP_ETH_DEPLOYER_PRIVATE_KEY`。本地闭环用一把有余额的本地 Anvil key 即可，但必须显式声明由哪把 key 部署；脚本不再内置任何 Anvil 默认私钥，私钥只经环境变量（或 key file）传递，绝不走 argv。
 
 ## 只部署合约
 

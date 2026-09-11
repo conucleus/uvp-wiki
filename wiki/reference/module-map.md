@@ -31,7 +31,7 @@ status: verified
 | `uvp-protocol/packages/product-dto` | `@uvp-eth/product-dto` | product-facing DTO contracts | React、wallet、storage、chain client |
 | `uvp-chain-services/service` | `@uvp-eth/chain-services` | indexer、relayer、proof verifier、Product/Store APIs；详见 [Chain Services](../concepts/services/chain-services.md) | 协议事实源 |
 | `zhixu-store/app` | `@uvp-eth/zhixu-store-web` | Store/workbench frontend | old Go-coupled Store BFF |
-| `uvp-order-app/app` | `@uvp-eth/order-app` | participant task/signal console | Store Console、escrow demo |
+| `uvp-order-app/app` | `@uvp-eth/order-app` | participant task/signal console | Store Console、付款占位（不托管资金） |
 | `uvp-executor-kit/package` | `@uvp-eth/executor-kit` | executor CLI/SDK/MCP、chain watcher、Product API signal producer | privileged backend truth |
 | `uvp-deploy/deploy` | `@uvp-eth/deploy` | deploy scripts、manifests、release records | external deploy repo（see `uvp-deploy` workspace） |
 | `uvp-deploy/apps/ops-console-web` | `@uvp-eth/ops-console-web` | operator console prototype | protocol runtime |

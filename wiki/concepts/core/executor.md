@@ -82,15 +82,15 @@ active executor overlay 只影响这个 Order，不修改 Plan。Patch 会把 Pl
 
 ## Zhixu 也可以是 Executor
 
-一条 Zhixu 可以作为另一条 Zhixu 的 stage executor：它接收本地秩序开放的执行接口，按自己的 plan、授权和 proof 路径运行，再通过 `signalMap` 把约定信号映射回本地秩序。典型例子是跨境供货里结算 stage 选择 `payment-settlement`，其内部又可以选择 `fiat-payout-bridge` 作为 executor。完整模型、DSL 写法和约束见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md)。
+一条 Zhixu 可以作为另一条 Zhixu 的 stage executor：它接收本地秩序开放的执行接口，按自己的 plan、授权和 proof 路径运行，再通过 `inputMap`/`signalMap` 把约定端口映射回本地秩序。典型例子是跨境供货里结算 stage 选择 `payment-settlement`，其内部又可以选择 `fiat-payout-bridge` 作为 executor。完整模型、DSL 写法和约束见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md)。
 
 ## Docked Zhixu 的运行时路径
 
-Docked 运行的骨架是：local dock entrance HookReady 后，docking module 通过已提交的 route/interface proof 调用 `openDockedOrder`，原子创建 linked order；linked order 独立执行并产生 str/cmp/err proof，再由 `submitDockedInput` / `submitDockedSignal` 传递输入和输出。链上 `(planId, orderId)` 与 Product/Store/adapter 工作流编号可以并存，运行态 proof 仍回到链上事件；详细路径见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md)。
+Docked 运行的骨架是：local 出生锚 Hook（`mode=new` route 的唯一 input 绑定）Ready 后，docking module 通过已提交的 route/interface proof 调用 `openDockedOrder`，原子创建 linked order；linked order 独立执行并产生 str/cmp/err proof，再由 `submitDockedInput` / `submitDockedSignal` 传递输入和输出。链上 `(planId, orderId)` 与 Product/Store/adapter 工作流编号可以并存，运行态 proof 仍回到链上事件；详细路径见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md)。
 
 ## signalMap 的协议含义
 
-`signalMap` 是 local stage 接受 linked Zhixu 输出的语义契约：`str` 与 `cmp` 为 compiler 必填，`err` 可选但建议配置，且同一个 signalMap 必须引用同一个 source。字段级语义表与编译器校验规则见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md)。
+`signalMap` 是 local stage 接受 linked Zhixu 输出的语义契约：`inputMap`/`signalMap` 至少一张非空（不强制特定业务信号），被绑定端口必须保持单一目标 source。字段级语义表与编译器校验规则见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md)。
 
 ## Executor Kit 的位置
 

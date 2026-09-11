@@ -29,7 +29,7 @@ The capability passport shows identity, capability profile, servable stages, and
 | --- | --- | --- |
 | Identity | Display name, subject id, wallet, organization notes, metadata URI; Registry binding status, revocation reason, proof rows. | Store metadata + `UVPIdentityRegistry` projection. |
 | Nucleus fit / usage | Servable Zhixu, stages, role slots, resource/evidence types; which Nuclei organized this supplier into which Zhixu. | Nucleus organization semantics. |
-| Capability | Catalog tags such as logistics, customs, inspection, payment, dispute review, document verification; servable stages, supported Product task intents, selector eligibility. | Store metadata + audit. |
+| Capability | Catalog tags such as logistics, customs, inspection, pricing, quality review, document verification; servable stages, supported Product task intents, selector eligibility. | Store metadata + audit. |
 | Contact / Operations | Contacts, notification channels, SLAs, available regions and hours, escalation paths, operational notes. | Store metadata; never on-chain plaintext. |
 | Participation / Runtime | Recent orders, open tasks, historical proof, failure/timeout history, active executor records. | `UVPStateMachine` / Product projection. |
 | Docking | Peer Zhixu subjects, supported signalMaps, adapter endpoints, sandbox sessions. | Store workflow + proof; identity bindings look at the Identity Registry. |
@@ -59,4 +59,4 @@ Each step has a different authority: the Nucleus organizes internal candidates, 
 
 ## As a Zhixu supplier
 
-`supplierType=zhixu` marks a peer-order capability that other orders can call: the Store shows the peer Zhixu UID, versioned Plan, acceptable local-stage inputs, target interface ports, and the output `str/cmp/err` signalMap. Docking proof is expressed by `DockOpened`, `DockInputSubmitted`, `DockOutputSubmitted`, and `DockTerminal`, together with each side's signal/proof; it must not rely on retired private Docked event names. Local orders must explicitly allow mapped signals to advance them through order registration, later authorization paths, or docking event paths. For the onboarding flow and field details see [Zhixu as an execution interface](../apps/zhixu-as-executor.md).
+`supplierType=zhixu` marks a peer-order capability that other orders can call: the Store shows the peer Zhixu by definition name, its versioned Plan, its published named interfaces (`orderModes` and ports), and the caller's `inputMap`/`signalMap` mappings. Docking proof is expressed by `DockOpened`, `DockInputSubmitted`, `DockOutputSubmitted`, and other events, together with each side's signal/proof; it must not rely on retired private Docked event names. Local orders must explicitly allow mapped signals to advance them through order registration, later authorization paths, or docking event paths. For the onboarding flow and field details see [Zhixu as an execution interface](../apps/zhixu-as-executor.md).

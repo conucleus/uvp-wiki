@@ -36,7 +36,7 @@ File Resource 是可验证的资源句柄：fileType、object namespace、URI po
 
 Proof verifier 的边界：
 
-- 货物是否真的送达由业务参与方、证据和争议/审查体系判断。
+- 货物是否真的送达由业务参与方、证据和各自的审查流程判断。
 - Identity Registry publication 只表达线下主体与链上账户的绑定关系，不认证供应商能力或信誉；供应商能力/信誉属于 Store 链下经营数据。
 - object handle 可访问性不能生成 `SignalSubmitted`。
 - hash 对齐是证明条件；hook ready 来自状态机事件。

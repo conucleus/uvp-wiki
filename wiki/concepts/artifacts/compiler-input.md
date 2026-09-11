@@ -13,19 +13,21 @@ status: verified
 
 | 字段 | 用途 |
 | --- | --- |
-| `metadata.name` | 计划可读名称和缺省标识输入。 |
-| `metadata.uid` | Zhixu 稳定标识。 |
-| `metadata.annotations.version` | 计划版本。 |
+| `metadata.name` | 必填 slug（`^[a-z][a-z0-9_-]{0,99}$`）；进入 canonical 内容与 planId 派生，也是跨轨引用目标定义的键。 |
+| `metadata.uid` | 不是 DSL 字段：源定义出现 `metadata.uid` 按未知字段响亮拒绝；定义身份分轨——链轨由内容派生（`zx-<32hex>`，链轨内幕），云轨为唯一 name + 数据库主键。 |
+| `metadata.labels` | 定义内容的一部分；链轨身份派生包含 labels（链轨内幕），云轨仅作内容。 |
+| `metadata.annotations` | 自由注解，永不参与身份或哈希推导（无原生版本语义）。 |
 | `spec.platform` | 平台目标，参与哈希。 |
 | `taskPatterns[].name` | stage 标识的一部分。 |
 | `stages[].name` | stage 标识的一部分。 |
 | `stages[].source` | hook source 和 `sourceId` 输入。 |
 | `stages[].receiveSignals` | 生成 receive hook。 |
-| `stages[].trigger` | 决定哪些 hook Ready 时发 `HookReady`。 |
+| `stages[].mint` | 出生阶段声明（per-fact 代铸/dock 出生锚相关物化位）。 |
 | `stages[].executor` | executor route 和 reachability。 |
 | `stages[].selectedStages` | selector binding 和 executor closure。 |
 | `stages[].sendSignals` | 出站 signal 描述。 |
 | `stages[].fileResources` | 产品资源要求和 resource patch 输入。 |
+| `spec.dockInterface` | 具名接口 map，编译为 dock 接口承诺（interface roots）。 |
 
 ## 编译器会拒绝什么
 

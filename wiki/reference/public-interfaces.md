@@ -28,11 +28,9 @@ status: verified
 | Product DTO | product-dto | chain-services、Store、Order App、executor-kit、periphery adapter | 更新 DTO tests、route tests、frontend/API consumers 和 ordinary-user copy。 |
 | Product API | chain-services | Store、Order App、executor-kit Product API mode、MCP adapter | 更新 API reference、route tests、browser E2E、failure language。 |
 | Deployment manifest | uvp-deploy/deploy | chain-services、staging scripts、release records | 只提交 curated manifest/evidence；local generated address files 默认不提交。 |
-| Release evidence schema | uvp-deploy/deploy | release owner、audit、PRD101 evidence pack | 保持 no-secret、redacted、可审计；不要把 raw logs 或 object bytes 当作 release record。 |
+| Release evidence schema | uvp-deploy/deploy | release owner、audit、release evidence pack 消费方 | 保持 no-secret、redacted、可审计；不要把 raw logs 或 object bytes 当作 release record。 |
 | Store Console HTTP API | chain-services（`uvp-chain-services/service/src/api/routes/`） | Store workbench、operator scripts | route、错误码、proof rows 和 authz 语义需要和 DTO 同步；更新 Store 前端消费者与 route tests。 |
 | CLI 与运行配置 | executor-kit、chain-services config、deploy scripts | executor、release owner、staging operator | 私钥只从显式 env 读取；staging/profile 配置必须 fail closed；更新 CLI reference 与 profile tests。 |
-
-> 待确认（TODO）：PRD101 现指哪个 PRD？docs/product 下无 prd-101。
 
 ## Drift checklist
 
@@ -57,7 +55,7 @@ release record or PRD trace
 - Product BFF database 是可重建读模型，plan/order/signal/hook 的 source of truth 是链上事件；详见 [事实源](../concepts/protocol-boundaries.md#事实源)。
 - Relayer 配置是广播配置，业务授权来自 order authorization 和签名；详见 [授权与签名](../concepts/protocol-boundaries.md#授权与签名)。
 - 产品表面不存在 demo fallback、fixture catalog 或 mock frontend mode：空投影按设计返回空结果，没有可以打开的 demo profile；操作辅助不改变协议事实。完整边界见 [协议边界](../concepts/protocol-boundaries.md)。
-- Funding、USDC、escrow、guarantee、settlement adapter 属于 adapter/periphery；详见 [外围适配](../concepts/protocol-boundaries.md#外围适配)。
+- Funding、USDC、资金托管、guarantee、settlement adapter 属于 adapter/periphery；详见 [外围适配](../concepts/protocol-boundaries.md#外围适配)。
 
 ## 相关参考
 

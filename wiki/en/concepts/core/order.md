@@ -13,7 +13,7 @@ An Order is a run. In the protocol, it is an independent fact stream forked from
 
 ## Who Uses It
 
-A registrar creates orders through the trigger order entry; participants, executors, and adapters submit authorized signals to it; Product/Store/executor-kit project it into task, notification, and proof views.
+Any keyholder can create orders through the open birth entry (an EIP-712-signed trigger typed-data submission; order `creator` attribution is first-come-first-served — the contract has no sender allowlist); participants, executors, and adapters submit authorized signals to it; Product/Store/executor-kit project it into task, notification, and proof views.
 
 ## What It Produces
 
@@ -25,16 +25,16 @@ All Order facts come from `UVPStateMachine` events: whether a signal is valid, w
 
 ## Order Creation
 
-An order binds to a registered Plan through the trigger order entry:
+An order binds to a registered Plan through the following entries (`triggerOrderFromOutsideFor` lives on `UVPStateMachine`; `triggerOrderFromSignalFor` lives on the order-link module contract `UVPOrderLinkModule` — on the state machine itself only the module-callable `triggerOrderFromSignalFromModule` exists):
 
 ```text
-triggerOrderFromOutsideFor(trigger, authorizations, signature)
-triggerOrderFromSignalFor(trigger, authorizations, signature)
+UVPStateMachine.triggerOrderFromOutsideFor(trigger, authorizations, signature)
+UVPOrderLinkModule.triggerOrderFromSignalFor(trigger, authorizations, signature)
 ```
 
 At creation the contract:
 
-- Checks that the registrar transaction sender is allowed.
+- Verifies the deadline and a non-zero submitter, and — when the plan declares a capability vocabulary — requires the birth fact key `(sourceId, signalId)` to hit a relation-0 declaration (otherwise reverts `InvalidSignalCapability`); open submission has no sender allowlist, and `creator` attribution is first-come-first-served.
 - Verifies the trigger typed-data signature and recovers the business submitter.
 - Checks that the plan exists and is still endorsed by the official domain.
 - Writes order-level signal authorizations.
@@ -52,7 +52,7 @@ At creation the contract:
 | Resource overlay | `StageResourcePatchApplied`. |
 | Task projection | Rebuilt by chain-services from `HookReady` and authorization events. |
 | Proof rows | Event provenance. |
-| Docking relation | `DockOpened`, `DockInputSubmitted`, `DockOutputSubmitted`, `DockTerminal`, plus each side's own signal/proof. |
+| Docking relation | `DockOpened`, `DockInputSubmitted`, `DockOutputSubmitted`, plus each side's own signal/proof. |
 
 ## Order and Product Order
 
@@ -68,4 +68,4 @@ One Order may contain multiple [source causal chains](source.md). In cross-borde
 
 An Order does not need to be "closed" to stay consistent. A business party can stop writing further facts, or create a new Order from the same Zhixu. Signals use first-writer-wins; for deduplication and non-overwritable semantics see [Signal](signal.md). If the first-written business fact was wrong, the core protocol neither overwrites nor deletes old facts: instead a new Order is created to re-execute, and upper-layer products clearly present the business relationship between the two fact streams.
 
-If a stage is carried by another Zhixu, a signal binding between the local order and the linked order usually forms: after route/interface proofs pass, the docking module's `openDockedOrder` atomically records the relation and linked order, then `submitDockedInput` / `submitDockedSignal` deliver inputs and outputs. For the full runtime path see [Zhixu as Executor](../apps/zhixu-as-executor.md); Store/Product only keep sandbox, contact, review, and display state — runtime proof follows on-chain events of both orders.
+If a stage is carried by another Zhixu, a signal binding between the local order and the linked order usually forms: the docking module's `openDockedOrder` (`order.mode=new`) atomically records the docking relation and creates the linked order after route/interface proofs pass, then `submitDockedInput` / `submitDockedSignal` deliver inputs and outputs (`mode=existing` only attaches an existing target order — a cloud-track semantic). For the full runtime path see [Zhixu as Executor](../apps/zhixu-as-executor.md); Store/Product only keep sandbox, contact, review, and display state — runtime proof follows on-chain events of both orders.

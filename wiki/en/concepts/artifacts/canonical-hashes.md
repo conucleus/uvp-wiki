@@ -7,43 +7,45 @@ status: verified
 
 # Canonical Hash
 
-`uvp-eth` uses canonical hashes with a domain. That keeps the same JSON content from colliding across different semantic spaces.
+`uvp-eth` uses canonical hashes with a domain, so identical JSON content never collides across different semantic spaces.
 
 ## PlanId
 
-`planId` identifies a compiled plan version:
+`planId` binds one publisher to one on-chain artifact as a plan version:
 
 ```text
-hashCanonical("uvp:hook-plan-id:v1", {
-  compiler,
-  platform,
-  version,
-  zhixuId,
-  zhixuName
-})
+planId = keccak256(abi.encode(
+  keccak256("uvp.plan.id.v1"), // domain
+  publisher,                   // address
+  planHash                     // the EVM-facing planHash from the OnchainHookPlanArtifact
+))
 ```
 
-Changing the platform, version, or Zhixu identifier changes `planId`.
+Implementations: `planIdForPublisher()` in `uvp-protocol/packages/compiler/src/onchain-hook-plan.ts` and `planIdFor()` in `UVPStateMachine.sol`. Changing the publisher or the planHash changes the `planId`; for the same publisher and the same artifact the `planId` is deterministic.
 
 ## HookPlan planHash
-
-The readable HookPlan artifact hash uses:
 
 ```text
 hashCanonical("uvp:hook-plan-artifact:v1", payload)
 ```
 
-The payload includes the canonicalized source Zhixu, compiler information, platform information, hooks, dependencies, and routes.
+This is the domain of the compiler-internal hook-plan IR. HookPlan is an internal compiler artifact, not a public Store/import/deploy flow; see [Compiler Input](compiler-input.md). The payload carries the canonicalized source Zhixu, compiler information, platform information, hooks, dependencies, and routes.
 
 ## On-chain planHash
 
-The on-chain artifact uses a separate domain:
+The on-chain runtime `planHash` covers four domains and uses its own hash domain:
 
 ```text
-uvp:onchain-hook-plan-artifact:v1
+planHash = keccak256(abi.encode(
+  keccak256("uvp.plan.runtime.v2"),   // domain
+  hooksHash,                           // keccak256(abi.encode(hooks))
+  metadataHash,                        // keccak256(abi.encode(selectorBindings, signalCapabilities))
+  dockRoutesRoot,                      // empty Merkle root when no dock is declared
+  dockInterfaceRoot                    // empty Merkle root when no dock is declared
+))
 ```
 
-This hash covers compact hooks and metadata commitments. The publisher signs the commit and `UVPStateMachine` checks the EVM-facing `planHash`; Identity Registry is not involved.
+The publisher signs the PlanCommit (publisher, hooksHash, metadataHash, the two dock roots, deadline) via EIP-712, and `UVPStateMachine` checks this runtime `planHash` at commit/finalize; the Identity Registry is not involved. The whole `OnchainHookPlanArtifact` additionally has a canonical payload hash (domain `uvp:onchain-hook-plan-artifact:v1`) used only for artifact provenance and fixture pinning; it does not replace the runtime `planHash`.
 
 ## Stable IDs
 
@@ -60,11 +62,21 @@ routeId = keccak256(stageIdentifier#executorRoute)
 selectorBindingHash = hashCanonical("uvp:onchain-stage-selector-binding:v1", ...)
 ```
 
-For `bytes32,bytes32`, the compiler’s byte concatenation matches Solidity `abi.encode(sourceId, signalId)` at the byte-content level.
+For `bytes32,bytes32`, the compiler's byte concatenation matches Solidity `abi.encode(sourceId, signalId)` at the byte-content level.
 
-## Absent File Resources Encode as ZERO_HASH
+## Absent fileResources and ZERO_HASH
 
-When a compiled plan declares no file resources, absence is encoded explicitly: the compiler writes the protocol constant `ZERO_HASH` (`0x000...0`, 96 hex digits of `0`, i.e. `bytes32(0)`) into the resource-commitment slots that feed `routeHash` and `planHash`. A plan without file resources therefore hashes deterministically instead of depending on whether a field was omitted or left empty; only actual file-resource content changes the hash.
+In the route and plan hash formulas, `fileResources` is optional input. When a plan/route does **not** declare `fileResources`, the protocol requires ZERO_HASH (32 zero bytes, `0x0000…0000`) to enter the computation as `resourcesHash`:
+
+```text
+resourcesHash = fileResources undeclared ? ZERO_HASH : keccak256(canonicalJSON(fileResources))
+
+routeHash = hashCanonical("uvp:onchain-hook-route:v1", {
+  stageId, stageIdentifier, executorHash, resourcesHash
+})
+```
+
+`routeHash` then enters the on-chain runtime `planHash` commitment through the dock-route Merkle root. This is a protocol constant, not an implementation default: any reimplementation (TypeScript `compileExecutorRoute()` / `onchainRouteHash()`, Rust and other compiler backends) must use the same ZERO_HASH constant for "undeclared" and must not substitute an empty-string hash, omit the field, or pick another placeholder — otherwise the same definition would produce different routeHash/planHash values and break cross-implementation reproducibility.
 
 ## Canonical JSON Rules
 
