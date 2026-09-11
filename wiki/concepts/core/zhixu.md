@@ -32,9 +32,6 @@ apiVersion: uvp/v0
 kind: Zhixu
 metadata:
   name: cross-border-procurement
-  uid: zhixu-cross-border-procurement-v1
-  annotations:
-    version: "1"
 spec:
   platform:
     type: blockchain
@@ -63,14 +60,13 @@ spec:
           executor:
             supplierType: zhixu
             zhixuExecutorConfig:
-              schemaVersion: uvp.dock.v1
               target:
                 zhixu: supplier-sourcing
-                version: "1"
+              interface: sourcing_service
               order:
-                idPolicy: derived-v1
+                mode: new
               inputMap:
-                start: intake
+                SCOPE_READY: intake   # key 必须是本 stage 声明的 receiveSignals 通道（D005），value 是目标接口 input 端口名
               signalMap:
                 str: start
                 cmp: complete
@@ -85,10 +81,10 @@ spec:
 | --- | --- |
 | `apiVersion` | DSL 版本，目前是 `uvp/v0`。 |
 | `kind` | 当前 DSL 顶层对象固定为 `Zhixu`。 |
-| `metadata.name` | 必填的非空可读名称，也会参与计划身份。 |
-| `metadata.uid` | 稳定 Zhixu ID。没有时会回退到名称。 |
-| `metadata.labels` | 业务分类、行业、demo 标签。链上权限由 order authorization 和 overlay 决定。 |
-| `metadata.annotations.version` | 计划版本。版本变化会进入 `planId`。 |
+| `metadata.name` | 必填 slug（`^[a-z][a-z0-9_-]{0,99}$`）；DSL 内引用目标定义的键（`target.zhixu` 即目标的 `metadata.name`）。名字到实体的解析由各轨权威完成：云轨按唯一 name 注册查得，链轨由发布面解析到内容派生身份。 |
+| `metadata.uid` | 不是 DSL 字段：出现即按未知字段响亮拒绝。DSL 壳不携带任何派生身份；身份方案按轨分治（链轨内容派生、云轨数据库权威）。 |
+| `metadata.labels` | 业务分类、行业、demo 标签；是定义内容的一部分（链轨身份派生包含 labels——链轨内幕；云轨仅作内容）。链上权限由 order authorization 和 overlay 决定。 |
+| `metadata.annotations` | 自由注解，永不参与身份或哈希推导（Zhixu 无原生版本语义，`version` 键无特殊待遇）。 |
 | `spec.platform` | 目标平台。EVM track 使用 `type=blockchain`、`provider=eth`，可显式写 `network=base`。不写 `network` 时保持当前主网默认路径。 |
 | `spec.nucleation.id` | 秩序的发起核、设计者或组织域标识。详见 [Nucleus / 凝结核](nucleation.md)。 |
 | `spec.taskPatterns` | 任务模式列表，里面包含 stages。 |
@@ -118,7 +114,7 @@ receiveSignals:
   REQUESTED: "::ANCHOR(@customer::request.submit.requested)"
 ```
 
-`mint` 只能取 `per-fact`，出生阶段必须包含至少一个 `ANCHOR(@...)` 订阅，并使用静态的 individual/organization executor；编译器会拒绝自环和无界的跨源代铸环。没有 `mint` 的阶段可以用普通 `source::condition` hook，也可以用 `ANCHOR(@...)` 做通道监听；其订单身份由现有订单路由或执行器自报创建。旧的 `trigger`、`externalSignals`、`::OUTSIDE@`、`::MERGE@` 和旧 `::ANCHOR@(…)` 形态均已退役，编译器会显式拒绝。
+`mint` 只能取 `per-fact`，出生阶段必须包含至少一个 `ANCHOR(@...)` 订阅，并使用静态的 individual/organization executor；编译器会拒绝自环和无界的跨源代铸环。没有 `mint` 的阶段可以用普通 `source::condition` hook，也可以用 `ANCHOR(@...)` 做通道监听；其订单身份由现有订单路由或执行器自报创建。旧的 `trigger`、`externalSignals`，以及订阅以外的 wrapper 形态（`::OUTSIDE@`、旧 `::ANCHOR@(…)`）均已退役，编译器会显式拒绝。
 
 ## `selectedStages`
 
@@ -139,26 +135,20 @@ selectedStages:
 | --- | --- |
 | `individual` | 个体执行者。 |
 | `organization` | 组织、企业系统、服务商或团队。 |
-| `zhixu` | 另一条 Zhixu 作为执行接口对接；目标身份放在 `zhixuExecutorConfig.target`。 |
+| `zhixu` | 另一条 Zhixu 作为执行接口对接；目标引用放在 `zhixuExecutorConfig.target`。 |
 
-`supplierID` 只适用于 `individual`/`organization` executor。`supplierType=zhixu` 时禁止 `supplierID`，必须提供 `zhixuExecutorConfig`：它固定 dock schema、目标 Zhixu/version、派生订单策略，以及本地输入到目标入口端口的 `inputMap` 和本地输出到目标端口的 `signalMap`。目标 definition/artifact/interface 身份由发布系统提供的 `uvp.dock.resolution.v1` manifest 解析；不能用显示名称代替 UID。订单里的 active executor 钱包由订单注册授权或 `StageExecutorPatchApplied` 运行时事件决定。
+`supplierID` 只适用于 `individual`/`organization` executor。`supplierType=zhixu` 时禁止 `supplierID`，必须提供 `zhixuExecutorConfig`：它声明目标定义引用（`target.zhixu`，即目标定义的 `metadata.name`，或 `null` 留给运行时选择）、目标接口名（`interface`）、订单方式（`order.mode` ∈ {new, existing}），以及本地通道/信号到目标接口端口的 `inputMap`/`signalMap`（至少一张非空；`mode=new` 恰好一条 input 绑定）。名字到目标 definition/artifact/interface 实体的解析由各轨权威完成：core linker 按 `uvp.dock.resolution.v2` manifest 的 name 目录查找，链轨发布面在该 manifest 上内嵌定义全文、由 TS 编译器重算内容派生身份做内容寻址（链轨内幕），云轨按唯一 name 查库。订单里的 active executor 钱包由订单注册授权或 `StageExecutorPatchApplied` 运行时事件决定。
 
 ## `fileResources`
 
-`fileResources` 记录阶段协议、证据要求、验收标准或资源句柄。一个阶段可以指向链下 protocol 文件、manifest URI 或对象存储资源，并带上哈希：
+`fileResources` 记录阶段协议、证据要求、验收标准或资源句柄。一个阶段可以指向链下 protocol 文件或对象存储资源，`fileType` 取值是闭集 `local` / `http` / `txcloud` / `plain_text`（详见 [File Resources](file-resources.md)）：
 
 ```yaml
 fileResources:
   sourcing_contract:
-    fileType: manifest
-    resourceRole: stage_protocol
-    resourceType: document
-    mediaType: application/json
-    manifest:
-      manifestURI: "urn:uvp:resource-manifest:supplier-sourcing:v1"
-      manifestHash: "0x3002..."
-      policyHash: "0x7120..."
-      visibility: protected
+    fileType: http
+    httpFile:
+      url: "https://example.com/protocols/supplier-sourcing-v1.json"
 ```
 
 这些业务文件不进链。链上只记录哈希、URI 或 resource patch 事件。

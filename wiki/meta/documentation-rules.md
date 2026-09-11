@@ -47,7 +47,7 @@ status: verified | prototype | planned | archived
 - 区分已实现、fixture/local demo、staging evidence、planned PRD；拿不准的事实标 `<!-- TODO(confirm): ... -->`，禁止编写内容填补；页面发布前把注释转换为「待确认」引用块，避免构建站渲染出转义乱码。
 - Front-matter 字段固定为 `title` / `type` / `audience` / `preread` / `status`；`preread` 只写一个裸相对路径（如 `../core/executor.md`），不加引号、不写成 markdown 链接；正文 H1 下的「前置阅读」引用块须与该字段保持一致。
 - Store metadata、database row、relayer queue 标注为读模型或 workflow 状态；协议事实标注为 registry/state-machine event。
-- funding、USDC、escrow、guarantee 写在 periphery 边界内。
+- funding、USDC、资金托管、guarantee 写在 periphery 边界内。
 - 私钥、RPC secret、JWT secret、object storage credential 只写 redacted 口径。
 
 ## 信息架构规则

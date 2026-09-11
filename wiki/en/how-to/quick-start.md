@@ -33,7 +33,7 @@ Success criterion: build and test both pass. If the contract ABI, bytecode, even
 
 ## Run the Local Protocol Loop
 
-Prerequisites: Anvil is available and an explicit deployer private key is exported (`UVP_ETH_DEPLOYER_PRIVATE_KEY`; a throwaway local key is fine, but there is no built-in Anvil default key anymore). The full local loop (deploy contracts, compile Zhixu, register plan/order, submit signals, hook events, and replay verification) is covered in [Local Anvil Protocol Loop](../tutorials/local-anvil-loop.md).
+Prerequisites: Anvil is available and an explicit deployer private key is exported (`UVP_ETH_DEPLOYER_PRIVATE_KEY`; a throwaway local key is fine, but there is no built-in Anvil default key anymore and a `--private-key` argument is rejected). The full local loop (deploy contracts, compile Zhixu, register plan/order, submit signals, hook events, and replay verification) is covered in [Local Anvil Protocol Loop](../tutorials/local-anvil-loop.md).
 
 Success criterion: every item in that tutorial's "Success Criteria" section passes, with replay mismatch equal to 0.
 
@@ -45,7 +45,7 @@ Success criterion: every item in that tutorial's "Success Criteria" section pass
 | `pnpm test` | Test all packages. |
 | `pnpm build` | Build all packages. |
 | `pnpm lint` | Run lint for packages that provide a lint script. |
-| `pnpm verify:protocol-freeze` | Verify the v0.10 `UVPStateMachine`, v2.1 docking module, the remaining frozen modules, `UVPDeploymentRegistry`, and EIP-712 fixtures. |
+| `pnpm verify:protocol-freeze` | Verify the current frozen ABI/hash fixtures and EIP-712 domains: v0.10 `UVPStateMachine`, v4.0 docking module, v0.4 plan-metadata, v0.3 lens, v0.2 stage-patch/derived-signal/order-link/deployment-registry, v0.1 identity registry. |
 | `pnpm no-spend:safety` | Run the deploy package's no-spend checks plus environment-file validation; spends no gas. |
 
 Verification: the corresponding command exits with code 0.

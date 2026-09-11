@@ -32,9 +32,6 @@ apiVersion: uvp/v0
 kind: Zhixu
 metadata:
   name: cross-border-procurement
-  uid: zhixu-cross-border-procurement-v1
-  annotations:
-    version: "1"
 spec:
   platform:
     type: blockchain
@@ -63,14 +60,13 @@ spec:
           executor:
             supplierType: zhixu
             zhixuExecutorConfig:
-              schemaVersion: uvp.dock.v1
               target:
                 zhixu: supplier-sourcing
-                version: "1"
+              interface: sourcing_service
               order:
-                idPolicy: derived-v1
+                mode: new
               inputMap:
-                start: intake
+                SCOPE_READY: intake   # the key must be a receiveSignals channel declared by this stage (D005); the value is the target interface's input port name
               signalMap:
                 str: start
                 cmp: complete
@@ -85,10 +81,10 @@ This example shows three things: a `mint: per-fact` stage subscribes to an `ANCH
 | --- | --- |
 | `apiVersion` | DSL version, currently `uvp/v0`. |
 | `kind` | The DSL top-level object is fixed to `Zhixu`. |
-| `metadata.name` | Required non-empty human-readable name; also participates in plan identity. |
-| `metadata.uid` | Stable Zhixu ID. Falls back to the name when absent. |
-| `metadata.labels` | Business classification, industry, demo tags. On-chain permissions are decided by order authorization and overlays. |
-| `metadata.annotations.version` | Plan version. Version changes enter `planId`. |
+| `metadata.name` | Required slug (`^[a-z][a-z0-9_-]{0,99}$`); the key for referencing target definitions inside the DSL (`target.zhixu` is the target's `metadata.name`). Resolving the name to an entity is each track's authority: the cloud track looks it up by unique registered name, the chain track's publication surface resolves it to the content-derived identity. |
+| `metadata.uid` | Not a DSL field: any occurrence is loudly rejected as an unknown field. The DSL shell carries no derived identity; identity schemes are track-split (chain track content-derived, cloud track database-authoritative). |
+| `metadata.labels` | Business classification, industry, demo tags; part of the definition content (the chain track's identity derivation includes labels — a chain-track internal; the cloud track stores them as content only). On-chain permissions are decided by order authorization and overlays. |
+| `metadata.annotations` | Free-form annotations; never part of identity or hash derivation (Zhixu has no native version semantics; the `version` key gets no special treatment). |
 | `spec.platform` | Target platform. The EVM track uses `type=blockchain`, `provider=eth`, optionally `network=base`. Omitting `network` keeps the current mainnet default path. |
 | `spec.nucleation.id` | Identifier of the initiating nucleus, designer, or organizational domain of the order. See [Nucleus / 凝结核](nucleation.md). |
 | `spec.taskPatterns` | Task pattern list containing stages. |
@@ -118,7 +114,7 @@ receiveSignals:
   REQUESTED: "::ANCHOR(@customer::request.submit.requested)"
 ```
 
-`mint` accepts only `per-fact`; a birth stage must contain at least one `ANCHOR(@...)` subscription and use a static individual/organization executor. The compiler rejects self-loops and unbounded cross-source re-mint cycles. A stage without `mint` may use a normal `source::condition` hook or an `ANCHOR(@...)` channel listener; its order identity comes from existing order routing or an executor's self-reported order. The retired `trigger`, `externalSignals`, `::OUTSIDE@`, `::MERGE@`, and old `::ANCHOR@(…)` forms are rejected explicitly.
+`mint` accepts only `per-fact`; a birth stage must contain at least one `ANCHOR(@...)` subscription and use a static individual/organization executor. The compiler rejects self-loops and unbounded cross-source re-mint cycles. A stage without `mint` may use a normal `source::condition` hook or an `ANCHOR(@...)` channel listener; its order identity comes from existing order routing or an executor's self-reported order. The retired `trigger`, `externalSignals`, and wrapper forms other than the subscription (`::OUTSIDE@`, the old `::ANCHOR@(…)`) are rejected explicitly.
 
 ## `selectedStages`
 
@@ -139,26 +135,20 @@ Only stages with a selector binding may change the executor of the corresponding
 | --- | --- |
 | `individual` | Individual executor. |
 | `organization` | Organization, enterprise system, service provider, or team. |
-| `zhixu` | Another Zhixu docked as the execution interface; its identity is in `zhixuExecutorConfig.target`. |
+| `zhixu` | Another Zhixu docked as the execution interface; its reference is in `zhixuExecutorConfig.target`. |
 
-`supplierID` is allowed only for `individual`/`organization` executors. For `supplierType=zhixu`, `supplierID` is forbidden and `zhixuExecutorConfig` is required. That config fixes the dock schema, target Zhixu/version, derived order policy, and `inputMap`/`signalMap` from local signals to target ports. The published `uvp.dock.resolution.v1` manifest resolves target definition/artifact/interface identity; a display name must not substitute for the target UID. The active executor wallet in an order is decided by order registration authorization or the `StageExecutorPatchApplied` runtime event.
+`supplierID` is allowed only for `individual`/`organization` executors. For `supplierType=zhixu`, `supplierID` is forbidden and `zhixuExecutorConfig` is required. That config declares the target definition reference (`target.zhixu`, the target definition's `metadata.name`, or `null` for runtime selection), the target interface name (`interface`), the order mode (`order.mode` ∈ {new, existing}), and the `inputMap`/`signalMap` from local channels/signals to target interface ports (at least one non-empty map; `mode=new` carries exactly one input binding). Resolving the name to target definition/artifact/interface entities is each track's authority: the core linker looks names up in the `uvp.dock.resolution.v2` manifest's name directory, the chain track's publication surface embeds the definition in full in that manifest and the TS compiler recomputes the content-derived identity as a content-addressing check (chain-track internal), and the cloud track looks the unique name up in its database. The active executor wallet in an order is decided by order registration authorization or the `StageExecutorPatchApplied` runtime event.
 
 ## `fileResources`
 
-`fileResources` record stage protocols, evidence requirements, acceptance criteria, or resource handles. A stage can point to off-chain protocol files, manifest URIs, or object storage resources with hashes:
+`fileResources` record stage protocols, evidence requirements, acceptance criteria, or resource handles. A stage can point to off-chain protocol files or object-storage resources; `fileType` values are the closed set `local` / `http` / `txcloud` / `plain_text` (see [File Resources](file-resources.md)):
 
 ```yaml
 fileResources:
   sourcing_contract:
-    fileType: manifest
-    resourceRole: stage_protocol
-    resourceType: document
-    mediaType: application/json
-    manifest:
-      manifestURI: "urn:uvp:resource-manifest:supplier-sourcing:v1"
-      manifestHash: "0x3002..."
-      policyHash: "0x7120..."
-      visibility: protected
+    fileType: http
+    httpFile:
+      url: "https://example.com/protocols/supplier-sourcing-v1.json"
 ```
 
 These business files never go on chain. Only hashes, URIs, or resource patch events are recorded on chain.

@@ -26,10 +26,11 @@ The `UVPStateMachine` public boundary includes:
 - constructor args;
 - module configuration and one-time `freezeModules`;
 - signed `commitPlan` and one-time `finalizePlan`;
-- signed `triggerOrderFromOutsideFor` / `triggerOrderFromSignalFor`;
+- signed `triggerOrderFromOutsideFor` (the open birth entry on the state machine);
+- signed `triggerOrderFromSignalFor` on the order-link module contract `UVPOrderLinkModule` (order-to-order derived creation; on the state machine itself only the module-callable `triggerOrderFromSignalFromModule` exists);
 - `submitSignal`;
 - `submitSignalFor`;
-- `openDockedOrder`, which atomically creates the linked order and docking relation through the docking module;
+- the docking module's `openDockedOrder` (`order.mode=new`; the v2 request body carries the interface-name dimension), which atomically creates the linked order and docking relation;
 - the docking module's `submitDockedInput` / `submitDockedSignal`;
 - `applyStageExecutorPatch` / `applyStageExecutorPatchFor`;
 - `applyStageResourcePatch` / `applyStageResourcePatchFor`;
@@ -67,7 +68,6 @@ SignalSubmitted
 DockOpened
 DockInputSubmitted
 DockOutputSubmitted
-DockTerminal
 StageExecutorPatchApplied
 StageResourcePatchApplied
 StageExecutorActivated
@@ -104,4 +104,4 @@ For operating steps see [Troubleshooting](../how-to/troubleshooting.md).
 
 ## Funding Boundary
 
-The current contract modules' core boundary focuses on the state machine, the thin identity registry, and the deployment registry. Funding, escrow, custody, settlement, release, refund, dispute-payment, ERC20, or USDC contracts belong to adapter/periphery work; future funding-related work must have independent authorization, event mapping, tests, and PRD, and consume `UVPStateMachine` signals. For the complete boundary see [Protocol Boundaries: Periphery Adapters](../concepts/protocol-boundaries.md#periphery-adapters).
+The current contract modules' core boundary focuses on the state machine, the thin identity registry, and the deployment registry. Funding, settlement custody, release, refund, contested payouts, ERC20, or USDC contracts belong to adapter/periphery work; future funding-related work must have independent authorization, event mapping, tests, and PRD, and consume `UVPStateMachine` signals. For the complete boundary see [Protocol Boundaries: Periphery Adapters](../concepts/protocol-boundaries.md#periphery-adapters).

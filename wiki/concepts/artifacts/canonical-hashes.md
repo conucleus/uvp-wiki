@@ -33,13 +33,19 @@ hashCanonical("uvp:hook-plan-artifact:v1", payload)
 
 ## 链上 planHash
 
-链上产物使用独立 domain：
+链上 runtime `planHash` 覆盖四个域，使用独立哈希域：
 
 ```text
-uvp:onchain-hook-plan-artifact:v1
+planHash = keccak256(abi.encode(
+  keccak256("uvp.plan.runtime.v2"),   // domain
+  hooksHash,                           // keccak256(abi.encode(hooks))
+  metadataHash,                        // keccak256(abi.encode(selectorBindings, signalCapabilities))
+  dockRoutesRoot,                      // 未声明 dock 时为空 Merkle root
+  dockInterfaceRoot                    // 未声明 dock 时为空 Merkle root
+))
 ```
 
-这个哈希覆盖 compact hooks 与 metadata 承诺。publisher 对提交内容签名，`UVPStateMachine` 在 commit/finalize 时检查这个 EVM-facing `planHash`；Identity Registry 不参与。
+publisher 对 PlanCommit（publisher、hooksHash、metadataHash、两个 dock roots、deadline）做 EIP-712 签名，`UVPStateMachine` 在 commit/finalize 时检查这个 runtime `planHash`；Identity Registry 不参与。整个 `OnchainHookPlanArtifact` 另有 canonical payload hash（domain `uvp:onchain-hook-plan-artifact:v1`），只用于产物追溯与 fixture 固定，不替代 runtime `planHash`。
 
 ## 稳定 ID
 
@@ -70,7 +76,7 @@ routeHash = hashCanonical("uvp:onchain-hook-route:v1", {
 })
 ```
 
-`routeHash` 再进入链上 `planHash`（`uvp:onchain-hook-plan-artifact:v1`）的承诺范围。这是协议常量定义，不是实现细节的默认值：任何语言的重实现（TypeScript 见 `compileExecutorRoute()` / `onchainRouteHash()`，Rust 及其它编译器后端）都必须使用同一个 ZERO_HASH 常量表示「未声明」，不得改用空串哈希、省略字段或其它占位方式，否则同一份定义会算出不同的 routeHash/planHash，破坏跨实现的可复现性。
+`routeHash` 再经 dock route Merkle root 进入链上 runtime `planHash` 的承诺范围。这是协议常量定义，不是实现细节的默认值：任何语言的重实现（TypeScript 见 `compileExecutorRoute()` / `onchainRouteHash()`，Rust 及其它编译器后端）都必须使用同一个 ZERO_HASH 常量表示「未声明」，不得改用空串哈希、省略字段或其它占位方式，否则同一份定义会算出不同的 routeHash/planHash，破坏跨实现的可复现性。
 
 ## Canonical JSON 规则
 

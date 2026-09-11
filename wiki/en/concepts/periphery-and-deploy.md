@@ -13,13 +13,13 @@ status: verified
 
 `uvp-periphery` holds:
 
-- Escrow, payment, and guarantee adapters.
+- Settlement-custody, payment, and guarantee adapters.
 - USDC or stablecoin demos.
 - AI/MCP agent adapters.
 - Industry demos or scenario adapters.
 - Executor demos.
 
-Periphery may consume `UVPStateMachine`, optional `UVPIdentityRegistry` name resolution, Product DTOs, or executor-kit. It must not turn funding, guarantee, payment, release, refund, or dispute states into a new core source of truth.
+Periphery may consume `UVPStateMachine`, optional `UVPIdentityRegistry` name resolution, Product DTOs, or executor-kit. It must not turn funding, guarantee, payment, release, refund, or disputed-payout states into a new core source of truth.
 
 ## Scenario Adaptation Principle
 

@@ -40,7 +40,7 @@ That is the precondition for AI, enterprise systems, and ordinary participants t
 
 ## Why Not Just Trust the Platform
 
-Inside one legal jurisdiction, a centralized platform can often serve as the trusted record keeper because users can rely on local regulators, courts, and compliance duties. Cross-border coordination weakens that assumption: foreign users, banks, regulators, and counterparties do not automatically trust a database operated by one side, and a foreign regulator may not be able to directly discipline that platform.
+Inside one legal jurisdiction, a centralized platform can often serve as the trusted record keeper because users can rely on local regulators, courts, and compliance duties. Cross-border coordination weakens that assumption: foreign users, regulators, and counterparties do not automatically trust a database operated by one side, and a foreign regulator may not be able to directly discipline that platform.
 
 The counterfactual is simple: without chain events as a shared fact source, if party A and party B dispute who submitted a signal first, they must fall back to a platform database log; that database may be maintained by one party or by a platform inside one party's jurisdiction. UVP records authorization, signatures, evidence fingerprints, submission order, and state consequences as replayable chain events, so cross-border participants can start from a common record. Real-world truth, payment, regulatory conclusions, and legal liability still belong to contracts, regulators, arbitration, insurance, audit, or the Identity Registry; these boundaries are formally stated in [Protocol Boundaries](../concepts/protocol-boundaries.md).
 

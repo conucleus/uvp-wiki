@@ -37,8 +37,9 @@ Docking Sandbox 用来让凝结核试拼外部秩序、supplier signal map、ada
 | localPlanId / localStage | 本地 Zhixu 中要开放给外部执行接口的 stage。 |
 | nucleationId | 发起这次试拼的凝结核。 |
 | executorType | `zhixu`、enterprise adapter、MCP agent、manual supplier。 |
-| peerZhixu | 目标 Zhixu subject、active plan、trust status。 |
-| signalMap | `str/cmp/err` 映射和 source validation 结果。 |
+| peerZhixu | 目标 Zhixu 的定义 name（云轨唯一注册名）、active plan、trust status。 |
+| interface / orderMode | 选定的目标接口名与其允许的订单方式（new/existing；试拼时校验 `order.mode ∈ orderModes`）。 |
+| inputMap / signalMap | 本地通道/信号到目标接口端口名的映射和 source validation 结果（至少一张非空）。 |
 | resourceNeeds | local/linked 两侧资源句柄、manifest、证据要求。 |
 | contact | peer operator、adapter endpoint、notification policy。 |
 | proofChecklist | linked order 注册、linked signal、local mapped signal 的 proof 要求。 |
@@ -46,4 +47,4 @@ Docking Sandbox 用来让凝结核试拼外部秩序、supplier signal map、ada
 
 ## `supplierType=zhixu` 的特别检查
 
-`signalMap` 必须至少包含 `str` 和 `cmp`，且同一个 `signalMap` 应引用同一个 linked source；映射值使用已发布接口的 port 名。peer Zhixu 的版本化 plan publication 要可见，linked order 的关系和业务事实必须落到 `DockOpened`、`DockInputSubmitted`、`DockOutputSubmitted`、`DockTerminal` 等 state-machine/docking events，不能依赖私有生命周期字段。local order 继续推进前，其上必须出现授权 mapped signal 或 `DockOutputSubmitted`。完整接入材料与流程见 [Zhixu 作为执行接口](../apps/zhixu-as-executor.md)。
+`inputMap`/`signalMap` 至少一张非空，映射值使用已发布接口的端口名，被绑定端口必须来自同一个 linked source；`mode=new` 的 route 恰好一条 input 绑定（出生锚）。peer Zhixu 的版本化 plan publication 要可见，linked order 的关系和业务事实必须落到 `DockOpened`、`DockInputSubmitted`、`DockOutputSubmitted` 等 state-machine/docking events（`mode=existing` 的对接只连接既有目标订单，不产生新子单），不能依赖私有生命周期字段。local order 继续推进前，其上必须出现授权 mapped signal 或 `DockOutputSubmitted`。完整接入材料与流程见 [Zhixu 作为执行接口](../apps/zhixu-as-executor.md)。

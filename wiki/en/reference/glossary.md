@@ -16,7 +16,7 @@ This page explains project terms in plain language first, then gives the code an
 | UVP / Universal Value Protocol | A coordination protocol and product language for recording authorized business signals and the state consequences those signals bring. In Chinese, UVP is 通用价值协议. | `uvp-eth` is the EVM/Web3 implementation track. |
 | [Zhixu](../concepts/core/zhixu.md) | A reusable coordination rulebook describing how a class of Orders should run. | `ZhixuDefinition`, `kind: "Zhixu"`, compiler input. |
 | [Plan](../concepts/core/plan.md) / Zhixu version | A deterministic on-chain version compiled from one Zhixu. | `OnchainHookPlanArtifact`, two-step registration/finalization via `commitPlan()` + `finalizePlan()`, `PlanRegistered`. |
-| [Order](../concepts/core/order.md) / 订单 | One concrete run of some Plan. | `UVPStateMachine.Order`, `triggerOrderFromOutsideFor()` / `triggerOrderFromSignalFor()`, `OrderRegistered`, `OrderTriggered`. |
+| [Order](../concepts/core/order.md) / 订单 | One concrete run of some Plan. | `UVPStateMachine.Order`, `triggerOrderFromOutsideFor()` (open birth entry on the state machine) / `triggerOrderFromSignalFor()` (derived-creation entry on `UVPOrderLinkModule`), `OrderRegistered`, `OrderTriggered`. |
 | [Nucleus](../concepts/core/nucleation.md) | The organizational core that initiates, designs, and maintains a kind of Zhixu. It lets a class of coordination rules take shape, gain boundaries, and stay maintained; it can be a team, organization, project owner, or workflow owner. | `spec.nucleation.id`, Store Nucleus workbench. |
 | nucleation | The nucleation process, context, or field name--not a subject name. Existing DSL/API keeps this spelling to avoid public-interface drift. | `spec.nucleation.id`, `nucleationId`. |
 | Stage | A step or execution segment inside a task pattern. | `taskPatterns[].stages[]`, `stageIdentifier`, `stageId`. |
@@ -38,7 +38,7 @@ This page explains project terms in plain language first, then gives the code an
 | [Identity Binding](../concepts/contracts-and-registries.md) | A revocable registration made by the Store Registry for the real-world-subject-to-wallet correspondence; it does not include Plan or capability material review. | `IdentityBindingRegistered`, `IdentityBindingRevoked`. |
 | [Authorization](../concepts/trust/signal-authorization.md) | Permission for a wallet to submit a specific source/signal for a specific Order, or to perform a controlled stage patch. | `SignalSubmitterAuthorized`, stage patch authorization. |
 | [Publisher](../concepts/lifecycle.md) | The registered account or mechanism allowed to register Plans. | plan publisher allowlist; `commitPlan()` commit + `finalizePlan()` finalization (only a finalized Plan can create an Order). |
-| [Registrar](../concepts/lifecycle.md) | The account or mechanism that creates trigger orders: the order creator signs trigger typed data to create the Order (the current contracts have no registrar allowlist). | `triggerOrderFromOutsideFor()` / `triggerOrderFromSignalFor()`. |
+| [Registrar](../concepts/lifecycle.md) | The account or mechanism that creates trigger orders: the order creator signs trigger typed data to create the Order (the current contracts have no registrar allowlist — birth submission is open and creator attribution is first-come-first-served). | `triggerOrderFromOutsideFor()` (`UVPStateMachine`) / `triggerOrderFromSignalFor()` (`UVPOrderLinkModule`). |
 | [Registry Boundary](../concepts/contracts-and-registries.md) | One `UVPIdentityRegistry` address is one identity-resolution domain. Initially Store operates one; multiple independent regulated entities may be configured in the future. StateMachine does not read it. | `registryAddress`, `bindingId`, `UVPIdentityRegistry.owner()`. |
 | [HookReady](../concepts/state-machine/README.md) | The event emitted after a receive hook with `emitReady=true` becomes ready, meaning a Product task can open. | `HookReady(planId, orderId, hookId, stageId, hookName)`. |
 | [Stage Overlay](../concepts/state-machine/stage-overlay.md) | An order-level runtime overlay of executor or resources; it does not change the Plan. | executor/resource patch events. |
@@ -46,7 +46,7 @@ This page explains project terms in plain language first, then gives the code an
 | Selector Binding | A Plan rule declaring which target stage a given stage may patch. | selector stage id, target stage id, binding key. |
 | [Replay](../concepts/state-machine/replay.md) | Rebuilding or verifying order state from chain events. | statemachine reducer, chain-services projections. |
 
-> TODO(confirm): The Registrar entry has been rewritten per the current contracts; please manually re-check the external communication wording.
+> Registrar entry review (closed 2026-09-10): the external wording is unified as "order creator = the signing submitter of the trigger typed data; the contracts have no registrar allowlist — birth submission is open and creator attribution is first-come-first-served; `triggerOrderFromSignalFor` belongs to the order-link module contract".
 
 ## Evidence, Proof, and Product Terms
 

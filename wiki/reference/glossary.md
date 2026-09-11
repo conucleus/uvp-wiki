@@ -16,7 +16,7 @@ status: verified
 | UVP / 通用价值协议 | Universal Value Protocol，一套协作协议和产品语言，用来记录被授权的业务信号，以及这些信号带来的状态后果。 | `uvp-eth` 是 EVM/Web3 实现轨道。 |
 | [秩序 / Zhixu](../concepts/core/zhixu.md) | 描述“一类订单应该怎么运行”的可复用协作规则书。 | `ZhixuDefinition`、`kind: "Zhixu"`、compiler input。 |
 | [Plan](../concepts/core/plan.md) / 秩序版本 | 某个 Zhixu 编译后的确定性链上版本。 | `OnchainHookPlanArtifact`、`commitPlan()` + `finalizePlan()` 两步注册定稿、`PlanRegistered`。 |
-| [Order](../concepts/core/order.md) / 订单 | 某个 Plan 的一次具体运行。 | `UVPStateMachine.Order`、`triggerOrderFromOutsideFor()` / `triggerOrderFromSignalFor()`、`OrderRegistered`、`OrderTriggered`。 |
+| [Order](../concepts/core/order.md) / 订单 | 某个 Plan 的一次具体运行。 | `UVPStateMachine.Order`、`triggerOrderFromOutsideFor()`（状态机开放出生入口）/ `triggerOrderFromSignalFor()`（`UVPOrderLinkModule` 派生建单入口）、`OrderRegistered`、`OrderTriggered`。 |
 | [凝结核 / Nucleus](../concepts/core/nucleation.md) | 发起、设计并维护某类 Zhixu 的组织核心。它让一类协作规则成形、获得边界并持续维护；可以是团队、组织、项目 owner 或 workflow owner。 | `spec.nucleation.id`、Store 凝结核工作台。 |
 | nucleation / 成核上下文 | 成核过程、上下文或字段名，不是主体名。现有 DSL/API 保留这个拼写以避免 public interface 漂移。 | `spec.nucleation.id`、`nucleationId`。 |
 | Stage / 阶段 | task pattern 里的一个步骤或执行段。 | `taskPatterns[].stages[]`、`stageIdentifier`、`stageId`。 |
@@ -38,7 +38,7 @@ status: verified
 | [Identity Binding](../concepts/contracts-and-registries.md) / 身份绑定 | Store Registry 对现实主体与钱包对应关系作出的可撤销登记，不包含 Plan 或能力材料审核。 | `IdentityBindingRegistered`、`IdentityBindingRevoked`。 |
 | [Authorization](../concepts/trust/signal-authorization.md) / 授权 | 某个钱包可以为某个 Order 提交特定 source/signal，或执行受控 stage patch。 | `SignalSubmitterAuthorized`、stage patch authorization。 |
 | [Publisher](../concepts/lifecycle.md) | 被允许注册 Plan 的注册账户或机制。 | plan publisher allowlist、`commitPlan()` 提交 + `finalizePlan()` 定稿（仅 finalized Plan 可创建 Order）。 |
-| [Registrar](../concepts/lifecycle.md) | 创建 trigger order 的账户或机制：订单创建者签名 trigger typed data 创建 Order（现行合约没有 registrar allowlist）。 | `triggerOrderFromOutsideFor()` / `triggerOrderFromSignalFor()`。 |
+| [Registrar](../concepts/lifecycle.md) | 创建 trigger order 的账户或机制：订单创建者签名 trigger typed data 创建 Order（现行合约没有 registrar allowlist，出生开放提交、creator 先到先得）。 | `triggerOrderFromOutsideFor()`（`UVPStateMachine`）/ `triggerOrderFromSignalFor()`（`UVPOrderLinkModule`）。 |
 | [Registry Boundary](../concepts/contracts-and-registries.md) | 一个 `UVPIdentityRegistry` 地址就是一个身份解析域。首期由 Store 运营一个，未来可配置多个独立合规主体。StateMachine 不读取它。 | `registryAddress`、`bindingId`、`UVPIdentityRegistry.owner()`。 |
 | [HookReady](../concepts/state-machine/README.md) | 带有 `emitReady=true` 的 receive hook ready 后发出的事件，表示 Product task 可以打开。 | `HookReady(planId, orderId, hookId, stageId, hookName)`。 |
 | [Stage Overlay](../concepts/state-machine/stage-overlay.md) | Order 运行时对 executor 或 resource 的订单级覆盖，不改变 Plan。 | executor/resource patch events。 |
@@ -46,7 +46,7 @@ status: verified
 | [Selector Binding](../concepts/state-machine/stage-overlay.md) | Plan 里声明“某个 stage 可以 patch 哪个目标 stage”的规则。 | selector stage id、target stage id、binding key。 |
 | [Replay](../concepts/state-machine/replay.md) / 重放 | 从链事件重建或校验订单状态。 | statemachine reducer、chain-services projections。 |
 
-> 待确认（TODO）：Registrar 词条已按现行合约改写，请人工复核对外沟通口径。
+> Registrar 词条复核（2026-09-10 收口）：对外口径统一为"订单创建者 = trigger typed data 的签名 submitter；合约无 registrar allowlist，出生开放提交、creator 先到先得；`triggerOrderFromSignalFor` 归属 order-link 模块合约"。
 
 ## 证据、Proof 与产品术语
 

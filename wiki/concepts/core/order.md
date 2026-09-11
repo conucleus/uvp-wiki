@@ -13,7 +13,7 @@ Order 是“订单”。在协议里，它是从某个已注册 [Plan](plan.md) 
 
 ## 谁使用
 
-registrar 用 trigger order 入口创建订单；参与方、executor 和 adapter 向它提交授权 signal；Product/Store/executor-kit 把它投影成任务、通知和 proof 视图。
+任何持钥人都可以经开放出生入口创建订单（按 EIP-712 签名提交 trigger typed data，订单 `creator` 归属先到先得——合约不设发送者准入名单）；参与方、executor 和 adapter 向它提交授权 signal；Product/Store/executor-kit 把它投影成任务、通知和 proof 视图。
 
 ## 产生什么结果
 
@@ -25,16 +25,16 @@ Order 的全部事实来自 `UVPStateMachine` 事件：signal 是否有效、hoo
 
 ## Order 创建
 
-订单通过 trigger order 入口绑定一个已注册 Plan：
+订单经以下入口绑定一个已注册 Plan（`triggerOrderFromOutsideFor` 在 `UVPStateMachine` 上；`triggerOrderFromSignalFor` 在 order-link 模块合约 `UVPOrderLinkModule` 上，状态机内部只有模块可调的 `triggerOrderFromSignalFromModule`）：
 
 ```text
-triggerOrderFromOutsideFor(trigger, authorizations, signature)
-triggerOrderFromSignalFor(trigger, authorizations, signature)
+UVPStateMachine.triggerOrderFromOutsideFor(trigger, authorizations, signature)
+UVPOrderLinkModule.triggerOrderFromSignalFor(trigger, authorizations, signature)
 ```
 
 创建时合约会：
 
-- 检查 registrar 交易发送者是否被允许。
+- 校验 deadline、非零 submitter，并在 plan 声明了 capability 词表时要求出生事实键 `(sourceId, signalId)` 命中 relation-0 声明（否则 revert `InvalidSignalCapability`）——开放提交不设发送者准入，`creator` 归属先到先得。
 - 校验 trigger typed data 签名并恢复业务 submitter。
 - 检查 plan 是否存在且仍被官方域认可。
 - 写入订单级 signal 授权。
@@ -52,7 +52,7 @@ triggerOrderFromSignalFor(trigger, authorizations, signature)
 | resource overlay | `StageResourcePatchApplied`。 |
 | task projection | chain-services 从 `HookReady` 和授权事件重建。 |
 | proof rows | event provenance。 |
-| docking relation | `DockOpened`、`DockInputSubmitted`、`DockOutputSubmitted`、`DockTerminal`，以及两边订单各自的 signal/proof。 |
+| docking relation | `DockOpened`、`DockInputSubmitted`、`DockOutputSubmitted`，以及两边订单各自的 signal/proof。 |
 
 ## Order 和 Product Order
 
@@ -68,4 +68,4 @@ Product task ID、Store docking session ID、adapter job ID 都是工作流索�
 
 Order 不需要被“关闭”才能保持一致性。业务方可以停止继续写入，也可以从同一个 Zhixu 重新创建新的 Order。Signal 采用 first-writer-wins，去重与不可覆盖语义见 [Signal](signal.md)；如果首次写入的业务事实有误，核心协议不覆盖或删除旧事实，而是创建新的 Order 重新执行，并由上层产品把两条事实流的业务关系展示清楚。
 
-如果某个 stage 由另一条 Zhixu 承接，通常会形成 local order 和 linked order 之间的信号绑定：docking module 的 `openDockedOrder` 在 route/interface proof 通过后原子记录对接关系和 linked order，随后由 `submitDockedInput` / `submitDockedSignal` 传递输入与输出。完整运行时路径见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md)；Store/Product 只保存 sandbox、contact、review 和展示状态，运行态 proof 以两边订单的链上事件为准。
+如果某个 stage 由另一条 Zhixu 承接，通常会形成 local order 和 linked order 之间的信号绑定：docking module 的 `openDockedOrder`（`order.mode=new`）在 route/interface proof 通过后原子记录对接关系并创建 linked order，随后由 `submitDockedInput` / `submitDockedSignal` 传递输入与输出（`mode=existing` 只连接既有目标订单，是云轨语义）。完整运行时路径见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md)；Store/Product 只保存 sandbox、contact、review 和展示状态，运行态 proof 以两边订单的链上事件为准。

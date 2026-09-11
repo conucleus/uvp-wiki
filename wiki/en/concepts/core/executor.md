@@ -82,15 +82,15 @@ The active executor overlay affects only this Order and never modifies the Plan.
 
 ## A Zhixu Can Also Be an Executor
 
-One Zhixu can act as another Zhixu's stage executor: it receives the execution interface opened by the local order, runs by its own plan, authorization, and proof path, then maps agreed signals back into the local order via `signalMap`. A typical example: in cross-border supply the settlement stage chooses `payment-settlement`, whose internals may choose `fiat-payout-bridge` as executor. For the full model, DSL syntax, and constraints see [Zhixu as Executor](../apps/zhixu-as-executor.md).
+One Zhixu can act as another Zhixu's stage executor: it receives the execution interface opened by the local order, runs by its own plan, authorization, and proof path, then maps agreed ports back into the local order via `inputMap`/`signalMap`. A typical example: in cross-border supply the settlement stage chooses `payment-settlement`, whose internals may choose `fiat-payout-bridge` as executor. For the full model, DSL syntax, and constraints see [Zhixu as Executor](../apps/zhixu-as-executor.md).
 
 ## Runtime Path of Docked Zhixu
 
-The skeleton of docked execution is: after the local dock entrance emits `HookReady`, the docking module calls `openDockedOrder` with committed route/interface proofs to atomically create the linked Order; the linked Order executes independently and produces str/cmp/err proof, then `submitDockedInput` / `submitDockedSignal` deliver inputs and outputs. On-chain `(planId, orderId)` can coexist with Product/Store/adapter workflow numbers, while runtime proof returns to on-chain events; see [Zhixu as Executor](../apps/zhixu-as-executor.md) for the detailed path.
+The skeleton of docked execution is: after the local birth-anchor hook (the single input binding of a `mode=new` route) emits `HookReady`, the docking module calls `openDockedOrder` with committed route/interface proofs to atomically create the linked Order; the linked Order executes independently and produces str/cmp/err proof, then `submitDockedInput` / `submitDockedSignal` deliver inputs and outputs. On-chain `(planId, orderId)` can coexist with Product/Store/adapter workflow numbers, while runtime proof returns to on-chain events; see [Zhixu as Executor](../apps/zhixu-as-executor.md) for the detailed path.
 
 ## Protocol Meaning of signalMap
 
-`signalMap` is the semantic contract by which a local stage accepts a linked Zhixu's output: `str` and `cmp` are compiler-required, `err` is optional but recommended, and one signalMap must reference a single source. For the field-level semantics table and compiler validation rules see [Zhixu as Executor](../apps/zhixu-as-executor.md).
+`signalMap` is the semantic contract by which a local stage accepts a linked Zhixu's output: at least one of `inputMap`/`signalMap` must be non-empty (no specific business signal is forced), and the bound ports must keep a single target source. For the field-level semantics table and compiler validation rules see [Zhixu as Executor](../apps/zhixu-as-executor.md).
 
 ## Where Executor Kit Fits
 

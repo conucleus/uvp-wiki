@@ -25,14 +25,15 @@ Product DTO 是面向普通用户和产品前端的稳定合同。它把协议�
 | proof | 从 event provenance 生成。 |
 | trust | 从 identity projection 合并。 |
 
-资金字段当前故意表达为未接入：
+资金面当前以占位（placeholder）表达，未接入任何真实资金动作。当 Plan 声明付款类能力插件时，订单 DTO 附带 `settlementPreview`：
 
 ```text
-totalAmount.display = "未接入资金托管"
-fundingStatus = "资金托管未接入本接口"
+settlementPreview.label = "稳定币模块占位"
+settlementPreview.adapterStatus = "placeholder"
+settlementPreview.disclaimer = "当前不托管、不划转、不释放、不退款任何资金，只记录付款条件和证明。"
 ```
 
-这表示核心 UVP 协议不是支付提供方。USDC、escrow 或担保应由 periphery adapter 接入。
+这表示核心 UVP 协议不是支付提供方。稳定币、资金托管或担保应由 periphery adapter 接入。
 
 ## ProductTaskDTO
 

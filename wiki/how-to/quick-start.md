@@ -37,7 +37,7 @@ indexer、executor 和部署脚本同步。
 
 ## 运行本地协议闭环
 
-前置条件：Anvil 可用，不需要真实私钥。完整的本地闭环（部署合约、编译 Zhixu、
+前置条件：Anvil 可用，并显式导出部署私钥（`UVP_ETH_DEPLOYER_PRIVATE_KEY`；一次性本地 key 即可，但已无内置 Anvil 默认私钥，`--private-key` 传参会被拒绝）。完整的本地闭环（部署合约、编译 Zhixu、
 注册 plan/order、提交 signal、hook 事件与 replay 校验）见
 [Local Anvil 协议闭环](../tutorials/local-anvil-loop.md)。
 
@@ -51,7 +51,8 @@ indexer、executor 和部署脚本同步。
 | `pnpm test` | 所有 package 的 test。 |
 | `pnpm build` | 所有 package 的 build。 |
 | `pnpm lint` | 有 lint 脚本的 package 执行 lint。 |
-| `pnpm verify:protocol-freeze` | 校验 v0.10 `UVPStateMachine`、v2.1 docking module、其余冻结 modules、`UVPDeploymentRegistry` 和 EIP-712 fixture。 |
+| `pnpm verify:protocol-freeze` | 校验当前全部冻结 ABI/hash fixture 与 EIP-712 domain：v0.10 `UVPStateMachine`、v4.0 docking module、v0.4 plan-metadata、v0.3 lens、v0.2 stage-patch/derived-signal/order-link/deployment-registry、v0.1 identity registry。 |
+| `pnpm no-spend:safety` | 运行 deploy 包的 no-spend 检查和环境文件校验；不花 gas。 |
 
 验证方式：对应命令退出码为 0。
 
