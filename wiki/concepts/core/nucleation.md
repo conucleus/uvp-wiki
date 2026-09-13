@@ -23,7 +23,7 @@ status: verified
 
 ## 权威来自哪里
 
-凝结核不自动等同于 Store operator、Identity Registry、registrar 或 submitter wallet。它可以出现在 workflow 材料和 Store 记录里，但链上权威仍然来自 plan publication、publisher/registrar 权限、订单级 authorization 和参与方签名。
+凝结核不自动等同于 Store operator、Identity Registry、registrar 或 submitter wallet。它可以出现在 workflow 材料和 Store 记录里，但链上权威仍然来自 plan publication 的 publisher 签名、订单级 authorization 和参与方签名；订单创建没有 registrar 权限门——现行合约没有 registrar allowlist，出生事实开放提交、creator 先到先得（见[核心术语表](../../reference/glossary.md)）。
 
 ```yaml
 spec:
@@ -60,7 +60,7 @@ spec:
 | Store admin / 外部机构 | 平台工作台、材料审核、目录与发布流程；对外部合规、能力与推荐作各自判断。 |
 | Supplier | 能力主体，可能被凝结核组织进秩序。 |
 | Executor | 某个订单里的运行时执行者或 submitter。 |
-| Registrar | 注册订单的授权主体。 |
+| Registrar | 订单创建的开放提交者：签名 trigger typed data 提交出生事实即成为 creator（先到先得），无 allowlist 权限门（见[核心术语表](../../reference/glossary.md)）。 |
 
 拼写约定见 [核心术语表](../../reference/glossary.md)。
 

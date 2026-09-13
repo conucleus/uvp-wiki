@@ -29,7 +29,7 @@ Implementations: `planIdForPublisher()` in `uvp-protocol/packages/compiler/src/o
 hashCanonical("uvp:hook-plan-artifact:v1", payload)
 ```
 
-This is the domain of the compiler-internal hook-plan IR. HookPlan is an internal compiler artifact, not a public Store/import/deploy flow; see [Compiler Input](compiler-input.md). The payload carries the canonicalized source Zhixu, compiler information, platform information, hooks, dependencies, and routes.
+This is the planHash domain of the compiler-internal chain-track hook plan artifact (`HookPlanArtifact`). The payload embeds a canonicalized snapshot of the source Zhixu with annotations stripped (annotations never participate in identity; see [Compiler Input](compiler-input.md)), plus the planId, platform, compiled hooks, dependency index, executor routes, and the dock interface/route commitments (both roots). This planHash does not go on-chain directly; it anchors the source definition snapshot as the `sourcePlanHash` of the `OnchainHookPlanArtifact`. The on-chain runtime `planHash` is covered in the next section.
 
 ## On-chain planHash
 

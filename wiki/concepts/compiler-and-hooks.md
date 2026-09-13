@@ -53,8 +53,6 @@ Compiler 的确定性保证各方得到同一个 plan hash。合约注册 compac
 
 以下都是 compile 期规则，不是运行时规则；运行时求值见 [Hook 求值](state-machine/evaluation.md)。
 
-> 待确认（TODO）：指令称八条细则，源页（components/semantics-and-compiler.md）实际仅七条。
-
 - `receiveSignals` 的 key 是本 stage 的 receive hook 名称，value 是该 hook 的规范化表达式；不再读取 `stage.trigger` 或 `externalSignals`。
 - Hook 的订单入口由 `orderTriggerKind` 明确表达：`none`、`mint` 或 `dock`；Ready 事件是否对外发出由独立的 `emitReady` 布尔值表达。
 - `mint: per-fact` 只能用于出生 stage：每个满足锚点的事实铸造一个新订单；docking 出生必须带完整 dock route/interface proof。

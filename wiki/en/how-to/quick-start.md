@@ -45,7 +45,7 @@ Success criterion: every item in that tutorial's "Success Criteria" section pass
 | `pnpm test` | Test all packages. |
 | `pnpm build` | Build all packages. |
 | `pnpm lint` | Run lint for packages that provide a lint script. |
-| `pnpm verify:protocol-freeze` | Verify the current frozen ABI/hash fixtures and EIP-712 domains: v0.10 `UVPStateMachine`, v4.0 docking module, v0.4 plan-metadata, v0.3 lens, v0.2 stage-patch/derived-signal/order-link/deployment-registry, v0.1 identity registry. |
+| `pnpm verify:protocol-freeze` | Verify the current frozen ABI/hash fixtures and EIP-712 domains: v0.10 `UVPStateMachine`, v4.2 docking module, v0.5 plan-metadata, v0.3 lens, v0.3 stage-patch, v0.2 derived-signal/order-link/deployment-registry, v0.1 identity registry. |
 | `pnpm no-spend:safety` | Run the deploy package's no-spend checks plus environment-file validation; spends no gas. |
 
 Verification: the corresponding command exits with code 0.

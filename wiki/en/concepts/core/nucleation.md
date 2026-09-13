@@ -23,7 +23,7 @@ A nucleus designs and maintains Zhixu DSL, which through compilation and publica
 
 ## Where Authority Comes From
 
-A nucleus is not automatically a Store operator, Identity Registry authority, registrar, or submitter wallet. It may appear in workflow materials and Store records, but on-chain authority still comes from plan publication, publisher/registrar permissions, order-level authorization, and participant signatures.
+A nucleus is not automatically a Store operator, Identity Registry authority, registrar, or submitter wallet. It may appear in workflow materials and Store records, but on-chain authority still comes from the publisher signature on plan publication, order-level authorization, and participant signatures; order creation has no registrar permission gate — the current contracts have no registrar allowlist, birth facts are openly submitted, and the creator is first-come-first-served (see the [Core Glossary](../../reference/glossary.md)).
 
 ```yaml
 spec:
@@ -50,7 +50,7 @@ These responsibilities first appear in Zhixu DSL, resource handles, Product sche
 | Store admin / external institutions | Platform workbench, material review, cataloging, and publication processes; each makes its own judgment about compliance, capability, and recommendation. |
 | Supplier | Capability subject, possibly organized into the order by the nucleus. |
 | Executor | Runtime executor or submitter within one order. |
-| Registrar | The authorized subject registering orders. |
+| Registrar | The open submitter that creates orders: signing the trigger typed data and submitting the birth fact makes it the creator (first-come-first-served); there is no allowlist permission gate (see the [Core Glossary](../../reference/glossary.md)). |
 
 For spelling conventions see the [Core Glossary](../../reference/glossary.md).
 
