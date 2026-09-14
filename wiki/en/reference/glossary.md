@@ -70,7 +70,7 @@ This page explains project terms in plain language first, then gives the code an
 | [Docked Zhixu](../concepts/state-machine/docking.md) | One Zhixu hands a stage to another independently runnable Zhixu. | `supplierType=zhixu`, `signalMap`, docking events. |
 | `signalMap` | Maps the linked Zhixu's `str/cmp/err` outputs back into the local stage interface. | `zhixuExecutorConfig.signalMap`. |
 | [Periphery Adapter](../concepts/periphery-and-deploy.md) | Funding, guarantee, payment, agent, or business-system adapter layers around the core state machine. | `uvp-periphery/`. |
-| [Relayer](../concepts/services/relayer.md) | A service or wallet broadcasting signed transactions and possibly paying gas. It is not the business signer. | chain-services relayer, `submitSignalFor()`. |
+| [Relayer](../concepts/services/relayer.md) | A participant role or wallet broadcasting signed transactions and possibly paying gas. It is not the business signer. | submissions/stage-patches broadcast adapters and the product BFF, `submitSignalFor()`. |
 | [EIP-712](../concepts/trust/eip712-relayer.md) | The format wallets use to sign structured business actions. | typed data builders, `UVPStateMachineSignal`. |
 | Anvil | The local EVM chain used for development and protocol loops. | local Anvil scripts. |
 | Base Sepolia | The public EVM testnet target used for staging/rehearsal claims. | chain id `84532`. |

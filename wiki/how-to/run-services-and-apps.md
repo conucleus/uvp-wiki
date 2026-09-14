@@ -31,8 +31,9 @@ pnpm --filter @uvp-eth/chain-services dev:api
 ```bash
 pnpm --filter @uvp-eth/chain-services dev:indexer
 pnpm --filter @uvp-eth/chain-services rebuild:indexer
-pnpm --filter @uvp-eth/chain-services dev:relayer
 ```
+
+没有独立的 relayer 进程：广播能力内嵌在 API 服务的提交链路里（submissions/stage-patches 广播装配件与 product BFF，见 [Relayer](../concepts/services/relayer.md)）。
 
 Staging/testnet profile 不能使用 memory/SQLite，也不能使用 localhost RPC（背景见[协议边界](../concepts/protocol-boundaries.md)）。demo 与 E2E fixture 模式在服务层已不存在：你声明的是什么 profile，运行的就是什么 profile。
 

@@ -85,9 +85,9 @@ Check:
 
 ## Relayer Does Not Broadcast
 
-First distinguish the two fail-closed behaviors:
+The relayer is a role, not a standalone process (broadcasting is carried by the submissions/stage-patches broadcast adapters and the product BFF; see [Relayer](../concepts/services/relayer.md)). First distinguish the two fail-closed behaviors:
 
-- In a non-local environment, or when `UVP_STATE_MACHINE_RELAYER_BROADCAST_ENABLED=true`, a missing broadcast adapter is a startup configuration error — the relayer refuses to start rather than running half-configured.
+- In a non-local environment, or when `UVP_STATE_MACHINE_RELAYER_BROADCAST_ENABLED=true`, a missing broadcast adapter is a startup configuration error — the service refuses to start rather than running half-configured.
 - In a local run without a configured broadcast adapter, submit returns `broadcastStatus: "not_attempted"`: no nonce is reserved and the audit entry records the submission as skipped. This is explicit local dry-run semantics, not silent success.
 
 Check:

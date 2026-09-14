@@ -47,7 +47,7 @@ When forking or self-deploying, these interface constraints must hold:
 | Subsystem | Code entry | Description |
 | --- | --- | --- |
 | [Indexer and Projections](indexer-projections.md) | `src/indexer/`, `src/storage/` projection rows | Rebuild order/task/proof/identity views from deployment registry, state-machine, and identity registry events. |
-| [Relayer](relayer.md) | `src/relayer/` | Gas payer, broadcasting, confirmation, retry; generates no business signatures. |
+| [Relayer](relayer.md) | `src/submissions/`, `src/stage-patches/`, `src/product/` (broadcast adapters) | Gas payer and broadcasting **role**, carried by the submissions/stage-patches broadcast adapters and the product BFF; confirmation, retry; generates no business signatures. |
 | [Submissions and Stage Patch](submissions-stage-patch.md) | `src/submissions/`, `src/product/bff/`, `src/stage-patches/` | Submission status tracking, order registration/BFF workflow, executor/resource stage patch submission entry points. |
 | [Evidence, Proof, and File Resource](evidence-proof.md) | `src/evidence/`, `src/proof-verifier/` | Evidence hashes, metadata hashes, object handles, proof mismatch reports. |
 | [Product API](product-api.md) | `src/product/`, `src/api/routes/product-read.ts` | Ordinary-user order/task/timeline/proof DTOs and Product staging readiness. |

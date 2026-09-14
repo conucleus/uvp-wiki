@@ -82,9 +82,9 @@ Product API 没有 demo 数据源：空投影返回空数组，缺失明细返�
 
 ## Relayer 不广播
 
-先区分两种 fail-closed 行为：
+Relayer 是角色不是独立进程（广播由 submissions/stage-patches 广播装配件与 product BFF 承担，见 [Relayer](../concepts/services/relayer.md)）。先区分两种 fail-closed 行为：
 
-- 非 local 环境，或 `UVP_STATE_MACHINE_RELAYER_BROADCAST_ENABLED=true` 而没有配置广播适配器：启动即抛出配置错误——relayer 拒绝启动，不会半配置运行。
+- 非 local 环境，或 `UVP_STATE_MACHINE_RELAYER_BROADCAST_ENABLED=true` 而没有配置广播适配器：服务启动即抛出配置错误——不会半配置运行。
 - local 且未配置广播适配器时，submit 返回 `broadcastStatus: "not_attempted"`：不占 nonce，audit 记录该次提交为 skipped。这是显式的 local dry-run 语义，不是静默成功。
 
 检查：
