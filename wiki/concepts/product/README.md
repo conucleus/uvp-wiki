@@ -75,4 +75,4 @@ Product DTO 最终落在真实可跑的产品表面上：Order App 面向普通�
 - Store metadata、draft、supplier profile、audit 和 JWT session 属于 [秩序商店](../store/README.md) 语境，是凝结核工作台或平台 workflow 状态。
 - Product API 可以准备 typed data、验证签名、调用 relayer、返回 proof；授权检查始终由合约执行。协议不变量的唯一总纲见[协议边界](../protocol-boundaries.md)。
 - 如果 Product API 返回的状态无法追溯到 event provenance 或 Store 明确标注的 metadata，就属于产品读模型或 workflow 状态。
-- executor-kit 的 Product API signal producer 和 thin MCP adapter 属于 [Executor Kit](../apps/executor-kit.md)；生产运行、密钥治理和 live operator runbook 由执行与运维页面承载。
+- executor-kit 的 Product API signal producer 属于 [Executor Kit](../apps/executor-kit.md)；生产运行、密钥治理和 live operator runbook 由执行与运维页面承载。

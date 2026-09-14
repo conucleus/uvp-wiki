@@ -73,7 +73,7 @@ flowchart LR
 | 链上事实 | `uvp-protocol/contracts/uvp-contracts/` | Plan、Order、Signal、Hook、身份绑定、deployment cutover 的事实记录。 | Product 展示、Store workflow、私有文件存储。 |
 | 服务层（可重建） | `uvp-chain-services/service/`、`uvp-protocol/packages/product-dto/` | indexer、projection、Product/Store API、relayer boundary、proof/evidence workflow、notifications，以及各产品共享的 DTO contract。 | 成为 plan/order/signal/trust 的事实源，或生成业务签名。 |
 | 产品表面 | `zhixu-store/app/`、`uvp-order-app/app/` | 把链上事实翻译成订单、任务、proof、trust 和 Store 工作台。 | 改写合约事实、绕过 order-level authorization。 |
-| 执行者工具 | `uvp-executor-kit/package/` | CLI/SDK/MCP signal producer、chain watcher、Product API prepare/sign/submit/proof。 | 托管默认私钥、替业务方承担签名责任。 |
+| 执行者工具 | `uvp-executor-kit/package/` | CLI/SDK signal producer、chain watcher、Product API prepare/sign/submit/proof。 | 托管默认私钥、替业务方承担签名责任。 |
 | 部署和证据 | `uvp-deploy/deploy/` | address manifest、release record、Anvil/Base Sepolia rehearsal、staging gate。 | 重新定义协议语义或隐藏失败证据。 |
 
 ## 组件总线
@@ -86,7 +86,7 @@ flowchart LR
 | Bindings | `uvp-protocol/packages/protocol-bindings/` | browser-safe ABI、typed-data builders、hash helpers、calldata builders。 |
 | 服务层 | `uvp-chain-services/service/`、`uvp-protocol/packages/product-dto/` | 可 fork 的链下 indexer、projection、relayer boundary、proof verifier、Product/Store API；Product order/task/proof/trust DTO。 |
 | Store/Product UIs | `zhixu-store/app/`、`uvp-order-app/app/` | Store workbench、participant task UI、proof display。 |
-| Execution tools | `uvp-executor-kit/package/` | CLI/SDK/MCP signal producer。 |
+| Execution tools | `uvp-executor-kit/package/` | CLI/SDK signal producer。 |
 | Deploy/evidence | `uvp-deploy/deploy/` | deployment manifests、release records、staging gates。 |
 | Periphery | `uvp-periphery/` | payment/funding/guarantee/agent adapters and demos。 |
 

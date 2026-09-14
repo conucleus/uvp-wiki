@@ -16,7 +16,7 @@ Executor Kit 有两个同等重要的 signal producer 表面：
 | 模式 | 输入 | 输出 | 适用场景 |
 | --- | --- | --- | --- |
 | Chain-native | `UVPStateMachine.HookReady`、本地 handler config、钱包。 | 直接构造 `submitSignal` 交易或 dry-run job。 | 高级链原生 executor、自管 watcher。 |
-| Product API | Product task / signal container / evidence id。 | prepare/sign/submit/proof 的标准流程。 | 企业脚本、supervised AI/MCP、普通自动化集成。 |
+| Product API | Product task / signal container / evidence id。 | prepare/sign/submit/proof 的标准流程。 | 企业脚本、supervised AI agent、普通自动化集成。 |
 
 ## Product API 模式
 
@@ -85,20 +85,9 @@ chain watcher job identity 必须包含 emitting state-machine address，避免�
 
 doctor 不需要私钥，也不应打印协议 secrets。
 
-## MCP/AI adapter
+## AI agent 与企业脚本
 
-MCP adapter 是 `product.ts` SDK 的薄封装。AI agent、MCP tool、企业脚本和浏览器 Order App 都接到同一个 Product API prepare/sign/submit/proof 边界。
-
-```ts
-import { createProductMcpAdapter } from "@uvp-eth/executor-kit/mcp";
-
-const uvp = createProductMcpAdapter({ chainServicesUrl: "http://127.0.0.1:8787" });
-await uvp.uvp_list_tasks({ walletAddress });
-await uvp.uvp_prepare_signal({ taskId: "task_123", walletAddress });
-await uvp.uvp_submit_signal({ prepared, privateKeyEnv: "UVP_PARTICIPANT_PRIVATE_KEY", walletAddress });
-```
-
-MCP 可以协助准备、路由和展示结果；授权参与方签名仍由对应钱包完成。`includeRaw: true` 只应在明确的钱包签名交接或协议调试中使用。
+executor-kit 不内置 MCP 适配器（此前的 `@uvp-eth/executor-kit/mcp` 薄封装已删除）。AI agent、企业脚本和后续 MCP 客户端统一作为 Product API SDK（`product.ts`）/CLI 的消费者，接到同一个 prepare/sign/submit/proof 边界：工具可以协助准备、路由和展示结果，授权参与方签名仍由对应钱包完成。
 
 ## 权限边界
 

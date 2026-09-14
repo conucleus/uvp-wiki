@@ -16,7 +16,7 @@ status: verified
 | [uvp-chain-services](https://github.com/conucleus/uvp-chain-services) | `uvp-chain-services/` | indexer、submission 广播（relayer 角色）、proof verifier、Product/Store API、projection、workflow runtime。 |
 | [zhixu-store](https://github.com/conucleus/zhixu-store) | `zhixu-store/` | Store/workbench frontend、catalog、supplier directory、identity/proof views。 |
 | [uvp-order-app](https://github.com/conucleus/uvp-order-app) | `uvp-order-app/` | participant Order App、task inbox、evidence/proof display、readiness checks。 |
-| [uvp-executor-kit](https://github.com/conucleus/uvp-executor-kit) | `uvp-executor-kit/` | executor CLI/SDK/MCP、chain watcher、Product API signal producer、adapter integration。 |
+| [uvp-executor-kit](https://github.com/conucleus/uvp-executor-kit) | `uvp-executor-kit/` | executor CLI/SDK、chain watcher、Product API signal producer、adapter integration。 |
 
 ## Workspace 模块
 
@@ -32,7 +32,7 @@ status: verified
 | `uvp-chain-services/service` | `@uvp-eth/chain-services` | indexer、submission 广播（relayer 角色）、proof verifier、Product/Store APIs；详见 [Chain Services](../concepts/services/chain-services.md) | 协议事实源 |
 | `zhixu-store/app` | `@uvp-eth/zhixu-store-web` | Store/workbench frontend | old Go-coupled Store BFF |
 | `uvp-order-app/app` | `@uvp-eth/order-app` | participant task/signal console | Store Console、付款占位（不托管资金） |
-| `uvp-executor-kit/package` | `@uvp-eth/executor-kit` | executor CLI/SDK/MCP、chain watcher、Product API signal producer | privileged backend truth |
+| `uvp-executor-kit/package` | `@uvp-eth/executor-kit` | executor CLI/SDK、chain watcher、Product API signal producer | privileged backend truth |
 | `uvp-deploy/deploy` | `@uvp-eth/deploy` | deploy scripts、manifests、release records | external deploy repo（see `uvp-deploy` workspace） |
 | `uvp-deploy/apps/ops-console-web` | `@uvp-eth/ops-console-web` | operator console prototype | protocol runtime |
 | `uvp-periphery` | mixed | funding/payment/guarantee/agent adapters and demos | core protocol truth |

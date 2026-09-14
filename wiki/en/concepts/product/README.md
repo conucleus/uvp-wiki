@@ -75,4 +75,4 @@ Ordinary users mainly see orders, tasks, participants, evidence, and proof. Prot
 - Store metadata, drafts, supplier profiles, audit, and JWT sessions belong to the [Zhixu Store](../store/README.md) context and are Nucleation workbench or platform workflow state.
 - The Product API can prepare typed data, verify signatures, call the relayer, and return proof; authorization checks are always enforced by contracts. The single authoritative statement of protocol invariants is [Protocol boundaries](../protocol-boundaries.md).
 - If a status returned by the Product API cannot be traced to event provenance or metadata explicitly labeled by the Store, it is a product read model or workflow state.
-- The executor-kit Product API signal producer and thin MCP adapter belong to [Executor Kit](../apps/executor-kit.md); production runtime, key governance, and live operator runbooks are carried by execution and operations pages.
+- The executor-kit Product API signal producer belongs to [Executor Kit](../apps/executor-kit.md); production runtime, key governance, and live operator runbooks are carried by execution and operations pages.

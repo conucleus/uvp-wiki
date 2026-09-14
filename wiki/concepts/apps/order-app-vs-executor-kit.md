@@ -38,7 +38,7 @@ Order App 和 executor-kit 都是 signal producer 的入口，但用户不同。
 
 ## Executor Kit
 
-`uvp-executor-kit/package` 面向执行者、企业系统、AI/MCP adapter、executor。它有两类模式：
+`uvp-executor-kit/package` 面向执行者、企业系统、supervised AI agent 脚本、executor。它有两类模式：
 
 | 模式 | 用途 |
 | --- | --- |
