@@ -29,8 +29,9 @@ Other services:
 ```bash
 pnpm --filter @uvp-eth/chain-services dev:indexer
 pnpm --filter @uvp-eth/chain-services rebuild:indexer
-pnpm --filter @uvp-eth/chain-services dev:relayer
 ```
+
+There is no standalone relayer process: broadcast capability is embedded in the API service's submission paths (submissions/stage-patches broadcast adapters and the product BFF; see [Relayer](../concepts/services/relayer.md)).
 
 Staging/testnet profiles must not use memory/SQLite, nor localhost RPC (background in [Protocol Boundaries](../concepts/protocol-boundaries.md)). `CHAIN_SERVICES_DATABASE_DRIVER` and `CHAIN_SERVICES_DATABASE_URL` are required in every environment; the service refuses to start when they are missing. There are no demo or E2E fixture modes anywhere in the service layer — whatever profile you declare is exactly what runs.
 

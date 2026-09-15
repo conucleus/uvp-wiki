@@ -26,7 +26,7 @@ status: verified
 | EIP-712 domain / typed data | contracts、protocol-bindings | Product submit、relayer、executor-kit、wallet UI | 更新 digest helpers、signing tests、staging domain check；staging 不能回退到旧 `0.1` domain。 |
 | Canonical hash / artifact schema | compiler、hook-core、statemachine | Plan publication、commitPlan/finalizePlan、release evidence | 更新 golden fixtures、canonical hash docs、compiler/statemachine tests。 |
 | Product DTO | product-dto | chain-services、Store、Order App、executor-kit、periphery adapter | 更新 DTO tests、route tests、frontend/API consumers 和 ordinary-user copy。 |
-| Product API | chain-services | Store、Order App、executor-kit Product API mode、MCP adapter | 更新 API reference、route tests、browser E2E、failure language。 |
+| Product API | chain-services | Store、Order App、executor-kit Product API mode、企业脚本/AI agent（经 executor-kit SDK/CLI） | 更新 API reference、route tests、browser E2E、failure language。 |
 | Deployment manifest | uvp-deploy/deploy | chain-services、staging scripts、release records | 只提交 curated manifest/evidence；local generated address files 默认不提交。 |
 | Release evidence schema | uvp-deploy/deploy | release owner、audit、release evidence pack 消费方 | 保持 no-secret、redacted、可审计；不要把 raw logs 或 object bytes 当作 release record。 |
 | Store Console HTTP API | chain-services（`uvp-chain-services/service/src/api/routes/`） | Store workbench、operator scripts | route、错误码、proof rows 和 authz 语义需要和 DTO 同步；更新 Store 前端消费者与 route tests。 |

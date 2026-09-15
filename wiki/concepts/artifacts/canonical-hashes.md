@@ -29,7 +29,7 @@ planId = keccak256(abi.encode(
 hashCanonical("uvp:hook-plan-artifact:v1", payload)
 ```
 
-这是历史对外产物的 domain。现 HookPlan 仅作编译器内部 IR，不再是 Store/import/deploy 的公开流程，见 [编译输入](compiler-input.md)。payload 曾包含 canonicalized source Zhixu、编译器信息、平台信息、hook、依赖和 route。
+这是编译器内部链轨 hook plan 制品（`HookPlanArtifact`）的 planHash domain。payload 内嵌 `stripAnnotations` 后的 canonicalized source Zhixu 快照（注解永不参与身份，见 [编译输入](compiler-input.md)），以及 planId、平台信息、compiled hooks、依赖索引、executor routes 和 dock 接口/路由承诺（含两个 root）。该 planHash 不直接上链，而是作为 `OnchainHookPlanArtifact` 的 `sourcePlanHash` 锚定源定义快照；链上 runtime `planHash` 见下节。
 
 ## 链上 planHash
 

@@ -7,24 +7,23 @@ status: verified
 
 # Relayer
 
-The relayer is the gas payer and transaction broadcaster of the rebuildable service layer. It broadcasts already-signed business payloads to chain and records retries, confirmations, and failures; business signatures come from the buyer's, seller's, executor's, or selector's own wallet.
+The relayer is a protocol participant **role**, not a standalone service: it is the gas payer and transaction broadcaster that takes participant-signed business payloads to chain. Business signatures always come from the buyer's, seller's, executor's, or selector's own wallet. There is no separate relayer service process or `src/relayer/` module in chain-services — broadcast capability is embedded as adapters inside the submission paths.
 
-## Code Entry Points
+## Who Carries It
 
-| File | Responsibility |
+| Carrier | Responsibility |
 | --- | --- |
-| `src/relayer/service.ts` | Relayer runtime entry point and broadcast logic. |
-| `src/relayer/types.ts` | Relayer request, result, and status types. |
-| `src/submissions/broadcast-adapter.ts` | Abstract broadcast adapter. |
-| `src/submissions/safe-broadcast-adapter.ts` | Safe broadcast wrapper that avoids sending unverified payloads straight to chain. |
-| `src/config/preflight.ts` | Fail-closed checks for runtime env, relayer key, and broadcast flags. |
+| `src/submissions/broadcast-adapter.ts`, `src/submissions/safe-broadcast-adapter.ts` | Broadcast adapter and safe wrapper for Product signal submissions; avoids sending unverified payloads straight to chain. |
+| `src/stage-patches/broadcast-adapter.ts` | Broadcast assembly for selector-signed stage patches. |
+| The order trigger broadcast adapter in `src/product/query/bff/` | On-chain trigger broadcast for order registration. |
+| `src/shared/broadcast/`, `src/config/preflight.ts` | Shared broadcast kit, plus fail-closed checks for runtime env, relayer key, and broadcast flags. |
 
 ## Transaction Boundary
 
 ```text
 participant signs EIP-712 payload
   -> Product API / submission route verifies structure and signer context
-  -> relayer pays gas and broadcasts tx
+  -> relayer (broadcast adapter) pays gas and broadcasts tx
   -> submission/reconcile tracks tx status
   -> indexer sees emitted chain event
 ```
@@ -35,9 +34,9 @@ The relayer key represents only the gas payer, never a business actor. Authority
 
 A broadcast adapter is an explicit declaration, not a default:
 
-- When the environment is non-local, or `UVP_STATE_MACHINE_RELAYER_BROADCAST_ENABLED=true`, a missing broadcast adapter is a startup configuration error — the relayer refuses to start.
+- When the environment is non-local, or `UVP_STATE_MACHINE_RELAYER_BROADCAST_ENABLED=true`, a missing broadcast adapter is a startup configuration error — the service refuses to run half-configured.
 - In a local run without a configured broadcast adapter, submit returns `broadcastStatus: "not_attempted"`: no nonce is reserved and the audit entry records the submission as skipped. This is explicit local dry-run semantics.
-- `broadcast_disabled` is no longer a capability tier of the relayer; it only describes these local dry-run semantics.
+- `broadcast_disabled` is not a capability tier; it only describes these local dry-run semantics.
 
 ## What It Can Do
 

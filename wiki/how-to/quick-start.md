@@ -51,7 +51,7 @@ indexer、executor 和部署脚本同步。
 | `pnpm test` | 所有 package 的 test。 |
 | `pnpm build` | 所有 package 的 build。 |
 | `pnpm lint` | 有 lint 脚本的 package 执行 lint。 |
-| `pnpm verify:protocol-freeze` | 校验当前全部冻结 ABI/hash fixture 与 EIP-712 domain：v0.10 `UVPStateMachine`、v4.0 docking module、v0.4 plan-metadata、v0.3 lens、v0.2 stage-patch/derived-signal/order-link/deployment-registry、v0.1 identity registry。 |
+| `pnpm verify:protocol-freeze` | 校验当前全部冻结 ABI/hash fixture 与 EIP-712 domain：v0.10 `UVPStateMachine`、v4.2 docking module、v0.5 plan-metadata、v0.3 lens、v0.3 stage-patch、v0.2 derived-signal/order-link/deployment-registry、v0.1 identity registry。 |
 | `pnpm no-spend:safety` | 运行 deploy 包的 no-spend 检查和环境文件校验；不花 gas。 |
 
 验证方式：对应命令退出码为 0。

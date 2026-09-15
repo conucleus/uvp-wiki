@@ -38,7 +38,7 @@ The ordinary user interface does not expose HookPlan, sourceId, signalId, ABI, c
 
 ## Executor Kit
 
-`uvp-executor-kit/package` faces executors, enterprise systems, AI/MCP adapters, and executors. It has two mode families:
+`uvp-executor-kit/package` faces executors, enterprise systems, supervised AI agent scripts, and executors. It has two mode families:
 
 | Mode | Purpose |
 | --- | --- |

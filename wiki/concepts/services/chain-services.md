@@ -47,7 +47,7 @@ fork 或自部署时必须守住这些接口约束：
 | 子系统 | 代码入口 | 说明 |
 | --- | --- | --- |
 | [Indexer 与投影](indexer-projections.md) | `src/indexer/`、`src/storage/` projection rows | 从 deployment registry、state-machine、identity registry 事件重建 order/task/proof/identity 视图。 |
-| [Relayer](relayer.md) | `src/relayer/` | gas payer、广播、confirmation、retry；不生成业务签名。 |
+| [Relayer](relayer.md) | `src/submissions/`、`src/stage-patches/`、`src/product/`（broadcast 装配件） | gas payer 与广播**角色**，由 submissions/stage-patches 广播装配件与 product BFF 承担；confirmation、retry；不生成业务签名。 |
 | [Submissions 与 Stage Patch](submissions-stage-patch.md) | `src/submissions/`、`src/product/bff/`、`src/stage-patches/` | submission 状态跟踪、order registration/BFF workflow、executor/resource stage patch 提交入口。 |
 | [Evidence、Proof 与 File Resource](evidence-proof.md) | `src/evidence/`、`src/proof-verifier/` | evidence hash、metadata hash、object handle、proof mismatch report。 |
 | [Product API](product-api.md) | `src/product/`、`src/api/routes/product-read.ts` | ordinary user order/task/timeline/proof DTO 和 Product staging readiness。 |

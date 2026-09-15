@@ -73,7 +73,7 @@ Postgres, object storage, and APIs in this diagram are product runtime layers. T
 | On-chain facts | `uvp-protocol/contracts/uvp-contracts/` | Fact records for Plans, Orders, Signals, Hooks, identity bindings, and deployment cutovers. | Product display, Store workflows, private file storage. |
 | Service layer (rebuildable) | `uvp-chain-services/service/`, `uvp-protocol/packages/product-dto/` | Indexer, projections, Product/Store API, relayer boundary, proof/evidence workflows, notifications, and the DTO contracts shared by products. | Becoming the source of truth for plan/order/signal/trust, or producing business signatures. |
 | Product surfaces | `zhixu-store/app/`, `uvp-order-app/app/` | Translating on-chain facts into orders, tasks, proof, trust, and the Store workbench. | Rewriting contract facts, bypassing order-level authorization. |
-| Executor tooling | `uvp-executor-kit/package/` | CLI/SDK/MCP signal producer, chain watcher, Product API prepare/sign/submit/proof. | Custodying default private keys, taking over signature responsibility from businesses. |
+| Executor tooling | `uvp-executor-kit/package/` | CLI/SDK signal producer, chain watcher, Product API prepare/sign/submit/proof. | Custodying default private keys, taking over signature responsibility from businesses. |
 | Deployment and evidence | `uvp-deploy/deploy/` | Address manifests, release records, Anvil/Base Sepolia rehearsal, staging gates. | Redefining protocol semantics or hiding failure evidence. |
 
 ## Component Bus
@@ -86,7 +86,7 @@ Postgres, object storage, and APIs in this diagram are product runtime layers. T
 | Bindings | `uvp-protocol/packages/protocol-bindings/` | Browser-safe ABI, typed-data builders, hash helpers, calldata builders. |
 | Service layer | `uvp-chain-services/service/`, `uvp-protocol/packages/product-dto/` | Forkable off-chain indexer, projections, relayer boundary, proof verifier, Product/Store API; Product order/task/proof/trust DTOs. |
 | Store/Product UIs | `zhixu-store/app/`, `uvp-order-app/app/` | Store workbench, participant task UI, proof display. |
-| Execution tools | `uvp-executor-kit/package/` | CLI/SDK/MCP signal producer. |
+| Execution tools | `uvp-executor-kit/package/` | CLI/SDK signal producer. |
 | Deploy/evidence | `uvp-deploy/deploy/` | Deployment manifests, release records, staging gates. |
 | Periphery | `uvp-periphery/` | Payment/funding/guarantee/agent adapters and demos. |
 

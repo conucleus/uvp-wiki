@@ -16,7 +16,7 @@ Executor Kit has two equally important signal-producer surfaces:
 | Mode | Input | Output | Use case |
 | --- | --- | --- | --- |
 | Chain-native | `UVPStateMachine.HookReady`, local handler config, wallet. | Directly builds a `submitSignal` transaction or dry-run job. | Advanced chain-native executors, self-managed watchers. |
-| Product API | Product task / signal container / evidence id. | Standard prepare/sign/submit/proof flow. | Enterprise scripts, supervised AI/MCP, ordinary automation integration. |
+| Product API | Product task / signal container / evidence id. | Standard prepare/sign/submit/proof flow. | Enterprise scripts, supervised AI agents, ordinary automation integration. |
 
 ## Product API mode
 
@@ -85,20 +85,9 @@ It should answer:
 
 Doctor needs no private key and should not print protocol secrets.
 
-## MCP/AI adapter
+## AI agents and enterprise scripts
 
-The MCP adapter is a thin wrapper around the `product.ts` SDK. AI agents, MCP tools, enterprise scripts, and the browser Order App all connect to the same Product API prepare/sign/submit/proof boundary.
-
-```ts
-import { createProductMcpAdapter } from "@uvp-eth/executor-kit/mcp";
-
-const uvp = createProductMcpAdapter({ chainServicesUrl: "http://127.0.0.1:8787" });
-await uvp.uvp_list_tasks({ walletAddress });
-await uvp.uvp_prepare_signal({ taskId: "task_123", walletAddress });
-await uvp.uvp_submit_signal({ prepared, privateKeyEnv: "UVP_PARTICIPANT_PRIVATE_KEY", walletAddress });
-```
-
-MCP can assist with preparation, routing, and result display; the authorized participant's signature is still made by the corresponding wallet. `includeRaw: true` should be used only in explicit wallet-signing handoffs or protocol debugging.
+executor-kit ships no MCP adapter (the former thin `@uvp-eth/executor-kit/mcp` wrapper has been removed). AI agents, enterprise scripts, and future MCP clients all consume the Product API SDK (`product.ts`)/CLI and dock at the same prepare/sign/submit/proof boundary: tools may assist with preparation, routing, and result display, while the authorized participant's signature is still made by the corresponding wallet.
 
 ## Permission boundaries
 

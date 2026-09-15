@@ -26,7 +26,7 @@ It reads no environment variables, stores no private keys, submits no transactio
 | EIP-712 domain / typed data | contracts, protocol-bindings | Product submit, relayer, executor-kit, wallet UI | Update digest helpers, signing tests, and the staging domain check; staging must not fall back to the older `0.1` domain. |
 | Canonical hash / artifact schema | compiler, hook-core, statemachine | Plan publication, commitPlan/finalizePlan, release evidence | Update golden fixtures, canonical hash docs, and compiler/statemachine tests. |
 | Product DTO | product-dto | chain-services, Store, Order App, executor-kit, periphery adapter | Update DTO tests, route tests, frontend/API consumers, and ordinary-user copy. |
-| Product API | chain-services | Store, Order App, executor-kit Product API mode, MCP adapter | Update the API reference, route tests, browser E2E, and failure language. |
+| Product API | chain-services | Store, Order App, executor-kit Product API mode, enterprise scripts/AI agents (via the executor-kit SDK/CLI) | Update the API reference, route tests, browser E2E, and failure language. |
 | Deployment manifest | uvp-deploy/deploy | chain-services, staging scripts, release records | Commit only curated manifest/evidence; local generated address files are not committed by default. |
 | Release evidence schema | uvp-deploy/deploy | release owner, audit, release-evidence consumers | Keep it no-secret, redacted, and auditable; do not treat raw logs or object bytes as release records. |
 | Store Console HTTP API | chain-services (`uvp-chain-services/service/src/api/routes/`) | Store workbench, operator scripts | Routes, error codes, proof rows, and authz semantics must stay in sync with the DTO; update Store frontend consumers and route tests. |

@@ -70,7 +70,7 @@ status: verified
 | [Docked Zhixu / 对接秩序](../concepts/state-machine/docking.md) | 一条 Zhixu 把某个阶段交给另一条可独立运行的 Zhixu。 | `supplierType=zhixu`、`signalMap`、docking events。 |
 | `signalMap` | 把 linked Zhixu 的 `str/cmp/err` 输出映射回本地 stage interface。 | `zhixuExecutorConfig.signalMap`。 |
 | [Periphery Adapter](../concepts/periphery-and-deploy.md) | 围绕核心状态机的资金、担保、付款、agent 或业务系统适配层。 | `uvp-periphery/`。 |
-| [Relayer](../concepts/services/relayer.md) | 广播已签名交易、可能代付 gas 的服务或钱包。它不是业务签名者。 | chain-services relayer、`submitSignalFor()`。 |
+| [Relayer](../concepts/services/relayer.md) | 广播已签名交易、可能代付 gas 的参与方角色或钱包。它不是业务签名者。 | submissions/stage-patches 广播装配件与 product BFF、`submitSignalFor()`。 |
 | [EIP-712](../concepts/trust/eip712-relayer.md) | 钱包签结构化业务动作的格式。 | typed data builders、`UVPStateMachineSignal`。 |
 | Anvil | 本地开发和协议闭环使用的 EVM 链。 | local Anvil scripts。 |
 | Base Sepolia | 公共 EVM 测试网目标，用于 staging/rehearsal claim。 | chain id `84532`。 |
