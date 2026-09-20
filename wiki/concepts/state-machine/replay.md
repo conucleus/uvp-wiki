@@ -43,7 +43,7 @@ Replay 解决三个问题：
 
 ## First Writer Wins
 
-Reference reducer 也按 signal key 处理 first-writer-wins。重复 signal 不应改变状态。这样它和合约的 `_signals[orderId][signalKey]` 语义保持一致。
+Reference reducer 也按 signal key 处理 first-writer-wins。重复 signal 不应改变状态。订单在 replay 状态里按 `(planId, orderId)` 复合键定位（uvp-core replay oracle 的订单键即 `planId::orderId`），这样它和合约的 `_signals[planId][orderId][signalKey]` 语义保持一致——两个 plan 复用同一 orderId 时不会互相覆盖或共享信号。
 
 ## Projection 与 authority
 

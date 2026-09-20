@@ -29,11 +29,11 @@ GET /product/me/activity-feed
 
 Plan 发布状态来自 `UVPStateMachine.PlanRegistered` 投影。任务来自 `HookReady`，执行钱包来自 Plan 声明的 signal capability 与订单级 `SignalSubmitterAuthorized`。角色名称只负责展示。
 
-### 访问口径：纯链上事实公开，业务档案凭身份
+### 访问口径：timeline/proof 走参与者门，业务档案凭身份与归属
 
-`GET /product/orders/:orderId/timeline` 与 `GET /product/orders/:orderId/proof` 是纯链上事实的投影，**匿名可读是设计口径**（白皮书 §7：链上事件是公开可回放真相，链下投影可从事件重建、不造事实），不是漏配的鉴权缺口。
+`GET /product/orders/:orderId/timeline` 与 `GET /product/orders/:orderId/proof` 虽是纯链上事实的投影，但事件载荷携带信号提交者钱包、签名细节等参与者数据——与订单详情同口径走参与者门（白皮书 §7：链上事件公开可回放指的是直接读链，不等于链下读端点匿名开放）：要求会话身份（钱包会话，或 local 开发的显式 dev 身份），且只有订单参与者（链上指派钱包、在任执行者、创建者或已接受参与的订单归属）可读；匿名请求返回 401，非参与者与"订单不存在"同响应（404），不泄露存在性。
 
-与之相对，业务档案端点一律要求会话身份（白皮书 §7.2 业务面最小可见）：`GET /product/submissions/:submissionId`、`GET /product/order-triggers/:triggerId` 要求钱包会话（或 local 开发的显式 dev 身份）；邀请预览 `GET /product/invites/:inviteId` 除会话身份外还必须携带一次性 invite token（哈希比对），且响应只含最小字段集——联系方式脱敏、金额仅对创建者/已接受参与者可见。
+业务档案端点同样要求会话身份（白皮书 §7.2 业务面最小可见）：`GET /product/submissions/:submissionId`、`GET /product/order-triggers/:triggerId` 要求钱包会话（或 local 开发的显式 dev 身份），会话钱包还须与档案归属比对；邀请预览 `POST /product/invites/:inviteId` 必须携带一次性 invite token（哈希比对，随请求体提交；会话钱包可选，仅用于金额可见范围判定），且响应只含最小字段集——联系方式脱敏、金额仅对创建者/已接受参与者可见。
 
 ## Product BFF（草稿、邀请与订单触发）
 
@@ -46,7 +46,7 @@ POST /product/order-drafts/:draftId/trigger
 GET  /product/order-triggers/:triggerId
 GET  /product/orders/:draftId/participants
 POST /product/orders/:draftId/invites
-GET  /product/invites/:inviteId
+POST /product/invites/:inviteId
 POST /product/invites/:inviteId/accept
 POST /product/invites/:inviteId/reject
 ```
@@ -154,7 +154,7 @@ Listing 与页面装饰：
 POST /store/listings/import
 GET  /store/listings
 GET  /store/listings/:listingId
-POST /store/listings/:listingId/anchor-verification
+GET  /store/listings/:listingId/anchor-verification
 POST /store/listings/:listingId/review
 POST /store/listings/:listingId/delist
 POST /store/listings/:listingId/relist
@@ -167,7 +167,7 @@ POST /store/publishers/delegations
 POST /store/publishers/delegations/:delegationId/revoke
 ```
 
-入驻申请与评估：
+入驻申请：
 
 ```text
 POST /store/join-applications
@@ -177,10 +177,6 @@ POST /store/join-applications/:applicationId/review-start
 POST /store/join-applications/:applicationId/approve
 POST /store/join-applications/:applicationId/reject
 POST /store/join-applications/:applicationId/revoke
-GET  /store/compliance/capabilities
-POST /store/compliance/access-preview
-GET  /store/risk/capabilities
-POST /store/risk/assess
 ```
 
 Draft、docking session、listing、装饰、供应商名称、能力标签、匹配资料与审核记录属于 Store 的链下事实。Identity Registry 投影只提供 `subjectId` 与钱包的公开对应关系。

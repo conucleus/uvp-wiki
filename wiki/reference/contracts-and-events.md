@@ -15,6 +15,13 @@ status: verified
 | --- | --- |
 | `UVPIdentityRegistry` | 线下 subject 与钱包的身份绑定及逐 binding 撤销。 |
 | `UVPStateMachine` | plan/order/signal/hook/timer/stage overlay runtime。 |
+| `UVPPlanRegistration` | 计划生命周期外部链接库：`commitPlan` / `finalizePlan` 与全部注册边界校验，经 DELEGATECALL 写主合约存储。 |
+| `UVPPlanMetadataModule` | plan 元数据注册与查询：stage selector 绑定、signal capability、dock route/interface Merkle root。 |
+| `UVPStagePatchModule` | 阶段 executor/resource patch 的应用与 active patch 记录（`applyStageExecutorPatch` / `applyStageResourcePatch`）。 |
+| `UVPDerivedSignalModule` | 订单间派生信号的签名提交入口，两端绑定 `(planId, orderId)` 复合身份。 |
+| `UVPOrderLinkModule` | 订单间派生建单：signed `triggerOrderFromSignalFor` 与 `OrderTriggerLink` 登记。 |
+| `UVPDockingModule` | 统一 Zhixu DockRoute：`openDockedOrder` 原子创建 linked order 并写 entrance fact，`submitDockedInput` / `submitDockedSignal` 回写交付。 |
+| `UVPStateMachineLens` | 状态机与各模块的只读 lens 视图聚合（active patch、docking、plan 元数据）。 |
 | `UVPDeploymentRegistry` | versioned state-machine deployment cutover ledger。 |
 | `ECDSA` | minimal signature recovery helper。 |
 | `UVPSignatures` | relayed state-machine signal submission shared signature structs。 |
@@ -67,6 +74,7 @@ SignalSubmitted
 DockOpened
 DockInputSubmitted
 DockOutputSubmitted
+DockOutputSatisfied
 StageExecutorPatchApplied
 StageResourcePatchApplied
 StageExecutorActivated

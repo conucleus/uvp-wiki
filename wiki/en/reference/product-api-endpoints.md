@@ -29,11 +29,11 @@ GET /product/me/activity-feed
 
 Plan publication status comes from the `UVPStateMachine.PlanRegistered` projection. Tasks come from `HookReady`; executor wallets come from Plan-declared signal capabilities and order-level `SignalSubmitterAuthorized`. Role names are display only.
 
-### Access policy: pure on-chain facts are public, business records require identity
+### Access policy: timeline/proof use the participant gate, business records require identity and ownership
 
-`GET /product/orders/:orderId/timeline` and `GET /product/orders/:orderId/proof` are projections of pure on-chain facts. **Anonymous readability is by design** (whitepaper §7: chain events are the publicly replayable truth; off-chain projections are rebuildable from events and create no facts) — not a missing auth gate.
+`GET /product/orders/:orderId/timeline` and `GET /product/orders/:orderId/proof` are projections of pure on-chain facts, but their event payloads carry participant data such as signal-submitter wallets and signature details — they use the same participant gate as the order detail (whitepaper §7: chain events being publicly replayable refers to reading the chain directly; it does not mean the off-chain read endpoints are open anonymously): they require a session identity (a wallet session, or an explicit dev identity in local development), and only order participants (on-chain assignee wallets, active executors, the creator, or accepted participants) may read them; anonymous requests get 401, and non-participants get the same response as "order not found" (404), leaking no existence.
 
-In contrast, business-record endpoints always require a session identity (whitepaper §7.2, minimal business visibility): `GET /product/submissions/:submissionId` and `GET /product/order-triggers/:triggerId` require a wallet session (or an explicit dev identity in local development); the invite preview `GET /product/invites/:inviteId` additionally requires the one-time invite token (hash-compared), and its response is a minimal field set — contact info is masked and money amounts are visible only to the draft creator or accepted participants.
+Business-record endpoints likewise require a session identity (whitepaper §7.2, minimal business visibility): `GET /product/submissions/:submissionId` and `GET /product/order-triggers/:triggerId` require a wallet session (or an explicit dev identity in local development), and the session wallet must further match the record's owner; the invite preview `POST /product/invites/:inviteId` must carry the one-time invite token (hash-compared, submitted in the request body; a session wallet is optional and only widens amount visibility), and its response is a minimal field set — contact info is masked and money amounts are visible only to the draft creator or accepted participants.
 
 ## Product BFF (drafts, invites, and order triggers)
 
@@ -46,7 +46,7 @@ POST /product/order-drafts/:draftId/trigger
 GET  /product/order-triggers/:triggerId
 GET  /product/orders/:draftId/participants
 POST /product/orders/:draftId/invites
-GET  /product/invites/:inviteId
+POST /product/invites/:inviteId
 POST /product/invites/:inviteId/accept
 POST /product/invites/:inviteId/reject
 ```
@@ -154,7 +154,7 @@ Listings and page decoration:
 POST /store/listings/import
 GET  /store/listings
 GET  /store/listings/:listingId
-POST /store/listings/:listingId/anchor-verification
+GET  /store/listings/:listingId/anchor-verification
 POST /store/listings/:listingId/review
 POST /store/listings/:listingId/delist
 POST /store/listings/:listingId/relist
@@ -167,7 +167,7 @@ POST /store/publishers/delegations
 POST /store/publishers/delegations/:delegationId/revoke
 ```
 
-Join applications and assessments:
+Join applications:
 
 ```text
 POST /store/join-applications
@@ -177,10 +177,6 @@ POST /store/join-applications/:applicationId/review-start
 POST /store/join-applications/:applicationId/approve
 POST /store/join-applications/:applicationId/reject
 POST /store/join-applications/:applicationId/revoke
-GET  /store/compliance/capabilities
-POST /store/compliance/access-preview
-GET  /store/risk/capabilities
-POST /store/risk/assess
 ```
 
 Drafts, docking sessions, listings, decoration, supplier names, capability tags, matching profiles, and review records are Store off-chain facts. The Identity Registry projection only provides the public correspondence between `subjectId` and wallets.

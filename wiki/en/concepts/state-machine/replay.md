@@ -43,7 +43,7 @@ Replay solves three problems:
 
 ## First Writer Wins
 
-The reference reducer also applies first-writer-wins by signal key. A duplicate signal should not change state. That keeps it aligned with the contract semantics of `_signals[orderId][signalKey]`.
+The reference reducer also applies first-writer-wins by signal key. A duplicate signal should not change state. Orders are addressed in replay state by the `(planId, orderId)` composite key (the uvp-core replay oracle keys orders as `planId::orderId`), which keeps it aligned with the contract semantics of `_signals[planId][orderId][signalKey]` — two plans reusing the same order id cannot overwrite or share each other's signals.
 
 ## Projection and Authority
 
