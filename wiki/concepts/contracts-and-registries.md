@@ -12,7 +12,7 @@ status: verified
 ## UVPStateMachine 与 modules
 
 - publisher 签名提交 Plan，任意 relayer 广播。
-- hooks 与 metadata hash 在 commit 时绑定，metadata 在 finalize 时一次冻结。
+- publisher 签名承诺 `hooksHash`、`capabilitiesRoot` 与两个 dock roots，`finalizePlan` 只落定稿。
 - 只允许 finalized Plan 创建 Order。
 - creator/submitter 签名产生订单级权利；relayer 不需要 allowlist。
 - Signal、HookReady、stage patch、resource patch、docking 与 derived signal 都留下可重放事件。

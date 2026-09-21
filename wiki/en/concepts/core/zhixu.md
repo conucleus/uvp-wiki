@@ -114,7 +114,7 @@ receiveSignals:
   REQUESTED: "::ANCHOR(@customer::request.submit.requested)"
 ```
 
-`mint` accepts only `per-fact`; a birth stage must contain at least one `ANCHOR(@...)` subscription and use a static individual/organization executor. The compiler rejects self-loops and unbounded cross-source re-mint cycles. A stage without `mint` may use a normal `source::condition` hook or an `ANCHOR(@...)` channel listener; its order identity comes from existing order routing or an executor's self-reported order. The retired `trigger`, `externalSignals`, and wrapper forms other than the subscription (`::OUTSIDE@`, the old `::ANCHOR@(…)`) are rejected explicitly.
+`mint` accepts only `per-fact`; a birth stage must contain at least one `ANCHOR(@...)` subscription and use a static individual/organization executor. The compiler rejects self-loops and unbounded cross-source re-mint cycles. A stage without `mint` may use a normal `source::condition` hook or an `ANCHOR(@...)` channel listener; its order identity comes from existing order routing or an executor's self-reported order. `trigger`, `externalSignals`, and wrapper forms other than the subscription (`::OUTSIDE@`, `::ANCHOR@(…)`) are not valid DSL and are rejected explicitly.
 
 ## `selectedStages`
 

@@ -35,7 +35,7 @@ Import Zhixu
   -> Product Schema and resource requirement validation
   -> Store review
   -> publisher signature
-  -> PlanCommitted / metadata registration / PlanFinalized
+  -> PlanCommitted (capabilitiesRoot committed with the plan) / PlanFinalized
   -> StateMachine PlanRegistered projection
   -> Store selects an active version
 ```
@@ -53,6 +53,6 @@ Plan publication authority comes from the publisher signature. Any relayer may b
 
 ## Sources of fact
 
-For facts such as whether a Plan is published, who published it, which Plan an Order currently uses, or whether a supplier fits a stage, the authority sources are unified in the [README.md](README.md) "Information objects and authority sources" table; this page no longer keeps a separate list.
+For facts such as whether a Plan is published, who published it, which Plan an Order currently uses, or whether a supplier fits a stage, the authority sources are unified in the [README.md](README.md) "Information objects and authority sources" table; this page does not keep a separate list.
 
 The Identity Registry only records the mapping between real-world subjects and wallets; it performs no capability certification — see the one-line version in the [README.md](README.md) authority table and the full discussion in [../protocol-boundaries.md](../protocol-boundaries.md).

@@ -13,12 +13,12 @@ Stage overlay is an order-level patch. It allows a specific order to assign a ne
 
 `StageExecutorPatchApplied` / `StageExecutorActivated` change only the target stage executor of a single order, not the Plan. An executor patch changes the execution constraint of a target stage. The contract requires:
 
-- A `StageSelectorBinding` exists between the stage that initiates the patch and the target stage.
+- A `StageSelectorBinding` exists between the stage that initiates the patch and the target stage (membership verified by the bindingProof carried by the patch).
 - The submitter of the patch has order-level authorization for the internal `EXECUTOR_PATCH_SIGNAL_ID`.
 - The nonce must increase, so older patches cannot overwrite newer ones.
 - Different modes such as assign, handoff, and replacement have different signature or approval requirements.
 
-After activation, the contract automatically delegates to the active executor the target stage's current-order signal capabilities declared by Plan `sendSignals`. The selected wallet need not be preauthorized when the Order is created, but it can submit only those Plan-declared signals; a patch cannot expand Plan capabilities.
+After activation, the contract automatically delegates to the active executor the target stage's current-order signal capabilities declared by Plan `sendSignals`. Those capabilities are folded into the `capabilitiesRoot` and verified against the tree through the bindingProof/stageFacts carried by the patch. The selected wallet need not be preauthorized when the Order is created, but it can submit only those Plan-declared signals; a patch cannot expand Plan capabilities.
 
 For details see [Executor Patch](executor-patch.md).
 

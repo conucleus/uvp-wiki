@@ -29,7 +29,7 @@ status: verified
 | [Trigger](../concepts/core/trigger.md) | 订单入口语义：`orderTriggerKind` 表达 mint/dock/none，`emitReady` 独立控制是否发出可执行任务的 `HookReady`。 | `orderTriggerKind`、`emitReady`、`HookReady`。 |
 | [File Resource](../concepts/core/file-resources.md) | 阶段协议、证据模板、资源清单等链下材料的句柄，不是明文文件存储。 | `fileResources`、resource patch、metadata URI/hash。 |
 | OnchainHookPlan | 面向 EVM 注册和材料审核的紧凑链上产物。 | `OnchainHookPlanArtifact`、compact hooks、dependency indexes、selector bindings。 |
-| HookPlan IR | 编译器内部中间形态，不再是 Store/import/deploy 的公开流程。 | `compileZhixuOnchainHookPlan()` 内部使用。 |
+| HookPlan IR | 编译器内部中间形态，不是 Store/import/deploy 的公开流程。 | `compileZhixuOnchainHookPlan()` 内部使用。 |
 
 ## 动作与事件
 

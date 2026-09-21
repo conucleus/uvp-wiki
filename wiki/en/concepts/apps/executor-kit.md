@@ -87,7 +87,7 @@ Doctor needs no private key and should not print protocol secrets.
 
 ## AI agents and enterprise scripts
 
-executor-kit ships no MCP adapter (the former thin `@uvp-eth/executor-kit/mcp` wrapper has been removed). AI agents, enterprise scripts, and future MCP clients all consume the Product API SDK (`product.ts`)/CLI and dock at the same prepare/sign/submit/proof boundary: tools may assist with preparation, routing, and result display, while the authorized participant's signature is still made by the corresponding wallet.
+executor-kit ships no MCP adapter. AI agents, enterprise scripts, and future MCP clients all consume the Product API SDK (`product.ts`)/CLI and dock at the same prepare/sign/submit/proof boundary: tools may assist with preparation, routing, and result display, while the authorized participant's signature is still made by the corresponding wallet.
 
 ## Permission boundaries
 

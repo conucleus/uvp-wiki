@@ -29,7 +29,7 @@ This page explains project terms in plain language first, then gives the code an
 | [Trigger](../concepts/core/trigger.md) | Order-entry semantics: `orderTriggerKind` expresses mint/dock/none, while `emitReady` independently controls whether an actionable `HookReady` is emitted. | `orderTriggerKind`, `emitReady`, `HookReady`. |
 | [File Resource](../concepts/core/file-resources.md) | A handle for off-chain materials such as stage protocols, evidence templates, and resource manifests; not plaintext file storage. | `fileResources`, resource patch, metadata URI/hash. |
 | OnchainHookPlan | The compact on-chain artifact for EVM registration and material review. | `OnchainHookPlanArtifact`, compact hooks, dependency indexes, selector bindings. |
-| HookPlan IR | The compiler-internal intermediate shape; no longer a public Store/import/deploy flow. | Used internally by `compileZhixuOnchainHookPlan()`. |
+| HookPlan IR | The compiler-internal intermediate shape; not a public Store/import/deploy flow. | Used internally by `compileZhixuOnchainHookPlan()`. |
 
 ## Actions and Events
 

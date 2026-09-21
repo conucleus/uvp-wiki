@@ -14,7 +14,7 @@ The Compiler and Hook Core are the entry point through which protocol semantics 
 `uvp-protocol/packages/hook-core` is responsible for:
 
 - Parsing `source::condition`.
-- Supporting `&`, `|`, `~`, delay, and cross-source `::ANCHOR(@source::task.stage.signal)` subscriptions; the subscription is the only wrapper form for cross-source facts — every other wrapper (e.g. `::OUTSIDE@` or the old `::ANCHOR@(…)`) and `OUTSOURCE` fails at parse time.
+- Supporting `&`, `|`, `~`, delay, and cross-source `::ANCHOR(@source::task.stage.signal)` subscriptions; the subscription is the only wrapper form for cross-source facts — every other wrapper (e.g. `::OUTSIDE@` or `::ANCHOR@(…)`) and `OUTSOURCE` fails at parse time.
 - Generating receive Hooks only from stage `receiveSignals`; there is no parallel `externalSignals` or trigger-wrapper semantics that bypass the AST.
 - Interpreting `~A` as "the A signal has not yet appeared in the current order's event set". Once a signal appears it never disappears, so this is monotonic existence logic.
 - Extracting positive, negative, and timer dependencies.

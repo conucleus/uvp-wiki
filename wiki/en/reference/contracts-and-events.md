@@ -16,7 +16,7 @@ Contract source lives in `uvp-protocol/contracts/uvp-contracts/`.
 | `UVPIdentityRegistry` | Offline subject-to-wallet identity binding with per-binding revocation. |
 | `UVPStateMachine` | Plan/order/signal/hook/timer/stage overlay runtime. |
 | `UVPPlanRegistration` | Plan-lifecycle linked library: `commitPlan` / `finalizePlan` and all registration boundary checks, writing main-contract storage via DELEGATECALL. |
-| `UVPPlanMetadataModule` | Plan metadata registration and queries: stage selector bindings, signal capabilities, dock route/interface Merkle roots. |
+| `UVPPlanMetadataModule` | Plan metadata storage and verification: the `capabilitiesRoot` (capability/binding Merkle tree) and dock route/interface Merkle roots — storage, leaf formulas, and proof verification. |
 | `UVPStagePatchModule` | Applying stage executor/resource patches and recording active patches (`applyStageExecutorPatch` / `applyStageResourcePatch`). |
 | `UVPDerivedSignalModule` | Signed submission entry for order-to-order derived signals, binding both ends to the `(planId, orderId)` composite identity. |
 | `UVPOrderLinkModule` | Order-to-order derived creation: signed `triggerOrderFromSignalFor` and `OrderTriggerLink` registration. |

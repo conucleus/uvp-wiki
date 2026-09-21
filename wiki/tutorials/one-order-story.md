@@ -115,7 +115,7 @@ Zhixu 是一份让计算机、链上合约、企业系统、AI agent、Store、O
 
 ### 5.3 发布这个版本并登记参与方身份
 
-Publisher 用 EIP-712 签名发布稳定版本，StateMachine 把 Plan 的哈希、metadata 和 publisher 记录成可重放事件。Store 线下核验参与机构后，可以把 subject 与钱包的对应写入 Identity Registry，帮助参与者识别钱包背后的现实主体。
+Publisher 用 EIP-712 签名发布稳定版本，StateMachine 把 Plan 的哈希、能力树根和 publisher 记录成可重放事件。Store 线下核验参与机构后，可以把 subject 与钱包的对应写入 Identity Registry，帮助参与者识别钱包背后的现实主体。
 
 ### 5.4 最后创建这一次执行
 

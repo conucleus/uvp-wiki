@@ -115,7 +115,7 @@ The system checks and packages the Zhixu: once references are complete and stage
 
 ### 5.3 Publish the Version and Register Participant Identities
 
-The Publisher signs the stable version with EIP-712 to publish it, and StateMachine records the Plan hash, metadata, and publisher as replayable events. After offline verification of participating organizations, the Store can write subject-to-wallet mappings into the Identity Registry, helping participants identify the real-world subject behind a wallet.
+The Publisher signs the stable version with EIP-712 to publish it, and StateMachine records the Plan hash, the capability-tree root, and the publisher as replayable events. After offline verification of participating organizations, the Store can write subject-to-wallet mappings into the Identity Registry, helping participants identify the real-world subject behind a wallet.
 
 ### 5.4 Create This Concrete Run
 

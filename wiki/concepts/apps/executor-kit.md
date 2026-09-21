@@ -87,7 +87,7 @@ doctor 不需要私钥，也不应打印协议 secrets。
 
 ## AI agent 与企业脚本
 
-executor-kit 不内置 MCP 适配器（此前的 `@uvp-eth/executor-kit/mcp` 薄封装已删除）。AI agent、企业脚本和后续 MCP 客户端统一作为 Product API SDK（`product.ts`）/CLI 的消费者，接到同一个 prepare/sign/submit/proof 边界：工具可以协助准备、路由和展示结果，授权参与方签名仍由对应钱包完成。
+executor-kit 不内置 MCP 适配器。AI agent、企业脚本和后续 MCP 客户端统一作为 Product API SDK（`product.ts`）/CLI 的消费者，接到同一个 prepare/sign/submit/proof 边界：工具可以协助准备、路由和展示结果，授权参与方签名仍由对应钱包完成。
 
 ## 权限边界
 

@@ -33,19 +33,35 @@ hashCanonical("uvp:hook-plan-artifact:v1", payload)
 
 ## 链上 planHash
 
-链上 runtime `planHash` 覆盖四个域，使用独立哈希域：
+链上 runtime `planHash` 覆盖 hooks、能力树根和两个 dock roots，使用独立哈希域：
 
 ```text
 planHash = keccak256(abi.encode(
-  keccak256("uvp.plan.runtime.v2"),   // domain
+  keccak256("uvp.plan.runtime.v3"),   // domain
   hooksHash,                           // keccak256(abi.encode(hooks))
-  metadataHash,                        // keccak256(abi.encode(selectorBindings, signalCapabilities))
+  capabilitiesRoot,                    // 能力/绑定两表的单棵 Merkle root
   dockRoutesRoot,                      // 未声明 dock 时为空 Merkle root
   dockInterfaceRoot                    // 未声明 dock 时为空 Merkle root
 ))
 ```
 
-publisher 对 PlanCommit（publisher、hooksHash、metadataHash、两个 dock roots、deadline）做 EIP-712 签名，`UVPStateMachine` 在 commit/finalize 时检查这个 runtime `planHash`；Identity Registry 不参与。整个 `OnchainHookPlanArtifact` 另有 canonical payload hash（domain `uvp:onchain-hook-plan-artifact:v1`），只用于产物追溯与 fixture 固定，不替代 runtime `planHash`。
+publisher 对 PlanCommit（publisher、hooksHash、capabilitiesRoot、两个 dock roots、deadline）做 EIP-712 签名，`UVPStateMachine` 在 commit/finalize 时检查这个 runtime `planHash`；Identity Registry 不参与。整个 `OnchainHookPlanArtifact` 另有 canonical payload hash（domain `uvp:onchain-hook-plan-artifact:v1`），只用于产物追溯与 fixture 固定，不替代 runtime `planHash`。
+
+## capabilitiesRoot（能力/绑定 Merkle 树）
+
+能力表（signal capabilities）与绑定表（selector bindings）不逐条上链注册。编译器在链下把两表混编进同一棵域分隔排序配对 Merkle 树（排序去重、奇数尾叶提升），链上只存 root；成员资格由使用方按「用字段重算叶 + 携 proof」验证。叶子公式：
+
+```text
+capabilityLeaf = keccak256(abi.encode(
+  keccak256("UVP_SIGNAL_CAPABILITY_V1"),  // 叶域
+  stageId, targetSourceId, signalId, relation))
+
+bindingLeaf = keccak256(abi.encode(
+  keccak256("UVP_SELECTOR_BINDING_V1"),   // 叶域
+  selectorStageId, targetStageId))
+```
+
+叶子公式与合约 `UVPPlanMetadataModule` 的 `signalCapabilityLeaf`/`selectorBindingLeaf` 逐字节一致；空表时 root 为 `keccak256("")`。权威实现是 `uvp-protocol/packages/compiler/src/onchain/capabilities-root.ts`，合约侧验证见 `UVPPlanMetadataModule.sol`。
 
 ## 稳定 ID
 

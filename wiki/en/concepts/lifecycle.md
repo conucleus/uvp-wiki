@@ -20,7 +20,7 @@ An order passes through seven steps from static Zhixu to on-chain fact. The six-
 
 ## 1. Author and Compile
 
-Store or developers write the Zhixu; the Compiler generates hooks, selector bindings, signal capabilities, `hooksHash`, `metadataHash`, the dock roots, and the runtime `planHash`. Compilation only validates rule structure; it does not certify real-world supplier capability.
+Store or developers write the Zhixu; the Compiler generates hooks, selector bindings, signal capabilities, `hooksHash`, `capabilitiesRoot`, the dock roots, and the runtime `planHash`. Compilation only validates rule structure; it does not certify real-world supplier capability.
 
 ## 2. Configure and Freeze the StateMachine
 
@@ -28,11 +28,11 @@ Deploy the StateMachine and six modules, then call `freezeModules()` once addres
 
 ## 3. Sign and Commit the Plan
 
-The publisher signs the PlanCommit (`publisher + hooksHash + metadataHash + dockRoutesRoot + dockInterfaceRoot + deadline`). Any relayer calls `commitPlan`; the contract verifies the hash of the full hooks and the publisher signature, and derives `planId = hash(publisher, planHash)` — `planHash` covers hooks, metadata, and the two dock roots.
+The publisher signs the PlanCommit (`publisher + hooksHash + capabilitiesRoot + dockRoutesRoot + dockInterfaceRoot + deadline`). Any relayer calls `commitPlan`; the contract verifies the hash of the full hooks and the publisher signature, and derives `planId = hash(publisher, planHash)` — `planHash` covers hooks, capabilitiesRoot, and the two dock roots.
 
-## 4. Freeze Metadata Once
+## 4. Finalize the Plan
 
-Any caller submits selector bindings and signal capabilities. `finalizePlan` verifies `metadataHash` and writes to the Metadata Module in one shot. Only finalized Plans can create Orders.
+The capability and binding tables are already folded into `capabilitiesRoot`, committed with the plan by the publisher at commit time. Any caller calls `finalizePlan(planId)` to finalize (permissionless); this step only finalizes and submits no table data. Only finalized Plans can create Orders.
 
 ## 5. Identity Directory (Optional)
 

@@ -9,7 +9,7 @@ status: verified
 # 协议边界（不变量总纲）
 
 > 前置阅读：[核心概念](README.md)
-本页是 UVP 协议边界的唯一权威陈述处。全站其他页面遇到这些边界时只做一句话引用并链接到这里，不再各自复述完整版本。协议事实以代码、`uvp-protocol/contracts/uvp-contracts/fixtures/`、链事件和 release 记录为准；本页表述与实现冲突时，以实现为准并修订本页。
+本页是 UVP 协议边界的唯一权威陈述处。全站其他页面遇到这些边界时只做一句话引用并链接到这里，不复述完整版本。协议事实以代码、`uvp-protocol/contracts/uvp-contracts/fixtures/`、链事件和 release 记录为准；本页表述与实现冲突时，以实现为准并修订本页。
 
 ## 事实源
 
@@ -35,7 +35,7 @@ Store metadata 是读模型：供应商能力、标签、声誉、搜索排序�
 
 ## Plan 生命周期
 
-Plan 通过 `commitPlan()` 提交并绑定 publisher 签名与 hooks/metadata hash，再经 `finalizePlan()` 一次冻结 metadata；只有 finalized Plan 可以创建 Order。Plan 身份由发布者与提交内容共同确定（`planId = hash(publisher, planHash)`）。部署时冻结的 modules 不能被 owner 替换；升级必须部署新 StateMachine 并经 Deployment Registry 显式 cutover。详见 [Contracts 与 Registries](contracts-and-registries.md)、[Canonical Hash](artifacts/canonical-hashes.md) 与 [Plan 与订单生命周期](lifecycle.md)。
+Plan 通过 `commitPlan()` 提交并绑定 publisher 签名（承诺 `hooksHash`、`capabilitiesRoot` 与两个 dock roots），再经 `finalizePlan()` 落定稿；只有 finalized Plan 可以创建 Order。Plan 身份由发布者与提交内容共同确定（`planId = hash(publisher, planHash)`）。部署时冻结的 modules 不能被 owner 替换；升级必须部署新 StateMachine 并经 Deployment Registry 显式 cutover。详见 [Contracts 与 Registries](contracts-and-registries.md)、[Canonical Hash](artifacts/canonical-hashes.md) 与 [Plan 与订单生命周期](lifecycle.md)。
 
 ## 订单与证据边界
 

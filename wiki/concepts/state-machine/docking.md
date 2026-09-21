@@ -39,8 +39,8 @@ route/interface，绑定与路由哈希都带 `interfaceNameId`（keccak(接口�
 
 `UVPStateMachineLens.getActiveDock`、`dockInputDelivered`、
 `dockOutputDelivered`、`dockByLocalRoute` 和 `dockByTargetOrder` 是读取当前
-对接状态的权威 view；旧的 `getActiveDockedOrderLink`、
-`getActiveDockedSignalBinding` 已删除。
+对接状态的权威 view；不存在 `getActiveDockedOrderLink`、
+`getActiveDockedSignalBinding` 视图。
 
 ## 运行路径
 
@@ -79,8 +79,8 @@ dock instance 和 target definition 身份派生，防止跨 plan 抢占。
 
 local stage 的入口由 `receiveSignals` Hook 产生；跨源事实使用
 `::ANCHOR(@source::task.stage.signal)`，出生阶段另声明 `mint: per-fact`。
-旧的 `stage.trigger`、`externalSignals`、`triggerEntrance`，以及订阅以外的
-wrapper 形态（`::OUTSIDE@(...)`、旧 `::ANCHOR@(…)`）不属于当前
+`stage.trigger`、`externalSignals`、`triggerEntrance`，以及订阅以外的
+wrapper 形态（`::OUTSIDE@(...)`、`::ANCHOR@(…)`）不属于当前
 DSL，编译器会拒绝。
 
 linked Zhixu 的 `supplierType: zhixu` 配置声明目标接口名、`order.mode`，并将

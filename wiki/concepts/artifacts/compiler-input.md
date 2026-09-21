@@ -45,7 +45,7 @@ status: verified
 
 ## 源定义如何进入哈希
 
-链上 runtime `planHash` 只覆盖四元组：`hooksHash`、`metadataHash`、`dockRoutesRoot`、`dockInterfaceRoot`（公式见 [Canonical Hash](canonical-hashes.md)）——canonicalized source Zhixu 不在其中。影响协议语义的源定义变化会改变 hooks、selector bindings/signal capabilities 与 dock roots，因此必然改变 `planHash`；整个 `OnchainHookPlanArtifact` 另有 canonical payload hash（经 `sourcePlanHash` 锚定源定义快照），只用于产物追溯与 fixture 固定，不充当链上 `planHash`。编译产物不是手写 JSON，应由脚本从源定义可重复生成。
+链上 runtime `planHash` 只覆盖四元组：`hooksHash`、`capabilitiesRoot`、`dockRoutesRoot`、`dockInterfaceRoot`（公式见 [Canonical Hash](canonical-hashes.md)）——canonicalized source Zhixu 不在其中。影响协议语义的源定义变化会改变 hooks、selector bindings/signal capabilities 与 dock roots，因此必然改变 `planHash`；整个 `OnchainHookPlanArtifact` 另有 canonical payload hash（经 `sourcePlanHash` 锚定源定义快照），只用于产物追溯与 fixture 固定，不充当链上 `planHash`。编译产物不是手写 JSON，应由脚本从源定义可重复生成。
 
 字段清单以 `uvp-protocol/packages/compiler/src/types` 为准。
 

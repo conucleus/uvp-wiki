@@ -45,7 +45,7 @@ These errors must surface at compile time, not at contract registration or order
 
 ## How the Source Definition Enters Hashing
 
-The on-chain runtime `planHash` covers exactly four values: `hooksHash`, `metadataHash`, `dockRoutesRoot`, and `dockInterfaceRoot` (see [Canonical Hash](canonical-hashes.md)) — the canonicalized source Zhixu is not among them. A source-definition change that affects protocol semantics changes the hooks, selector bindings/signal capabilities, and dock roots, and therefore changes the `planHash`. The whole `OnchainHookPlanArtifact` additionally has a canonical payload hash (pinning the source definition snapshot via `sourcePlanHash`) used only for artifact provenance and fixture pinning; it does not act as the on-chain `planHash`. The compiled artifact should not be handwritten JSON; it must be reproducibly generated from the source definition by script.
+The on-chain runtime `planHash` covers exactly four values: `hooksHash`, `capabilitiesRoot`, `dockRoutesRoot`, and `dockInterfaceRoot` (see [Canonical Hash](canonical-hashes.md)) — the canonicalized source Zhixu is not among them. A source-definition change that affects protocol semantics changes the hooks, selector bindings/signal capabilities, and dock roots, and therefore changes the `planHash`. The whole `OnchainHookPlanArtifact` additionally has a canonical payload hash (pinning the source definition snapshot via `sourcePlanHash`) used only for artifact provenance and fixture pinning; it does not act as the on-chain `planHash`. The compiled artifact should not be handwritten JSON; it must be reproducibly generated from the source definition by script.
 
 ## Related Pages
 

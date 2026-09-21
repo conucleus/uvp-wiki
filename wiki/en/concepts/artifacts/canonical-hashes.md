@@ -33,19 +33,35 @@ This is the planHash domain of the compiler-internal chain-track hook plan artif
 
 ## On-chain planHash
 
-The on-chain runtime `planHash` covers four domains and uses its own hash domain:
+The on-chain runtime `planHash` covers hooks, the capability-tree root, and the two dock roots, using its own hash domain:
 
 ```text
 planHash = keccak256(abi.encode(
-  keccak256("uvp.plan.runtime.v2"),   // domain
+  keccak256("uvp.plan.runtime.v3"),   // domain
   hooksHash,                           // keccak256(abi.encode(hooks))
-  metadataHash,                        // keccak256(abi.encode(selectorBindings, signalCapabilities))
+  capabilitiesRoot,                    // the single Merkle root of the capability/binding tables
   dockRoutesRoot,                      // empty Merkle root when no dock is declared
   dockInterfaceRoot                    // empty Merkle root when no dock is declared
 ))
 ```
 
-The publisher signs the PlanCommit (publisher, hooksHash, metadataHash, the two dock roots, deadline) via EIP-712, and `UVPStateMachine` checks this runtime `planHash` at commit/finalize; the Identity Registry is not involved. The whole `OnchainHookPlanArtifact` additionally has a canonical payload hash (domain `uvp:onchain-hook-plan-artifact:v1`) used only for artifact provenance and fixture pinning; it does not replace the runtime `planHash`.
+The publisher signs the PlanCommit (publisher, hooksHash, capabilitiesRoot, the two dock roots, deadline) via EIP-712, and `UVPStateMachine` checks this runtime `planHash` at commit/finalize; the Identity Registry is not involved. The whole `OnchainHookPlanArtifact` additionally has a canonical payload hash (domain `uvp:onchain-hook-plan-artifact:v1`) used only for artifact provenance and fixture pinning; it does not replace the runtime `planHash`.
+
+## capabilitiesRoot (the capability/binding Merkle tree)
+
+The capability table (signal capabilities) and the binding table (selector bindings) are not registered on-chain item by item. The compiler mixes both tables into a single domain-separated sorted-pairing Merkle tree off-chain (sorted and deduplicated, odd tail leaf promoted); only the root lives on-chain, and membership is verified by the caller recomputing the leaf from its fields and carrying a proof. Leaf formulas:
+
+```text
+capabilityLeaf = keccak256(abi.encode(
+  keccak256("UVP_SIGNAL_CAPABILITY_V1"),  // leaf domain
+  stageId, targetSourceId, signalId, relation))
+
+bindingLeaf = keccak256(abi.encode(
+  keccak256("UVP_SELECTOR_BINDING_V1"),   // leaf domain
+  selectorStageId, targetStageId))
+```
+
+The leaf formulas are byte-identical to `signalCapabilityLeaf`/`selectorBindingLeaf` in the `UVPPlanMetadataModule` contract; an empty table yields the root `keccak256("")`. The authoritative implementation is `uvp-protocol/packages/compiler/src/onchain/capabilities-root.ts`; the contract-side verification lives in `UVPPlanMetadataModule.sol`.
 
 ## Stable IDs
 

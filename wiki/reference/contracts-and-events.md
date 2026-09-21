@@ -16,7 +16,7 @@ status: verified
 | `UVPIdentityRegistry` | 线下 subject 与钱包的身份绑定及逐 binding 撤销。 |
 | `UVPStateMachine` | plan/order/signal/hook/timer/stage overlay runtime。 |
 | `UVPPlanRegistration` | 计划生命周期外部链接库：`commitPlan` / `finalizePlan` 与全部注册边界校验，经 DELEGATECALL 写主合约存储。 |
-| `UVPPlanMetadataModule` | plan 元数据注册与查询：stage selector 绑定、signal capability、dock route/interface Merkle root。 |
+| `UVPPlanMetadataModule` | plan 元数据存储与校验：`capabilitiesRoot`（能力/绑定 Merkle 树）与 dock route/interface Merkle root 的存储、叶公式和 proof 验证。 |
 | `UVPStagePatchModule` | 阶段 executor/resource patch 的应用与 active patch 记录（`applyStageExecutorPatch` / `applyStageResourcePatch`）。 |
 | `UVPDerivedSignalModule` | 订单间派生信号的签名提交入口，两端绑定 `(planId, orderId)` 复合身份。 |
 | `UVPOrderLinkModule` | 订单间派生建单：signed `triggerOrderFromSignalFor` 与 `OrderTriggerLink` 登记。 |

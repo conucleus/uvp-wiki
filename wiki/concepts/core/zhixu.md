@@ -106,7 +106,7 @@ spec:
 
 ## `receiveSignals` 与 `mint`
 
-`receiveSignals` 定义 Hook 条件。普通表达式在当前订单上下文中求值；跨源订阅使用空标头的 `::ANCHOR(@source::task.stage.signal)`，由事实路由层逐事件投递。阶段是否是出生阶段只由 `mint: per-fact` 声明决定，不再通过 `trigger` 或 `externalSignals` 声明入口：
+`receiveSignals` 定义 Hook 条件。普通表达式在当前订单上下文中求值；跨源订阅使用空标头的 `::ANCHOR(@source::task.stage.signal)`，由事实路由层逐事件投递。阶段是否是出生阶段只由 `mint: per-fact` 声明决定，不通过 `trigger` 或 `externalSignals` 声明入口：
 
 ```yaml
 mint: per-fact
@@ -114,7 +114,7 @@ receiveSignals:
   REQUESTED: "::ANCHOR(@customer::request.submit.requested)"
 ```
 
-`mint` 只能取 `per-fact`，出生阶段必须包含至少一个 `ANCHOR(@...)` 订阅，并使用静态的 individual/organization executor；编译器会拒绝自环和无界的跨源代铸环。没有 `mint` 的阶段可以用普通 `source::condition` hook，也可以用 `ANCHOR(@...)` 做通道监听；其订单身份由现有订单路由或执行器自报创建。旧的 `trigger`、`externalSignals`，以及订阅以外的 wrapper 形态（`::OUTSIDE@`、旧 `::ANCHOR@(…)`）均已退役，编译器会显式拒绝。
+`mint` 只能取 `per-fact`，出生阶段必须包含至少一个 `ANCHOR(@...)` 订阅，并使用静态的 individual/organization executor；编译器会拒绝自环和无界的跨源代铸环。没有 `mint` 的阶段可以用普通 `source::condition` hook，也可以用 `ANCHOR(@...)` 做通道监听；其订单身份由现有订单路由或执行器自报创建。`trigger`、`externalSignals`，以及订阅以外的 wrapper 形态（`::OUTSIDE@`、`::ANCHOR@(…)`）不是合法 DSL，编译器会显式拒绝。
 
 ## `selectedStages`
 

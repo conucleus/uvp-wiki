@@ -17,7 +17,7 @@ Publishers sign to publish Plans; registrars create Orders against finalized Pla
 
 ## What It Produces
 
-A successful publication produces `planHash`, `planId`, and permanently frozen on-chain hooks/metadata plus the dock-root commitments; every Order afterwards references this immutable identity, and rule changes can only be expressed by publishing a new Plan.
+A successful publication produces `planHash`, `planId`, and permanently frozen on-chain hooks, capabilitiesRoot, and dock-root commitments; every Order afterwards references this immutable identity, and rule changes can only be expressed by publishing a new Plan.
 
 ## Where Authority Comes From
 
@@ -27,11 +27,11 @@ A Plan's authority comes from the publisher's EIP-712 signature, the hash checks
 
 ```text
 hooksHash        = keccak256(abi.encode(hooks))
-metadataHash     = keccak256(abi.encode(selectorBindings, signalCapabilities))
+capabilitiesRoot = the single Merkle root of the capability/binding tables
 planHash         = keccak256(abi.encode(
-                     keccak256("uvp.plan.runtime.v2"),  // domain
+                     keccak256("uvp.plan.runtime.v3"),  // domain
                      hooksHash,
-                     metadataHash,
+                     capabilitiesRoot,
                      dockRoutesRoot,
                      dockInterfaceRoot))
 planId           = keccak256(abi.encode(
@@ -40,18 +40,18 @@ planId           = keccak256(abi.encode(
                      planHash))
 ```
 
-The `planHash` preimage is a four-tuple: hooks, metadata, and the two dock roots (routes and interface). When a Plan declares no docks, both roots enter the formula as the empty Merkle root; the formula itself does not change. The compiler's own artifact hashes remain for tracing source artifacts but no longer impersonate the on-chain `planHash`. Putting the publisher inside `planId` prevents different publishers from fighting over global names for identical content.
+The `planHash` preimage is a four-tuple: hooks, the capability-tree root, and the two dock roots (routes and interface). When a Plan declares no docks, both dock roots enter the formula as the empty Merkle root; when both tables are empty, `capabilitiesRoot` is `keccak256("")`; the formula itself does not change. Leaf formulas and tree rules are in [Canonical Hash](../artifacts/canonical-hashes.md). The compiler's own artifact hashes remain for tracing source artifacts but do not impersonate the on-chain `planHash`. Putting the publisher inside `planId` prevents different publishers from fighting over global names for identical content.
 
 ## Two-step Freezing
 
-1. The publisher makes an EIP-712 signature over the PlanCommit (`publisher + hooksHash + metadataHash + dockRoutesRoot + dockInterfaceRoot + deadline`); any relayer calls `commitPlan`, submitting the full hooks at once.
-2. Any caller submits selector bindings and signal capabilities; `finalizePlan` verifies `metadataHash` and the Metadata Module writes them in one shot, permanently frozen.
+1. The publisher makes an EIP-712 signature over the PlanCommit (`publisher + hooksHash + capabilitiesRoot + dockRoutesRoot + dockInterfaceRoot + deadline`); any relayer calls `commitPlan`, submitting the full hooks and committing the capability/binding tree root at the same time.
+2. Any caller calls `finalizePlan(planId)` to finalize (permissionless); this step only finalizes the plan and submits no table data.
 
-A pending Plan cannot create Orders. After finalize, neither hooks nor metadata can change; if rules change, publish a new Plan.
+A pending Plan cannot create Orders. After finalize, hooks, capabilitiesRoot, and the dock roots cannot change; if rules change, publish a new Plan.
 
 ## Module Freezing
 
-After the StateMachine is deployed and six modules configured, `freezeModules()` is called. Frozen module addresses cannot be replaced by the owner, so "the meaning of code" no longer depends on the deployer's future goodwill. New implementations can only enter through a new StateMachine deployment and an explicit cutover. For the division of labor among contracts and registries see [Contracts and Registries](../contracts-and-registries.md).
+After the StateMachine is deployed and six modules configured, `freezeModules()` is called. Frozen module addresses cannot be replaced by the owner, so "the meaning of code" does not depend on the deployer's future goodwill. New implementations can only enter through a new StateMachine deployment and an explicit cutover. For the division of labor among contracts and registries see [Contracts and Registries](../contracts-and-registries.md).
 
 ## What a Plan Does Not Carry
 

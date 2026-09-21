@@ -54,7 +54,7 @@ pnpm --filter @uvp-eth/executor-kit cli -- product submit task_123 \
   --private-key-env UVP_PARTICIPANT_PRIVATE_KEY
 ```
 
-Chain watcher dry-run（`--dry-run` 仍是显式测试辅助：只演练扫描与准备，不提交任何交易）。示例 config 的 `stateMachines[]` 已声明被扫描的 state machine，因此不再传 `--state-machine`——两者并存会被直接拒绝，扫描集合必须只在一处声明：
+Chain watcher dry-run（`--dry-run` 仍是显式测试辅助：只演练扫描与准备，不提交任何交易）。示例 config 的 `stateMachines[]` 已声明被扫描的 state machine，因此不传 `--state-machine`——两者并存会被直接拒绝，扫描集合必须只在一处声明：
 
 ```bash
 pnpm --filter @uvp-eth/executor-kit cli -- chain-once \

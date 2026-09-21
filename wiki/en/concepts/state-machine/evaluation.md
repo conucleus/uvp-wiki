@@ -95,4 +95,4 @@ orders across plans by bare `orderId`. For the authorization model, see
 
 ## The Contract Is the Authority
 
-The TypeScript `hook-core` and `statemachine` packages no longer maintain their own local semantic models: parsing, evaluation, and replay all delegate to the Rust `uvp-core` (semantic boundary `uvp.semantic.v1`), which stays consistent with the contract. The final on-chain state follows the evaluation result in `UVPStateMachine.sol`; if `uvp-core` and the contract semantics diverge, tests and documentation should make the correction explicit.
+The TypeScript `hook-core` and `statemachine` packages do not maintain their own local semantic models: parsing, evaluation, and replay all delegate to the Rust `uvp-core` (semantic boundary `uvp.semantic.v1`), which stays consistent with the contract. The final on-chain state follows the evaluation result in `UVPStateMachine.sol`; if `uvp-core` and the contract semantics diverge, tests and documentation should make the correction explicit.

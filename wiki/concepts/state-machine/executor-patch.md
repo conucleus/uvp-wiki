@@ -34,6 +34,7 @@ Executor patch 至少受这些条件约束：
 - executor 地址不能是零地址。
 - assign、handoff、replacement 等 mode 有不同的 previous executor 或 approval signal 要求。
 - Plan 必须为目标 stage 通过 `sendSignals` 预声明至少一个 current-order signal capability。
+- 资格核验由提交方自证：patch 携带 bindingProof（selector 绑定叶的成员资格证明）与 stageFacts（目标 stage 的 capability 叶证明），合约按 `capabilitiesRoot` 验证；全零表示不携证。
 - patch 激活后，合约把这些 Plan 预声明的 `(sourceId, signalId)` 权限自动委任给新 executor；executor 不需要在 Order 创建时已经位于候选钱包授权表中。
 - 后续 replacement 或 handoff 会把尚未首次写入的同一能力范围切换给新 executor；已经写入的 Signal 不会被重写。
 
@@ -45,7 +46,7 @@ Executor patch 至少受这些条件约束：
 | --- | --- |
 | `UVPStagePatchModule.sol` | `applyStageExecutorPatch`、`applyStageExecutorPatchFor`、patch digest、mode 校验。 |
 | `UVPStateMachine.sol` | active executor 激活和后续 signal 检查。 |
-| `UVPPlanMetadataModule.sol` | 保存编译器从 `sendSignals` 生成的 signal capability，作为动态委任上限。 |
+| `UVPPlanMetadataModule.sol` | 保存 `capabilitiesRoot`，验证 patch 携带的 bindingProof 与 stageFacts。 |
 | `protocol-bindings/src/index.ts` | stage executor patch typed data、call builder、signer recovery。 |
 | `uvp-chain-services/service/src/stage-patches/` | Product API prepare/submit executor patch。 |
 

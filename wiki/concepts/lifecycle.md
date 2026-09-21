@@ -20,7 +20,7 @@ status: verified
 
 ## 1. 编写与编译
 
-Store 或开发者编写 Zhixu；Compiler 生成 hooks、selector bindings、signal capabilities、`hooksHash`、`metadataHash`、dock roots 和 runtime `planHash`。编译阶段只做规则结构校验，不认证现实供应商能力。
+Store 或开发者编写 Zhixu；Compiler 生成 hooks、selector bindings、signal capabilities、`hooksHash`、`capabilitiesRoot`、dock roots 和 runtime `planHash`。编译阶段只做规则结构校验，不认证现实供应商能力。
 
 ## 2. 配置并冻结 StateMachine
 
@@ -28,11 +28,11 @@ Store 或开发者编写 Zhixu；Compiler 生成 hooks、selector bindings、sig
 
 ## 3. 签名提交 Plan
 
-publisher 签署 PlanCommit（`publisher + hooksHash + metadataHash + dockRoutesRoot + dockInterfaceRoot + deadline`）。任意 relayer 调用 `commitPlan`，合约验证完整 hooks 的 hash 和 publisher 签名，导出 `planId = hash(publisher, planHash)`——`planHash` 覆盖 hooks、metadata 与两个 dock roots。
+publisher 签署 PlanCommit（`publisher + hooksHash + capabilitiesRoot + dockRoutesRoot + dockInterfaceRoot + deadline`）。任意 relayer 调用 `commitPlan`，合约验证完整 hooks 的 hash 和 publisher 签名，导出 `planId = hash(publisher, planHash)`——`planHash` 覆盖 hooks、capabilitiesRoot 与两个 dock roots。
 
-## 4. 一次冻结 metadata
+## 4. 定稿 Plan
 
-任意调用者提交 selector bindings 与 signal capabilities。`finalizePlan` 验证 `metadataHash` 并一次写入 Metadata Module。只有 finalized Plan 能创建 Order。
+能力表与绑定表已折叠为 `capabilitiesRoot`，随 commit 一并被 publisher 承诺。任意调用者调用 `finalizePlan(planId)` 定稿（permissionless），本步只落定稿、不提交表数据。只有 finalized Plan 能创建 Order。
 
 ## 5. 身份目录（可选）
 

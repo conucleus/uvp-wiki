@@ -15,7 +15,7 @@ A relayer can help broadcast transactions, but it cannot make business decisions
 
 ```text
 name = UVPStateMachine
-version = 0.10
+version = 0.11
 ```
 
 The primary type for signal submission is:
@@ -38,6 +38,8 @@ deadline
 ```
 
 `submitSignalFor()` in the contract recovers the signing address and requires the recovered signer to equal `submitter`.
+
+The call tails of `submitSignal`/`submitSignalFor` may carry `attribution` (sourceId, signalId, stageId, capabilityProof) and `selectorBinding` (selectorStageId, proof) parameters: all-zero means no claim, and submitting off-vocabulary facts is legal. These tail parameters do not enter the EIP-712 signing envelope; the typehash and the signed digest stay unchanged.
 
 ## Relayer Boundary
 

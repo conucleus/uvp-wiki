@@ -23,11 +23,11 @@ Zhixu Catalog 是凝结核维护秩序设计、编译材料和 Store 展示资�
 | Registry operator | 核验线下主体并登记 subject/account。 | Identity Registry owner 权限。 |
 | Order participant | 接受订单角色并提交被授权的 Signal。 | 订单级授权、active executor overlay 与签名。 |
 
-各对象的权威来源统一见 [README.md](README.md)「信息对象与权威来源」表；本页不再复述边界论述。
+各对象的权威来源统一见 [README.md](README.md)「信息对象与权威来源」表；本页不复述边界论述。
 
 ## 发布路径
 
-> 本图为发布路径的全站唯一出处，其他页面引用此路径时直接链接到这里，不再复制图或步骤列表。
+> 本图为发布路径的全站唯一出处，其他页面引用此路径时直接链接到这里，不复制图或步骤列表。
 
 ```text
 导入 Zhixu
@@ -35,7 +35,7 @@ Zhixu Catalog 是凝结核维护秩序设计、编译材料和 Store 展示资�
   -> Product Schema 与资源要求校验
   -> Store review
   -> publisher 签名
-  -> PlanCommitted / metadata registration / PlanFinalized
+  -> PlanCommitted（capabilitiesRoot 随 commit 承诺）/ PlanFinalized
   -> StateMachine PlanRegistered 投影
   -> Store 选择 active version
 ```
@@ -53,6 +53,6 @@ Plan 的发布权来自 publisher 签名。任意 relayer 可以广播有效签�
 
 ## 事实来源
 
-Plan 是否发布、谁发布 Plan、当前 Order 使用哪个 Plan、Supplier 是否适合某环节等事实的权威来源，统一见 [README.md](README.md)「信息对象与权威来源」表，本页不再单独列表。
+Plan 是否发布、谁发布 Plan、当前 Order 使用哪个 Plan、Supplier 是否适合某环节等事实的权威来源，统一见 [README.md](README.md)「信息对象与权威来源」表，本页不单独列表。
 
 Identity Registry 只登记现实主体与钱包的对应关系，不做能力认证——一句话版本见 [README.md](README.md) 权威表，完整论述见 [../protocol-boundaries.md](../protocol-boundaries.md)。

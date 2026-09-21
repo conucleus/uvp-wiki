@@ -34,6 +34,7 @@ Executor patch is constrained by at least these checks:
 - Executor address cannot be zero.
 - Modes such as assign, handoff, and replacement have different previous-executor or approval-signal requirements.
 - The Plan must declare at least one current-order signal capability for the target stage through `sendSignals`.
+- Eligibility is proven by the submitter: the patch carries a bindingProof (membership proof for the selector-binding leaf) and stageFacts (capability-leaf proofs for the target stage), which the contract verifies against `capabilitiesRoot`; all-zero means no proof carried.
 - After activation, the contract automatically delegates those Plan-declared `(sourceId, signalId)` capabilities to the new executor; the wallet does not need to be in the candidate-wallet authorization table when the Order is created.
 - A later replacement or handoff moves the still-unwritten capability scope to the new executor; already-written Signals remain unchanged.
 
@@ -45,7 +46,7 @@ This is Plan-bounded automatic delegation, not wildcard Signal authority for the
 | --- | --- |
 | `UVPStagePatchModule.sol` | `applyStageExecutorPatch`, `applyStageExecutorPatchFor`, patch digest, mode checks. |
 | `UVPStateMachine.sol` | Active executor activation and later signal checks. |
-| `UVPPlanMetadataModule.sol` | Signal capabilities compiled from `sendSignals`, stored as the cap on dynamic delegation. |
+| `UVPPlanMetadataModule.sol` | Stores the `capabilitiesRoot` and verifies the bindingProof/stageFacts carried by patches. |
 | `protocol-bindings/src/index.ts` | Stage executor patch typed data, call builder, signer recovery. |
 | `uvp-chain-services/service/src/stage-patches/` | Product API prepare/submit executor patch. |
 

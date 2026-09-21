@@ -92,4 +92,4 @@ Product API 都必须携带 `planId`，不能用 bare `orderId` 跨 plan 归并�
 
 ## 合约是权威实现
 
-TypeScript 侧的 `hook-core` 与 `statemachine` package 不再各自维护本地语义模型：解析、求值与 replay 都委托给 Rust `uvp-core`（语义边界 `uvp.semantic.v1`），由它与合约保持一致。最终链上状态以 `UVPStateMachine.sol` 的求值结果为准；如果 `uvp-core` 与合约语义不一致，应通过测试和文档明确修正。
+TypeScript 侧的 `hook-core` 与 `statemachine` package 不各自维护本地语义模型：解析、求值与 replay 都委托给 Rust `uvp-core`（语义边界 `uvp.semantic.v1`），由它与合约保持一致。最终链上状态以 `UVPStateMachine.sol` 的求值结果为准；如果 `uvp-core` 与合约语义不一致，应通过测试和文档明确修正。

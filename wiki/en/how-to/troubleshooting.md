@@ -50,7 +50,7 @@ Symptoms:
 - expected and observed event counts differ;
 - `HookReady` or `HookStatusChanged` order or state does not match.
 
-Replay is always strict — the optional lenient mode has been removed, so any mismatch throws rather than being tolerated or warned about.
+Replay is always strict — there is no lenient mode; any mismatch throws rather than being tolerated or warned about.
 
 Check:
 

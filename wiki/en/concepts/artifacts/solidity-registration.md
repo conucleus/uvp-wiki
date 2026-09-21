@@ -7,7 +7,7 @@ status: verified
 
 # On-chain Registration Parameters
 
-`OnchainHookPlanArtifact` is not yet the final transaction parameter set. The compiler further converts it into the compact structures required by `UVPStateMachine.commitPlan()` and `UVPStateMachine.finalizePlan()`. The current `uvp.onchainHookPlan.v2` also commits `planId`, `planHash`, dock route/interface roots, selector bindings, and signal capabilities.
+`OnchainHookPlanArtifact` is not yet the final transaction parameter set. The compiler further converts it into the compact structures required by `UVPStateMachine.commitPlan()`; the capability table and the binding table are folded off-chain into the single Merkle-tree `capabilitiesRoot`, committed together with the plan by the publisher at commit time, and `finalizePlan(bytes32)` only finalizes. The table size is decoupled from registration gas cost, with no entry cap. The current `uvp.onchainHookPlan.v3` also commits `planId`, `planHash`, dock route/interface roots, and the `capabilitiesRoot`.
 
 ## CompactHook
 
@@ -44,15 +44,14 @@ Selector binding is the wire / API field name for describing whether one stage m
 selectorStageIdentifier -> targetStageIdentifier
 ```
 
-On-chain, the form is:
+On-chain, the identifiers are:
 
 ```text
 selectorStageId = keccak256(selectorStageIdentifier)
 targetStageId = keccak256(targetStageIdentifier)
-bindingKey = keccak256(abi.encode(selectorStageId, targetStageId))
 ```
 
-Executor patches and resource patches both go through this binding check.
+Bindings are not stored on-chain item by item: each binding enters the `capabilitiesRoot` Merkle tree as a leaf (leaf domain `UVP_SELECTOR_BINDING_V1`), and executor/resource patches verify membership at check time by recomputing the leaf from the fields and carrying a proof. The leaf formulas and tree rules live in [Canonical Hash](canonical-hashes.md).
 
 ## ABI Fixture
 
@@ -65,7 +64,7 @@ pnpm verify:protocol-freeze
 Changes to ABI, bytecode, selectors, event topics, typed-data fields, canonical hashes, or artifact schemas should be captured in release notes and migration decisions.
 
 CompactHook, event, selector, and EIP-712 fields are pinned by
-`fixtures/uvp-state-machine.v0.10.json`, the module fixtures, and
+`fixtures/uvp-state-machine.v0.11.json`, the module fixtures, and
 `pnpm verify:protocol-freeze`. A change must update bindings, indexers,
 executor-kit, and bootstrap together; updating one fixture in isolation is not
 an accepted migration.

@@ -37,7 +37,7 @@ Store metadata is a read model: supplier capabilities, tags, reputation, search 
 
 ## Plan Lifecycle
 
-A Plan is committed via `commitPlan()` binding the publisher signature and hooks/metadata hashes, then frozen once via `finalizePlan()`; only finalized Plans can create Orders. Plan identity derives from publisher plus committed content (`planId = hash(publisher, planHash)`). Modules frozen at deployment cannot be swapped by the owner; upgrades require deploying a new StateMachine and an explicit Deployment Registry cutover. See [Contracts and Registries](contracts-and-registries.md), [Canonical Hash](artifacts/canonical-hashes.md), and [Plan and Order Lifecycle](lifecycle.md).
+A Plan is committed via `commitPlan()` binding the publisher signature (committing to `hooksHash`, `capabilitiesRoot`, and the two dock roots), then finalized via `finalizePlan()`; only finalized Plans can create Orders. Plan identity derives from publisher plus committed content (`planId = hash(publisher, planHash)`). Modules frozen at deployment cannot be swapped by the owner; upgrades require deploying a new StateMachine and an explicit Deployment Registry cutover. See [Contracts and Registries](contracts-and-registries.md), [Canonical Hash](artifacts/canonical-hashes.md), and [Plan and Order Lifecycle](lifecycle.md).
 
 ## Order and Evidence Boundary
 

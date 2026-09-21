@@ -33,11 +33,11 @@ When a signal is submitted, the contract checks whether `planId + orderId + sign
 
 ## Dynamic Delegation from Executor Patch
 
-The compiler turns stage `sendSignals` into Plan `signalCapabilities`. When a valid Executor patch selects a wallet for a target stage, the contract automatically creates delegation only for those predeclared current-order `(sourceId, signalId)` pairs:
+The compiler turns stage `sendSignals` into Plan `signalCapabilities` (folded into `capabilitiesRoot` on-chain). When a valid Executor patch selects a wallet for a target stage, the contract automatically creates delegation only for those predeclared current-order `(sourceId, signalId)` pairs, with eligibility proven by the submitter carrying a capability proof (all-zero means no claim):
 
 - The new executor can be a wallet that appears after Order creation; it need not be pre-listed as an authorized candidate.
 - The selector's power comes from the `StageSelectorBinding`, internal patch-signal authorization, and signature/mode constraints.
-- The executor's signal power comes from the registered Plan capability combined with the valid patch.
+- The executor's signal power comes from the Plan capability committed in the capability tree combined with the valid patch.
 - A patch can change only the executor; it cannot add a Signal the Plan did not declare.
 - First-writer-wins still applies; an existing Signal never changes because of a handoff.
 
@@ -63,7 +63,7 @@ metadataHash = keccak256("uvp:product-bff:authorization:v3:...")
 
 ## Initial Trigger
 
-An order is created through signed `triggerOrderFromOutsideFor()` (the open birth entry on `UVPStateMachine`) or `triggerOrderFromSignalFor()` (the derived-creation entry on the order-link module contract `UVPOrderLinkModule`): the contract binds the order to the finalized `planId`, records either the trigger fact or a trigger-origin link, and can at the same time write the order-level signal authorizations described above.
+An order is created through signed `triggerOrderFromOutsideFor()` (the open birth entry on `UVPStateMachine`) or `triggerOrderFromSignalFor()` (the derived-creation entry on the order-link module contract `UVPOrderLinkModule`): the contract binds the order to the finalized `planId`, records either the trigger fact or a trigger-origin link, and can at the same time write the order-level signal authorizations described above. The tail of `triggerOrderFromOutsideFor` may carry a `birthFactAttribution` (sourceId, signalId, stageId, capabilityProof) declaring the owner stage of the birth fact; all-zero means no claim, and off-vocabulary facts are legal.
 
 External facts are normalized by the backend/executor into a concrete `source`/`signal`, then handled through the current Plan's `receiveSignals` or trigger entry; they are not a fixed on-chain `OUTSIDE` signal. The backend first verifies signatures, deduplicates, persists, and normalizes the fact. If an EVM adapter needs to submit that normalized fact to the state machine, authorization must bind to the actual `entry.source` and `entry.signalName`:
 

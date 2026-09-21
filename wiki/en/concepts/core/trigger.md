@@ -91,15 +91,15 @@ time. `mode=existing` creates no child order; it only attaches an existing
 target order (a cloud-track semantic; rejected explicitly at on-chain compile
 time).
 
-## Retired fields
+## Forms the compiler explicitly rejects
 
-The compiler explicitly rejects:
+The following forms are not valid DSL; the compiler explicitly rejects:
 
 - `stage.trigger` and `stage.externalSignals`;
 - executor `triggerEntrance`;
 - combining `supplierType: zhixu` with `supplierID`;
 - putting `source::task.stage.signal` Hook DSL in a `signalMap` value;
-- wrapper forms other than the subscription (e.g. `::OUTSIDE@(...)` or the old `::ANCHOR@(…)`).
+- wrapper forms other than the subscription (e.g. `::OUTSIDE@(...)` or `::ANCHOR@(…)`).
 
 For a cross-source fact, use `::ANCHOR(@source::task.stage.signal)`; to mint an
 order from that fact, additionally declare `mint: per-fact` on the stage.

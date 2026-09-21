@@ -10,7 +10,7 @@ status: verified
 
 > 前置阅读：[核心概念](../README.md)
 
-当前 DSL 不再有 stage 级 `trigger` 或 `externalSignals` 字段。每个
+当前 DSL 没有 stage 级 `trigger` 或 `externalSignals` 字段。每个
 `receiveSignals` 条目都是一个 Hook；编译器通过 `orderTriggerKind` 和
 `emitReady` 标记该 Hook 的订单入口角色。
 
@@ -84,17 +84,17 @@ input 端口名；`signalMap` 的 key 必须是本地 `sendSignals`，value 必�
 `mode=existing` 不创建子订单，
 只连接既有目标订单（云轨语义；链上编译期显式拒绝）。
 
-## 旧字段迁移
+## 编译器显式拒绝的形态
 
-以下写法已退役并由编译器明确拒绝：
+以下写法不是合法 DSL，由编译器明确拒绝：
 
 - `stage.trigger` 和 `stage.externalSignals`；
 - executor 的 `triggerEntrance`；
 - `supplierType: zhixu` 与 `supplierID` 并用；
 - 把 `signalMap` value 写成 `source::task.stage.signal` Hook DSL；
-- 订阅以外的 wrapper 形态（如 `::OUTSIDE@(...)` 与旧 `::ANCHOR@(…)`）。
+- 订阅以外的 wrapper 形态（如 `::OUTSIDE@(...)` 与 `::ANCHOR@(…)`）。
 
-需要跨源事实时，改用 `::ANCHOR(@source::task.stage.signal)`；需要从事实出生
+需要跨源事实时，使用 `::ANCHOR(@source::task.stage.signal)`；需要从事实出生
 订单时，再在阶段上声明 `mint: per-fact`。
 
 ## 运行与证明

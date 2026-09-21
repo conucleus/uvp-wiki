@@ -7,7 +7,7 @@ status: verified
 
 # 链上注册参数
 
-`OnchainHookPlanArtifact` 还不是最终交易参数。编译器把它压缩成紧凑结构后，CompactHook 等参数构成 `commitPlan()` 的提交载荷，metadata 在 `finalizePlan()` 中一次冻结；旧的单步入口 `registerPlan` 已不存在。当前 `uvp.onchainHookPlan.v2` 还承诺 `planId`、`planHash`、dock route/interface roots、selector bindings 和 signal capabilities。
+`OnchainHookPlanArtifact` 还不是最终交易参数。编译器把它压缩成紧凑结构后，CompactHook 等参数构成 `commitPlan()` 的提交载荷；能力表与绑定表在链下折叠为单棵 Merkle 树的 `capabilitiesRoot`，随 commit 一起被 publisher 承诺，`finalizePlan(bytes32)` 只落定稿。两表规模与注册 gas 成本脱钩，没有条目上限。当前 `uvp.onchainHookPlan.v3` 还承诺 `planId`、`planHash`、dock route/interface roots 和 `capabilitiesRoot`。
 
 ## CompactHook
 
@@ -49,10 +49,9 @@ selectorStageIdentifier -> targetStageIdentifier
 ```text
 selectorStageId = keccak256(selectorStageIdentifier)
 targetStageId = keccak256(targetStageIdentifier)
-bindingKey = keccak256(abi.encode(selectorStageId, targetStageId))
 ```
 
-Executor patch 和 resource patch 都要经过这个绑定检查。
+链上不逐条存储绑定：每条绑定以叶（叶域 `UVP_SELECTOR_BINDING_V1`）混入 `capabilitiesRoot` 那棵 Merkle 树，Executor patch 和 resource patch 在检查时按字段重算叶并携 proof 验证成员资格。叶公式与树规则见 [Canonical Hash](canonical-hashes.md)。
 
 ## ABI Fixture
 
@@ -65,7 +64,7 @@ pnpm verify:protocol-freeze
 ABI、bytecode、selector、event topic、typed-data 字段、canonical hash 或 artifact schema 的变化都应进入发布说明和迁移判断。
 
 CompactHook、事件、selector 和 EIP-712 字段已经由
-`fixtures/uvp-state-machine.v0.10.json`、各 module fixture 以及
+`fixtures/uvp-state-machine.v0.11.json`、各 module fixture 以及
 `pnpm verify:protocol-freeze` 固定；变更必须同步 bindings、indexer、executor
 和 bootstrap，不能只更新单侧 fixture。
 
