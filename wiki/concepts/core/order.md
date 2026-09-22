@@ -68,4 +68,4 @@ Product task ID、Store docking session ID、adapter job ID 都是工作流索�
 
 Order 不需要被“关闭”才能保持一致性。业务方可以停止继续写入，也可以从同一个 Zhixu 重新创建新的 Order。Signal 采用 first-writer-wins，去重与不可覆盖语义见 [Signal](signal.md)；如果首次写入的业务事实有误，核心协议不覆盖或删除旧事实，而是创建新的 Order 重新执行，并由上层产品把两条事实流的业务关系展示清楚。
 
-如果某个 stage 由另一条 Zhixu 承接，通常会形成 local order 和 linked order 之间的信号绑定：docking module 的 `openDockedOrder`（`order.mode=new`）在 route/interface proof 通过后原子记录对接关系并创建 linked order，随后由 `submitDockedInput` / `submitDockedSignal` 传递输入与输出（`mode=existing` 只连接既有目标订单，是云轨语义）。完整运行时路径见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md)；Store/Product 只保存 sandbox、contact、review 和展示状态，运行态 proof 以两边订单的链上事件为准。
+如果某个 stage 由另一条 Zhixu 承接，通常会形成 local order 和 linked order 之间的信号绑定：docking module 的 `openDockedOrder`（`order.mode=new`）在 route/interface proof 通过后原子记录对接关系并创建 linked order，随后由 `submitDockedInput` / `submitDockedSignal` 传递输入与输出；`mode=existing` 经 `attachDockedOrder` 对等挂接既有目标订单（不创建子订单），挂接后走同一交付面（见 [Docked Zhixu Runtime](../state-machine/docking.md)）。完整运行时路径见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md)；Store/Product 只保存 sandbox、contact、review 和展示状态，运行态 proof 以两边订单的链上事件为准。

@@ -87,9 +87,10 @@ least one of the two maps must be non-empty. The target name (slug shape, same
 rule as `metadata.name`), interface existence, port direction,
 `order.mode ∈ the target interface's orderModes`, the interface root, the route
 root, and the single input binding of `mode=new` are all validated at compile
-time. `mode=existing` creates no child order; it only attaches an existing
-target order (a cloud-track semantic; rejected explicitly at on-chain compile
-time).
+time. `mode=existing` creates no child order; it attaches an existing target
+order as a peer — carried by both tracks, on-chain via `attachDockedOrder`
+(`UVPDockingModule` 4.4), sharing the same delivery surface as `new` after the
+attach (see [Docked Zhixu Runtime](../state-machine/docking.md)).
 
 ## Forms the compiler explicitly rejects
 

@@ -47,4 +47,4 @@ Docking Sandbox 用来让凝结核试拼外部秩序、supplier signal map、ada
 
 ## `supplierType=zhixu` 的特别检查
 
-`inputMap`/`signalMap` 至少一张非空，映射值使用已发布接口的端口名，被绑定端口必须来自同一个 linked source；`mode=new` 的 route 恰好一条 input 绑定（出生锚）。peer Zhixu 的版本化 plan publication 要可见，linked order 的关系和业务事实必须落到 `DockOpened`、`DockInputSubmitted`、`DockOutputSubmitted` 等 state-machine/docking events（`mode=existing` 的对接只连接既有目标订单，不产生新子单），不能依赖私有生命周期字段。local order 继续推进前，其上必须出现授权 mapped signal 或 `DockOutputSubmitted`。完整接入材料与流程见 [Zhixu 作为执行接口](../apps/zhixu-as-executor.md)。
+`inputMap`/`signalMap` 至少一张非空，映射值使用已发布接口的端口名，被绑定端口必须来自同一个 linked source；`mode=new` 的 route 恰好一条 input 绑定（出生锚）。peer Zhixu 的版本化 plan publication 要可见，linked order 的关系和业务事实必须落到 `DockOpened`、`DockAttached`、`DockInputSubmitted`、`DockOutputSubmitted` 等 state-machine/docking events（`mode=existing` 的对接经 `attachDockedOrder` 挂接既有目标订单，不产生新子单），不能依赖私有生命周期字段。local order 继续推进前，其上必须出现授权 mapped signal 或 `DockOutputSubmitted`。完整接入材料与流程见 [Zhixu 作为执行接口](../apps/zhixu-as-executor.md)。

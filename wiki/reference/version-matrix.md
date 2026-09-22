@@ -26,7 +26,7 @@ status: verified
 | Product submit domain | `0.11` | Product signal submit EIP-712 domain。 |
 | Order-link module ABI | `0.3` | Linked-order 模块冻结 ABI（trigger EIP-712 domain version `0.8`）。 |
 | Stage patch module ABI | `0.4` | Executor/resource patch 所在模块冻结 ABI（patch EIP-712 domains version `0.1`）。 |
-| Docking module ABI | `4.3` | 统一 Zhixu DockRoute：open/input/output 绑定（接口名叶、mode word）；order mode new 唯一支持，existing 模式在哈希重算处显式拒绝；EIP-712 domain version `4`。 |
+| Docking module ABI | `4.4` | 统一 Zhixu DockRoute：open/attach 两种出生通道（接口名叶、mode word，动态选择候选叶域随 4.4 追加）——new 经 `openDockedOrder` 铸子单，existing 经 `attachDockedOrder` 挂接既有目标单（不铸子单、同意门三腿之一），`target: null` 动态选择经候选集 membership proof 在 attach 期选定；EIP-712 domain version `4`。 |
 | Plan metadata module ABI | `0.6` | plan metadata/dock 接口端口校验（含接口名维度）。 |
 | StateMachine lens ABI | `0.4` | dock/order/hook 只读视图。 |
 | Deployment manifest | `uvp-eth.addresses.v1` | 部署地址清单 schema。 |

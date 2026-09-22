@@ -13,7 +13,7 @@ order, then map a signal that already happened in the linked order back into the
 local order.
 
 This is not a Store sandbox draft and not a normal backend integration. The
-formal runtime path must land in the `UVPDockingModule` (abiVersion 4.2,
+formal runtime path must land in the `UVPDockingModule` (abiVersion 4.4,
 preimage v2) events and proof; the contract accepts only routes/interfaces
 covered by their committed `dockRoutesRoot`, `dockInterfaceRoot`, and Merkle
 proofs, and every binding/route hash carries an `interfaceNameId`
@@ -33,7 +33,8 @@ proofs, and every binding/route hash carries an `interfaceNameId`
 
 | Event | Meaning |
 | --- | --- |
-| `DockOpened` | Atomically records the dock instance, local/target plan/order, `interfaceNameId`, route, depth, and opener. |
+| `DockOpened` | Atomically records the dock instance, local/target plan/order, `interfaceNameId`, route, depth, and opener (`mode=new` mints a child order). |
+| `DockAttached` | For a `mode=existing` docking onto an existing target order: records the dock instance and docking facts (the indexed `linkedOrderId` carries the target-side "who attached to me" projection; N:1 batching). |
 | `DockInputSubmitted` | Records an input delivered to the linked order under a binding. |
 | `DockOutputSubmitted` | Records a linked output mapped back to the local order under a binding. |
 
@@ -74,17 +75,25 @@ instance and target definition identity, preventing cross-plan preemption.
   registers the link, and writes the birth-anchor fact in one transaction. The
   entrance permit typed-data is `UVPDockEntrancePermitV2` (with
   `interfaceNameId`; EIP-712 domain version "4").
-- `order.mode=existing`: not supported on-chain. The on-chain compilation
-  boundary rejects it loudly (the error states that on-chain targets do not
-  support existing — serve the route from a cloud runtime or bind an interface
-  with order mode "new"); no silent fallback.
-- `target: null` (dynamic selection): the compiled artifact carries the local
-  declaration surface as `unresolvedDockRoutes`
-  (`uvp.dockRoute.unresolved.v1`); the on-chain compilation/deserialization
-  boundary rejects it loudly with `UNRESOLVED_DOCK_TARGET`. The cloud runtime
+- `order.mode=existing`: supported on-chain. `attachDockedOrder`
+  (`UVPDockingModule` 4.4) attaches an existing target order as a peer — no
+  child order is created; the consent gate is one of three legs (target order
+  creator / incumbent executor / target plan publisher pre-authorization), and
+  after attaching, inputs/outputs share the same delivery surface as `new`
+  (semantics: uvp-core subscription-mint-spec §2.4).
+- `target: null` (dynamic selection): supported on-chain. The compiled
+  artifact carries the declaration surface as `unresolvedDockRoutes`
+  (`uvp.dockRoute.unresolved.v1`; the candidate set derives from the
+  resolution manifest), and `attachDockedOrder` settles the target with a
+  candidate-leaf membership proof, pinned for the instance's lifetime. The only
+  dynamic route the chain track rejects is `order.mode=new`
+  (`UNRESOLVED_DOCK_MODE`). The cloud runtime
   reads dock route selection records to fill in the target (resolved by name,
   validated against the local interface/port declaration, with the instance
   established on DB natural keys).
+
+For the per-syntax-point acceptance comparison across the two tracks see
+`zhixu-dsl-grammar.md` (chain-track volume) §10 item 5 in the `uvp-eth` repo.
 
 ## Subscriptions and Entries
 

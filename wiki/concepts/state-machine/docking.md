@@ -12,7 +12,7 @@ local order 把某个 stage 交给另一条 linked Zhixu / linked order 执行�
 linked order 中已经发生的 signal 映射回 local order。
 
 这不是 Store sandbox 草稿，也不是普通后端联动。正式运行态要落到
-`UVPDockingModule`（abiVersion 4.2，preimage v2）的事件和 proof 上；合约只接受
+`UVPDockingModule`（abiVersion 4.4，preimage v2）的事件和 proof 上；合约只接受
 已经通过 `dockRoutesRoot`、`dockInterfaceRoot` 和各自 Merkle proof 的
 route/interface，绑定与路由哈希都带 `interfaceNameId`（keccak(接口名)）维度。
 
@@ -30,7 +30,8 @@ route/interface，绑定与路由哈希都带 `interfaceNameId`（keccak(接口�
 
 | 事件 | 说明 |
 | --- | --- |
-| `DockOpened` | 原子记录 dock instance、local/target plan/order、`interfaceNameId`、route、depth 和 opener。 |
+| `DockOpened` | 原子记录 dock instance、local/target plan/order、`interfaceNameId`、route、depth 和 opener（`mode=new` 铸子单）。 |
+| `DockAttached` | `mode=existing` 挂接既有目标单时记录 dock instance 与对接事实（indexed `linkedOrderId` 承载目标侧"谁挂了我"投影，N:1 拼批）。 |
 | `DockInputSubmitted` | 记录 input binding 已按绑定投递到 linked order。 |
 | `DockOutputSubmitted` | 记录 linked output 已按 binding 映射回 local order。 |
 
@@ -68,12 +69,19 @@ dock instance 和 target definition 身份派生，防止跨 plan 抢占。
   `openDockedOrder` 在一笔交易内创建子订单、登记 link 并写入出生锚事实；
   entrance permit 的 typed-data 是 `UVPDockEntrancePermitV2`（含
   `interfaceNameId`，EIP-712 域 version "4"）。
-- `order.mode=existing`：链上不支持。on-chain 编译边界显式拒绝（错误说明
-  on-chain target 不支持 existing，需由云轨承接或改用 new 接口），不静默降级。
-- `target: null`（动态选择）：编译产物以 `unresolvedDockRoutes`
-  （`uvp.dockRoute.unresolved.v1`）携带本地声明面，on-chain 编译/反序列化边界
-  按 `UNRESOLVED_DOCK_TARGET` 响亮拒绝；云轨运行时读取 dock route selection
+- `order.mode=existing`：链上支持。`attachDockedOrder`（`UVPDockingModule`
+  4.4）对等挂接既有目标单——不创建子订单，同意门为目标单 creator / 在任
+  执行者 / 目标 plan publisher 预授权三者之一，挂接后 input/output 走与
+  `new` 同一的交付面（语义见 uvp-core subscription-mint-spec §2.4）。
+- `target: null`（动态选择）：链上支持。编译产物以 `unresolvedDockRoutes`
+  （`uvp.dockRoute.unresolved.v1`）携带声明面（候选集从 resolution
+  manifest 派生），`attachDockedOrder` 携候选叶 membership proof 选定目标
+  并终身钉住；唯 `order.mode=new` 的动态路由被链轨编译拒绝
+  （`UNRESOLVED_DOCK_MODE`）。云轨运行时读取 dock route selection
   记录补齐目标（按 name 解析，校验接口/端口满足本地声明，DB 自然键建立实例）。
+
+两轨逐语法点的接受/拒绝对照见 `uvp-eth` 仓 `zhixu-dsl-grammar.md`（链轨册）
+§10 第 5 条。
 
 ## 订阅与入口
 

@@ -26,7 +26,7 @@ status: verified
 | Product submit domain | `0.11` | Product signal-submit EIP-712 domain. |
 | Order-link module ABI | `0.3` | Frozen ABI of the linked-order module (trigger EIP-712 domain version `0.8`). |
 | Stage patch module ABI | `0.4` | Frozen ABI of the module hosting executor/resource patch (patch EIP-712 domains version `0.1`). |
-| Docking module ABI | `4.3` | Unified Zhixu DockRoute: open/input/output bindings (interface-name leaves, mode word); order mode new is the only supported mode and existing-mode routes are rejected at hash recomputation; EIP-712 domain version `4`. |
+| Docking module ABI | `4.4` | Unified Zhixu DockRoute: open/attach birth channels (interface-name leaves, mode word; the dynamic-selection candidate-leaf domain added in 4.4) — new mints a child order via `openDockedOrder`, existing attaches an existing target order via `attachDockedOrder` (no child order, three-legged consent gate), and `target: null` dynamic selection is settled at attach via a candidate-set membership proof; EIP-712 domain version `4`. |
 | Plan metadata module ABI | `0.6` | Plan metadata / dock interface port validation (with the interface-name dimension). |
 | StateMachine lens ABI | `0.4` | Read-only dock/order/hook views. |
 | Deployment manifest | `uvp-eth.addresses.v1` | Deployment address-manifest schema. |

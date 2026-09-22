@@ -82,7 +82,9 @@ input 端口名；`signalMap` 的 key 必须是本地 `sendSignals`，value 必�
 `metadata.name` 同规则）、接口存在、端口方向、`order.mode ∈ 目标接口 orderModes`、
 接口 root、route root 和 `mode=new` 的唯一 input 绑定都在编译期验证。
 `mode=existing` 不创建子订单，
-只连接既有目标订单（云轨语义；链上编译期显式拒绝）。
+只对等挂接既有目标订单——两轨均承接，链上经 `attachDockedOrder`
+（`UVPDockingModule` 4.4）挂接，挂接后与 `new` 同一交付面
+（见 [Docked Zhixu Runtime](../state-machine/docking.md)）。
 
 ## 编译器显式拒绝的形态
 
