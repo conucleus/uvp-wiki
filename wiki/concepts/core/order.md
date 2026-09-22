@@ -52,7 +52,7 @@ UVPOrderLinkModule.triggerOrderFromSignalFor(trigger, authorizations, signature)
 | resource overlay | `StageResourcePatchApplied`。 |
 | task projection | chain-services 从 `HookReady` 和授权事件重建。 |
 | proof rows | event provenance。 |
-| docking relation | `DockOpened`、`DockInputSubmitted`、`DockOutputSubmitted`，以及两边订单各自的 signal/proof。 |
+| docking relation | 出生事件按模式区分（`mode=new` 的 `DockOpened`、`mode=existing` 的 `DockAttached`），交付事件 `DockInputSubmitted`、`DockOutputSubmitted`，以及两边订单各自的 signal/proof。 |
 
 ## Order 和 Product Order
 

@@ -129,7 +129,7 @@ or an explicit conflict.
 
 - The local and linked orders are independent on-chain orders, each with `(planId, orderId)`, authorization, events, and lifecycle.
 - The linked Zhixu has its own plan publication, order registration, signal authorization, and proof.
-- A Store docking session is only trial composition and review material; formal proof comes from `DockOpened`, `DockInputSubmitted`, `DockOutputSubmitted`, and events on both orders.
+- A Store docking session is only trial composition and review material; formal proof comes from the birth event per mode (`DockOpened` for `mode=new`, `DockAttached` for `mode=existing` — attaching does not emit `DockOpened`), the delivery events shared by both modes (`DockInputSubmitted` / `DockOutputSubmitted`), and events on both orders.
 - `submitDockedSignal` maps a signal that already exists in the linked order and satisfies the binding; it does not create business facts for the linked order and never forces a terminal state on either side.
 - Unknown, pending, reverted, and retryable states must remain distinct in adapters/Store and must not be rendered as success or silently dropped.
 

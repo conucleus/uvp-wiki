@@ -125,7 +125,7 @@ A complete docked Zhixu proof covers at least:
 | Question | Proof source |
 | --- | --- |
 | Why did the local stage open for execution? | The local order's `HookReady`. |
-| Why is the link-stage entrance valid? | Local `HookReady` / `DockOpened` proof plus interface/route membership proof for the target input port. |
+| Why is the link-stage entrance valid? | Local `HookReady` plus the birth proof per mode (`DockOpened` for `mode=new`, `DockAttached` for `mode=existing`), plus interface/route membership proof for the target input port. |
 | Which plan did the linked Zhixu use? | The linked order's `OrderRegistered` and linked plan projection. |
 | Is the linked Zhixu's Plan usable? | The linked StateMachine's `PlanCommitted/PlanFinalized` projection. |
 | How did the linked order advance? | The linked order's `SignalSubmitted` / hook proof. |

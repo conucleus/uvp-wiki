@@ -111,7 +111,7 @@ input、linked-order registration 和 `DockOpened` 在一笔 EVM 事务中完成
 
 - local order 和 linked order 都是独立链上订单，各自有 `(planId, orderId)`、授权、事件和生命周期。
 - linked Zhixu 的 plan publication、order registration、signal authorization 和 proof 独立存在。
-- Store docking session 只是试拼和审核材料；正式 proof 看 `DockOpened`、`DockInputSubmitted`、`DockOutputSubmitted` 及两边订单事件。
+- Store docking session 只是试拼和审核材料；正式 proof 按模式看出生事件（`mode=new` 为 `DockOpened`，`mode=existing` 为 `DockAttached`，挂接不 emit `DockOpened`）、两模式同族的交付事件 `DockInputSubmitted` / `DockOutputSubmitted`，以及两边订单事件。
 - `submitDockedSignal` 只映射 linked order 已存在且满足 binding 的 signal，不替 linked order 生成业务事实，也不会把任何一方自动置为终态。
 - unknown、pending、reverted 和 retryable 状态必须由 adapter/Store 分别表达，不能渲染成成功或静默空结果。
 

@@ -125,7 +125,7 @@ local order 某个 receive hook Ready
 | 问题 | 证明来源 |
 | --- | --- |
 | local stage 为什么开放执行 | local order 的 `HookReady`。 |
-| link stage 的入口为何有效 | local `HookReady` / `DockOpened` proof，以及目标 input 端口的 interface/route membership proof。 |
+| link stage 的入口为何有效 | local `HookReady` 与按模式的出生 proof（`mode=new` 的 `DockOpened`、`mode=existing` 的 `DockAttached`），以及目标 input 端口的 interface/route membership proof。 |
 | linked Zhixu 使用哪个计划 | linked order 的 `OrderRegistered` 和 linked plan projection。 |
 | linked Zhixu 的 Plan 是否可用 | linked StateMachine 的 `PlanCommitted/PlanFinalized` projection。 |
 | linked order 如何推进 | linked order 的 `SignalSubmitted` / hook proof。 |

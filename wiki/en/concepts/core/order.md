@@ -52,7 +52,7 @@ At creation the contract:
 | Resource overlay | `StageResourcePatchApplied`. |
 | Task projection | Rebuilt by chain-services from `HookReady` and authorization events. |
 | Proof rows | Event provenance. |
-| Docking relation | `DockOpened`, `DockInputSubmitted`, `DockOutputSubmitted`, plus each side's own signal/proof. |
+| Docking relation | Birth events per mode (`DockOpened` for `mode=new`, `DockAttached` for `mode=existing`), the delivery events `DockInputSubmitted` and `DockOutputSubmitted`, plus each side's own signal/proof. |
 
 ## Order and Product Order
 
