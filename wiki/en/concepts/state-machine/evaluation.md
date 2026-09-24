@@ -85,7 +85,9 @@ struct EvalValue {
 
 `submitSignal()` deduplicates by `(planId, orderId, sourceId, signalId)`: within
 one order scope only the first submission writes a `SignalRecord`
-(first-writer-wins); a duplicate submission reverts with `SignalAlreadyExists`.
+(first-writer-wins); later duplicate external submissions are absorbed
+idempotently without repeated advance (the `SignalAlreadyExists` revert is
+reserved for engine-internal write entry points).
 The contract also checks whether the submitter holds an
 explicit order-level authorization, or is the wallet currently delegated by the
 active executor overlay; when neither holds, the submission is rejected. Every

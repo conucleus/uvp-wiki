@@ -68,7 +68,7 @@ executor:
 selectedStages:
   - customs.complete
 sendSignals:
-  - select_executor
+  - name: select_executor
 ```
 
 运行时会出现类似事件：

@@ -30,7 +30,7 @@ Two places in a Zhixu stage relate directly to signals:
 | Field | Meaning |
 | --- | --- |
 | `receiveSignals` | Which input signals the stage waits for. Each key compiles into one [Hook](hook.md). |
-| `sendSignals` | Which output signals the stage may emit after execution. |
+| `sendSignals` | Which output signals the stage may emit after execution; entries are objects `{name, validWhen?}` (see "Emission admission" below). |
 
 For example, a buyer commitment stage:
 
@@ -40,12 +40,16 @@ buyer_commit:
   receiveSignals:
     OFFER_READY: commercial::master.commercial_offer.cmp
   sendSignals:
-    - cmp
-    - cxl
-    - err
+    - name: cmp
+    - name: cxl
+    - name: err
 ```
 
 The meaning: once the commercial offer completes, the buyer commitment stage is ready; that stage may subsequently emit `cmp`, `cxl`, or `err` for later hooks to consume.
+
+## Emission Admission (validWhen)
+
+A `sendSignals` entry may declare `validWhen`, an emission admission expression. When an externally submitted signal carrying such a declaration arrives, the engine first evaluates the expression against the facts already committed on the order (excluding the submission itself): the whole expression must be ready for the emission to be admitted, otherwise it is rejected with a typed error — on chain the entire transaction reverts with `SignalAdmissionRejected`, and nothing is written to the fact stream. Signals without `validWhen` are admitted unconditionally; duplicate submissions of an already-recorded fact are absorbed first-win without re-screening. The expression language, compile-time constraints, and evaluation semantics are owned by the two-track grammar manuals (`zhixu-dsl-grammar.md` §5.7); facts produced inside the engine (dock delivery, per-fact minting) do not pass this face.
 
 ## From Text Name to On-chain Key
 
@@ -88,7 +92,7 @@ For the protocol boundary overview, see [Protocol Boundaries](../protocol-bounda
 Within one order, a given `signalKey` can be successfully submitted only once:
 
 - The first submission writes the `SignalRecord` and emits `SignalSubmitted`.
-- Later duplicate submissions revert with `SignalAlreadyExists`.
+- Later duplicate submissions are absorbed first-win: no second fact, no repeated advance, and no re-run of the emission admission screen (safe for at-least-once retries); the `SignalAlreadyExists` revert is reserved for engine-internal write entry points.
 - The first successful write is the final on-chain fact of that `(planId, orderId, sourceId, signalId)`; there is no overwrite, revocation, or admin rewrite entry point.
 
 The `idempotencyKey` is kept in events and projections so the service layer can identify request origin; but the contract-level deduplication key is `(planId, orderId, sourceId, signalId)`.

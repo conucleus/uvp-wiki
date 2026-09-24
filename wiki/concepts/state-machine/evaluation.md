@@ -85,7 +85,8 @@ struct EvalValue {
 
 `submitSignal()` 按 `(planId, orderId, sourceId, signalId)` 去重：同一订单
 作用域内的 `signalKey` 只有第一次提交会写入 `SignalRecord`（first-writer-wins），
-重复提交以 `SignalAlreadyExists` 回滚。提交时合约检查 submitter 是否持有显式订单级授权，或是否是当前 active
+重复的外部提交被幂等吸收、不重复推进（`SignalAlreadyExists` revert 保留给引擎
+内部写入口）。提交时合约检查 submitter 是否持有显式订单级授权，或是否是当前 active
 executor overlay 委任的钱包；两者都不满足时提交被拒绝。授权模型详见
 [Signal 授权](../trust/signal-authorization.md)。任何 replay oracle、索引和
 Product API 都必须携带 `planId`，不能用 bare `orderId` 跨 plan 归并。

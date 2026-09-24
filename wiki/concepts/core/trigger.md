@@ -36,7 +36,7 @@ status: verified
   source: buyer
   receiveSignals:
     READY: seller::purchase.submit.cmp
-  sendSignals: [str, cmp, err]
+  sendSignals: [{name: str}, {name: cmp}, {name: err}]
 ```
 
 出生阶段显式声明 `mint: per-fact`，并且只能以跨源订阅作为入口：
@@ -47,7 +47,7 @@ status: verified
   mint: per-fact
   receiveSignals:
     REQUESTED: "::ANCHOR(@customer::request.submit.requested)"
-  sendSignals: [str, cmp, err]
+  sendSignals: [{name: str}, {name: cmp}, {name: err}]
 ```
 
 `mint` 目前只有 `per-fact` 一个取值。出生阶段必须使用静态的

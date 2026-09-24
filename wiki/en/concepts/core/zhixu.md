@@ -48,7 +48,7 @@ spec:
           mint: per-fact
           receiveSignals:
             REQUESTED: "::ANCHOR(@customer::request.submit.requested)"
-          sendSignals: [str, cmp, err]
+          sendSignals: [{name: str}, {name: cmp}, {name: err}]
           executor:
             supplierType: organization
             supplierID: "{{ .intake_executor_uid }}"
@@ -56,7 +56,7 @@ spec:
           source: supply
           receiveSignals:
             SCOPE_READY: customer::master.intake.cmp
-          sendSignals: [str, cmp, err]
+          sendSignals: [{name: str}, {name: cmp}, {name: err}]
           executor:
             supplierType: zhixu
             zhixuExecutorConfig:
@@ -97,7 +97,7 @@ This example shows three things: a `mint: per-fact` stage subscribes to an `ANCH
 | `source` | The causal chain this stage's signals belong to; user roles are interpreted separately by Product/authorization. |
 | `mint` | Optional birth policy; the only value is `per-fact`, which mints at most one order per subscribed fact. |
 | `receiveSignals` | Mapping from hook key to Hook DSL expression. |
-| `sendSignals` | Signal names the stage may emit after completion. |
+| `sendSignals` | Signals the stage may emit after completion; entries are objects `{name, validWhen?}` — `validWhen` is an emission admission declaration (see [Signal](signal.md)). |
 | `executor` | Default executor configuration pointing to a supplier or another Zhixu. |
 | `selectedStages` | Which target stages this stage may choose executors for. |
 | `fileResources` | Off-chain resource handles such as stage protocols, evidence requirements, or resource manifests. See [File Resources](file-resources.md). |

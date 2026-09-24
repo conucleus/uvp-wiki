@@ -30,7 +30,7 @@ Zhixu stage 里有两处和 signal 直接相关：
 | 字段 | 含义 |
 | --- | --- |
 | `receiveSignals` | 当前 stage 等待哪些输入 signal。每个 key 会编译成一个 [Hook](hook.md)。 |
-| `sendSignals` | 当前 stage 执行后可能发出哪些输出 signal。 |
+| `sendSignals` | 当前 stage 执行后可能发出哪些输出 signal，条目是对象 `{name, validWhen?}`（见下节"发射适格"）。 |
 
 例如一个买方承诺 stage：
 
@@ -40,12 +40,16 @@ buyer_commit:
   receiveSignals:
     OFFER_READY: commercial::master.commercial_offer.cmp
   sendSignals:
-    - cmp
-    - cxl
-    - err
+    - name: cmp
+    - name: cxl
+    - name: err
 ```
 
 含义是：商业报价完成后，买方承诺阶段 ready；该阶段后续可能发出 `cmp`、`cxl` 或 `err`，供后续 hook 消费。
+
+## 发射适格（validWhen）
+
+`sendSignals` 条目可以声明 `validWhen`（发射适格表达式）。声明了它的 signal 在**外部提交**到达时先过一道判定：引擎对提交前已成立的事实（不含本次提交本身）求值这条表达式，整棵表达式就绪才准入，否则以类型化错误拒绝——链上整笔 revert `SignalAdmissionRejected`，事实流不落任何行。不声明 `validWhen` 的 signal 无条件准入；已落库事实的重复提交按 first-win 幂等吸收，不看适格。表达式语言、编译期约束与求值语义的权威在两轨文法手册（`zhixu-dsl-grammar.md` §5.7）；引擎内部产生的事实（dock 投递、per-fact 铸单）不经此面。
 
 ## 文本名到链上 key
 
@@ -88,7 +92,7 @@ signalKey = keccak256(abi.encode(sourceId, signalId))
 同一个订单里，同一个 `signalKey` 只能成功提交一次：
 
 - 第一次提交会写入 `SignalRecord` 并发出 `SignalSubmitted`。
-- 后续重复提交会因为 `SignalAlreadyExists` 回滚。
+- 后续重复提交被 first-win 幂等吸收：不产生第二条事实、不重复推进、不再过发射适格筛（at-least-once 重试安全）；`SignalAlreadyExists` revert 保留给引擎内部写入口。
 - 第一次成功写入就是该 `(planId, orderId, sourceId, signalId)` 的最终链上事实，不提供覆盖、撤销或管理员改写入口。
 
 `idempotencyKey` 会保存在事件和投影里，方便服务层识别请求来源；但合约语义上的去重键是 `(planId, orderId, sourceId, signalId)`。

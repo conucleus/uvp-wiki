@@ -25,7 +25,7 @@ The compiler input is `ZhixuDefinition`. The compiler does more than move string
 | `stages[].mint` | Birth-stage declaration (the materialization seat for per-fact minting and dock birth anchors). |
 | `stages[].executor` | Executor route and reachability. |
 | `stages[].selectedStages` | Selector binding and executor closure. |
-| `stages[].sendSignals` | Outbound signal description. |
+| `stages[].sendSignals` | Outbound signal declarations (entries are objects `{name, validWhen?}`: capability list plus emission admission artifacts). |
 | `stages[].fileResources` | Product resource requirements and resource patch input. |
 | `spec.dockInterface` | Named interface map, compiled into the dock interface commitment (interface roots). |
 

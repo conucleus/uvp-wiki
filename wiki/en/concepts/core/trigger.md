@@ -37,7 +37,7 @@ A normal stage uses an in-order expression:
   source: buyer
   receiveSignals:
     READY: seller::purchase.submit.cmp
-  sendSignals: [str, cmp, err]
+  sendSignals: [{name: str}, {name: cmp}, {name: err}]
 ```
 
 A birth stage explicitly declares `mint: per-fact` and may use only a
@@ -49,7 +49,7 @@ cross-source subscription as its entry:
   mint: per-fact
   receiveSignals:
     REQUESTED: "::ANCHOR(@customer::request.submit.requested)"
-  sendSignals: [str, cmp, err]
+  sendSignals: [{name: str}, {name: cmp}, {name: err}]
 ```
 
 `per-fact` is currently the only `mint` value. A birth stage must use a static

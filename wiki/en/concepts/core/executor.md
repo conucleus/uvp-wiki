@@ -68,7 +68,7 @@ Some stages have their executor chosen during the run by a control stage carryin
 selectedStages:
   - customs.complete
 sendSignals:
-  - select_executor
+  - name: select_executor
 ```
 
 At runtime events like these appear:

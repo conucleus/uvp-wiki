@@ -48,7 +48,7 @@ spec:
           mint: per-fact
           receiveSignals:
             REQUESTED: "::ANCHOR(@customer::request.submit.requested)"
-          sendSignals: [str, cmp, err]
+          sendSignals: [{name: str}, {name: cmp}, {name: err}]
           executor:
             supplierType: organization
             supplierID: "{{ .intake_executor_uid }}"
@@ -56,7 +56,7 @@ spec:
           source: supply
           receiveSignals:
             SCOPE_READY: customer::master.intake.cmp
-          sendSignals: [str, cmp, err]
+          sendSignals: [{name: str}, {name: cmp}, {name: err}]
           executor:
             supplierType: zhixu
             zhixuExecutorConfig:
@@ -97,7 +97,7 @@ spec:
 | `source` | 该阶段 signal 所属的因果链；用户角色由 Product/authorization 另行解释。 |
 | `mint` | 可选的出生策略，目前唯一取值为 `per-fact`；声明后每个订阅事实最多代铸一个订单。 |
 | `receiveSignals` | hook key 到 Hook DSL 表达式的映射。 |
-| `sendSignals` | 阶段完成后可能发出的 signal 名称。 |
+| `sendSignals` | 阶段完成后可能发出的 signal，条目是对象 `{name, validWhen?}`——`validWhen` 是发射适格声明（见 [Signal](signal.md)）。 |
 | `executor` | 默认执行者配置，指向 supplier 或另一条 Zhixu。 |
 | `selectedStages` | 当前阶段能为哪些目标阶段选择 executor。 |
 | `fileResources` | 阶段协议、证据要求、资源清单等链下资源句柄。详见 [File Resources](file-resources.md)。 |

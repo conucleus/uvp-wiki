@@ -25,7 +25,7 @@ status: verified
 | `stages[].mint` | 出生阶段声明（per-fact 代铸/dock 出生锚相关物化位）。 |
 | `stages[].executor` | executor route 和 reachability。 |
 | `stages[].selectedStages` | selector binding 和 executor closure。 |
-| `stages[].sendSignals` | 出站 signal 描述。 |
+| `stages[].sendSignals` | 出站 signal 声明（条目对象 `{name, validWhen?}`：能力清单 + 发射适格产物）。 |
 | `stages[].fileResources` | 产品资源要求和 resource patch 输入。 |
 | `spec.dockInterface` | 具名接口 map，编译为 dock 接口承诺（interface roots）。 |
 
