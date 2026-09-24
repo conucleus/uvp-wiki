@@ -18,12 +18,12 @@ status: verified
 | Dock interface artifact | `uvp.dockInterfaceArtifact.v2` | Target-side named-interface commitment artifact schema. |
 | Dock route artifact | `uvp.dockRoute.v2` | Resolved-route artifact schema (an unresolved dynamic route is `uvp.dockRoute.unresolved.v1`). |
 | Dock resolution manifest | `uvp.dock.resolution.v2` | Target-resolution manifest schema (a name directory; the chain track's publication surface embeds the definition in full on the same schema for content addressing). |
-| StateMachine ABI / EIP-712 | `0.11` | Signed Plan commit/finalize, composite `(planId, orderId)` orders, permissionless relayer. |
+| StateMachine ABI / EIP-712 | `0.12` | Signed Plan commit/finalize, composite `(planId, orderId)` orders, permissionless relayer. |
 | Plan registration library ABI | `0.2` | The `UVPPlanRegistration` library that hosts the `commitPlan`/`finalizePlan` body. |
 | IdentityRegistry ABI | `0.1` | Thin offline subject-to-wallet identity binding. |
 | DeploymentRegistry ABI | `0.2` | Deployment cutover and canary records. |
 | Derived signal module ABI | `0.3` | Frozen ABI of the derived-signal module (EIP-712 domain version `0.6`). |
-| Product submit domain | `0.11` | Product signal-submit EIP-712 domain. |
+| Product submit domain | `0.12` | Product signal-submit EIP-712 domain. |
 | Order-link module ABI | `0.3` | Frozen ABI of the linked-order module (trigger EIP-712 domain version `0.8`). |
 | Stage patch module ABI | `0.4` | Frozen ABI of the module hosting executor/resource patch (patch EIP-712 domains version `0.1`). |
 | Docking module ABI | `4.4` | Unified Zhixu DockRoute: the open order-creation channel plus the attach channel (interface-name leaves, mode word; the dynamic-selection candidate-leaf domain added in 4.4) — new mints a child order via `openDockedOrder`, existing attaches an existing target order via `attachDockedOrder` (no child order, three-legged consent gate), and `target: null` dynamic selection is settled at attach via a candidate-set membership proof; EIP-712 domain version `4`. |
