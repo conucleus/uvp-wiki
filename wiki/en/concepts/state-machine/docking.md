@@ -93,7 +93,7 @@ instance and target definition identity, preventing cross-plan preemption.
   established on DB natural keys).
 
 For the per-syntax-point acceptance comparison across the two tracks see
-`zhixu-dsl-grammar.md` (chain-track volume) §10 item 5 in the `uvp-eth` repo.
+`zhixu-dsl-grammar.md` (chain-track volume) Appendix B in the `uvp-eth` repo.
 
 ## Subscriptions and Entries
 

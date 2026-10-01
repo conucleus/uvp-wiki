@@ -81,7 +81,7 @@ dock instance 和 target definition 身份派生，防止跨 plan 抢占。
   记录补齐目标（按 name 解析，校验接口/端口满足本地声明，DB 自然键建立实例）。
 
 两轨逐语法点的接受/拒绝对照见 `uvp-eth` 仓 `zhixu-dsl-grammar.md`（链轨册）
-§10 第 5 条。
+附录 B。
 
 ## 订阅与入口
 
