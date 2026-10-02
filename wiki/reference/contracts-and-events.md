@@ -71,14 +71,16 @@ OrderLinked
 OrderMaterialized
 StageMaterialized
 SignalSubmitted
+DerivedSignalSubmitted
 DockOpened
+DockAttached
 DockInputSubmitted
 DockOutputSubmitted
 DockOutputSatisfied
 StageExecutorPatchApplied
 StageResourcePatchApplied
 StageExecutorActivated
-StageExecutorSignalDelegated
+OrderForked
 HookStatusChanged
 HookReady
 TimerPoked
