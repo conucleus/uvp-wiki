@@ -49,7 +49,7 @@ buyer_commit:
 
 ## 发射适格（validWhen）
 
-`sendSignals` 条目可以声明 `validWhen`（发射适格表达式）。声明了它的 signal 在**外部提交**到达时先过一道判定：引擎对提交前已成立的事实（不含本次提交本身）求值这条表达式，整棵表达式就绪才准入，否则以类型化错误拒绝——链上整笔 revert `SignalAdmissionRejected`，事实流不落任何行。不声明 `validWhen` 的 signal 无条件准入；已落库事实的重复提交按 first-win 幂等吸收，不看适格。表达式语言、编译期约束与求值语义的权威在两轨文法手册（`zhixu-dsl-grammar.md` §5.6 发射适格位）；引擎内部产生的事实（dock 投递、per-fact 铸单）不经此面。
+`sendSignals` 条目可以声明 `validWhen`（发射适格表达式）。声明了它的 signal 在**外部提交**到达时先过一道判定：引擎对提交前已成立的事实（不含本次提交本身）求值这条表达式，整棵表达式就绪才准入，否则以类型化错误拒绝——链上整笔 revert `SignalAdmissionRejected`，事实流不落任何行。声明形态是表达式列表（`[]string`：每项完整的 `{source}::{condition}`、全体项 header source 一致；编译期折叠为一棵 AND）。不声明 `validWhen` 的 signal 无条件准入；已落库事实的重复提交按 first-win 幂等吸收，不看适格。表达式语言、编译期约束与求值语义的权威在两轨文法手册（`zhixu-dsl-grammar.md` §5.6 发射适格位）；引擎内部产生的事实（dock 投递、per-fact 铸单）不经此面。
 
 ## 文本名到链上 key
 
