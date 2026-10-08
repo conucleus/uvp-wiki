@@ -45,7 +45,7 @@ spec:
 
 凝结核负责秩序内部的设计和运行原则：
 
-- 设计 Zhixu 的 task pattern、stage、source、signal、hook 和 trigger；
+- 设计 Zhixu 的 stage、source、signal、hook 和 trigger；
 - 定义哪些 stage 需要哪些 supplier 能力；
 - 设计选择权、资源要求、证据要求和公平规则；
 - 组织供应商网络，并维护秩序内部的协作、公平和运转；

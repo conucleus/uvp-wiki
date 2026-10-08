@@ -75,7 +75,7 @@ submitter = participant/business submitter address
 
 业务提交者签署对应的 trigger 或 signal typed data；registrar/relayer 只负责广播。广播地址不会因此获得业务提交权限。授权键和事件都必须保留 `(planId, orderId)`，不能仅按裸 `orderId` 归属事实。
 
-docked Zhixu 的跨源入口由 `orderTriggerKind: dock` 和已提交的 dock route/interface commitment 表达；跨 source 条件使用 `::ANCHOR(@source::task.stage.signal)` 订阅，并对实际的 source/signal 建立同样的订单级授权。linked order 后续的 `str/cmp/err` 映射仍按 `signalMap`、docking relation 和 mapped signal 授权检查。
+docked Zhixu 的跨源入口由 `orderTriggerKind: dock` 和已提交的 dock route/interface commitment 表达；跨 source 条件使用 `::ANCHOR(@source::stage.signal)` 订阅，并对实际的 source/signal 建立同样的订单级授权。linked order 后续的 `str/cmp/err` 映射仍按 `signalMap`、docking relation 和 mapped signal 授权检查。
 
 ## 授权和任务展示
 

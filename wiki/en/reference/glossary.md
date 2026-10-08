@@ -19,8 +19,7 @@ This page explains project terms in plain language first, then gives the code an
 | [Order](../concepts/core/order.md) / 订单 | One concrete run of some Plan. | `UVPStateMachine.Order`, `triggerOrderFromOutsideFor()` (open birth entry on the state machine) / `triggerOrderFromSignalFor()` (derived-creation entry on `UVPOrderLinkModule`), `OrderRegistered`, `OrderTriggered`. |
 | [Nucleus](../concepts/core/nucleation.md) | The organizational core that initiates, designs, and maintains a kind of Zhixu. It lets a class of coordination rules take shape, gain boundaries, and stay maintained; it can be a team, organization, project owner, or workflow owner. | `spec.nucleation.id`, Store Nucleus workbench. |
 | nucleation | The nucleation process, context, or field name--not a subject name. Existing DSL/API keeps this spelling to avoid public-interface drift. | `spec.nucleation.id`, `nucleationId`. |
-| Stage | A step or execution segment inside a task pattern. | `taskPatterns[].stages[]`, `stageIdentifier`, `stageId`. |
-| Task Pattern | A reusable grouping of stages inside a Zhixu. Many examples use `master` for the main task pattern. | `taskPatterns[].name`. |
+| Stage | A step or execution segment inside a Zhixu; stage names are globally unique within the Zhixu. | `spec.stages[]`, `stageIdentifier`, `stageId`. |
 | [Supplier](../concepts/core/supplier.md) | A real-world or digital subject organized by the Store; capability profiles are off-chain Store judgments. | Store metadata, Identity Binding. |
 | [Executor](../concepts/core/executor.md) | The Supplier or submitter selected or elected to handle the current Order stage or submit that stage's signal. | order authorization, stage executor overlay, EIP-712 submitter. |
 | [Source](../concepts/core/source.md) | The causal namespace a signal belongs to, answering which business-progression line an action enters. | `source`, `sourceId`, `signalKey`. |

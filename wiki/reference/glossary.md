@@ -19,8 +19,7 @@ status: verified
 | [Order](../concepts/core/order.md) / 订单 | 某个 Plan 的一次具体运行。 | `UVPStateMachine.Order`、`triggerOrderFromOutsideFor()`（状态机开放出生入口）/ `triggerOrderFromSignalFor()`（`UVPOrderLinkModule` 派生建单入口）、`OrderRegistered`、`OrderTriggered`。 |
 | [凝结核 / Nucleus](../concepts/core/nucleation.md) | 发起、设计并维护某类 Zhixu 的组织核心。它让一类协作规则成形、获得边界并持续维护；可以是团队、组织、项目 owner 或 workflow owner。 | `spec.nucleation.id`、Store 凝结核工作台。 |
 | nucleation / 成核上下文 | 成核过程、上下文或字段名，不是主体名。现有 DSL/API 保留这个拼写以避免 public interface 漂移。 | `spec.nucleation.id`、`nucleationId`。 |
-| Stage / 阶段 | task pattern 里的一个步骤或执行段。 | `taskPatterns[].stages[]`、`stageIdentifier`、`stageId`。 |
-| Task Pattern | Zhixu 里一组可复用阶段。很多例子用 `master` 表示主 task pattern。 | `taskPatterns[].name`。 |
+| Stage / 阶段 | 秩序 (Zhixu) 里的一个步骤或执行段，stage 名在秩序内全局唯一。 | `spec.stages[]`、`stageIdentifier`、`stageId`。 |
 | [Supplier](../concepts/core/supplier.md) | Store 组织的现实或数字主体；能力资料是 Store 链下判断。 | Store metadata、Identity Binding。 |
 | [Executor](../concepts/core/executor.md) | 被选中或当选来处理当前 Order 阶段或提交该阶段 signal 的 Supplier 或 submitter。 | order authorization、stage executor overlay、EIP-712 submitter。 |
 | [Source](../concepts/core/source.md) | signal 所属的因果命名空间，回答“这个动作进入哪条业务推进线”。 | `source`、`sourceId`、`signalKey`。 |

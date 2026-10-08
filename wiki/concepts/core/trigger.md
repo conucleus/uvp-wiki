@@ -35,7 +35,7 @@ status: verified
 - name: review
   source: buyer
   receiveSignals:
-    READY: seller::purchase.submit.cmp
+    READY: seller::submit.cmp
   sendSignals: [{name: str}, {name: cmp}, {name: err}]
 ```
 
@@ -46,7 +46,7 @@ status: verified
   source: customer
   mint: per-fact
   receiveSignals:
-    REQUESTED: "::ANCHOR(@customer::request.submit.requested)"
+    REQUESTED: "::ANCHOR(@customer::submit.requested)"
   sendSignals: [{name: str}, {name: cmp}, {name: err}]
 ```
 
@@ -93,10 +93,10 @@ input 端口名；`signalMap` 的 key 必须是本地 `sendSignals`，value 必�
 - `stage.trigger` 和 `stage.externalSignals`；
 - executor 的 `triggerEntrance`；
 - `supplierType: zhixu` 与 `supplierID` 并用；
-- 把 `signalMap` value 写成 `source::task.stage.signal` Hook DSL；
+- 把 `signalMap` value 写成 `source::stage.signal` Hook DSL；
 - 订阅以外的 wrapper 形态（如 `::OUTSIDE@(...)` 与 `::ANCHOR@(…)`）。
 
-需要跨源事实时，使用 `::ANCHOR(@source::task.stage.signal)`；需要从事实出生
+需要跨源事实时，使用 `::ANCHOR(@source::stage.signal)`；需要从事实出生
 订单时，再在阶段上声明 `mint: per-fact`。
 
 ## 运行与证明

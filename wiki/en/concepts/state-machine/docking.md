@@ -98,7 +98,7 @@ For the per-syntax-point acceptance comparison across the two tracks see
 ## Subscriptions and Entries
 
 The local stage entry is produced by a `receiveSignals` Hook. A cross-source
-fact uses `::ANCHOR(@source::task.stage.signal)`; a birth stage additionally
+fact uses `::ANCHOR(@source::stage.signal)`; a birth stage additionally
 declares `mint: per-fact`. `stage.trigger`, `externalSignals`,
 `triggerEntrance`, and wrapper forms other than the subscription
 (`::OUTSIDE@(...)`, `::ANCHOR@(…)`) are not part of the current DSL

@@ -66,7 +66,7 @@ Some stages have their executor chosen during the run by a control stage carryin
 
 ```yaml
 selectedStages:
-  - customs.complete
+  - complete
 sendSignals:
   - name: select_executor
 ```

@@ -75,7 +75,7 @@ submitter = participant/business submitter address
 
 The business submitter signs the corresponding trigger or signal typed data; the registrar/relayer is only responsible for broadcasting. The broadcasting address does not gain business-submission authority by doing so. Authorization keys and events must retain `(planId, orderId)` and must not assign facts to a Plan from a bare `orderId`.
 
-A docked Zhixu cross-source entry is expressed by `orderTriggerKind: dock` plus committed dock route/interface proofs; cross-source conditions use the `::ANCHOR(@source::task.stage.signal)` subscription, with the same order-level authorization established for the actual source/signal. The later `str/cmp/err` mapping for a linked order still follows `signalMap`, the docking relation, and mapped-signal authorization checks.
+A docked Zhixu cross-source entry is expressed by `orderTriggerKind: dock` plus committed dock route/interface proofs; cross-source conditions use the `::ANCHOR(@source::stage.signal)` subscription, with the same order-level authorization established for the actual source/signal. The later `str/cmp/err` mapping for a linked order still follows `signalMap`, the docking relation, and mapped-signal authorization checks.
 
 ## Authorization and Task Display
 

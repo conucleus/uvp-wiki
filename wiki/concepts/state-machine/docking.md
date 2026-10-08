@@ -86,7 +86,7 @@ dock instance 和 target definition 身份派生，防止跨 plan 抢占。
 ## 订阅与入口
 
 local stage 的入口由 `receiveSignals` Hook 产生；跨源事实使用
-`::ANCHOR(@source::task.stage.signal)`，出生阶段另声明 `mint: per-fact`。
+`::ANCHOR(@source::stage.signal)`，出生阶段另声明 `mint: per-fact`。
 `stage.trigger`、`externalSignals`、`triggerEntrance`，以及订阅以外的
 wrapper 形态（`::OUTSIDE@(...)`、`::ANCHOR@(…)`）不属于当前
 DSL，编译器会拒绝。

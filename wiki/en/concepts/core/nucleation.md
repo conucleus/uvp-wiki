@@ -35,7 +35,7 @@ spec:
 
 The nucleus owns design and operating principles inside its order:
 
-- Designing the Zhixu's task patterns, stages, sources, signals, hooks, and triggers;
+- Designing the Zhixu's stages, sources, signals, hooks, and triggers;
 - Defining which stages need which supplier capabilities;
 - Designing choice rights, resource requirements, evidence requirements, and operating rules;
 - Organizing supplier networks and maintaining collaboration and operation inside the order;

@@ -66,7 +66,7 @@ executor:
 
 ```yaml
 selectedStages:
-  - customs.complete
+  - complete
 sendSignals:
   - name: select_executor
 ```

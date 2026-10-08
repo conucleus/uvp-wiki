@@ -40,15 +40,15 @@ struct Instruction {
 Hook DSL：
 
 ```text
-buyer::(task.pay.cmp +5s) & ~task.pay.refund
+buyer::(pay.cmp +5s) & ~pay.refund
 ```
 
 可能编译为类似指令：
 
 ```text
-SIGNAL buyer/task.pay.cmp
+SIGNAL buyer/pay.cmp
 DELAY 5
-SIGNAL buyer/task.pay.refund
+SIGNAL buyer/pay.refund
 NOT
 AND 2
 ```
@@ -67,7 +67,7 @@ struct EvalValue {
 }
 ```
 
-`wait/ready/cxl` 是 hook 运行态；云侧语义层另有 `init`（尚未收敛的初始态）等中间态，但它不是链上 `Instruction[]` 的求值结果。跨源订阅统一使用 `::ANCHOR(@source::task.stage.signal)`；路由层按 source 类逐事件投递，`mint: per-fact` 决定是否从事实代铸订单，汇聚（撮合）语义由无锚监听、多条订阅与执行器配对表达。
+`wait/ready/cxl` 是 hook 运行态；云侧语义层另有 `init`（尚未收敛的初始态）等中间态，但它不是链上 `Instruction[]` 的求值结果。跨源订阅统一使用 `::ANCHOR(@source::stage.signal)`；路由层按 source 类逐事件投递，`mint: per-fact` 决定是否从事实代铸订单，汇聚（撮合）语义由无锚监听、多条订阅与执行器配对表达。
 
 ## Operator 语义
 

@@ -46,7 +46,7 @@ local order 和 linked order 都是独立的 `UVPStateMachine` order。它们各
 - name: fiat_bridge
   source: settlement
   receiveSignals:
-    ROUTE_FIAT: settlement::payment.route.use_fiat_bridge
+    ROUTE_FIAT: settlement::route.use_fiat_bridge
   executor:
     supplierType: zhixu
     zhixuExecutorConfig:
@@ -65,13 +65,13 @@ local order 和 linked order 都是独立的 `UVPStateMachine` order。它们各
 
 本地 stage 的 source 是 `settlement`；`str/cmp/err` 各字段的确切语义见下文 [signalMap 的协议含义](#signalmap-的协议含义)。
 
-对接阶段的入口仍然必须是本地 `receiveSignals` hook；如果它订阅另一个域的事实，使用 `::ANCHOR(@source::task.stage.signal)`。不存在独立的 `trigger` 或 `externalSignals` 入口字段：
+对接阶段的入口仍然必须是本地 `receiveSignals` hook；如果它订阅另一个域的事实，使用 `::ANCHOR(@source::stage.signal)`。不存在独立的 `trigger` 或 `externalSignals` 入口字段：
 
 ```yaml
 - name: dock_customs_clearance
   source: customs
   receiveSignals:
-    LINK_READY: "::ANCHOR(@customs::clearance.entry.ready)"
+    LINK_READY: "::ANCHOR(@customs::clearance.ready)"
   executor:
     supplierType: zhixu
     zhixuExecutorConfig:

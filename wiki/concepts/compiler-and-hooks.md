@@ -14,7 +14,7 @@ Compiler 和 Hook Core 是协议语义进入链上前的入口。它们不处理
 `uvp-protocol/packages/hook-core` 负责：
 
 - 解析 `source::condition`。
-- 支持 `&`、`|`、`~`、delay，以及跨 source 的 `::ANCHOR(@source::task.stage.signal)` 订阅；订阅是跨源事实的唯一 wrapper 形态，`::OUTSIDE@`、旧 `::ANCHOR@(…)` 等其余 wrapper 与 `OUTSOURCE` 都在解析期报错。
+- 支持 `&`、`|`、`~`、delay，以及跨 source 的 `::ANCHOR(@source::stage.signal)` 订阅；订阅是跨源事实的唯一 wrapper 形态，`::OUTSIDE@`、旧 `::ANCHOR@(…)` 等其余 wrapper 与 `OUTSOURCE` 都在解析期报错。
 - 只为 stage 的 `receiveSignals` 生成 receive Hook；不存在一套绕过 AST 的 `externalSignals` 或 trigger wrapper 语义。
 - 把 `~A` 解释为“A signal 尚未出现在当前订单事件集中”。signal 一旦出现就不会消失，所以这里是单调存在逻辑。
 - 抽取 positive、negative、timer dependencies。

@@ -18,8 +18,7 @@ The compiler input is `ZhixuDefinition`. The compiler does more than move string
 | `metadata.labels` | Part of the definition content; the chain track's identity derivation includes labels (chain-track internal), the cloud track stores them as content only. |
 | `metadata.annotations` | Free-form annotations; never part of identity or hash derivation (no native version semantics). |
 | `spec.platform` | Platform target, participates in hashing. |
-| `taskPatterns[].name` | Part of the stage identifier. |
-| `stages[].name` | Part of the stage identifier. |
+| `stages[].name` | The stage identifier (`stageIdentifier`) itself, unique within the Zhixu. |
 | `stages[].source` | Input to hook source and `sourceId`. |
 | `stages[].receiveSignals` | Generates receive hooks. |
 | `stages[].mint` | Birth-stage declaration (the materialization seat for per-fact minting and dock birth anchors). |
@@ -33,11 +32,12 @@ The compiler input is `ZhixuDefinition`. The compiler does more than move string
 
 Before hashing, the compiler rejects these shapes:
 
-- Missing required `metadata`, `spec`, `taskPatterns`, or stages.
+- Missing required `metadata`, `spec`, `stages`, or stage fields.
+- Duplicate stage names within a Zhixu.
 - `selectedStages` pointing to a stage that does not exist.
 - Executor routes that cannot be reached by a static executor or selector.
 - Invalid hook expression format.
-- Signal references that are not in `task.stage.signal` form.
+- Signal references that are not in `stage.signal` form.
 - Receive signals or signal maps that reference non-existent stages or signals.
 - Stage selector bindings that cannot form a deterministic relation.
 

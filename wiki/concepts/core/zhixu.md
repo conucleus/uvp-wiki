@@ -9,7 +9,7 @@ status: verified
 # 秩序 (Zhixu) DSL
 
 > 前置阅读：[核心概念](../README.md)
-`Zhixu` 是“秩序”的拼音。在本仓库里，秩序 (Zhixu) 是凝结核设计出的可复用协作规则书。它用 DSL 声明一类可复用的生产关系：有哪些任务模式、每个任务有哪些阶段、阶段在哪条 source 因果链上、接收什么 signal、发出什么 signal、是否按事实代铸订单、默认 executor 是谁、哪些阶段能为其他阶段选择 executor、需要哪些资源，以及可选的 dock interface。
+`Zhixu` 是“秩序”的拼音。在本仓库里，秩序 (Zhixu) 是凝结核设计出的可复用协作规则书。它用 DSL 声明一类可复用的生产关系：有哪些阶段、每个阶段在哪条 source 因果链上、接收什么 signal、发出什么 signal、是否按事实代铸订单、默认 executor 是谁、哪些阶段能为其他阶段选择 executor、需要哪些资源，以及可选的 dock interface。
 
 代码入口是 `uvp-protocol/packages/compiler/src/types/index.ts` 的 `ZhixuDefinition`。订单 (Order) 是这份规则书编译、注册之后的一次运行实例。
 
@@ -40,37 +40,35 @@ spec:
     version: 0.1.3 <!-- 示例值，以 compiler 当前版本为准 -->
   nucleation:
     id: procurement-nucleus
-  taskPatterns:
-    - name: master
-      stages:
-        - name: intake
-          source: customer
-          mint: per-fact
-          receiveSignals:
-            REQUESTED: "::ANCHOR(@customer::request.submit.requested)"
-          sendSignals: [{name: str}, {name: cmp}, {name: err}]
-          executor:
-            supplierType: organization
-            supplierID: "{{ .intake_executor_uid }}"
-        - name: supplier_sourcing
-          source: supply
-          receiveSignals:
-            SCOPE_READY: customer::master.intake.cmp
-          sendSignals: [{name: str}, {name: cmp}, {name: err}]
-          executor:
-            supplierType: zhixu
-            zhixuExecutorConfig:
-              target:
-                zhixu: supplier-sourcing
-              interface: sourcing_service
-              order:
-                mode: new
-              inputMap:
-                SCOPE_READY: intake   # key 必须是本 stage 声明的 receiveSignals 通道（D005），value 是目标接口 input 端口名
-              signalMap:
-                str: start
-                cmp: complete
-                err: failed
+  stages:
+    - name: intake
+      source: customer
+      mint: per-fact
+      receiveSignals:
+        REQUESTED: "::ANCHOR(@customer::submit.requested)"
+      sendSignals: [{name: str}, {name: cmp}, {name: err}]
+      executor:
+        supplierType: organization
+        supplierID: "{{ .intake_executor_uid }}"
+    - name: supplier_sourcing
+      source: supply
+      receiveSignals:
+        SCOPE_READY: customer::intake.cmp
+      sendSignals: [{name: str}, {name: cmp}, {name: err}]
+      executor:
+        supplierType: zhixu
+        zhixuExecutorConfig:
+          target:
+            zhixu: supplier-sourcing
+          interface: sourcing_service
+          order:
+            mode: new
+          inputMap:
+            SCOPE_READY: intake   # key 必须是本 stage 声明的 receiveSignals 通道（D005），value 是目标接口 input 端口名
+          signalMap:
+            str: start
+            cmp: complete
+            err: failed
 ```
 
 这段示例说明三件事：`mint: per-fact` 阶段通过 `ANCHOR(@...)` 订阅事实并按事实纯函数代铸一个订单；普通阶段通过 `receiveSignals` 继续推进；委托阶段把另一条 Zhixu 作为执行接口，并以目标端口名配置 `inputMap/signalMap`。linked 秩序的输出经 proof 校验和授权 submitter 映射后推动本地秩序继续运行。`signalMap` 的协议语义与运行时对接详见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md) 和 [Executor](executor.md)。
@@ -87,13 +85,13 @@ spec:
 | `metadata.annotations` | 自由注解，永不参与身份或哈希推导（Zhixu 无原生版本语义，`version` 键无特殊待遇）。 |
 | `spec.platform` | 目标平台。EVM track 使用 `type=blockchain`、`provider=eth`，可显式写 `network=base`。不写 `network` 时保持当前主网默认路径。 |
 | `spec.nucleation.id` | 秩序的发起核、设计者或组织域标识。详见 [Nucleus / 凝结核](nucleation.md)。 |
-| `spec.taskPatterns` | 任务模式列表，里面包含 stages。 |
+| `spec.stages` | 阶段列表；stage 名在秩序内全局唯一。 |
 
 ## Stage 字段
 
 | 字段 | 解释 |
 | --- | --- |
-| `name` | 阶段名称。和 task pattern 名拼成 `stageIdentifier`。 |
+| `name` | 阶段名称，即 `stageIdentifier` 本身，在秩序内全局唯一。 |
 | `source` | 该阶段 signal 所属的因果链；用户角色由 Product/authorization 另行解释。 |
 | `mint` | 可选的出生策略，目前唯一取值为 `per-fact`；声明后每个订阅事实最多代铸一个订单。 |
 | `receiveSignals` | hook key 到 Hook DSL 表达式的映射。 |
@@ -102,27 +100,27 @@ spec:
 | `selectedStages` | 当前阶段能为哪些目标阶段选择 executor。 |
 | `fileResources` | 阶段协议、证据要求、资源清单等链下资源句柄。详见 [File Resources](file-resources.md)。 |
 
-编译器把 `taskPattern.name + "." + stage.name` 变成 `stageIdentifier`。例如 `master.supplier_sourcing` 会被哈希为链上的 `stageId`。
+编译器把 stage 的 `name` 直接作为 `stageIdentifier`。例如 `supplier_sourcing` 会被哈希为链上的 `stageId`。
 
 ## `receiveSignals` 与 `mint`
 
-`receiveSignals` 定义 Hook 条件。普通表达式在当前订单上下文中求值；跨源订阅使用空标头的 `::ANCHOR(@source::task.stage.signal)`，由事实路由层逐事件投递。阶段是否是出生阶段只由 `mint: per-fact` 声明决定，不通过 `trigger` 或 `externalSignals` 声明入口：
+`receiveSignals` 定义 Hook 条件。普通表达式在当前订单上下文中求值；跨源订阅使用空标头的 `::ANCHOR(@source::stage.signal)`，由事实路由层逐事件投递。阶段是否是出生阶段只由 `mint: per-fact` 声明决定，不通过 `trigger` 或 `externalSignals` 声明入口：
 
 ```yaml
 mint: per-fact
 receiveSignals:
-  REQUESTED: "::ANCHOR(@customer::request.submit.requested)"
+  REQUESTED: "::ANCHOR(@customer::submit.requested)"
 ```
 
 `mint` 只能取 `per-fact`，出生阶段必须包含至少一个 `ANCHOR(@...)` 订阅，并使用静态的 individual/organization executor；编译器会拒绝自环和无界的跨源代铸环。没有 `mint` 的阶段可以用普通 `source::condition` hook，也可以用 `ANCHOR(@...)` 做通道监听；其订单身份由现有订单路由或执行器自报创建。`trigger`、`externalSignals`，以及订阅以外的 wrapper 形态（`::OUTSIDE@`、`::ANCHOR@(…)`）不是合法 DSL，编译器会显式拒绝。
 
 ## `selectedStages`
 
-`selectedStages` 是某个 stage 对目标 stage 的 executor patch 能力。例如在报关闭环中，买家提交的阶段可以为 `customs.complete` 指定具体执行者。编译器把这个关系变成 selector binding，合约在 executor patch 时检查这个 stage-to-target 绑定。
+`selectedStages` 是某个 stage 对目标 stage 的 executor patch 能力。例如在报关闭环中，买家提交的阶段可以为 `complete` 指定具体执行者。编译器把这个关系变成 selector binding，合约在 executor patch 时检查这个 stage-to-target 绑定。
 
 ```yaml
 selectedStages:
-  - customs.complete
+  - complete
 ```
 
 只有存在 selector binding 的 stage 才能为对应目标 stage 改 executor。

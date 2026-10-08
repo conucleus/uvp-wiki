@@ -15,7 +15,7 @@ Hook 本身只是条件。带 `emitReady=true` 的 hook Ready 时，链上才会
 
 ## 谁使用
 
-凝结核在 stage 的 `receiveSignals` 里声明 hook 条件；编译器把它们规范化并编入 Plan；状态机在订单事件上求值；Product/Store/executor-kit 跟随 `HookReady` 创建任务和通知。跨源事实通过 `::ANCHOR(@source::task.stage.signal)` 订阅进入路由层，`mint: per-fact` 决定是否从每条事实代铸订单。
+凝结核在 stage 的 `receiveSignals` 里声明 hook 条件；编译器把它们规范化并编入 Plan；状态机在订单事件上求值；Product/Store/executor-kit 跟随 `HookReady` 创建任务和通知。跨源事实通过 `::ANCHOR(@source::stage.signal)` 订阅进入路由层，`mint: per-fact` 决定是否从每条事实代铸订单。
 
 ## 产生什么结果
 
@@ -27,7 +27,7 @@ hook 条件的权威形态是链上 `UVPStateMachine.StoredHook`（由 Plan 注�
 
 ## Hook 表达式
 
-普通 Hook 表达式使用 `source::condition` 形式。`parseHookExpression()` 要求表达式有 source 和 condition；跨源订阅使用空标头 `::ANCHOR(@source::task.stage.signal)`：
+普通 Hook 表达式使用 `source::condition` 形式。`parseHookExpression()` 要求表达式有 source 和 condition；跨源订阅使用空标头 `::ANCHOR(@source::stage.signal)`：
 
 ```text
 source::condition
@@ -36,12 +36,12 @@ source::condition
 例如：
 
 ```text
-buyer::(task.pay.cmp +5s) & ~task.pay.refund
+buyer::(pay.cmp +5s) & ~pay.refund
 ```
 
-这句话表示：来自 `buyer` 的 `task.pay.cmp` signal 出现后等待 5 秒；在这个判断窗口里，如果 `task.pay.refund` 还没有出现，条件成立。
+这句话表示：来自 `buyer` 的 `pay.cmp` signal 出现后等待 5 秒；在这个判断窗口里，如果 `pay.refund` 还没有出现，条件成立。
 
-Hook 表达式里的 `~A` 是存在逻辑里的缺席判断。它表示“当前订单事件集中还没有出现 A signal”。signal 一旦被授权提交到订单中，就成为可重放事件，不能在后续判断里消失或变回未出现。因此 `~task.pay.refund` 的含义是“退款 signal 尚未发出”；如果退款 signal 已经出现，这个依赖它缺席的分支会被取消。
+Hook 表达式里的 `~A` 是存在逻辑里的缺席判断。它表示“当前订单事件集中还没有出现 A signal”。signal 一旦被授权提交到订单中，就成为可重放事件，不能在后续判断里消失或变回未出现。因此 `~pay.refund` 的含义是“退款 signal 尚未发出”；如果退款 signal 已经出现，这个依赖它缺席的分支会被取消。
 
 ## 支持的 AST 节点
 
@@ -49,14 +49,14 @@ Hook 表达式里的 `~A` 是存在逻辑里的缺席判断。它表示“当前
 
 | 节点 | 含义 |
 | --- | --- |
-| `signal` | 等待某个 `task.stage.signal` 出现。 |
-| `subscription` | `::ANCHOR(@source::task.stage.signal)` 跨源事实订阅：按 source 类逐事件路由；是否从事实代铸订单由 stage 的 `mint: per-fact` 决定。 |
+| `signal` | 等待某个 `stage.signal` 出现。 |
+| `subscription` | `::ANCHOR(@source::stage.signal)` 跨源事实订阅：按 source 类逐事件路由；是否从事实代铸订单由 stage 的 `mint: per-fact` 决定。 |
 | `not` | 缺席条件，表示某个 signal 尚未出现；如果它后来出现，依赖该缺席条件的分支取消。 |
 | `and` | 多个条件都满足。 |
 | `or` | 任一分支满足。 |
 | `delay` | 某个正向锚点出现后等待一段时间（正整数时长，上限 30 天）。 |
 
-解析器会拒绝没有正向锚点的条件，也会拒绝 `OR` 中没有正向锚点的分支。纯缺席条件例如 `buyer::~task.cancel.cmp` 不能成为 hook，因为状态机需要先有一个正向事件，才能知道从什么时候开始判断“尚未出现”。
+解析器会拒绝没有正向锚点的条件，也会拒绝 `OR` 中没有正向锚点的分支。纯缺席条件例如 `buyer::~cancel.cmp` 不能成为 hook，因为状态机需要先有一个正向事件，才能知道从什么时候开始判断“尚未出现”。
 
 ## HookPlan 里保存什么
 

@@ -43,13 +43,13 @@ signalKey = keccak256(abi.encode(sourceId, signalId))
 
 | Source | 现实推进线 | 示例 signal | 常见提交者 | 后续依赖 |
 | --- | --- | --- | --- | --- |
-| `sales` | 商务需求、报价和买方沟通。 | `master.commercial_offer.cmp` | sales 或买方侧 operator。 | 买方承诺任务可以打开。 |
-| `solution` | 技术范围和方案确认。 | `master.technical_scope.cmp` | solution engineer。 | 供应商寻源可以打开。 |
-| `supply` | supplier sourcing 和采购准备。 | `master.supplier_sourcing.cmp` | procurement executor。 | logistics 或 payment 任务可能等待它。 |
-| `payment` | 付款路径、资金准备或 settlement adapter 结果。 | `master.supplier_usdc_direct.cmp` | payment executor 或 adapter。 | 采购执行可能要求付款 proof。 |
-| `logistics` | 国际物流和清关。 | `master.customs_clearance.cmp` | logistics/customs executor。 | delivery 或 field work 可以打开。 |
-| `field` | 现场交付、安装或调试。 | `master.site_acceptance.cmp` | field executor 或买方代表。 | 最终验收可以打开。 |
-| `buyer` | 买方承诺和验收。 | `master.acceptance.cmp` | buyer wallet。 | 订单关闭或售后分支。 |
+| `sales` | 商务需求、报价和买方沟通。 | `commercial_offer.cmp` | sales 或买方侧 operator。 | 买方承诺任务可以打开。 |
+| `solution` | 技术范围和方案确认。 | `technical_scope.cmp` | solution engineer。 | 供应商寻源可以打开。 |
+| `supply` | supplier sourcing 和采购准备。 | `supplier_sourcing.cmp` | procurement executor。 | logistics 或 payment 任务可能等待它。 |
+| `payment` | 付款路径、资金准备或 settlement adapter 结果。 | `supplier_usdc_direct.cmp` | payment executor 或 adapter。 | 采购执行可能要求付款 proof。 |
+| `logistics` | 国际物流和清关。 | `customs_clearance.cmp` | logistics/customs executor。 | delivery 或 field work 可以打开。 |
+| `field` | 现场交付、安装或调试。 | `site_acceptance.cmp` | field executor 或买方代表。 | 最终验收可以打开。 |
+| `buyer` | 买方承诺和验收。 | `acceptance.cmp` | buyer wallet。 | 订单关闭或售后分支。 |
 
 Source 是 hooks 和 signals 使用的命名空间，让状态机能重放正确的因果线。
 
@@ -61,17 +61,17 @@ Source 是 hooks 和 signals 使用的命名空间，让状态机能重放正确
 market_scan:
   source: sourcing
   receiveSignals:
-    INTAKE_READY: sourcing::source.start.cmp
+    INTAKE_READY: sourcing::start.cmp
 
 rfq:
   source: sourcing
   receiveSignals:
-    LONG_LIST_READY: sourcing::source.market_scan.cmp
+    LONG_LIST_READY: sourcing::market_scan.cmp
 
 quote_compare:
   source: sourcing
   receiveSignals:
-    RFQ_SENT: sourcing::source.rfq.cmp
+    RFQ_SENT: sourcing::rfq.cmp
 ```
 
 这里表达一条寻源因果链：intake 完成后才能 market scan，market scan 完成后才能 RFQ，RFQ 完成后才能 quote comparison。
@@ -84,7 +84,7 @@ quote_compare:
 procurement_execution:
   source: supply
   receiveSignals:
-    SUPPLIER_FUNDED: payment::master.supplier_usdc_direct.cmp | master.supplier_settlement_exec.cmp
+    SUPPLIER_FUNDED: payment::supplier_usdc_direct.cmp | supplier_settlement_exec.cmp
 ```
 
 这是一个交汇点：采购执行阶段属于 supply source，但它依赖 payment proof。

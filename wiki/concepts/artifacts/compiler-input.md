@@ -18,8 +18,7 @@ status: verified
 | `metadata.labels` | 定义内容的一部分；链轨身份派生包含 labels（链轨内幕），云轨仅作内容。 |
 | `metadata.annotations` | 自由注解，永不参与身份或哈希推导（无原生版本语义）。 |
 | `spec.platform` | 平台目标，参与哈希。 |
-| `taskPatterns[].name` | stage 标识的一部分。 |
-| `stages[].name` | stage 标识的一部分。 |
+| `stages[].name` | stage 标识（`stageIdentifier`）本身，秩序内唯一。 |
 | `stages[].source` | hook source 和 `sourceId` 输入。 |
 | `stages[].receiveSignals` | 生成 receive hook。 |
 | `stages[].mint` | 出生阶段声明（per-fact 代铸/dock 出生锚相关物化位）。 |
@@ -33,11 +32,12 @@ status: verified
 
 编译器会在哈希前拒绝这些形状：
 
-- 缺少必要的 `metadata`、`spec`、`taskPatterns` 或 stage。
+- 缺少必要的 `metadata`、`spec`、`stages` 或 stage 字段。
+- stage 名在秩序内重复。
 - `selectedStages` 指向不存在的 stage。
 - executor route 无法被静态 executor 或 selector 触达。
 - hook 表达式格式不合法。
-- signal 引用不是 `task.stage.signal` 形式。
+- signal 引用不是 `stage.signal` 形式。
 - receive signal 或 signal map 引用不存在的阶段或信号。
 - stage selector binding 无法形成确定关系。
 

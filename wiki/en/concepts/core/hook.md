@@ -15,7 +15,7 @@ A Hook is only a condition. When a hook with `emitReady=true` becomes Ready, the
 
 ## Who Uses It
 
-Nuclei declare hook conditions in stage `receiveSignals`; the compiler normalizes them into the Plan; the state machine evaluates them over order events; Product/Store/executor-kit follow `HookReady` to create tasks and notifications. Cross-source facts enter the routing layer through `::ANCHOR(@source::task.stage.signal)`, while `mint: per-fact` determines whether each fact derives an order.
+Nuclei declare hook conditions in stage `receiveSignals`; the compiler normalizes them into the Plan; the state machine evaluates them over order events; Product/Store/executor-kit follow `HookReady` to create tasks and notifications. Cross-source facts enter the routing layer through `::ANCHOR(@source::stage.signal)`, while `mint: per-fact` determines whether each fact derives an order.
 
 ## What It Produces
 
@@ -27,7 +27,7 @@ The authoritative form of hook conditions is on-chain `UVPStateMachine.StoredHoo
 
 ## Hook Expressions
 
-Normal Hook expressions use the `source::condition` form. `parseHookExpression()` requires both a source and a condition; cross-source subscriptions use the empty-header `::ANCHOR(@source::task.stage.signal)` form:
+Normal Hook expressions use the `source::condition` form. `parseHookExpression()` requires both a source and a condition; cross-source subscriptions use the empty-header `::ANCHOR(@source::stage.signal)` form:
 
 ```text
 source::condition
@@ -36,12 +36,12 @@ source::condition
 For example:
 
 ```text
-buyer::(task.pay.cmp +5s) & ~task.pay.refund
+buyer::(pay.cmp +5s) & ~pay.refund
 ```
 
-This means: after the `task.pay.cmp` signal from `buyer` appears, wait 5 seconds; within that judgment window, if `task.pay.refund` has not yet appeared, the condition holds.
+This means: after the `pay.cmp` signal from `buyer` appears, wait 5 seconds; within that judgment window, if `pay.refund` has not yet appeared, the condition holds.
 
-`~A` in a Hook expression is absence judgment under existence logic. It means "the A signal has not yet appeared in the current order's event set". Once a signal is authorized and submitted into the order it becomes a replayable event that cannot disappear or revert to not-having-appeared in later judgments. So `~task.pay.refund` means "the refund signal has not been emitted"; if the refund signal has appeared, any branch depending on its absence gets cancelled.
+`~A` in a Hook expression is absence judgment under existence logic. It means "the A signal has not yet appeared in the current order's event set". Once a signal is authorized and submitted into the order it becomes a replayable event that cannot disappear or revert to not-having-appeared in later judgments. So `~pay.refund` means "the refund signal has not been emitted"; if the refund signal has appeared, any branch depending on its absence gets cancelled.
 
 ## Supported AST Nodes
 
@@ -49,14 +49,14 @@ The parsed node types are exactly these:
 
 | Node | Meaning |
 | --- | --- |
-| `signal` | Waits for some `task.stage.signal` to appear. |
-| `subscription` | The `::ANCHOR(@source::task.stage.signal)` cross-source fact subscription, routed event by event by source class; `mint: per-fact` determines whether each fact derives an order. |
+| `signal` | Waits for some `stage.signal` to appear. |
+| `subscription` | The `::ANCHOR(@source::stage.signal)` cross-source fact subscription, routed event by event by source class; `mint: per-fact` determines whether each fact derives an order. |
 | `not` | Absence condition: some signal has not appeared; if it later appears, branches depending on the absence are cancelled. |
 | `and` | All conditions satisfied. |
 | `or` | Any branch satisfied. |
 | `delay` | Wait for some duration after a positive anchor appears (positive integer durations, capped at 30 days). |
 
-The parser rejects conditions without positive anchors and rejects `OR` branches without positive anchors. A pure-absence condition like `buyer::~task.cancel.cmp` cannot become a hook, because the state machine needs a positive event first to know from when to judge "not yet appeared".
+The parser rejects conditions without positive anchors and rejects `OR` branches without positive anchors. A pure-absence condition like `buyer::~cancel.cmp` cannot become a hook, because the state machine needs a positive event first to know from when to judge "not yet appeared".
 
 ## What Is Stored in the HookPlan
 

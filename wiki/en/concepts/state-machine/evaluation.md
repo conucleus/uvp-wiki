@@ -40,15 +40,15 @@ Opcodes outside the vocabulary are explicitly reverted by `_validateHook` at the
 Hook DSL:
 
 ```text
-buyer::(task.pay.cmp +5s) & ~task.pay.refund
+buyer::(pay.cmp +5s) & ~pay.refund
 ```
 
 It may compile into instructions like:
 
 ```text
-SIGNAL buyer/task.pay.cmp
+SIGNAL buyer/pay.cmp
 DELAY 5
-SIGNAL buyer/task.pay.refund
+SIGNAL buyer/pay.refund
 NOT
 AND 2
 ```
@@ -67,7 +67,7 @@ struct EvalValue {
 }
 ```
 
-`wait/ready/cxl` are hook runtime statuses; the cloud-side semantic layer additionally has `init` (a not-yet-converged initial state), which is not an on-chain `Instruction[]` evaluation result. Cross-source subscriptions uniformly use `::ANCHOR(@source::task.stage.signal)`; the routing layer delivers facts by source class, `mint: per-fact` decides whether a fact derives an order, and aggregation (matching) semantics are expressed as anchorless listening plus multiple subscriptions paired by the executor.
+`wait/ready/cxl` are hook runtime statuses; the cloud-side semantic layer additionally has `init` (a not-yet-converged initial state), which is not an on-chain `Instruction[]` evaluation result. Cross-source subscriptions uniformly use `::ANCHOR(@source::stage.signal)`; the routing layer delivers facts by source class, `mint: per-fact` decides whether a fact derives an order, and aggregation (matching) semantics are expressed as anchorless listening plus multiple subscriptions paired by the executor.
 
 ## Operator Semantics
 

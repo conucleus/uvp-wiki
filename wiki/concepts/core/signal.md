@@ -38,7 +38,7 @@ Zhixu stage 里有两处和 signal 直接相关：
 buyer_commit:
   source: buyer
   receiveSignals:
-    OFFER_READY: commercial::master.commercial_offer.cmp
+    OFFER_READY: commercial::commercial_offer.cmp
   sendSignals:
     - name: cmp
     - name: cxl
@@ -56,7 +56,7 @@ buyer_commit:
 在 Hook DSL 里，signal 通常写成：
 
 ```text
-task.stage.signal
+stage.signal
 ```
 
 在合约里，它会变成三个稳定标识：

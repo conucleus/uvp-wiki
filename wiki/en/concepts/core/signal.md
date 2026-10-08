@@ -38,7 +38,7 @@ For example, a buyer commitment stage:
 buyer_commit:
   source: buyer
   receiveSignals:
-    OFFER_READY: commercial::master.commercial_offer.cmp
+    OFFER_READY: commercial::commercial_offer.cmp
   sendSignals:
     - name: cmp
     - name: cxl
@@ -56,7 +56,7 @@ A `sendSignals` entry may declare `validWhen`, an emission admission expression.
 In Hook DSL a signal is usually written as:
 
 ```text
-task.stage.signal
+stage.signal
 ```
 
 In the contract it becomes three stable identifiers:

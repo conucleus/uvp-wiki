@@ -46,7 +46,7 @@ A settlement stage can use another Zhixu as an execution interface like this:
 - name: fiat_bridge
   source: settlement
   receiveSignals:
-    ROUTE_FIAT: settlement::payment.route.use_fiat_bridge
+    ROUTE_FIAT: settlement::route.use_fiat_bridge
   executor:
     supplierType: zhixu
     zhixuExecutorConfig:
@@ -65,13 +65,13 @@ A settlement stage can use another Zhixu as an execution interface like this:
 
 The local stage's source is `settlement`; for the exact semantics of the `str/cmp/err` fields see [Protocol meaning of signalMap](#protocol-meaning-of-signalmap).
 
-The docking stage still needs a local `receiveSignals` hook. When it subscribes to a fact in another domain, use `::ANCHOR(@source::task.stage.signal)`. There is no separate `trigger` or `externalSignals` entry field:
+The docking stage still needs a local `receiveSignals` hook. When it subscribes to a fact in another domain, use `::ANCHOR(@source::stage.signal)`. There is no separate `trigger` or `externalSignals` entry field:
 
 ```yaml
 - name: dock_customs_clearance
   source: customs
   receiveSignals:
-    LINK_READY: "::ANCHOR(@customs::clearance.entry.ready)"
+    LINK_READY: "::ANCHOR(@customs::clearance.ready)"
   executor:
     supplierType: zhixu
     zhixuExecutorConfig:

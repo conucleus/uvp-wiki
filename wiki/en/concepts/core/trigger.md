@@ -36,7 +36,7 @@ A normal stage uses an in-order expression:
 - name: review
   source: buyer
   receiveSignals:
-    READY: seller::purchase.submit.cmp
+    READY: seller::submit.cmp
   sendSignals: [{name: str}, {name: cmp}, {name: err}]
 ```
 
@@ -48,7 +48,7 @@ cross-source subscription as its entry:
   source: customer
   mint: per-fact
   receiveSignals:
-    REQUESTED: "::ANCHOR(@customer::request.submit.requested)"
+    REQUESTED: "::ANCHOR(@customer::submit.requested)"
   sendSignals: [{name: str}, {name: cmp}, {name: err}]
 ```
 
@@ -99,10 +99,10 @@ The following forms are not valid DSL; the compiler explicitly rejects:
 - `stage.trigger` and `stage.externalSignals`;
 - executor `triggerEntrance`;
 - combining `supplierType: zhixu` with `supplierID`;
-- putting `source::task.stage.signal` Hook DSL in a `signalMap` value;
+- putting `source::stage.signal` Hook DSL in a `signalMap` value;
 - wrapper forms other than the subscription (e.g. `::OUTSIDE@(...)` or `::ANCHOR@(…)`).
 
-For a cross-source fact, use `::ANCHOR(@source::task.stage.signal)`; to mint an
+For a cross-source fact, use `::ANCHOR(@source::stage.signal)`; to mint an
 order from that fact, additionally declare `mint: per-fact` on the stage.
 
 ## Runtime and proof

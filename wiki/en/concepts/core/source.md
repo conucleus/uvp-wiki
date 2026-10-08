@@ -43,13 +43,13 @@ In a cross-border supply Order, multiple causal lanes can advance in parallel an
 
 | Source | Real-world line | Example signal | Common submitter | Downstream dependency |
 | --- | --- | --- | --- | --- |
-| `sales` | Business requirements, quotations, buyer communication. | `master.commercial_offer.cmp` | Sales or buyer-side operator. | Buyer commitment task can open. |
-| `solution` | Technical scope and solution confirmation. | `master.technical_scope.cmp` | Solution engineer. | Supplier sourcing can open. |
-| `supply` | Supplier sourcing and procurement preparation. | `master.supplier_sourcing.cmp` | Procurement executor. | Logistics or payment tasks may wait for it. |
-| `payment` | Payment path, funding preparation, or settlement adapter results. | `master.supplier_usdc_direct.cmp` | Payment executor or adapter. | Procurement execution may require payment proof. |
-| `logistics` | International logistics and customs clearance. | `master.customs_clearance.cmp` | Logistics/customs executor. | Delivery or field work can open. |
-| `field` | On-site delivery, installation, or commissioning. | `master.site_acceptance.cmp` | Field executor or buyer representative. | Final acceptance can open. |
-| `buyer` | Buyer commitment and acceptance. | `master.acceptance.cmp` | Buyer wallet. | Order closure or after-sales branch. |
+| `sales` | Business requirements, quotations, buyer communication. | `commercial_offer.cmp` | Sales or buyer-side operator. | Buyer commitment task can open. |
+| `solution` | Technical scope and solution confirmation. | `technical_scope.cmp` | Solution engineer. | Supplier sourcing can open. |
+| `supply` | Supplier sourcing and procurement preparation. | `supplier_sourcing.cmp` | Procurement executor. | Logistics or payment tasks may wait for it. |
+| `payment` | Payment path, funding preparation, or settlement adapter results. | `supplier_usdc_direct.cmp` | Payment executor or adapter. | Procurement execution may require payment proof. |
+| `logistics` | International logistics and customs clearance. | `customs_clearance.cmp` | Logistics/customs executor. | Delivery or field work can open. |
+| `field` | On-site delivery, installation, or commissioning. | `site_acceptance.cmp` | Field executor or buyer representative. | Final acceptance can open. |
+| `buyer` | Buyer commitment and acceptance. | `acceptance.cmp` | Buyer wallet. | Order closure or after-sales branch. |
 
 Source is the namespace used by hooks and signals so the state machine replays the right causal lanes.
 
@@ -61,17 +61,17 @@ In a supplier-sourcing linked Zhixu, several stages can advance under the same `
 market_scan:
   source: sourcing
   receiveSignals:
-    INTAKE_READY: sourcing::source.start.cmp
+    INTAKE_READY: sourcing::start.cmp
 
 rfq:
   source: sourcing
   receiveSignals:
-    LONG_LIST_READY: sourcing::source.market_scan.cmp
+    LONG_LIST_READY: sourcing::market_scan.cmp
 
 quote_compare:
   source: sourcing
   receiveSignals:
-    RFQ_SENT: sourcing::source.rfq.cmp
+    RFQ_SENT: sourcing::rfq.cmp
 ```
 
 This expresses one sourcing causal chain: intake completes before market scan, market scan before RFQ, RFQ before quote comparison.
@@ -84,7 +84,7 @@ A stage can belong to one source while waiting for another source's result. If a
 procurement_execution:
   source: supply
   receiveSignals:
-    SUPPLIER_FUNDED: payment::master.supplier_usdc_direct.cmp | master.supplier_settlement_exec.cmp
+    SUPPLIER_FUNDED: payment::supplier_usdc_direct.cmp | supplier_settlement_exec.cmp
 ```
 
 This is a convergence point: the procurement execution stage belongs to the supply source but depends on payment proof.
