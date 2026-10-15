@@ -61,6 +61,8 @@ pokeTimer(planId, orderId, hookId)
 
 检查通过后，合约发出 `TimerPoked` 并重新评估 hook。
 
+保活件的当前装配形态：`uvp-chain-services` 的 timer keeper(默认关闭，`UVP_TIMER_KEEPER_ENABLED` 开启)轮询投影里到期但仍为 `Wait` 的 hook，用产品 gas 池代发 `pokeTimer`——它是可重建的中继件，不产生协议事实。
+
 ## 产品层应该怎么展示
 
 Product DTO 可以把 `Wait + dueAt` 显示为“等待到某个时间后自动/可手动继续检查”。但真实推进仍需要链上交易。前端不能只因为本地时间到了就把任务改成 ready，必须等待 `HookReady` 或新的 `HookStatusChanged`。

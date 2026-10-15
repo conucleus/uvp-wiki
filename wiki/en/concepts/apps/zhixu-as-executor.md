@@ -16,7 +16,7 @@ One Zhixu can act as another Zhixu's stage executor. Executor here means an exec
 ```text
 local Zhixu / local order
   -> stage.executor.supplierType = zhixu
-  -> zhixuExecutorConfig.target references the peer definition's metadata.name (slug) or is null (runtime selection); the DSL shell carries no derived identity
+  -> zhixuExecutorConfig.target carries the peer definition's content-derived uid (zx-<32hex>) or is null (runtime selection); the shell's own metadata.uid is not authorable
   -> interface selects the target interface; order.mode declares new (child order) or existing (attach)
   -> inputMap/signalMap bind local hooks/signals to target port names
   -> local receive hook becomes ready and opens execution
@@ -51,7 +51,7 @@ A settlement stage can use another Zhixu as an execution interface like this:
     supplierType: zhixu
     zhixuExecutorConfig:
       target:
-        zhixu: fiat-payout-bridge   # the target definition's metadata.name (slug)
+        zhixu: zx-9c41f0d27a3e5b86c4d1af0b7e285c36   # the target definition's content-derived uid (zx-<32hex>; D003 rejects name slugs)
       interface: payout_service
       order:
         mode: new
@@ -76,7 +76,7 @@ The docking stage still needs a local `receiveSignals` hook. When it subscribes 
     supplierType: zhixu
     zhixuExecutorConfig:
       target:
-        zhixu: customs-clearance
+        zhixu: zx-9c41f0d27a3e5b86c4d1af0b7e285c36
       interface: clearance_service
       order:
         mode: new
@@ -100,7 +100,7 @@ The `signalMap` is the semantic contract through which the local stage accepts t
 | `cmp` | Signal that the linked Zhixu completed. Commonly used but not required. |
 | `err` | Signal that the linked Zhixu failed, rejected, or hit an exception. Optional, but most real workflows should configure it. |
 
-The `signalMap` keys must be local stage `sendSignals` and its values must be output-port names of the target interface. The `inputMap` keys must be local `receiveSignals` channel names and its values must be input-port names of the target interface. At least one of the two maps must be non-empty — whether `str/cmp/err` are needed is decided by the actual workflow, and the compiler does not require any particular business signal. The compiler validates the target reference (name-slug shape, same rule as `metadata.name`), interface existence and port direction, `order.mode ∈ interface orderModes`, the single input binding of `mode=new`, port-name syntax, and interface/route roots; `signalMap` does not carry Hook DSL.
+The `signalMap` keys must be local stage `sendSignals` and its values must be output-port names of the target interface. The `inputMap` keys must be local `receiveSignals` channel names and its values must be input-port names of the target interface. At least one of the two maps must be non-empty — whether `str/cmp/err` are needed is decided by the actual workflow, and the compiler does not require any particular business signal. The compiler validates the target reference (content-derived uid shape `zx-<32hex>`, D003), interface existence and port direction, `order.mode ∈ interface orderModes`, the single input binding of `mode=new`, port-name syntax, and interface/route roots; `signalMap` does not carry Hook DSL.
 
 ## Docked runtime path
 

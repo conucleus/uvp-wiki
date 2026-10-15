@@ -39,7 +39,7 @@ deadline
 
 `submitSignalFor()` in the contract recovers the signing address and requires the recovered signer to equal `submitter`.
 
-The call tails of `submitSignal`/`submitSignalFor` may carry `attribution` (sourceId, signalId, stageId, capabilityProof) and `selectorBinding` (selectorStageId, proof) parameters: all-zero means no claim, and submitting off-vocabulary facts is legal. These tail parameters do not enter the EIP-712 signing envelope; the typehash and the signed digest stay unchanged.
+The call tails of `submitSignal`/`submitSignalFor` may carry `attribution` (sourceId, signalId, stageId, capabilityProof) and `selectorBinding` (selectorStageId, proof) parameters: all-zero means no claim — when the plan declares a capability vocabulary, submitting an off-vocabulary fact without a proof is always rejected (revert `InvalidSignalCapability`); only zero-vocabulary plans admit them. These tail parameters do not enter the EIP-712 signing envelope; the typehash and the signed digest stay unchanged.
 
 ## Relayer Boundary
 

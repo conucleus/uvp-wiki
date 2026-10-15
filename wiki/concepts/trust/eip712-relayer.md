@@ -39,7 +39,7 @@ deadline
 
 合约的 `submitSignalFor()` 会恢复签名地址，并要求恢复出的 signer 等于 `submitter`。
 
-`submitSignal`/`submitSignalFor` 的调用尾部可携带 `attribution`（sourceId、signalId、stageId、capabilityProof）与 `selectorBinding`（selectorStageId、proof）参数：全零表示不声明，提交词表外的事实也合法。这些尾参不进入 EIP-712 签名信封，typehash 与签名摘要保持不变。
+`submitSignal`/`submitSignalFor` 的调用尾部可携带 `attribution`（sourceId、signalId、stageId、capabilityProof）与 `selectorBinding`（selectorStageId、proof）参数：全零表示不声明——plan 声明了能力词表时，提交词表外事实未携证即必拒（revert `InvalidSignalCapability`），仅零词表 plan 放行。这些尾参不进入 EIP-712 签名信封，typehash 与签名摘要保持不变。
 
 ## Relayer 的边界
 

@@ -16,7 +16,7 @@ status: verified
 ```text
 local Zhixu / local order
   -> stage.executor.supplierType = zhixu
-  -> zhixuExecutorConfig.target 引用 peer 定义的 metadata.name（slug）或为 null（运行时选择）；DSL 壳不携带派生身份
+  -> zhixuExecutorConfig.target 携带 peer 定义的内容派生 uid（zx-<32hex>）或为 null（运行时选择）；壳自身的 metadata.uid 不可书写
   -> interface 指定目标接口名；order.mode 声明 new（建子单）或 existing（接既有单）
   -> inputMap/signalMap bind local hooks/signals to target port names
   -> local receive hook becomes ready and opens execution
@@ -51,7 +51,7 @@ local order 和 linked order 都是独立的 `UVPStateMachine` order。它们各
     supplierType: zhixu
     zhixuExecutorConfig:
       target:
-        zhixu: fiat-payout-bridge   # 目标定义 metadata.name（slug）
+        zhixu: zx-9c41f0d27a3e5b86c4d1af0b7e285c36   # 目标定义的内容派生 uid（zx-<32hex>，D003 拒绝 name slug）
       interface: payout_service
       order:
         mode: new
@@ -76,7 +76,7 @@ local order 和 linked order 都是独立的 `UVPStateMachine` order。它们各
     supplierType: zhixu
     zhixuExecutorConfig:
       target:
-        zhixu: customs-clearance
+        zhixu: zx-9c41f0d27a3e5b86c4d1af0b7e285c36
       interface: clearance_service
       order:
         mode: new
@@ -100,7 +100,7 @@ local order 和 linked order 都是独立的 `UVPStateMachine` order。它们各
 | `cmp` | linked Zhixu 完成的信号。常用但非必填。 |
 | `err` | linked Zhixu 失败、拒绝或异常的信号。可选但大多数真实 workflow 应配置。 |
 
-`signalMap` 的 key 必须是本地 stage 的 `sendSignals`，value 必须是目标接口的 output 端口名；`inputMap` 的 key 必须是本地 `receiveSignals` 通道，value 必须是目标接口的 input 端口名。两张 map 至少一张非空——是否需要 `str/cmp/err` 由实际 workflow 决定，编译器不要求特定业务信号。编译器会校验 target 引用（name slug 形态，与 `metadata.name` 同规则）、接口存在与端口方向、`order.mode ∈ 目标接口 orderModes`、`mode=new` 恰好一条 input 绑定、端口名字符集及接口/route roots；`signalMap` 不承载 Hook DSL。
+`signalMap` 的 key 必须是本地 stage 的 `sendSignals`，value 必须是目标接口的 output 端口名；`inputMap` 的 key 必须是本地 `receiveSignals` 通道，value 必须是目标接口的 input 端口名。两张 map 至少一张非空——是否需要 `str/cmp/err` 由实际 workflow 决定，编译器不要求特定业务信号。编译器会校验 target 引用（内容派生 uid 形态 `zx-<32hex>`，D003）、接口存在与端口方向、`order.mode ∈ 目标接口 orderModes`、`mode=new` 恰好一条 input 绑定、端口名字符集及接口/route roots；`signalMap` 不承载 Hook DSL。
 
 ## Docked 运行时路径
 
