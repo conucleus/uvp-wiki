@@ -47,12 +47,12 @@ For DTO field definitions, see [Product DTO](../product/dto.md).
 
 ## Order ID Resolution
 
-The same `orderId` can appear in different `UVPStateMachine` deployments, so the projection key must include contract context. A service may accept a bare id when it is unique; if multiple candidates exist, the API should return ambiguous candidates.
+An `orderId` is only unique inside a single `(chainId, stateMachineAddress, planId)` context and can repeat across deployments or plans, so the projection key must include both contract and plan context. A service may accept a bare id when it is unique; if multiple candidates exist, the API should return ambiguous candidates.
 
 Authoritative source: the composition of the projection key follows the implementation in `uvp-chain-services/service/src/indexer`.
 
 ```text
-projection key = chainId + stateMachineAddress + orderId
+projection key = chainId + stateMachineAddress + planId + orderId
 ```
 
 ## Relation to Statemachine Replay

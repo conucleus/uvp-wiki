@@ -13,8 +13,8 @@ order, then map a signal that already happened in the linked order back into the
 local order.
 
 This is not a Store sandbox draft and not a normal backend integration. The
-formal runtime path must land in the `UVPDockingModule` (abiVersion 4.4,
-preimage v2) events and proof; the contract accepts only routes/interfaces
+formal runtime path must land in the `UVPDockingModule` (abiVersion 4.7)
+events and proof; the contract accepts only routes/interfaces
 covered by their committed `dockRoutesRoot`, `dockInterfaceRoot`, and Merkle
 proofs, and every binding/route hash carries an `interfaceNameId`
 (keccak of the interface name) dimension.
@@ -25,7 +25,7 @@ proofs, and every binding/route hash carries an `interfaceNameId`
 | --- | --- |
 | local order | The current order, identified by `(localPlanId, localOrderId)`, waiting for a peer Zhixu's output to move a local stage forward. |
 | linked order | Another Zhixu order docked into this one, identified by `(targetPlanId, linkedOrderId)`, with its own plan, authorization, signals, and proof. |
-| dock instance | One concrete docking relation containing local stage, route, target plan/order, interface, mode, source seam, input/output roots, and depth. |
+| dock instance | One concrete docking relation containing local stage, route, target plan/order, interface, mode, source seam, input/output roots, and the parent-chain edge position (`depth`). |
 | input binding | A binding from a local Hook to a target interface input port, deduplicated by `inputBindingHash`. |
 | output binding | A mapping from a target interface output port to a local source/signal, deduplicated by `outputBindingHash`. |
 
@@ -33,7 +33,7 @@ proofs, and every binding/route hash carries an `interfaceNameId`
 
 | Event | Meaning |
 | --- | --- |
-| `DockOpened` | Atomically records the dock instance, local/target plan/order, `interfaceNameId`, route, depth, and opener (`mode=new` mints a child order). |
+| `DockOpened` | Atomically records the dock instance, local/target plan/order, `interfaceNameId`, route, depth (this edge's parent-chain position = parent ledger + 1), and opener (`mode=new` mints a child order). |
 | `DockAttached` | For a `mode=existing` docking onto an existing target order: records the dock instance and docking facts (the indexed `linkedOrderId` carries the target-side "who attached to me" projection; N:1 batching). |
 | `DockInputSubmitted` | Records an input delivered to the linked order under a binding. |
 | `DockOutputSubmitted` | Records a linked output mapped back to the local order under a binding. |
@@ -52,7 +52,7 @@ authoritative views for the active relation; there are no
 ```text
 local stage HookReady(planId, orderId, hookId, ...)
   -> Store/Product or adapter selects a published target Zhixu by definition name
-  -> openDockedOrder (OpenDockRequestV2) validates route/interface roots, permit, identity, and depth
+  -> openDockedOrder (single-argument OpenDockCallV1) validates route/interface roots, permit, the target-side consent gate, and the edge budget
   -> one transaction creates the linked order and submits the birth-anchor input (the single input binding of a mode=new route)
   -> the linked order runs under its own Plan, authorization, and executor
   -> submitDockedInput delivers later local signal inputs as needed
@@ -65,18 +65,31 @@ local stage HookReady(planId, orderId, hookId, ...)
 Every cross-plan reference must retain `planId`. An `orderId` is not a global key
 and cannot be used alone to look up or merge docks, signals, or proofs.
 `dockInstanceId` also includes the local plan namespace, the mode word, and
-`interfaceNameId` in its preimage; `linkedOrderId` is derived from the dock
+`interfaceNameId` in its preimage; the route hash (domain V3,
+`UVP_DOCK_ROUTE_V3`) pins targetPlanId in its preimage's target slot for static
+routes, so a mirror plan that copies interface commitments still cannot satisfy
+a committed route's identity; `linkedOrderId` is derived from the dock
 instance and target definition identity, preventing cross-plan preemption.
 
 ## Mode Boundaries: new / existing / dynamic selection
 
 - `order.mode=new`: fully supported on-chain. Each route carries exactly one
   input binding (the birth anchor); `openDockedOrder` creates the child order,
-  registers the link, and writes the birth-anchor fact in one transaction. The
-  entrance permit typed-data is `UVPDockEntrancePermitV2` (with
-  `interfaceNameId`; EIP-712 domain version "4").
+  registers the link, and writes the birth-anchor fact in one transaction.
+  Establishment must pass the **target-side consent gate**: a caller that is
+  itself the target plan publisher (the same authority as the new-route child
+  order creator — the two legs coincide) signs nothing; any other caller must
+  carry the publisher's EIP-712 consent signature — typed data
+  `UVPDockOpenConsentV1` (domain `UVPDockingModule` version "4"; ten-field
+  digest: targetPlanId / interfaceNameId / localPlanId / localOrderId / routeId
+  / routeHash / dockInstanceId / linkedOrderId / nonce / deadline, with its own
+  nonce ledger); an empty signature from a non-publisher reverts
+  (`DockOpenConsentRequired`). The entrance permit typed-data is
+  `UVPDockEntrancePermitV2` (with `interfaceNameId`; same domain) — the permit
+  is an optional delivery pre-authorization, the consent is the establishment
+  precondition of open, and the two live in separate digest/nonce ledgers.
 - `order.mode=existing`: supported on-chain. `attachDockedOrder`
-  (`UVPDockingModule` 4.4) attaches an existing target order as a peer — no
+  (`UVPDockingModule` 4.7) attaches an existing target order as a peer — no
   child order is created; the consent gate is one of three legs (target order
   creator / incumbent executor / target plan publisher pre-authorization), and
   after attaching, inputs/outputs share the same delivery surface as `new`
@@ -84,8 +97,10 @@ instance and target definition identity, preventing cross-plan preemption.
 - `target: null` (dynamic selection): supported on-chain. The compiled
   artifact carries the declaration surface as `unresolvedDockRoutes`
   (`uvp.dockRoute.unresolved.v1`; the candidate set derives from the
-  resolution manifest), and `attachDockedOrder` settles the target with a
-  candidate-leaf membership proof, pinned for the instance's lifetime. The only
+  resolution manifest); the route hash (domain V3) leaves the target slot
+  zero in its dynamic form, and `attachDockedOrder` settles the target with a
+  candidate-leaf (`UVP_DOCK_CANDIDATE_V2`, binding the selected target's
+  planId) membership proof, pinned for the instance's lifetime. The only
   dynamic route the chain track rejects is `order.mode=new`
   (`UNRESOLVED_DOCK_MODE`). The cloud runtime
   reads dock route selection records to fill in the target (resolved by name,
@@ -115,15 +130,24 @@ schema, and the TS compiler recomputes the content-derived identity
 (chain-track internal). `signalMap` does not carry Hook DSL and does not
 complete local business work merely by being configured.
 
-## Depth and Idempotency
+## Edge Budget and Idempotency
 
-The parent's real dock depth is authoritative. A new instance has
-`parentDepth + 1` and cannot exceed frozen `MAX_DOCK_DEPTH=8`. Open,
-birth-anchor input, linked-order registration, and `DockOpened` complete in one
-EVM transaction; any failure rolls everything back. After dock identity, route,
-endpoint, and permit checks pass, a repeated open returns `false` without
-consuming the permit nonce. Repeated input/output returns an idempotent result
-or an explicit conflict.
+The per-order total dock-edge ledger `dockEdgeCountOfOrder` is the single
+authority: open mints the dock child order and counts an edge (child ledger =
+parent ledger + 1), while attach counts an edge and takes the max (target
+ledger raised to max(own, parent ledger + 1)). The caller-reported `parentDepth`
+must match the ledger (`DockDepthMismatch` otherwise), and a ledger that has
+reached `MAX_DOCK_EDGES = 8` is rejected (`DockDepthExceeded`, meaning the
+per-order total dock-edge cap is exceeded). Before attach, a bounded ancestor
+check walks the `dockParentOfOrder` parent-chain pointers for at most 8 hops
+and rejects if the target order appears inside the parent's ancestor chain
+(`DockAncestorCycle`, preventing cross-order cycles). The longest path is not
+maintained on-chain; indexers derive it from the `DockOpened` / `DockAttached`
+event graph. Open, birth-anchor input, linked-order registration, and
+`DockOpened` complete in one EVM transaction; any failure rolls everything
+back. After dock identity, route, endpoint, and permit checks pass, a repeated
+open returns `false` without consuming the permit nonce. Repeated input/output
+returns an idempotent result or an explicit conflict.
 
 ## Boundaries
 

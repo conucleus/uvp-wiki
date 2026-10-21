@@ -28,7 +28,7 @@ Deploy the StateMachine and six modules, then call `freezeModules()` once addres
 
 ## 3. Sign and Commit the Plan
 
-The publisher signs the PlanCommit (`publisher + hooksHash + capabilitiesRoot + dockRoutesRoot + dockInterfaceRoot + deadline`). Any relayer calls `commitPlan`; the contract verifies the hash of the full hooks and the publisher signature, and derives `planId = hash(publisher, planHash)` — `planHash` covers hooks, capabilitiesRoot, and the two dock roots.
+The publisher signs the PlanCommit (`publisher + hooksHash + capabilitiesRoot + dockRoutesRoot + dockInterfaceRoot + deadline`). Any relayer calls `commitPlan`; the contract verifies the hash of the full hooks and the publisher signature, and derives `planId = hash(publisher, planHash)` — `planHash` covers hooks, capabilitiesRoot, the two dock roots, and executorCandidatesRoot.
 
 ## 4. Finalize the Plan
 

@@ -28,7 +28,7 @@ Store 或开发者编写 Zhixu；Compiler 生成 hooks、selector bindings、sig
 
 ## 3. 签名提交 Plan
 
-publisher 签署 PlanCommit（`publisher + hooksHash + capabilitiesRoot + dockRoutesRoot + dockInterfaceRoot + deadline`）。任意 relayer 调用 `commitPlan`，合约验证完整 hooks 的 hash 和 publisher 签名，导出 `planId = hash(publisher, planHash)`——`planHash` 覆盖 hooks、capabilitiesRoot 与两个 dock roots。
+publisher 签署 PlanCommit（`publisher + hooksHash + capabilitiesRoot + dockRoutesRoot + dockInterfaceRoot + deadline`）。任意 relayer 调用 `commitPlan`，合约验证完整 hooks 的 hash 和 publisher 签名，导出 `planId = hash(publisher, planHash)`——`planHash` 覆盖 hooks、capabilitiesRoot、两个 dock roots 与 executorCandidatesRoot。
 
 ## 4. 定稿 Plan
 

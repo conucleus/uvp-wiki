@@ -89,7 +89,7 @@ rule as `metadata.name`), interface existence, port direction,
 root, and the single input binding of `mode=new` are all validated at compile
 time. `mode=existing` creates no child order; it attaches an existing target
 order as a peer — carried by both tracks, on-chain via `attachDockedOrder`
-(`UVPDockingModule` 4.4), sharing the same delivery surface as `new` after the
+(`UVPDockingModule` 4.7), sharing the same delivery surface as `new` after the
 attach (see [Docked Zhixu Runtime](../state-machine/docking.md)).
 
 ## Forms the compiler explicitly rejects

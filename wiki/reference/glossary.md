@@ -36,7 +36,7 @@ status: verified
 | --- | --- | --- |
 | [Identity Binding](../concepts/contracts-and-registries.md) / 身份绑定 | Store Registry 对现实主体与钱包对应关系作出的可撤销登记，不包含 Plan 或能力材料审核。 | `IdentityBindingRegistered`、`IdentityBindingRevoked`。 |
 | [Authorization](../concepts/trust/signal-authorization.md) / 授权 | 某个钱包可以为某个 Order 提交特定 source/signal，或执行受控 stage patch。 | `SignalSubmitterAuthorized`、stage patch authorization。 |
-| [Publisher](../concepts/lifecycle.md) | 被允许注册 Plan 的注册账户或机制。 | plan publisher allowlist、`commitPlan()` 提交 + `finalizePlan()` 定稿（仅 finalized Plan 可创建 Order）。 |
+| [Publisher](../concepts/lifecycle.md) | 以自有密钥签署 Plan commit 的账户或机制：协议层不设 publisher 白名单，发布面 permissionless（谁能作为 publisher 对外发布属 Store/治理域的准入判断）。 | `commitPlan()` 提交 + `finalizePlan()` 定稿（仅 finalized Plan 可创建 Order）。 |
 | [Registrar](../concepts/lifecycle.md) | 创建 trigger order 的账户或机制：订单创建者签名 trigger typed data 创建 Order（现行合约没有 registrar allowlist，出生开放提交、creator 先到先得）。 | `triggerOrderFromOutsideFor()`（`UVPStateMachine`）/ `triggerOrderFromSignalFor()`（`UVPOrderLinkModule`）。 |
 | [Registry Boundary](../concepts/contracts-and-registries.md) | 一个 `UVPIdentityRegistry` 地址就是一个身份解析域。首期由 Store 运营一个，未来可配置多个独立合规主体。StateMachine 不读取它。 | `registryAddress`、`bindingId`、`UVPIdentityRegistry.owner()`。 |
 | [HookReady](../concepts/state-machine/README.md) | 带有 `emitReady=true` 的 receive hook ready 后发出的事件，表示 Product task 可以打开。 | `HookReady(planId, orderId, hookId, stageId, hookName)`。 |

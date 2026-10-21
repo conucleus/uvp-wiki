@@ -12,7 +12,7 @@ local order 把某个 stage 交给另一条 linked Zhixu / linked order 执行�
 linked order 中已经发生的 signal 映射回 local order。
 
 这不是 Store sandbox 草稿，也不是普通后端联动。正式运行态要落到
-`UVPDockingModule`（abiVersion 4.4，preimage v2）的事件和 proof 上；合约只接受
+`UVPDockingModule`（abiVersion 4.7）的事件和 proof 上；合约只接受
 已经通过 `dockRoutesRoot`、`dockInterfaceRoot` 和各自 Merkle proof 的
 route/interface，绑定与路由哈希都带 `interfaceNameId`（keccak(接口名)）维度。
 
@@ -22,7 +22,7 @@ route/interface，绑定与路由哈希都带 `interfaceNameId`（keccak(接口�
 | --- | --- |
 | local order | 当前订单，身份是 `(localPlanId, localOrderId)`，等待 peer Zhixu 的输出推动本地阶段。 |
 | linked order | 被 dock 进来的另一条 Zhixu order，身份是 `(targetPlanId, linkedOrderId)`，有自己的 plan、授权、signal 和 proof。 |
-| dock instance | 一次具体对接，绑定 local stage、route、target plan/order、interface、mode、source seam、inputs/outputs roots 和 depth。 |
+| dock instance | 一次具体对接，绑定 local stage、route、target plan/order、interface、mode、source seam、inputs/outputs roots 和父链边序位（depth）。 |
 | input binding | local Hook 到目标接口 input 端口的绑定，按 `inputBindingHash` 去重。 |
 | output binding | 目标接口 output 端口到 local source/signal 的映射，按 `outputBindingHash` 去重。 |
 
@@ -30,7 +30,7 @@ route/interface，绑定与路由哈希都带 `interfaceNameId`（keccak(接口�
 
 | 事件 | 说明 |
 | --- | --- |
-| `DockOpened` | 原子记录 dock instance、local/target plan/order、`interfaceNameId`、route、depth 和 opener（`mode=new` 铸子单）。 |
+| `DockOpened` | 原子记录 dock instance、local/target plan/order、`interfaceNameId`、route、depth（本条边的父链序位 = 父账本 +1）和 opener（`mode=new` 铸子单）。 |
 | `DockAttached` | `mode=existing` 挂接既有目标单时记录 dock instance 与对接事实（indexed `linkedOrderId` 承载目标侧"谁挂了我"投影，N:1 拼批）。 |
 | `DockInputSubmitted` | 记录 input binding 已按绑定投递到 linked order。 |
 | `DockOutputSubmitted` | 记录 linked output 已按 binding 映射回 local order。 |
@@ -48,7 +48,7 @@ route/interface，绑定与路由哈希都带 `interfaceNameId`（keccak(接口�
 ```text
 local stage HookReady(planId, orderId, hookId, ...)
   -> Store/Product 或 adapter 按定义 name 选定已发布的 target Zhixu
-  -> openDockedOrder（OpenDockRequestV2）校验 route/interface roots、permit、身份和 depth
+  -> openDockedOrder（单参数 OpenDockCallV1）校验 route/interface roots、permit、目标侧同意门和边数预算
   -> 原子创建 linked order 并提交出生锚 input（mode=new 的唯一 input 绑定）
   -> linked order 按自己的 Plan、授权和 executor 运行
   -> submitDockedInput 投递后续 local signal input（按需）
@@ -60,25 +60,36 @@ local stage HookReady(planId, orderId, hookId, ...)
 
 跨 plan 的每个引用都必须保留 `planId`。`orderId` 不是全局键，不能用 bare
 `orderId` 查找或合并 dock、signal、proof。`dockInstanceId` 的 preimage 也
-包含 local plan namespace、modeWord 和 `interfaceNameId`；`linkedOrderId` 从
+包含 local plan namespace、modeWord 和 `interfaceNameId`；routeHash（域 V3
+`UVP_DOCK_ROUTE_V3`）preimage 的目标槽钉 targetPlanId（静态路由），镜像
+计划复制接口承诺也无法满足已提交 route 的身份；`linkedOrderId` 从
 dock instance 和 target definition 身份派生，防止跨 plan 抢占。
 
 ## 模式边界：new / existing / 动态选择
 
 - `order.mode=new`：链上完整支持。每条 route 恰好一条 input 绑定（出生锚），
-  `openDockedOrder` 在一笔交易内创建子订单、登记 link 并写入出生锚事实；
-  entrance permit 的 typed-data 是 `UVPDockEntrancePermitV2`（含
-  `interfaceNameId`，EIP-712 域 version "4"）。
+  `openDockedOrder` 在一笔交易内创建子订单、登记 link 并写入出生锚事实。
+  建立必过**目标侧同意门**：调用方即目标 plan publisher（new 路由子订单
+  creator 与之同源，两腿合一）免签，否则必须携 publisher 的 EIP-712 同意
+  签名——typed data `UVPDockOpenConsentV1`（域 `UVPDockingModule`
+  version "4"，十字段 digest：targetPlanId / interfaceNameId / localPlanId /
+  localOrderId / routeId / routeHash / dockInstanceId / linkedOrderId /
+  nonce / deadline，独立 nonce 账本），空签名且非 publisher 即拒绝
+  （`DockOpenConsentRequired`）。entrance permit 的 typed-data 是
+  `UVPDockEntrancePermitV2`（含 `interfaceNameId`，同域）——permit 是可选的
+  交付预授权，同意是 open 的建立前提，两者分属不同 digest/nonce 账本。
 - `order.mode=existing`：链上支持。`attachDockedOrder`（`UVPDockingModule`
-  4.4）对等挂接既有目标单——不创建子订单，同意门为目标单 creator / 在任
+  4.7）对等挂接既有目标单——不创建子订单，同意门为目标单 creator / 在任
   执行者 / 目标 plan publisher 预授权三者之一，挂接后 input/output 走与
   `new` 同一的交付面（语义见 uvp-core subscription-mint-spec §2.4）。
 - `target: null`（动态选择）：链上支持。编译产物以 `unresolvedDockRoutes`
   （`uvp.dockRoute.unresolved.v1`）携带声明面（候选集从 resolution
-  manifest 派生），`attachDockedOrder` 携候选叶 membership proof 选定目标
-  并终身钉住；唯 `order.mode=new` 的动态路由被链轨编译拒绝
-  （`UNRESOLVED_DOCK_MODE`）。云轨运行时读取 dock route selection
-  记录补齐目标（按 name 解析，校验接口/端口满足本地声明，DB 自然键建立实例）。
+  manifest 派生）；routeHash（域 V3）动态形态的目标槽为零字，
+  `attachDockedOrder` 携候选叶（`UVP_DOCK_CANDIDATE_V2`，绑定选定目标
+  planId）membership proof 选定目标并终身钉住；唯 `order.mode=new` 的
+  动态路由被链轨编译拒绝（`UNRESOLVED_DOCK_MODE`）。云轨运行时读取 dock
+  route selection 记录补齐目标（按 name 解析，校验接口/端口满足本地声明，
+  DB 自然键建立实例）。
 
 两轨逐语法点的接受/拒绝对照见 `uvp-eth` 仓 `uvp-chain.md`
 附录 B。
@@ -98,10 +109,16 @@ core linker 按 `uvp.dock.resolution.v2` manifest 的 name 目录查找并做结
 派生身份（zx-<32hex>）与 artifact/interface roots 做内容寻址（链轨内幕）。
 `signalMap` 不承载 Hook DSL，也不会凭配置自动完成 local 业务。
 
-## 深度与幂等
+## 边数预算与幂等
 
-父订单的真实 dock depth 是唯一权威，新 instance 的 depth 为
-`parentDepth + 1`，且不得超过冻结的 `MAX_DOCK_DEPTH=8`。open、出生锚
+每单总挂接边数账本 `dockEdgeCountOfOrder` 是唯一权威：open 建 dock 单计边
+（子订单账本 = 父账本 + 1），attach 计边取 max（目标账本抬升到
+max(自身, 父账本 + 1)）。请求自报的 `parentDepth` 必须与账本一致（否则
+`DockDepthMismatch`），账本达到 `MAX_DOCK_EDGES = 8` 即拒绝
+（`DockDepthExceeded`，语义为每单总挂接边数超限）。attach 前另有有界祖先
+检查：沿 `dockParentOfOrder` 父链指针上溯至多 8 跳，目标订单出现在父单
+祖先链内即拒绝（`DockAncestorCycle`，防跨单环）。最长路径不由链上维护，
+索引器从 `DockOpened` / `DockAttached` 事件图派生。open、出生锚
 input、linked-order registration 和 `DockOpened` 在一笔 EVM 事务中完成；任一
 步骤失败全部回滚。重复 open 在 dock 身份、route、endpoint 和 permit 校验
 通过后返回 `false`，不会再次消耗 permit nonce；重复 input/output 同样返回

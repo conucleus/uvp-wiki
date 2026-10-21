@@ -47,12 +47,12 @@ DTO 字段定义见 [Product DTO](../product/dto.md)。
 
 ## Order ID 解析
 
-同一个 `orderId` 可能出现在不同 `UVPStateMachine` deployment 里。因此 projection key 需要包含 contract context。服务可以在唯一时接受裸 id；如果出现多个 candidate，API 应返回 ambiguous candidates。
+同一个 `orderId` 只在单一 `(chainId, stateMachineAddress, planId)` 上下文内唯一，跨部署/跨计划可重号。因此 projection key 需要包含 contract 与 plan context。服务可以在唯一时接受裸 id；如果出现多个 candidate，API 应返回 ambiguous candidates。
 
 规范性来源：projection key 的组成以 `uvp-chain-services/service/src/indexer` 实现为准。
 
 ```text
-projection key = chainId + stateMachineAddress + orderId
+projection key = chainId + stateMachineAddress + planId + orderId
 ```
 
 ## 与 statemachine replay 的关系
