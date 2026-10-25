@@ -74,19 +74,17 @@ pnpm --filter @uvp-eth/executor-kit cli -- chain-once \
 完整模块边界见 [Chain Services](../concepts/services/chain-services.md)。这里保留本地配置速查。
 
 ```text
-CHAIN_SERVICES_DATABASE_DRIVER=memory|sqlite|postgres
-CHAIN_SERVICES_DATABASE_URL=<按 driver 显式配置>
+CHAIN_SERVICES_DATABASE_URL=postgres://uvp:uvp@127.0.0.1:5432/uvp_chain_services
 ```
 
-`CHAIN_SERVICES_DATABASE_DRIVER` 与 `CHAIN_SERVICES_DATABASE_URL` 全环境必填，本地与测试也不例外；任一缺失时启动即失败并报出键名。`memory|sqlite|postgres` 都是显式声明，没有隐式默认值。
+`CHAIN_SERVICES_DATABASE_URL` 全环境必填，本地与测试也不例外；缺失时启动即失败并报出键名。值必须是 `postgres://`（或 `postgresql://`）DSN：driver 开关 `CHAIN_SERVICES_DATABASE_DRIVER` 已删除，SQLite 与内存引擎已移除，没有隐式默认值。
 
-本地 SQLite 示例（驱动与 URL 同样必须显式给出）：
+本地 Postgres 示例（一次性 docker 库，DSN 注入后运行命令，退出即销毁容器）：
 
 ```bash
-CHAIN_SERVICES_DATABASE_DRIVER=sqlite \
-CHAIN_SERVICES_DATABASE_URL=sqlite://./chain-services.sqlite3 \
+cd uvp-chain-services/service
 CHAIN_SERVICES_MIGRATIONS_AUTO_RUN=true \
-pnpm --filter @uvp-eth/chain-services dev:api
+./scripts/with-postgres.sh CHAIN_SERVICES_DATABASE_URL -- pnpm dev:api
 ```
 
 ## Frontend Config

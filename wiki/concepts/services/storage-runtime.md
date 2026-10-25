@@ -7,49 +7,48 @@ status: verified
 
 # Storage、Migration 与 Runtime Profile
 
-Storage 是可重建服务层的工作流和投影缓存。Chain Services 支持 memory、SQLite 和 PostgreSQL；不同 profile 只影响运行可靠性，不改变事实源。
+Storage 是可重建服务层的工作流和投影缓存。存储引擎只有 PostgreSQL：部署、本地与测试跑同一个引擎；profile 只影响运行可靠性，不改变事实源。
 
 ## Storage profile
 
 ```text
-CHAIN_SERVICES_DATABASE_DRIVER=memory|sqlite|postgres
-CHAIN_SERVICES_DATABASE_URL=<按 driver 显式配置>
+CHAIN_SERVICES_DATABASE_URL=postgres://user:password@host:5432/database
 ```
 
-`CHAIN_SERVICES_DATABASE_DRIVER` 与 `CHAIN_SERVICES_DATABASE_URL` 是全环境必填键——本地运行和单元测试也不例外；任一缺失时启动即失败，报错信息包含缺失键名。三个合法值都是对目标 profile 的显式声明：没有隐式默认值，也没有不配置驱动就能启动的模式。生产环境额外要求 `postgres` 并显式管理 migration，runtime fail-closed。
+`CHAIN_SERVICES_DATABASE_URL` 是全环境必填键——本地运行和单元测试也不例外；缺失时启动即失败，报错信息包含键名与起库提示。值必须是 `postgres://`（或 `postgresql://`）DSN：driver 开关 `CHAIN_SERVICES_DATABASE_DRIVER` 已删除，SQLite 与内存引擎已移除，没有隐式默认值，也没有绕开 Postgres 启动的模式。
 
-| 合法的显式驱动值 |
-| --- |
-| `memory`：只支撑单元测试、临时 prototype 口径。 |
-| `sqlite`：本地 durable run、开发者自测；适合个人 fork，不适合公共测试网服务。 |
-| `postgres`：Base Sepolia staging、长期服务、生产 profile。 |
+| 存储口径 | 要求 |
+| --- | --- |
+| 唯一存储 env：`CHAIN_SERVICES_DATABASE_URL` | 必须是 Postgres DSN；非 Postgres DSN 在配置解析阶段即失败。 |
+| `CHAIN_SERVICES_MIGRATIONS_AUTO_RUN` | 默认 `false`；production/staging/testnet 下置 `true` 需对应的显式 ack 键放行。 |
+
+### 本地与测试
+
+- 本地起库用 `uvp-chain-services/service/scripts/with-postgres.sh`（薄壳，内部复用 `uvp-deploy/deploy/scripts/lib/with-postgres.sh`）：目标 env 未设时拉起一次性 docker postgres（随机端口，命令退出即销毁容器）并把 DSN 注入该 env 后运行命令；env 已有值则直接透传。例如 `./scripts/with-postgres.sh CHAIN_SERVICES_DATABASE_URL -- pnpm dev:api`。
+- 单元测试：`pnpm test` 经 `./scripts/with-postgres.sh --env CHAIN_SERVICES_POSTGRES_TEST_URL -- vitest run` 自动起库再跑 vitest；直接运行 `vitest`（绕过该脚本）时必须自带 `CHAIN_SERVICES_POSTGRES_TEST_URL` 指向一个可达的 Postgres（测试供给器按模板库克隆出每用例库）。
 
 ## 代码入口
 
 | 文件 | 职责 |
 | --- | --- |
-| `src/storage/factory.ts` | 根据 env 创建 memory/SQLite/PostgreSQL store。 |
+| `src/storage/factory.ts` | 根据 env 创建 Postgres store 集合（PG-only）。 |
 | `src/storage/projection-store.ts` | projection storage contract。 |
-| `src/storage/sqlite.ts`、`sqlite-projection-store.ts` | SQLite adapter。 |
-| `src/storage/postgres.ts`、`postgres-client.ts` | PostgreSQL adapter。 |
-| `src/storage/migrations.ts`、`postgres-migrations.ts` | migration runner。 |
+| `src/storage/postgres.ts`、`postgres-client.ts`、`postgres-rows.ts` | PostgreSQL adapter。 |
+| `src/storage/postgres-migrations.ts` | migration runner：`NNNN_name.sql` 装载、checksum 台账、退役迁移检查。 |
 | `src/config/env.ts`、`preflight.ts` | runtime env parse 和 fail-closed 检查。 |
 | `src/security/redaction.ts`、`audit.ts` | redaction 和 audit support。 |
 
 ## Migrations
 
-以下清单截至本文撰写，最新以 `src/storage/migrations` 目录为准。
+历史编号迁移已折叠为单份净 schema；最新以 `service/migrations/postgres/` 目录为准。迁移字节以 dev 活线为准，不承诺跨版本升级路径；已编号的迁移文件不再修改，结构变化时开新编号迁移。
 
 | Migration | 内容 |
 | --- | --- |
-| `0001_projection_storage` | chain event projection 和基础 replay storage。 |
-| `0002_business_storage` | 业务查询辅助表，不作为协议事实。 |
-| `0003_product_order_start` | Product order draft/start workflow。 |
-| `0004_submission_attempt_operations` | submission attempt、retry、operation tracking。 |
-| `0005_projection_sync_state` | indexer sync/finality/rebuild 状态。 |
-| `0006_store_metadata` | Store Zhixu、supplier、docking 等 metadata。 |
-| `0007_store_product_schema` | Store Product Schema / add-on manifest 相关结构。 |
-| `0008_store_audit` | Store operator/admin audit trail。 |
+| `0001_schema` | 单份 pg_dump 净 schema：链事件投影、业务辅助表与 workflow state 的全部表结构。 |
+
+- runner 在 `chain_services_migrations` 台账记录每个迁移的 version 与 sha256 checksum；已应用迁移的文件 checksum 失配即拒启，需按台账清账后重建该库。
+- 台账中存在目录里已无对应文件的迁移版本同样拒启（退役检查），避免迁移历史被静默改写。
+- 投影数据必须可擦除重建：投影库删库后由 indexer 从链事件重放恢复。
 
 ## Testnet fail-closed
 
@@ -57,7 +56,7 @@ CHAIN_SERVICES_DATABASE_URL=<按 driver 显式配置>
 
 Base Sepolia / testnet profile 必须拒绝：
 
-- memory/SQLite storage。
+- 非 Postgres 存储（引擎只有 Postgres，`CHAIN_SERVICES_DATABASE_URL` 必须是 `postgres://` DSN）。
 - localhost RPC。
 - permissive authorization。
 - Anvil default private keys。

@@ -53,7 +53,7 @@ fork 或自部署时必须守住这些接口约束：
 | [Product API](product-api.md) | `src/product/`、`src/api/routes/product-read.ts` | ordinary user order/task/timeline/proof DTO 和 Product staging readiness。 |
 | [Store Console、Supplier 与 Governance API](store-api.md) | `src/store-console/`、`src/store-suppliers/`、`src/governance/` | 凝结核工作台、supplier directory、review、identity binding register/revoke request。 |
 | [Notifications 与 Reconcile](notifications-reconcile.md) | `src/notifications/`、`src/reconcile/` | delivery intent、retry/dead-letter、submission/projection reconciliation。 |
-| [Storage、Migration 与 Runtime Profile](storage-runtime.md) | `src/storage/`、`src/config/`、`migrations/` | memory/SQLite/PostgreSQL、migration、testnet fail-closed profile。 |
+| [Storage、Migration 与 Runtime Profile](storage-runtime.md) | `src/storage/`、`src/config/`、`migrations/` | Postgres-only 存储、migration、testnet fail-closed profile。 |
 | [API Routes](api-routes.md) | `src/api/routes/` | Product、Store、governance、notification、evidence、diagnostics route module 归属。 |
 
 ## 子系统地图
@@ -61,7 +61,7 @@ fork 或自部署时必须守住这些接口约束：
 | 子系统 | 输入 | 输出 |
 | --- | --- | --- |
 | Indexer | deployment registry、state-machine、Identity Registry logs。 | `OrderRegistered`、`SignalSubmitted`、`HookStatusChanged`、`HookReady` 等事件的归一化投影与 sync status。 |
-| Projection storage | replayed events、workflow rows、submission rows。 | memory/SQLite/PostgreSQL stores；可擦除重建的查询状态。 |
+| Projection storage | replayed events、workflow rows、submission rows。 | Postgres store；可擦除重建的查询状态。 |
 | Relayer boundary | participant-signed EIP-712 payload。 | tx submission、retry、confirmation、failure 状态。 |
 | Stage patches | selector-signed executor/resource patch typed data。 | `StageExecutorPatchApplied`、`StageResourcePatchApplied` 的提交路径。 |
 | Proof verifier | metadata hash、evidence hash、Zhixu hash、object handle。 | proof mismatch report 与 evidence metadata。 |

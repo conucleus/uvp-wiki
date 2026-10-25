@@ -55,9 +55,9 @@ ABI、event topic、EIP-712 typed data domain、canonical hash domain、artifact
 
 ## 运行环境纪律
 
-每个运行时配置都是显式声明；任何 profile 背后都不存在 demo 或 mock 模式。Product API 没有 demo 数据源——空投影返回空数组、缺失明细返回 `detail_unavailable`，不存在 `?fallback=demo` 参数和 `UVP_PRODUCT_DEMO_MODE` 键；前端同样没有 demo 模式，Store 访问级别只来自环境变量与登录会话。`CHAIN_SERVICES_DATABASE_DRIVER` 与 `CHAIN_SERVICES_DATABASE_URL` 全环境必填，缺失即启动失败，报错信息包含键名。
+每个运行时配置都是显式声明；任何 profile 背后都不存在 demo 或 mock 模式。Product API 没有 demo 数据源——空投影返回空数组、缺失明细返回 `detail_unavailable`，不存在 `?fallback=demo` 参数和 `UVP_PRODUCT_DEMO_MODE` 键；前端同样没有 demo 模式，Store 访问级别只来自环境变量与登录会话。存储引擎只有 Postgres：`CHAIN_SERVICES_DATABASE_URL`（必须是 `postgres://` DSN）全环境必填，缺失即启动失败，报错信息包含键名；driver 开关与 SQLite/内存引擎已移除。
 
-Staging/testnet profile 必须 fail-closed：拒绝 memory/SQLite 存储、localhost RPC、permissive authorization 与 Anvil 默认私钥；所有 bootstrap 入口都要求显式部署私钥（环境变量 `UVP_ETH_DEPLOYER_PRIVATE_KEY`，或 key file `--private-key-file` / `UVP_ETH_DEPLOYER_PRIVATE_KEY_FILE`；私钥绝不经 argv 传递，`--private-key` 传参被显式拒绝）。私钥、RPC secret、JWT secret、object storage credential 只写 redacted 口径，不进仓库、日志或文档。
+Staging/testnet profile 必须 fail-closed：存储只接受 Postgres DSN（无 memory/SQLite 可切换）、拒绝 localhost RPC、permissive authorization 与 Anvil 默认私钥；所有 bootstrap 入口都要求显式部署私钥（环境变量 `UVP_ETH_DEPLOYER_PRIVATE_KEY`，或 key file `--private-key-file` / `UVP_ETH_DEPLOYER_PRIVATE_KEY_FILE`；私钥绝不经 argv 传递，`--private-key` 传参被显式拒绝）。私钥、RPC secret、JWT secret、object storage credential 只写 redacted 口径，不进仓库、日志或文档。
 
 本页同时固定一条「对应」原则：系统承诺对应而非真实——每条记录必须对应某个主体的真实表达。持钥者以私钥作假，是其本意的行使，系统不得另设裁决层代为裁决；相应地，系统绝不代笔内容、不冒充成功、不以静默缺省顶替人的决定。
 

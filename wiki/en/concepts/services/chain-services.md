@@ -53,7 +53,7 @@ When forking or self-deploying, these interface constraints must hold:
 | [Product API](product-api.md) | `src/product/`, `src/api/routes/product-read.ts` | Ordinary-user order/task/timeline/proof DTOs and Product staging readiness. |
 | [Store Console, Supplier, and Governance API](store-api.md) | `src/store-console/`, `src/store-suppliers/`, `src/governance/` | Nucleus workbench, supplier directory, reviews, identity binding register/revoke requests. |
 | [Notifications and Reconcile](notifications-reconcile.md) | `src/notifications/`, `src/reconcile/` | Delivery intents, retry/dead-letter, submission/projection reconciliation. |
-| [Storage, Migration, and Runtime Profile](storage-runtime.md) | `src/storage/`, `src/config/`, `migrations/` | memory/SQLite/PostgreSQL, migrations, testnet fail-closed profile. |
+| [Storage, Migration, and Runtime Profile](storage-runtime.md) | `src/storage/`, `src/config/`, `migrations/` | Postgres-only storage, migrations, testnet fail-closed profile. |
 | [API Routes](api-routes.md) | `src/api/routes/` | Which module owns Product, Store, governance, notification, evidence, and diagnostics routes. |
 
 ## Subsystem Map
@@ -61,7 +61,7 @@ When forking or self-deploying, these interface constraints must hold:
 | Subsystem | Input | Output |
 | --- | --- | --- |
 | Indexer | Deployment registry, state-machine, Identity Registry logs. | Normalized projections and sync status over `OrderRegistered`, `SignalSubmitted`, `HookStatusChanged`, `HookReady`, etc. |
-| Projection storage | Replayed events, workflow rows, submission rows. | memory/SQLite/PostgreSQL stores; erasable, rebuildable query state. |
+| Projection storage | Replayed events, workflow rows, submission rows. | Postgres store; erasable, rebuildable query state. |
 | Relayer boundary | Participant-signed EIP-712 payloads. | Tx submission, retry, confirmation, failure states. |
 | Stage patches | Selector-signed executor/resource patch typed data. | Submission path for `StageExecutorPatchApplied`, `StageResourcePatchApplied`. |
 | Proof verifier | Metadata hash, evidence hash, Zhixu hash, object handle. | Proof mismatch report and evidence metadata. |

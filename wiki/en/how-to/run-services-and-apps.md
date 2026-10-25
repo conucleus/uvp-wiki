@@ -9,20 +9,17 @@ status: verified
 
 ## chain-services API
 
-Memory mode is suitable for tests and prototypes:
+The storage engine is PostgreSQL only: deployment, local runs, and tests use the same engine, and `CHAIN_SERVICES_DATABASE_URL` (which must be a `postgres://` DSN) is required in every environment — the service refuses to start when it is missing or not a Postgres DSN. The driver switch and the SQLite/in-memory engines have been removed.
+
+Local run (a disposable docker postgres on a random port; the DSN is injected into `CHAIN_SERVICES_DATABASE_URL` and the container is destroyed on exit):
 
 ```bash
-pnpm --filter @uvp-eth/chain-services dev:api
-```
-
-Local SQLite durable mode:
-
-```bash
-CHAIN_SERVICES_DATABASE_DRIVER=sqlite \
-CHAIN_SERVICES_DATABASE_URL=sqlite://./chain-services.sqlite3 \
+cd uvp-chain-services/service
 CHAIN_SERVICES_MIGRATIONS_AUTO_RUN=true \
-pnpm --filter @uvp-eth/chain-services dev:api
+./scripts/with-postgres.sh CHAIN_SERVICES_DATABASE_URL -- pnpm dev:api
 ```
+
+Unit tests: `pnpm test` provisions the docker database automatically through `scripts/with-postgres.sh` before running vitest; when invoking `vitest` directly, export `CHAIN_SERVICES_POSTGRES_TEST_URL` pointing at a reachable Postgres first.
 
 Other services:
 
@@ -33,7 +30,7 @@ pnpm --filter @uvp-eth/chain-services rebuild:indexer
 
 There is no standalone relayer process: broadcast capability is embedded in the API service's submission paths (submissions/stage-patches broadcast adapters and the product BFF; see [Relayer](../concepts/services/relayer.md)).
 
-Staging/testnet profiles must not use memory/SQLite, nor localhost RPC (background in [Protocol Boundaries](../concepts/protocol-boundaries.md)). `CHAIN_SERVICES_DATABASE_DRIVER` and `CHAIN_SERVICES_DATABASE_URL` are required in every environment; the service refuses to start when they are missing. There are no demo or E2E fixture modes anywhere in the service layer — whatever profile you declare is exactly what runs.
+Postgres is the only storage engine (memory/SQLite have been removed); staging/testnet profiles must not use localhost RPC either (background in [Protocol Boundaries](../concepts/protocol-boundaries.md)). There are no demo or E2E fixture modes anywhere in the service layer — whatever profile you declare is exactly what runs.
 
 ## Store Workbench
 

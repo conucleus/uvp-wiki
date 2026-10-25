@@ -20,7 +20,7 @@ Indexer 是可重建服务层的重放入口。它从链读取 `UVPDeploymentReg
 | `src/indexer/service.ts` | indexer 运行入口，支持普通同步和 `rebuild:indexer` 重建。 |
 | `src/indexer/projections.ts` | 从 state-machine 事件重建 order、task、timeline、proof projection。 |
 | `src/indexer/identity-projections.ts` | 从 Identity Registry 事件重建 subject/account identity projection。 |
-| `src/storage/projection-store.ts` | projection store contract，供 memory/SQLite/PostgreSQL 实现。 |
+| `src/storage/projection-store.ts` | projection store contract，由 Postgres adapter 实现（PG-only）。 |
 
 ## 输入事件
 

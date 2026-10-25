@@ -77,20 +77,18 @@ Use `--state-machine` only when the config does not declare `stateMachines[]` (p
 See [Chain Services](../concepts/services/chain-services.md) for full module boundaries. This section keeps a local configuration quick reference.
 
 ```text
-CHAIN_SERVICES_DATABASE_DRIVER=memory|sqlite|postgres
-CHAIN_SERVICES_DATABASE_URL=memory://projection-store
+CHAIN_SERVICES_DATABASE_URL=postgres://uvp:uvp@127.0.0.1:5432/uvp_chain_services
 CHAIN_SERVICES_MIGRATIONS_AUTO_RUN=false
 ```
 
-`CHAIN_SERVICES_DATABASE_DRIVER` and `CHAIN_SERVICES_DATABASE_URL` are required in every environment. Startup fails with an error naming the key when either is missing; `memory|sqlite|postgres` are all explicit declarations, with no implicit default.
+`CHAIN_SERVICES_DATABASE_URL` is required in every environment. Startup fails with an error naming the key when it is missing, and the value must be a `postgres://` (or `postgresql://`) DSN: the `CHAIN_SERVICES_DATABASE_DRIVER` switch has been removed, the SQLite and in-memory engines are gone, and there is no implicit default.
 
-Local SQLite:
+Local Postgres (a disposable docker database; the DSN is injected into the env and the container is destroyed on exit):
 
 ```bash
-CHAIN_SERVICES_DATABASE_DRIVER=sqlite \
-CHAIN_SERVICES_DATABASE_URL=sqlite://./chain-services.sqlite3 \
+cd uvp-chain-services/service
 CHAIN_SERVICES_MIGRATIONS_AUTO_RUN=true \
-pnpm --filter @uvp-eth/chain-services dev:api
+./scripts/with-postgres.sh CHAIN_SERVICES_DATABASE_URL -- pnpm dev:api
 ```
 
 ## Frontend Config

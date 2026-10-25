@@ -7,52 +7,49 @@ status: verified
 
 # Storage, Migration, and Runtime Profile
 
-Storage is the workflow and projection cache of the rebuildable service layer. Chain Services supports memory, SQLite, and PostgreSQL; different profiles change runtime reliability only, never the source of truth.
+Storage is the workflow and projection cache of the rebuildable service layer. The storage engine is PostgreSQL only: deployment, local runs, and tests all use the same engine; profiles change runtime reliability only, never the source of truth.
 
 ## Storage Profile
 
 ```text
-CHAIN_SERVICES_DATABASE_DRIVER=memory|sqlite|postgres
-CHAIN_SERVICES_DATABASE_URL=memory://projection-store
+CHAIN_SERVICES_DATABASE_URL=postgres://user:password@host:5432/database
 CHAIN_SERVICES_MIGRATIONS_AUTO_RUN=false
 ```
 
-Both `CHAIN_SERVICES_DATABASE_DRIVER` and `CHAIN_SERVICES_DATABASE_URL` are required in every environment — including local runs and unit-test setups. When either key is missing, startup fails with a configuration error that names the missing key. The three driver values are all explicit declarations of an intended profile; there is no implicit default and no demo mode.
+`CHAIN_SERVICES_DATABASE_URL` is required in every environment — including local runs and unit-test setups. When it is missing, startup fails with a configuration error that names the key and how to provision a database. The value must be a `postgres://` (or `postgresql://`) DSN: the `CHAIN_SERVICES_DATABASE_DRIVER` switch has been removed, the SQLite and in-memory engines are gone, and there is no implicit default or any mode that starts without Postgres.
 
-| Profile | Purpose | Constraints |
-| --- | --- | --- |
-| memory | Unit tests, temporary prototypes. | Supports test/prototype usage only. |
-| SQLite | Local durable runs, developer self-testing. | Suitable for personal forks, not for public testnet services. |
-| PostgreSQL | Base Sepolia staging, long-running services, production profile. | Migrations explicitly managed; runtime fails closed. |
+| Storage rule | Requirement |
+| --- | --- |
+| Single storage env: `CHAIN_SERVICES_DATABASE_URL` | Must be a Postgres DSN; non-Postgres DSNs fail at config parsing. |
+| `CHAIN_SERVICES_MIGRATIONS_AUTO_RUN` | Defaults to `false`; setting it to `true` under production/staging/testnet requires the matching explicit ack key. |
+
+### Local Runs and Tests
+
+- To start a local database, use `uvp-chain-services/service/scripts/with-postgres.sh` (a thin wrapper over `uvp-deploy/deploy/scripts/lib/with-postgres.sh`): when the target env is unset it starts a disposable docker postgres (random port, container destroyed when the command exits), injects the DSN into that env, and runs the command; if the env is already set it passes through. Example: `./scripts/with-postgres.sh CHAIN_SERVICES_DATABASE_URL -- pnpm dev:api`.
+- Unit tests: `pnpm test` runs `./scripts/with-postgres.sh --env CHAIN_SERVICES_POSTGRES_TEST_URL -- vitest run`, provisioning the docker database automatically; when invoking `vitest` directly (bypassing the script), export `CHAIN_SERVICES_POSTGRES_TEST_URL` pointing at a reachable Postgres first (the test provisioner clones a per-case database from a template).
 
 ## Code Entry Points
 
 | File | Responsibility |
 | --- | --- |
-| `src/storage/factory.ts` | Creates memory/SQLite/PostgreSQL stores from env. |
+| `src/storage/factory.ts` | Creates the Postgres store set from env (Postgres-only). |
 | `src/storage/projection-store.ts` | Projection storage contract. |
-| `src/storage/sqlite.ts`, `sqlite-projection-store.ts` | SQLite adapter. |
-| `src/storage/postgres.ts`, `postgres-client.ts` | PostgreSQL adapter. |
-| `src/storage/migrations.ts`, `postgres-migrations.ts` | Migration runner. |
+| `src/storage/postgres.ts`, `postgres-client.ts`, `postgres-rows.ts` | PostgreSQL adapter. |
+| `src/storage/postgres-migrations.ts` | Migration runner: `NNNN_name.sql` loading, checksum ledger, retired-migration checks. |
 | `src/config/env.ts`, `preflight.ts` | Runtime env parsing and fail-closed checks. |
 | `src/security/redaction.ts`, `audit.ts` | Redaction and audit support. |
 
 ## Migrations
 
-The list below is current as of this writing; the authoritative source is the `src/storage/migrations` directory (including `0009`/`0010`).
+The historical numbered migrations have been collapsed into a single net schema; the authoritative source is the `service/migrations/postgres/` directory. Migration bytes follow the dev live line — no cross-version upgrade path is promised; numbered migration files are never edited, and structural changes open a new numbered migration.
 
 | Migration | Contents |
 | --- | --- |
-| `0001_projection_storage` | Chain event projection and base replay storage. |
-| `0002_business_storage` | Helper tables for business queries; not protocol facts. |
-| `0003_product_order_start` | Product order draft/start workflow. |
-| `0004_submission_attempt_operations` | Submission attempt, retry, and operation tracking. |
-| `0005_projection_sync_state` | Indexer sync/finality/rebuild state. |
-| `0006_store_metadata` | Store Zhixu, supplier, docking, and related metadata. |
-| `0007_store_product_schema` | Structures related to Store Product Schema / add-on manifest. |
-| `0008_store_audit` | Store operator/admin audit trail. |
-| `0009_product_trigger_prepare` | Product trigger prepare/submit columns on the order trigger workflow (typed data, signature, idempotency). |
-| `0010_store_supplier_capability_audit` | Before/after supplier capability snapshots in the store supplier audit trail. |
+| `0001_schema` | A single pg_dump net schema: chain event projections, business helper tables, and workflow-state structures. |
+
+- The runner records each migration's version and sha256 checksum in the `chain_services_migrations` ledger; a checksum mismatch against an applied migration refuses startup, and the database must be reconciled against the ledger and recreated.
+- An applied version whose file no longer exists in the directory also refuses startup (retired-migration check), so migration history cannot be silently rewritten.
+- Projection data must be erasable and rebuildable: drop the projection database and the indexer replays it from chain events.
 
 ## Testnet Fail Closed
 
@@ -60,7 +57,7 @@ This section is the single authoritative source for the testnet fail-closed poli
 
 The Base Sepolia / testnet profile must reject:
 
-- memory/SQLite storage.
+- Non-Postgres storage (Postgres is the only engine; `CHAIN_SERVICES_DATABASE_URL` must be a `postgres://` DSN).
 - localhost RPC.
 - Permissive authorization.
 - Anvil default private keys.

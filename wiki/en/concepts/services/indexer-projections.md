@@ -20,7 +20,7 @@ It is responsible for replaying facts and building read models. The projection d
 | `src/indexer/service.ts` | Indexer runtime entry point, supporting normal sync and `rebuild:indexer`. |
 | `src/indexer/projections.ts` | Rebuilds order, task, timeline, and proof projections from state-machine events. |
 | `src/indexer/identity-projections.ts` | Rebuilds subject/account identity projections from Identity Registry events. |
-| `src/storage/projection-store.ts` | Projection store contract, implemented by memory/SQLite/PostgreSQL backends. |
+| `src/storage/projection-store.ts` | Projection store contract, implemented by the Postgres adapter (Postgres-only). |
 
 ## Input Events
 
