@@ -28,7 +28,7 @@ forge test
 本地链闭环：
 
 ```bash
-uvp-deploy/deploy/scripts/bootstrap-local-anvil.sh
+uvp-deploy/qa/scripts/bootstrap-local-anvil.sh
 ```
 
 地址清单必须明确包含当前 `stateMachineDeployments[]`、`activeDeploymentId`、冻结模块、`UVPDeploymentRegistry` 和 `UVPIdentityRegistry`（完整要求见 `uvp-deploy/deploy/README.md`）。生成日志、临时钱包、数据库和浏览器产物不进入版本库。

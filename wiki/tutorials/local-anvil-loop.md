@@ -42,7 +42,7 @@ pnpm deploy:local
 ## Happy Path Self Update
 
 ```bash
-uvp-deploy/deploy/scripts/bootstrap-local-anvil.sh --self-update
+uvp-deploy/qa/scripts/bootstrap-local-anvil.sh --self-update
 ```
 
 脚本会：
@@ -61,7 +61,7 @@ uvp-deploy/deploy/scripts/bootstrap-local-anvil.sh --self-update
 ## Failure Branch
 
 ```bash
-uvp-deploy/deploy/scripts/bootstrap-local-anvil.sh --failure
+uvp-deploy/qa/scripts/bootstrap-local-anvil.sh --failure
 ```
 
 这个分支驱动 rollback/failure 语义，验证 negative 或失败路径的链事件和 reference
@@ -98,7 +98,7 @@ reducer 一致。
 协议闭环之后，可以接着把面向用户的本地表面跑起来。先启动当前本地链闭环：
 
 ```bash
-uvp-deploy/deploy/scripts/bootstrap-local-anvil.sh
+uvp-deploy/qa/scripts/bootstrap-local-anvil.sh
 ```
 
 它会部署当前合约和冻结模块，编译并发布 Plan，创建 Order，写入 Signal 授权，提交场景 Signal，并核对链事件与回放结果。

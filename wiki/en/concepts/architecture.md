@@ -74,7 +74,7 @@ Postgres, object storage, and APIs in this diagram are product runtime layers. T
 | Service layer (rebuildable) | `uvp-chain-services/service/`, `uvp-protocol/packages/product-dto/` | Chain indexer, projections, generic read API, optional relay, proof verifier, and the DTO contracts shared by products. | Becoming the source of truth for plan/order/signal/trust, or producing business signatures. |
 | Product surfaces | `uvp-order-app/app/`, `zhixu-store/registry/` | Translating on-chain facts into orders, tasks, and proof; the registry only records self-descriptions and identity claims. | Rewriting contract facts, bypassing order-level authorization. |
 | Public client | `uvp-client/package/` | core/browser/headless SDK and executor CLI: transport, Product V3 client, EIP-1193 signing, watcher, signal build/submit. | Custodying default private keys, taking over signature responsibility from businesses. |
-| Deployment and evidence | `uvp-deploy/deploy/` | Address manifests, release records, Anvil/Base Sepolia rehearsal, staging gates. | Redefining protocol semantics or hiding failure evidence. |
+| Deployment and evidence | `uvp-deploy/` | Release `deploy/`: address manifests, release records, compatibility matrix, staging gates. QA `qa/`: Anvil/Base Sepolia rehearsal, chaos. | Redefining protocol semantics or hiding failure evidence. |
 
 ## Component Bus
 
@@ -87,7 +87,7 @@ Postgres, object storage, and APIs in this diagram are product runtime layers. T
 | Service layer | `uvp-chain-services/service/`, `uvp-protocol/packages/product-dto/` | Forkable chain indexer, projections, generic read API, optional relay, proof verifier; Product order/task/proof DTOs. |
 | Product surfaces | `uvp-order-app/app/`, `zhixu-store/registry/` | Participant order/task UI, proof display; registry data layer. |
 | Public client | `uvp-client/package/` | core/browser/headless SDK + executor CLI. |
-| Deploy/evidence | `uvp-deploy/deploy/` | Deployment manifests, release records, staging gates. |
+| Deploy/evidence | `uvp-deploy/` | Deployment domain by lane: release `deploy/` (manifests/records/matrix), QA `qa/` (Anvil harness, chaos), ops `ops/` (console, runbooks). |
 | Periphery | `uvp-periphery/` | Payment/funding/guarantee/agent adapters and demos. |
 
 ## Subpages

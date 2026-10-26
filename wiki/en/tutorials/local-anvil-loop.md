@@ -42,7 +42,7 @@ This entry accepts loopback RPCs only. It deploys the current State Machine, fro
 ## Happy Path Self Update
 
 ```bash
-uvp-deploy/deploy/scripts/bootstrap-local-anvil.sh --self-update
+uvp-deploy/qa/scripts/bootstrap-local-anvil.sh --self-update
 ```
 
 The script will:
@@ -60,7 +60,7 @@ The script will:
 ## Failure Branch
 
 ```bash
-uvp-deploy/deploy/scripts/bootstrap-local-anvil.sh --failure
+uvp-deploy/qa/scripts/bootstrap-local-anvil.sh --failure
 ```
 
 This branch drives rollback/failure semantics and verifies that the negative or failure-path chain events match the reference reducer.
@@ -94,7 +94,7 @@ If there is a replay mismatch, first read the "Chain event replay mismatch" sect
 After the protocol loop, you can bring up the user-facing local surfaces. First run the current local chain loop:
 
 ```bash
-uvp-deploy/deploy/scripts/bootstrap-local-anvil.sh
+uvp-deploy/qa/scripts/bootstrap-local-anvil.sh
 ```
 
 It deploys the current contracts and frozen modules, compiles and publishes the Plan, creates an Order, writes signal authorizations, submits scenario signals, and cross-checks chain events against replay results.

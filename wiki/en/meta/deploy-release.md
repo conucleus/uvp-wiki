@@ -20,7 +20,7 @@ The deployment and evidence components organize local closed-loop runs, Base Sep
 
 ## Evidence Boundary
 
-- `uvp-deploy/deploy/` is where this repository keeps deployment state; it does not depend on a sibling `uvp-deploy` repo.
+- `uvp-deploy/` is where this repository keeps its deployment domain (release `deploy/`, QA `qa/`, ops `ops/`); it does not depend on a sibling `uvp-deploy` repo. Version truth comes only from `deploy/compatibility/uvp-stack.v1.json` and the frozen fixtures.
 - Generated logs, temporary address manifests, Playwright traces, DB dumps, and object bytes must not be committed as release records.
 - Release records contain only redacted, auditable summaries.
 - Base Sepolia rehearsals are staging/testnet evidence, not production-ready.

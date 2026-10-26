@@ -20,7 +20,7 @@ status: verified
 
 ## 证据边界
 
-- `uvp-deploy/deploy/` 是本仓库 deployment state 的位置，不依赖 sibling `uvp-deploy` repo。
+- `uvp-deploy/` 是本仓库部署域的位置（release `deploy/`、QA `qa/`、ops `ops/`），不依赖 sibling `uvp-deploy` repo；版本真相只看 `deploy/compatibility/uvp-stack.v1.json` 与冻结 fixture。
 - Generated logs、temporary address manifests、Playwright trace、DB dump、object bytes 不应作为 release record 提交。
 - Release record 只写 redacted、可审计摘要。
 - Base Sepolia rehearsal 是 staging/testnet evidence，不是 production-ready。

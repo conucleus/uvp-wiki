@@ -27,10 +27,8 @@ Periphery scenarios may demonstrate how funding, guarantees, customs clearance, 
 
 ## Deploy
 
-`uvp-deploy/deploy` holds this repository's own deployment scripts, manifests, and release records. It is responsible for:
+`uvp-deploy/` is this repository's deployment domain, split by lane: `deploy/` (release) holds deployment/broadcast scripts, manifests, the compatibility matrix, and release records; `qa/` holds the local Anvil bootstrap, the local product loop, and chaos; `ops/` holds the operator console and runbooks. The release lane is responsible for:
 
-- Local Anvil bootstrap.
-- The local product loop.
 - Base Sepolia staging.
 - Release gates.
 - Deployment registry records.

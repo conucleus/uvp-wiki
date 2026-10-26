@@ -28,10 +28,8 @@ Periphery 场景可以展示资金、担保、清关、物流、AI/MCP 或企业
 
 ## Deploy
 
-`uvp-deploy/deploy` 放本仓库自己的部署脚本、manifest 和 release record。它负责：
+`uvp-deploy/` 是本仓库的部署域，按车道拆分：`deploy/`（release）放部署/广播脚本、manifest、兼容矩阵和 release record；`qa/` 放 local Anvil bootstrap、Product local loop 与 chaos；`ops/` 放运维台与 runbook。release 车道负责：
 
-- local Anvil bootstrap。
-- Product local loop。
 - Base Sepolia staging。
 - release gates。
 - deployment registry record。

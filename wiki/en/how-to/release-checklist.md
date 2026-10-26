@@ -28,7 +28,7 @@ forge test
 Local chain closure:
 
 ```bash
-uvp-deploy/deploy/scripts/bootstrap-local-anvil.sh
+uvp-deploy/qa/scripts/bootstrap-local-anvil.sh
 ```
 
 The address manifest must explicitly include the current `stateMachineDeployments[]`, `activeDeploymentId`, frozen modules, `UVPDeploymentRegistry`, and `UVPIdentityRegistry` (full requirements in `uvp-deploy/deploy/README.md`). Generated logs, temporary wallets, databases, and browser artifacts stay out of version control.

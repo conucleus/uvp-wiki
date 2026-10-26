@@ -74,7 +74,7 @@ flowchart LR
 | 服务层（可重建） | `uvp-chain-services/service/`、`uvp-protocol/packages/product-dto/` | chain indexer、projection、generic read API、可选 relay、proof verifier，以及各产品共享的 DTO contract。 | 成为 plan/order/signal/trust 的事实源，或生成业务签名。 |
 | 产品表面 | `uvp-order-app/app/`、`zhixu-store/registry/` | 把链上事实翻译成订单、任务、proof；registry 只登记自述与身份声明。 | 改写合约事实、绕过 order-level authorization。 |
 | 公共客户端 | `uvp-client/package/` | core/browser/headless SDK 与执行者 CLI：transport、Product V3 client、EIP-1193 签名、watcher、signal build/submit。 | 托管默认私钥、替业务方承担签名责任。 |
-| 部署和证据 | `uvp-deploy/deploy/` | address manifest、release record、Anvil/Base Sepolia rehearsal、staging gate。 | 重新定义协议语义或隐藏失败证据。 |
+| 部署和证据 | `uvp-deploy/` | release `deploy/`：address manifest、release record、compatibility matrix、staging gate；QA `qa/`：Anvil/Base Sepolia rehearsal、chaos。 | 重新定义协议语义或隐藏失败证据。 |
 
 ## 组件总线
 
@@ -87,7 +87,7 @@ flowchart LR
 | 服务层 | `uvp-chain-services/service/`、`uvp-protocol/packages/product-dto/` | 可 fork 的 chain indexer、projection、generic read API、可选 relay、proof verifier；Product order/task/proof DTO。 |
 | Product surfaces | `uvp-order-app/app/`、`zhixu-store/registry/` | participant order/task UI、proof display；registry data layer。 |
 | Public client | `uvp-client/package/` | core/browser/headless SDK + executor CLI。 |
-| Deploy/evidence | `uvp-deploy/deploy/` | deployment manifests、release records、staging gates。 |
+| Deploy/evidence | `uvp-deploy/` | 部署域按车道：release `deploy/`（manifests/records/matrix）、QA `qa/`（Anvil harness、chaos）、ops `ops/`（console、runbooks）。 |
 | Periphery | `uvp-periphery/` | payment/funding/guarantee/agent adapters and demos。 |
 
 ## 子页

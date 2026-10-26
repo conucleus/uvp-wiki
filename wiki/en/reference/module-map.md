@@ -33,8 +33,9 @@ status: verified
 | `zhixu-store/registry` | `@uvp-eth/zhixu-registry` | ZhixuRecord / IdentityClaim registry data layer (permissionless, no review) | storefront/UI, order authorization, KYC |
 | `uvp-order-app/app` | `@uvp-eth/order-app` | single participant flow (create/invite/accept/room) | order-state ownership, custody |
 | `uvp-client/package` | `@uvp-eth/uvp-client` | core/browser/headless SDK entries + executor CLI (watch/signal/doctor/wallet) | privileged backend truth, server |
-| `uvp-deploy/deploy` | `@uvp-eth/deploy` | deploy scripts, manifests, release records | external deploy repo (see the `uvp-deploy` workspace) |
-| `uvp-deploy/apps/ops-console-web` | `@uvp-eth/ops-console-web` | operator console prototype | protocol runtime |
+| `uvp-deploy/deploy` | `@uvp-eth/deploy` | release lane: deploy scripts, manifests, compatibility matrix, release records | external deploy repo (see the `uvp-deploy` workspace) |
+| `uvp-deploy/qa` | `@uvp-eth/deploy-qa` | QA lane: local Anvil harness, chaos driver, wrapper checks | release records, protocol runtime |
+| `uvp-deploy/ops/console-web` | `@uvp-eth/ops-console-web` | operator console prototype | protocol runtime |
 | `uvp-periphery` | mixed | funding/payment/guarantee/agent adapters and demos | core protocol truth |
 
 ## Workspace Packages
@@ -53,7 +54,8 @@ uvp-client/package
 uvp-order-app/app
 zhixu-store/registry
 uvp-deploy/deploy
-uvp-deploy/apps/*
+uvp-deploy/qa
+uvp-deploy/ops/*
 uvp-periphery/executors/*
 ```
 
