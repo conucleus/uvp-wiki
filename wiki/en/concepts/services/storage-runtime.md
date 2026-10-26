@@ -46,6 +46,7 @@ The historical numbered migrations have been collapsed into a single net schema;
 | Migration | Contents |
 | --- | --- |
 | `0001_schema` | A single pg_dump net schema: chain event projections, business helper tables, and workflow-state structures. |
+| `0002_plan_artifacts` | `plan_artifacts` compiled-plan table (row-immutable; the only plan-vocabulary source for index enrichment and submission proofs) plus supplier tag-column cleanup. |
 
 - The runner records each migration's version and sha256 checksum in the `chain_services_migrations` ledger; a checksum mismatch against an applied migration refuses startup, and the database must be reconciled against the ledger and recreated.
 - An applied version whose file no longer exists in the directory also refuses startup (retired-migration check), so migration history cannot be silently rewritten.

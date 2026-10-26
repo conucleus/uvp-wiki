@@ -45,6 +45,7 @@ CHAIN_SERVICES_DATABASE_URL=postgres://user:password@host:5432/database
 | Migration | 内容 |
 | --- | --- |
 | `0001_schema` | 单份 pg_dump 净 schema：链事件投影、业务辅助表与 workflow state 的全部表结构。 |
+| `0002_plan_artifacts` | 计划编译产物表 `plan_artifacts`（行级不可变；索引富集与提交造证的唯一 plan 词表源）+ supplier 标签列清理。 |
 
 - runner 在 `chain_services_migrations` 台账记录每个迁移的 version 与 sha256 checksum；已应用迁移的文件 checksum 失配即拒启，需按台账清账后重建该库。
 - 台账中存在目录里已无对应文件的迁移版本同样拒启（退役检查），避免迁移历史被静默改写。
