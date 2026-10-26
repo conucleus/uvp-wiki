@@ -18,7 +18,7 @@ This page describes only the current code baseline. For concrete versions, the [
 | Identity Registry | `UVPIdentityRegistry` records offline subject-to-wallet bindings and supports binding revocation. |
 | Chain Services | Rebuilds Plan, Order, task, proof, identity, and deployment projections from chain events and carries off-chain workflow data. |
 | Store | Maintains Zhixu presentation, supplier profiles, search matching, recommendations, contact data, governance audit data, and other Store data. |
-| Order App / executor-kit | Participants read assigned tasks, prepare signatures, submit business actions, and inspect proofs. |
+| Order App / uvp-client | Participants read assigned tasks, prepare signatures, submit business actions, and inspect proofs. |
 
 ## Current Boundaries
 

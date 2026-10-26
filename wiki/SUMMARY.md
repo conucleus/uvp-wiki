@@ -78,8 +78,8 @@
   - [Operator 权限、治理与 Audit](concepts/store/governance-audit.md)
   - [Docking Sandbox 与 signalMap](concepts/store/docking-sandbox.md)
 - [Order App](concepts/apps/order-app.md)
-- [Executor Kit](concepts/apps/executor-kit.md)
-- [Order App 与 Executor Kit](concepts/apps/order-app-vs-executor-kit.md)
+- [UVP Client](concepts/apps/uvp-client.md)
+- [Order App 与 UVP Client](concepts/apps/order-app-vs-uvp-client.md)
 - [Zhixu 作为 Executor](concepts/apps/zhixu-as-executor.md)
 
 ## 操作指南

@@ -22,7 +22,7 @@ Supplier 是能力主体和 trust subject；Executor 是运行时绑定和 signa
 
 ## 谁使用
 
-凝结核在 stage 上声明静态 executor 和 `selectedStages`；control stage 在运行中通过 executor patch 选择 active executor；Product/Store/executor-kit 依据 active executor 路由任务、展示履约说明并组织签名提交。
+凝结核在 stage 上声明静态 executor 和 `selectedStages`；control stage 在运行中通过 executor patch 选择 active executor；Product/Store/uvp-client 依据 active executor 路由任务、展示履约说明并组织签名提交。
 
 ## 产生什么结果
 
@@ -58,7 +58,7 @@ executor:
   supplierID: "{{ .customs_broker_uid }}"
 ```
 
-静态 executor 会进入编译产物的 executor route，帮助 Product API、Store、Order App 和 executor-kit 知道该阶段应当找谁、显示什么履约说明、需要什么资源或证据。但 signal 是否可提交，仍要看订单注册授权和运行时 overlay。
+静态 executor 会进入编译产物的 executor route，帮助 Product API、Store、Order App 和 uvp-client 知道该阶段应当找谁、显示什么履约说明、需要什么资源或证据。但 signal 是否可提交，仍要看订单注册授权和运行时 overlay。
 
 ## 动态 Active Executor
 
@@ -92,11 +92,13 @@ Docked 运行的骨架是：local 出生锚 Hook（`mode=new` route 的唯一 in
 
 `signalMap` 是 local stage 接受 linked Zhixu 输出的语义契约：`inputMap`/`signalMap` 至少一张非空（不强制特定业务信号），被绑定端口必须保持单一目标 source。字段级语义表与编译器校验规则见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md)。
 
-## Executor Kit 的位置
+## UVP Client 的位置
 
-`uvp-executor-kit` 是 Executor 的集成工具箱，详见 [Executor Kit](../apps/executor-kit.md)。它有两个同等重要的入口：
+`uvp-client` 是 Executor 的公共客户端，详见 [UVP Client](../apps/uvp-client.md)。按运行位置分四个入口：
 
-- Chain-native：监听 `HookReady`，按 handler 路由并提交授权 signal。
-- Product API：读取 task/signal container，准备证据、签名、提交并读取 proof。
+- `headless`：私钥钱包测试、监听 `HookReady`、按 handler 路由并提交授权 signal、维护 watch 状态。
+- `core`：构造/解码/提交 signal、validation 与 evidence hash 的共享实现。
+- `browser`：宿主注入钱包时读取 Product V3 任务、签名 typed data 并读取 proof。
+- `cli`：在终端运行 wallet/doctor/watch/signal。
 
-Executor Kit 可以帮助 executor 观察任务、生成 payload hash、签名、提交和诊断 blocked reason。
+UVP Client 可以帮助 executor 观察任务、生成 payload hash、签名、提交和诊断失败原因；它不创建订单授权、不托管默认私钥。

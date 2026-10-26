@@ -22,7 +22,7 @@ Supplier is the capability subject and trust subject; Executor is the runtime bi
 
 ## Who Uses It
 
-Nuclei declare static executors and `selectedStages` on stages; control stages choose active executors at runtime through executor patches; Product/Store/executor-kit route tasks by active executor, present fulfillment instructions, and organize signed submissions.
+Nuclei declare static executors and `selectedStages` on stages; control stages choose active executors at runtime through executor patches; Product/Store/uvp-client route tasks by active executor, present fulfillment instructions, and organize signed submissions.
 
 ## What It Produces
 
@@ -58,7 +58,7 @@ executor:
   supplierID: "{{ .customs_broker_uid }}"
 ```
 
-The static executor enters the compiled artifact's executor routes so Product API, Store, Order App, and executor-kit know who to approach for that stage, which fulfillment instructions to show, and which resources or evidence are needed. Whether a signal is submittable still depends on order registration authorization and runtime overlays.
+The static executor enters the compiled artifact's executor routes so Product API, Store, Order App, and uvp-client know who to approach for that stage, which fulfillment instructions to show, and which resources or evidence are needed. Whether a signal is submittable still depends on order registration authorization and runtime overlays.
 
 ## Dynamic Active Executor
 
@@ -92,11 +92,13 @@ The skeleton of docked execution is: after the local birth-anchor hook (the sing
 
 `signalMap` is the semantic contract by which a local stage accepts a linked Zhixu's output: at least one of `inputMap`/`signalMap` must be non-empty (no specific business signal is forced), and the bound ports must keep a single target source. For the field-level semantics table and compiler validation rules see [Zhixu as Executor](../apps/zhixu-as-executor.md).
 
-## Where Executor Kit Fits
+## Where UVP Client Fits
 
-`uvp-executor-kit` is the integration toolbox for Executors; see [Executor Kit](../apps/executor-kit.md). It has two equally important entries:
+`uvp-client` is the public client for Executors; see [UVP Client](../apps/uvp-client.md). It splits by runtime location into four entries:
 
-- Chain-native: listen for `HookReady`, route by handler, submit authorized signals.
-- Product API: read task/signal containers, prepare evidence, sign, submit, and read proof.
+- `headless`: private-key wallet handling, watching `HookReady`, routing through handlers, submitting authorized signals, and maintaining watch state.
+- `core`: the shared implementation for signal build/decode/submit, validation, and evidence hashing.
+- `browser`: read Product V3 tasks, sign typed data, and read proofs when the host injects a wallet.
+- `cli`: run wallet/doctor/watch/signal from a terminal.
 
-Executor Kit helps executors observe tasks, generate payload hashes, sign, submit, and diagnose blocked reasons.
+UVP Client helps executors observe tasks, generate payload hashes, sign, submit, and diagnose failures; it creates no order authorization and custodies no default private key.

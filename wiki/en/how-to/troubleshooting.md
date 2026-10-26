@@ -36,7 +36,7 @@ Handling:
 
 1. Confirm this is an intentional public-interface change.
 2. Update the fixture.
-3. Check `protocol-bindings`, chain-services, executor-kit, and deploy scripts.
+3. Check `protocol-bindings`, chain-services, uvp-client, and deploy scripts.
 4. Add tests and a release note.
 
 Do not silently change the fixture just to make tests pass.

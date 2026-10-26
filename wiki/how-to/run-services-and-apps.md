@@ -77,29 +77,33 @@ Readiness gate：
 pnpm --filter @uvp-eth/order-app readiness
 ```
 
-## Executor Kit
+## UVP Client
 
 CLI 入口：
 
 ```bash
-pnpm --filter @uvp-eth/executor-kit cli -- --help
+pnpm --filter @uvp-eth/uvp-client cli -- --help
 ```
 
-Product API doctor：
+非花费 doctor：
 
 ```bash
-pnpm --filter @uvp-eth/executor-kit cli -- doctor \
-  --chain-services-url http://127.0.0.1:8787
+pnpm --filter @uvp-eth/uvp-client cli -- doctor \
+  --rpc-url http://127.0.0.1:8545 \
+  --chain-id 31337 \
+  --state-machine 0x0000000000000000000000000000000000000001
 ```
 
-列出参与者任务：
+链 watcher dry-run：
 
 ```bash
-pnpm --filter @uvp-eth/executor-kit cli -- product tasks \
-  --chain-services-url http://127.0.0.1:8787 \
-  --wallet-address 0x0000000000000000000000000000000000000002
+pnpm --filter @uvp-eth/uvp-client cli -- chain-once \
+  --rpc-url http://127.0.0.1:8545 \
+  --chain-id 31337 \
+  --config uvp-client/package/fixtures/state-machine-executor.config.json \
+  --dry-run
 ```
 
-私钥只通过显式 `--private-key-env` 命名的环境变量读取（背景见[协议边界](../concepts/protocol-boundaries.md)）。
+宿主应用（Order App / used-car host）从 `@uvp-eth/uvp-client/browser` 取 Product V3 客户端与 EIP-1193 签名；私钥只通过显式 `--private-key-env` 命名的环境变量读取（背景见[协议边界](../concepts/protocol-boundaries.md)）。
 
 服务起不来或行为与预期不符时，先查[排障](troubleshooting.md)（含 Product API 返回空结果或 `detail_unavailable`、Order App 看不到任务、Relayer 不广播等常见症状）。

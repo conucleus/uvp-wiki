@@ -36,8 +36,8 @@ pnpm verify:protocol-freeze
 | `@uvp-eth/protocol-bindings` | `pnpm --filter @uvp-eth/protocol-bindings test` |
 | `@uvp-eth/product-dto` | `pnpm --filter @uvp-eth/product-dto test` |
 | `@uvp-eth/chain-services` | `pnpm --filter @uvp-eth/chain-services check` |
-| `@uvp-eth/executor-kit` | `pnpm --filter @uvp-eth/executor-kit test` |
-| `@uvp-eth/zhixu-store-web` | `pnpm --filter @uvp-eth/zhixu-store-web build` |
+| `@uvp-eth/uvp-client` | `pnpm --filter @uvp-eth/uvp-client test` |
+| `@uvp-eth/zhixu-registry` | `pnpm --filter @uvp-eth/zhixu-registry test`（Postgres） |
 | `@uvp-eth/order-app` | `pnpm --filter @uvp-eth/order-app readiness` |
 | `@uvp-eth/deploy` | `pnpm --filter @uvp-eth/deploy test` |
 
@@ -56,7 +56,7 @@ forge test
 
 1. 按 [排障](troubleshooting.md) 中 "ABI Fixture Drift" 一节更新或重生成 fixture。
 2. 跑 `pnpm verify:protocol-freeze`。
-3. 检查 chain-services indexer、executor-kit、protocol-bindings、deploy scripts。
+3. 检查 chain-services indexer、uvp-client、protocol-bindings、deploy scripts。
 4. 在 release note 或 PRD trace 中说明 drift。
 
 接口全景与各 owner 见[公共接口](../reference/public-interfaces.md)。

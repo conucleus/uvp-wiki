@@ -7,7 +7,7 @@ status: verified
 
 # Architecture
 
-The UVP EVM track is layered by source of truth: Zhixu and the compiler produce registrable Plans, contracts and registries record protocol facts, Chain Services rebuild product views from events, and Store, Order App, and executor-kit consume those views and submit authorized actions.
+The UVP EVM track is layered by source of truth: Zhixu and the compiler produce registrable Plans, contracts and registries record protocol facts, Chain Services rebuild product views from events, and Store, Order App, and uvp-client consume those views and submit authorized actions.
 
 ```mermaid
 flowchart TD
@@ -21,7 +21,7 @@ flowchart TD
   CS --> DTO["Product DTO / HTTP API"]
   DTO --> Store["Zhixu Store"]
   DTO --> OrderApp["Order App"]
-  DTO --> Exec["executor-kit"]
+  DTO --> Exec["uvp-client"]
   Store --> CS
   OrderApp --> CS
   Exec --> CS
@@ -36,7 +36,7 @@ flowchart LR
   Browser["User browser"]
   OrderApp["Order App"]
   Store["Store Console"]
-  Exec["executor-kit / enterprise script"]
+  Exec["uvp-client / enterprise script"]
   ProductAPI["Chain Services\nProduct API"]
   StoreAPI["Chain Services\nStore API"]
   Relayer["Relayer / RPC boundary"]
@@ -71,9 +71,9 @@ Postgres, object storage, and APIs in this diagram are product runtime layers. T
 | --- | --- | --- | --- |
 | Semantics and compilation | `uvp-protocol/packages/hook-core/`, `uvp-protocol/packages/compiler/` | Parsing Zhixu, evaluating Hook semantics, generating deterministic artifacts and hashes. | Registering orders, storing business evidence plaintext, signing for participants. |
 | On-chain facts | `uvp-protocol/contracts/uvp-contracts/` | Fact records for Plans, Orders, Signals, Hooks, identity bindings, and deployment cutovers. | Product display, Store workflows, private file storage. |
-| Service layer (rebuildable) | `uvp-chain-services/service/`, `uvp-protocol/packages/product-dto/` | Indexer, projections, Product/Store API, relayer boundary, proof/evidence workflows, notifications, and the DTO contracts shared by products. | Becoming the source of truth for plan/order/signal/trust, or producing business signatures. |
-| Product surfaces | `zhixu-store/app/`, `uvp-order-app/app/` | Translating on-chain facts into orders, tasks, proof, trust, and the Store workbench. | Rewriting contract facts, bypassing order-level authorization. |
-| Executor tooling | `uvp-executor-kit/package/` | CLI/SDK signal producer, chain watcher, Product API prepare/sign/submit/proof. | Custodying default private keys, taking over signature responsibility from businesses. |
+| Service layer (rebuildable) | `uvp-chain-services/service/`, `uvp-protocol/packages/product-dto/` | Chain indexer, projections, generic read API, optional relay, proof verifier, and the DTO contracts shared by products. | Becoming the source of truth for plan/order/signal/trust, or producing business signatures. |
+| Product surfaces | `uvp-order-app/app/`, `zhixu-store/registry/` | Translating on-chain facts into orders, tasks, and proof; the registry only records self-descriptions and identity claims. | Rewriting contract facts, bypassing order-level authorization. |
+| Public client | `uvp-client/package/` | core/browser/headless SDK and executor CLI: transport, Product V3 client, EIP-1193 signing, watcher, signal build/submit. | Custodying default private keys, taking over signature responsibility from businesses. |
 | Deployment and evidence | `uvp-deploy/deploy/` | Address manifests, release records, Anvil/Base Sepolia rehearsal, staging gates. | Redefining protocol semantics or hiding failure evidence. |
 
 ## Component Bus
@@ -84,9 +84,9 @@ Postgres, object storage, and APIs in this diagram are product runtime layers. T
 | On-chain execution | `uvp-protocol/contracts/uvp-contracts/` | ABI, events, EIP-712 domain, `UVPStateMachine`, modules, `UVPIdentityRegistry`. |
 | Replay/reference | `uvp-protocol/packages/statemachine/` | Reference reducer, event replay, runtime semantic tests. |
 | Bindings | `uvp-protocol/packages/protocol-bindings/` | Browser-safe ABI, typed-data builders, hash helpers, calldata builders. |
-| Service layer | `uvp-chain-services/service/`, `uvp-protocol/packages/product-dto/` | Forkable off-chain indexer, projections, relayer boundary, proof verifier, Product/Store API; Product order/task/proof/trust DTOs. |
-| Store/Product UIs | `zhixu-store/app/`, `uvp-order-app/app/` | Store workbench, participant task UI, proof display. |
-| Execution tools | `uvp-executor-kit/package/` | CLI/SDK signal producer. |
+| Service layer | `uvp-chain-services/service/`, `uvp-protocol/packages/product-dto/` | Forkable chain indexer, projections, generic read API, optional relay, proof verifier; Product order/task/proof DTOs. |
+| Product surfaces | `uvp-order-app/app/`, `zhixu-store/registry/` | Participant order/task UI, proof display; registry data layer. |
+| Public client | `uvp-client/package/` | core/browser/headless SDK + executor CLI. |
 | Deploy/evidence | `uvp-deploy/deploy/` | Deployment manifests, release records, staging gates. |
 | Periphery | `uvp-periphery/` | Payment/funding/guarantee/agent adapters and demos. |
 
@@ -104,7 +104,7 @@ Postgres, object storage, and APIs in this diagram are product runtime layers. T
 ## Architecture Rules
 
 - Contracts and chain events are the sole source of truth for plan, order, signal, hook, publication, and deployment cutover; see [Protocol Boundaries](protocol-boundaries.md#source-of-truth).
-- Store, Product API, Order App, and executor-kit may only consume, project, display, relay, or submit authorized actions; see [Protocol Boundaries](protocol-boundaries.md#product-surfaces-and-service-boundaries).
+- Store, Product API, Order App, and uvp-client may only consume, project, display, relay, or submit authorized actions; see [Protocol Boundaries](protocol-boundaries.md#product-surfaces-and-service-boundaries).
 - Indexers and durable databases must be rebuildable from events and cannot become a protocol source of truth; see [Protocol Boundaries](protocol-boundaries.md#rebuildability).
 - Periphery may implement funding, guarantee, payment, and agent adapters but must consume core interfaces; see [Protocol Boundaries](protocol-boundaries.md#periphery-adapters).
 - Every cross-module change must check for drift in ABI, events, typed data, canonical hashes, DTOs, CLIs, and release evidence; see [Protocol Boundaries](protocol-boundaries.md#public-interface-discipline).

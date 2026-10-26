@@ -13,7 +13,7 @@ A Signal is the smallest business input the order state machine accepts. It repr
 
 ## Who Uses It
 
-Authorized submitters (participant wallets, executors, adapters) submit signals; contracts validate and record them; Product/Store/executor-kit project `SignalSubmitted` into task completion status and proof rows.
+Authorized submitters (participant wallets, executors, adapters) submit signals; contracts validate and record them; Product/Store/uvp-client project `SignalSubmitted` into task completion status and proof rows.
 
 ## What It Produces
 

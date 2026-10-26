@@ -22,7 +22,7 @@ This is not the concept encyclopedia. The first pass only needs to build the bus
 
 After the first pass, move into the engineering path:
 
-1. [Plan and the Order Lifecycle](../concepts/lifecycle.md): use the same order to locate Store, compiler, Identity Registry, state machine, Chain Services, Order App, and executor-kit.
+1. [Plan and the Order Lifecycle](../concepts/lifecycle.md): use the same order to locate Store, compiler, Identity Registry, state machine, Chain Services, Order App, and uvp-client.
 
 
 2. [Architecture Overview](../concepts/architecture.md): module boundaries, dependency direction, source of truth, and data flow.

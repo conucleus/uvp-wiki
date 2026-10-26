@@ -15,7 +15,7 @@ A Hook is only a condition. When a hook with `emitReady=true` becomes Ready, the
 
 ## Who Uses It
 
-Nuclei declare hook conditions in stage `receiveSignals`; the compiler normalizes them into the Plan; the state machine evaluates them over order events; Product/Store/executor-kit follow `HookReady` to create tasks and notifications. Cross-source facts enter the routing layer through `::ANCHOR(@source::stage.signal)`, while `mint: per-fact` determines whether each fact derives an order.
+Nuclei declare hook conditions in stage `receiveSignals`; the compiler normalizes them into the Plan; the state machine evaluates them over order events; Product/Store/uvp-client follow `HookReady` to create tasks and notifications. Cross-source facts enter the routing layer through `::ANCHOR(@source::stage.signal)`, while `mint: per-fact` determines whether each fact derives an order.
 
 ## What It Produces
 
@@ -80,7 +80,7 @@ A readable hook typically contains:
 
 ## Ready and Order Entry
 
-Only hooks with `emitReady=true` emit `HookReady` the first time they become `Ready` in the contract. `orderTriggerKind` is `none`, `mint`, or `dock`. Product task creation, Store notifications, and executor-kit watchers all follow `HookReady`; UI drafts or temporary backend state serve display only.
+Only hooks with `emitReady=true` emit `HookReady` the first time they become `Ready` in the contract. `orderTriggerKind` is `none`, `mint`, or `dock`. Product task creation, Store notifications, and uvp-client watchers all follow `HookReady`; UI drafts or temporary backend state serve display only.
 
 For detailed semantics see [Trigger](trigger.md).
 

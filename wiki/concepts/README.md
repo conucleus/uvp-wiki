@@ -11,7 +11,7 @@ status: verified
 > 前置阅读：[核心术语表](../reference/glossary.md)
 不确定用词时，先查[核心术语表](../reference/glossary.md)。
 
-`uvp-eth` 的核心是一套把秩序 (Zhixu) 协作规则书落到 EVM 链上的状态机协议。合约和链事件是事实源；Store、Product API、Order App、executor-kit 和 periphery adapter 围绕这个事实源做编译、索引、展示、签名和提交。这些对象是各产品共同消费的语言层。
+`uvp-eth` 的核心是一套把秩序 (Zhixu) 协作规则书落到 EVM 链上的状态机协议。合约和链事件是事实源；Store、Product API、Order App、uvp-client 和 periphery adapter 围绕这个事实源做编译、索引、展示、签名和提交。这些对象是各产品共同消费的语言层。
 
 最短对象关系先这样读：
 
@@ -86,7 +86,7 @@ Executor 是订单运行时的执行绑定：静态秩序可以声明默认 exec
 | [信任与授权](trust/README.md) | Identity Registry、Plan 发布、订单级 signal 授权、EIP-712 和 relayer 边界。 |
 | [产品表面](product/README.md) | chain-services 如何把链事件投影成普通用户能读懂的订单、任务和证明。 |
 | [秩序商店](store/README.md) | Store 是一级产品/治理系统，给凝结核提供工作台，并重新解释 Zhixu/Supplier、身份校验、联系通知、履约记录和平台 workflow。 |
-| [Order App 与 executor-kit](apps/order-app-vs-executor-kit.md) | 参与者 App 与执行者集成面如何消费任务并提交 signal。 |
+| [Order App 与 uvp-client](apps/order-app-vs-uvp-client.md) | 参与者 App 与执行者集成面如何消费任务并提交 signal。 |
 
 ## 边界检查
 
@@ -100,7 +100,7 @@ Executor 是订单运行时的执行绑定：静态秩序可以声明默认 exec
 - `fileResources` 是资源句柄，业务文件明文留在链下。
 - Store metadata 组织对象与目录；plan/supplier identity 来自 registry events。
 - Store admin 负责平台 workflow；凝结核负责秩序内部治理；Identity Registry operator 负责身份核验与 binding。
-- Executor Kit 是执行者集成面，围绕状态机和 Product API 工作。
+- UVP Client 是执行者集成面，围绕状态机和 Product API 工作。
 - Funding、payment、guarantee、agent adapter 可以作为 Supplier 或 Executor 的实现形态出现，围绕核心接口消费 signal/proof，不新增事实源。
 
 这些边界的完整论述见 [协议边界](protocol-boundaries.md)。

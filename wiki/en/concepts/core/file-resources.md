@@ -13,7 +13,7 @@ status: verified
 
 ## Who Uses It
 
-Nuclei declare fileResources on stages; Store/Product API use them to present protocol and evidence requirements; Order App and executor-kit translate them into upload and validation flows; operators use the same handle model during resource patches.
+Nuclei declare fileResources on stages; Store/Product API use them to present protocol and evidence requirements; Order App and uvp-client translate them into upload and validation flows; operators use the same handle model during resource patches.
 
 ## What It Produces
 
@@ -52,7 +52,7 @@ fileResources:
       objectKey: "protocols/payment-settlement-v1.json"
 ```
 
-This YAML gives Store, Product API, executor-kit, or adapters one resource handle: they can display the protocol, compute hashes, surface evidence requirements, and check acceptance rules. Only hashes, URIs, or patch events are stored on chain.
+This YAML gives Store, Product API, uvp-client, or adapters one resource handle: they can display the protocol, compute hashes, surface evidence requirements, and check acceptance rules. Only hashes, URIs, or patch events are stored on chain.
 
 ## What fileType Means
 
@@ -92,7 +92,7 @@ Store can organize resource handles into:
 - manifest hash, metadata URI, content hash, ciphertext hash;
 - whether resources are missing, expired, or need operator review.
 
-Order App and executor-kit translate them into "what evidence to upload, what the hash is, where proof lives". Ordinary participant interfaces never show bucket secrets, storage credentials, presigned URLs, or internal object paths.
+Order App and uvp-client translate them into "what evidence to upload, what the hash is, where proof lives". Ordinary participant interfaces never show bucket secrets, storage credentials, presigned URLs, or internal object paths.
 
 ## Disallowed Uses
 

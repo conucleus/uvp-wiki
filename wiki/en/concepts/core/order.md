@@ -13,7 +13,7 @@ An Order is a run. In the protocol, it is an independent fact stream forked from
 
 ## Who Uses It
 
-Any keyholder can create orders through the open birth entry (an EIP-712-signed trigger typed-data submission; order `creator` attribution is first-come-first-served — the contract has no sender allowlist); participants, executors, and adapters submit authorized signals to it; Product/Store/executor-kit project it into task, notification, and proof views.
+Any keyholder can create orders through the open birth entry (an EIP-712-signed trigger typed-data submission; order `creator` attribution is first-come-first-served — the contract has no sender allowlist); participants, executors, and adapters submit authorized signals to it; Product/Store/uvp-client project it into task, notification, and proof views.
 
 ## What It Produces
 

@@ -7,7 +7,7 @@ status: verified
 
 # Product API 端点速查
 
-Product API 位于 `@uvp-eth/chain-services`，把 StateMachine 事件投影与 Store 链下资料组合成 Store、Order App 和 executor-kit 使用的 DTO。
+Product API 位于 `@uvp-eth/chain-services`，把 StateMachine 事件投影与 Store 链下资料组合成 Store、Order App 和 uvp-client 使用的 DTO。
 
 ## Catalog、Orders 与 Tasks
 

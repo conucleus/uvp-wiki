@@ -86,7 +86,7 @@ When changing the Product API:
 
 - update [Product API Endpoints](../reference/product-api-endpoints.md);
 - update [Product DTO and User Surfaces](../concepts/product/README.md) and the relevant services pages;
-- sync the related Store / Order App / Executor Kit how-to and concept pages.
+- sync the related Store / Order App / UVP Client how-to and concept pages.
 
 When changing the Store / Supplier / Zhixu management paths:
 
@@ -94,9 +94,9 @@ When changing the Store / Supplier / Zhixu management paths:
 - state whether the relevant status belongs to the read model or on-chain events (cite Protocol Boundaries; do not restate);
 - keep the three-way boundary clear between Nucleus internal governance, Store platform workflow, and Store or external institution external material review.
 
-When changing the Executor / executor-kit / docked Zhixu paths:
+When changing the Executor / uvp-client / docked Zhixu paths:
 
-- update [Executor Kit](../concepts/apps/executor-kit.md), [Zhixu as Executor](../concepts/apps/zhixu-as-executor.md), and [Order App](../concepts/apps/order-app.md);
+- update [UVP Client](../concepts/apps/uvp-client.md), [Zhixu as Executor](../concepts/apps/zhixu-as-executor.md), and [Order App](../concepts/apps/order-app.md);
 - sync CLI syntax with [CLI and Configuration](../reference/cli-and-config.md).
 
 When changing the release/staging gate:

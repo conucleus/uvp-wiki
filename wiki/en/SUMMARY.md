@@ -78,8 +78,8 @@
   - [Operator Permissions, Governance, and Audit](concepts/store/governance-audit.md)
   - [Docking Sandbox and signalMap](concepts/store/docking-sandbox.md)
 - [Order App](concepts/apps/order-app.md)
-- [Executor Kit](concepts/apps/executor-kit.md)
-- [Order App vs Executor Kit](concepts/apps/order-app-vs-executor-kit.md)
+- [UVP Client](concepts/apps/uvp-client.md)
+- [Order App vs UVP Client](concepts/apps/order-app-vs-uvp-client.md)
 - [Zhixu as Executor](concepts/apps/zhixu-as-executor.md)
 
 ## How-To

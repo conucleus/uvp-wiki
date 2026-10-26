@@ -11,7 +11,7 @@ status: verified
 > Prerequisite reading: [Glossary](../reference/glossary.md)
 When unsure about terminology, check the [Core Glossary](../reference/glossary.md) first.
 
-The core of `uvp-eth` is a state-machine protocol that lands Zhixu (order) coordination rulebooks on the EVM chain. Contracts and chain events are the source of truth; Store, Product API, Order App, executor-kit, and periphery adapters compile, index, display, sign, and submit around that source of truth. These objects are the language layer consumed jointly by every product.
+The core of `uvp-eth` is a state-machine protocol that lands Zhixu (order) coordination rulebooks on the EVM chain. Contracts and chain events are the source of truth; Store, Product API, Order App, uvp-client, and periphery adapters compile, index, display, sign, and submit around that source of truth. These objects are the language layer consumed jointly by every product.
 
 Read the shortest object relationship first:
 
@@ -86,7 +86,7 @@ The same objects carry different emphasis in different sections:
 | [Trust and Authorization](trust/README.md) | Identity Registry, Plan publication, order-level signal authorization, EIP-712, and the relayer boundary. |
 | [Product Surfaces](product/README.md) | How chain-services project chain events into orders, tasks, and proofs ordinary users can read. |
 | [Zhixu Store](store/README.md) | The Store is a first-class product/governance system that gives nuclei a workbench, and reinterprets Zhixu/Supplier, identity verification, contact notifications, fulfillment records, and platform workflow. |
-| [Order App and executor-kit](apps/order-app-vs-executor-kit.md) | How the participant app and the executor integration surface consume tasks and submit signals. |
+| [Order App and uvp-client](apps/order-app-vs-uvp-client.md) | How the participant app and the executor integration surface consume tasks and submit signals. |
 
 ## Boundary Checklist
 
@@ -100,7 +100,7 @@ The same objects carry different emphasis in different sections:
 - `fileResources` are resource handles; business file plaintext stays off-chain.
 - Store metadata organizes objects and catalogs; plan/supplier identity comes from registry events.
 - Store admins own platform workflow; nuclei own governance inside their Zhixu; Identity Registry operators own identity verification and binding.
-- Executor Kit is the executor integration surface, working around the state machine and Product API.
+- UVP Client is the executor integration surface, working around the state machine and Product API.
 - Funding, payment, guarantee, and agent adapters may appear as implementations of Supplier or Executor roles, consuming signal/proof around core interfaces without adding new sources of truth.
 
 For the full discussion of these boundaries, see [Protocol Boundaries](protocol-boundaries.md).

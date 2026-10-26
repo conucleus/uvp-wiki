@@ -7,7 +7,7 @@ status: verified
 
 # Product API Endpoints
 
-The Product API lives in `@uvp-eth/chain-services`. It combines StateMachine event projections with Store-managed off-chain records into the DTOs used by Store, Order App, and executor-kit.
+The Product API lives in `@uvp-eth/chain-services`. It combines StateMachine event projections with Store-managed off-chain records into the DTOs used by Store, Order App, and uvp-client.
 
 ## Catalog, Orders, and Tasks
 

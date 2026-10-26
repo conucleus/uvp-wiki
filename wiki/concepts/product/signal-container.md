@@ -71,9 +71,9 @@ POST /product/tasks/:taskId/submit-stage-resource-patch
 - 缺少显式 capability metadata 应 fail closed，避免从角色文案猜权限。
 - 普通 UI 不展示 ABI、calldata、gas、sourceId、signalId；高级证明视图可以展示。
 
-## 对 Executor Kit 和 MCP 的意义
+## 对 UVP Client 和 MCP 的意义
 
-executor-kit Product API mode 和未来 MCP tools 应消费 signal container，让 AI 或企业系统不用直接理解 HookReady、ABI 和 event topic。工具可以列任务、取 container、准备证据、签名、提交、读 proof；订单授权仍来自 state machine。
+uvp-client/browser 的 Product V3 客户端、headless 工具和未来 MCP tools 应消费 signal container，让 AI 或企业系统不用直接理解 HookReady、ABI 和 event topic。工具可以列任务、取 container、准备证据、签名、提交、读 proof；订单授权仍来自 state machine。
 
 ## 相关页面
 

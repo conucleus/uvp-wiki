@@ -13,7 +13,7 @@ Order 是“订单”。在协议里，它是从某个已注册 [Plan](plan.md) 
 
 ## 谁使用
 
-任何持钥人都可以经开放出生入口创建订单（按 EIP-712 签名提交 trigger typed data，订单 `creator` 归属先到先得——合约不设发送者准入名单）；参与方、executor 和 adapter 向它提交授权 signal；Product/Store/executor-kit 把它投影成任务、通知和 proof 视图。
+任何持钥人都可以经开放出生入口创建订单（按 EIP-712 签名提交 trigger typed data，订单 `creator` 归属先到先得——合约不设发送者准入名单）；参与方、executor 和 adapter 向它提交授权 signal；Product/Store/uvp-client 把它投影成任务、通知和 proof 视图。
 
 ## 产生什么结果
 

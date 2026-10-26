@@ -13,10 +13,10 @@ status: verified
 | --- | --- | --- |
 | [uvp-core](https://github.com/conucleus/uvp-core) | `uvp-core/` | Rust normative semantic core, golden corpus, CLI/FFI/N-API adapters. |
 | [uvp-protocol](https://github.com/conucleus/uvp-protocol) | `uvp-protocol/` | compiler, HookPlan, state-machine reference, contracts, ABI/EIP-712, Product DTO. |
-| [uvp-chain-services](https://github.com/conucleus/uvp-chain-services) | `uvp-chain-services/` | indexer, submission broadcast (relayer role), proof verifier, Product/Store API, projection, workflow runtime. |
-| [zhixu-store](https://github.com/conucleus/zhixu-store) | `zhixu-store/` | Store/workbench frontend, catalog, supplier directory, identity/proof views. |
-| [uvp-order-app](https://github.com/conucleus/uvp-order-app) | `uvp-order-app/` | participant Order App, task inbox, evidence/proof display, readiness checks. |
-| [uvp-executor-kit](https://github.com/conucleus/uvp-executor-kit) | `uvp-executor-kit/` | executor CLI/SDK, chain watcher, Product API signal producer, adapter integration. |
+| [uvp-chain-services](https://github.com/conucleus/uvp-chain-services) | `uvp-chain-services/` | chain indexer, projection, generic read API, optional relay, proof verifier, chain health. |
+| [zhixu-store](https://github.com/conucleus/zhixu-store) | `zhixu-store/` | hosts `@uvp-eth/zhixu-registry`: a permissionless ZhixuRecord / IdentityClaim data layer (no UI, no review). |
+| [uvp-order-app](https://github.com/conucleus/uvp-order-app) | `uvp-order-app/` | single participant flow: wallet session, order draft/invite/finalize, order room. |
+| [uvp-client](https://github.com/conucleus/uvp-client) | `uvp-client/` | four public entries (core/browser/headless/cli): transport, Product V3 client, EIP-1193 wallet, watcher, executor CLI. |
 
 ## Workspace Modules
 
@@ -29,10 +29,10 @@ status: verified
 | `uvp-protocol/packages/protocol-bindings` | `@uvp-eth/protocol-bindings` | ABI, EIP-712, calldata, hash helpers | private keys, env, watcher, tx submit |
 | `uvp-protocol/contracts/uvp-contracts` | Foundry project | Solidity contracts, ABI fixtures, contract tests | backend service code |
 | `uvp-protocol/packages/product-dto` | `@uvp-eth/product-dto` | product-facing DTO contracts | React, wallet, storage, chain client |
-| `uvp-chain-services/service` | `@uvp-eth/chain-services` | indexer, submission broadcast (relayer role), proof verifier, Product/Store APIs; see [Chain Services](../concepts/services/chain-services.md) | protocol source of truth |
-| `zhixu-store/app` | `@uvp-eth/zhixu-store-web` | Store/workbench frontend | old Go-coupled Store BFF |
-| `uvp-order-app/app` | `@uvp-eth/order-app` | participant task/signal console | Store Console, payment placeholder (no custody) |
-| `uvp-executor-kit/package` | `@uvp-eth/executor-kit` | executor CLI/SDK, chain watcher, Product API signal producer | privileged backend truth |
+| `uvp-chain-services/service` | `@uvp-eth/chain-services` | chain indexer, projection, generic read API, optional relay, proof verifier; see [Chain Services](../concepts/services/chain-services.md) | protocol source of truth, order/store business authority |
+| `zhixu-store/registry` | `@uvp-eth/zhixu-registry` | ZhixuRecord / IdentityClaim registry data layer (permissionless, no review) | storefront/UI, order authorization, KYC |
+| `uvp-order-app/app` | `@uvp-eth/order-app` | single participant flow (create/invite/accept/room) | order-state ownership, custody |
+| `uvp-client/package` | `@uvp-eth/uvp-client` | core/browser/headless SDK entries + executor CLI (watch/signal/doctor/wallet) | privileged backend truth, server |
 | `uvp-deploy/deploy` | `@uvp-eth/deploy` | deploy scripts, manifests, release records | external deploy repo (see the `uvp-deploy` workspace) |
 | `uvp-deploy/apps/ops-console-web` | `@uvp-eth/ops-console-web` | operator console prototype | protocol runtime |
 | `uvp-periphery` | mixed | funding/payment/guarantee/agent adapters and demos | core protocol truth |
@@ -49,9 +49,9 @@ uvp-protocol/packages/statemachine
 uvp-protocol/packages/product-dto
 uvp-protocol/packages/protocol-bindings
 uvp-chain-services/service
-uvp-executor-kit/package
+uvp-client/package
 uvp-order-app/app
-zhixu-store/app
+zhixu-store/registry
 uvp-deploy/deploy
 uvp-deploy/apps/*
 uvp-periphery/executors/*

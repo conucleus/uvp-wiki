@@ -71,9 +71,9 @@ POST /product/tasks/:taskId/submit-stage-resource-patch
 - Missing explicit capability metadata should fail closed instead of guessing permissions from role copy.
 - Ordinary UIs do not show ABI, calldata, gas, sourceId, or signalId; advanced proof views may.
 
-## Meaning for Executor Kit and MCP
+## Meaning for UVP Client and MCP
 
-executor-kit Product API mode and future MCP tools should consume signal containers so AI or enterprise systems do not need to understand HookReady, ABI, and event topics directly. Tools can list tasks, fetch containers, prepare evidence, sign, submit, and read proof; order authorization still comes from the state machine.
+The uvp-client/browser Product V3 client, headless tools, and future MCP tools should consume signal containers so AI or enterprise systems do not need to understand HookReady, ABI, and event topics directly. Tools can list tasks, fetch containers, prepare evidence, sign, submit, and read proof; order authorization still comes from the state machine.
 
 ## Related Pages
 

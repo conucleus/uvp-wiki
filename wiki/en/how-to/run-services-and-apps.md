@@ -74,29 +74,33 @@ Readiness gate:
 pnpm --filter @uvp-eth/order-app readiness
 ```
 
-## Executor Kit
+## UVP Client
 
 CLI entry:
 
 ```bash
-pnpm --filter @uvp-eth/executor-kit cli -- --help
+pnpm --filter @uvp-eth/uvp-client cli -- --help
 ```
 
-Product API doctor:
+Non-spending doctor:
 
 ```bash
-pnpm --filter @uvp-eth/executor-kit cli -- doctor \
-  --chain-services-url http://127.0.0.1:8787
+pnpm --filter @uvp-eth/uvp-client cli -- doctor \
+  --rpc-url http://127.0.0.1:8545 \
+  --chain-id 31337 \
+  --state-machine 0x0000000000000000000000000000000000000001
 ```
 
-List participant tasks:
+Chain watcher dry-run:
 
 ```bash
-pnpm --filter @uvp-eth/executor-kit cli -- product tasks \
-  --chain-services-url http://127.0.0.1:8787 \
-  --wallet-address 0x0000000000000000000000000000000000000002
+pnpm --filter @uvp-eth/uvp-client cli -- chain-once \
+  --rpc-url http://127.0.0.1:8545 \
+  --chain-id 31337 \
+  --config uvp-client/package/fixtures/state-machine-executor.config.json \
+  --dry-run
 ```
 
-Private keys are read only from environment variables explicitly named by `--private-key-env` (background in [Protocol Boundaries](../concepts/protocol-boundaries.md)).
+Host apps (Order App / used-car host) get the Product V3 client and EIP-1193 signing from `@uvp-eth/uvp-client/browser`; private keys are read only from environment variables explicitly named by `--private-key-env` (background in [Protocol Boundaries](../concepts/protocol-boundaries.md)).
 
 If a service fails to start or behaves unexpectedly, start with [Troubleshooting](troubleshooting.md) (common symptoms include Product API returning empty results or `detail_unavailable`, Order App showing no tasks, and Relayer not broadcasting).

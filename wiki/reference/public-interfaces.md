@@ -15,22 +15,22 @@ status: verified
 
 `@uvp-eth/protocol-bindings` 是浏览器安全的协议绑定包。它提供 ABI 常量、typed-data builders、calldata builders、地址/bytes32 校验、stage patch helpers 和 resource manifest hash helpers。
 
-它不读环境变量，不保存私钥，不提交交易，也不做业务授权判断。Order App、executor-kit、Chain Services 和 deploy scripts 可以复用它来避免各自手写 ABI、typed data 或 calldata。
+它不读环境变量，不保存私钥，不提交交易，也不做业务授权判断。Order App、uvp-client、Chain Services 和 deploy scripts 可以复用它来避免各自手写 ABI、typed data 或 calldata。
 
 ## 接口地图
 
 | 接口 | 主要 owner | 消费方 | 改动要求 |
 | --- | --- | --- | --- |
-| Solidity ABI / bytecode / function selector | `uvp-protocol/contracts/uvp-contracts` | protocol-bindings、chain-services、executor-kit、deploy scripts、release gates | 更新 fixture、bindings、contract tests、deploy/replay tests 和 release note。 |
+| Solidity ABI / bytecode / function selector | `uvp-protocol/contracts/uvp-contracts` | protocol-bindings、chain-services、uvp-client、deploy scripts、release gates | 更新 fixture、bindings、contract tests、deploy/replay tests 和 release note。 |
 | Event name / topic / indexed fields | contracts | indexer、statemachine replay、Product projection、proof verifier | 更新 replay oracle、projection tests、contracts/events reference。 |
-| EIP-712 domain / typed data | contracts、protocol-bindings | Product submit、relayer、executor-kit、wallet UI | 更新 digest helpers、signing tests、staging domain check；staging 不能回退到旧 `0.1` domain。 |
+| EIP-712 domain / typed data | contracts、protocol-bindings | Product submit、relayer、uvp-client、wallet UI | 更新 digest helpers、signing tests、staging domain check；staging 不能回退到旧 `0.1` domain。 |
 | Canonical hash / artifact schema | compiler、hook-core、statemachine | Plan publication、commitPlan/finalizePlan、release evidence | 更新 golden fixtures、canonical hash docs、compiler/statemachine tests。 |
-| Product DTO | product-dto | chain-services、Store、Order App、executor-kit、periphery adapter | 更新 DTO tests、route tests、frontend/API consumers 和 ordinary-user copy。 |
-| Product API | chain-services | Store、Order App、executor-kit Product API mode、企业脚本/AI agent（经 executor-kit SDK/CLI） | 更新 API reference、route tests、browser E2E、failure language。 |
+| Product DTO | product-dto | chain-services、Order App、uvp-client、periphery adapter | 更新 DTO tests、route tests、frontend/API consumers 和 ordinary-user copy。 |
+| Product API | chain-services | Order App/宿主（经 uvp-client/browser）、企业脚本/AI agent（经 uvp-client） | 更新 API reference、route tests、browser E2E、failure language。 |
 | Deployment manifest | uvp-deploy/deploy | chain-services、staging scripts、release records | 只提交 curated manifest/evidence；local generated address files 默认不提交。 |
 | Release evidence schema | uvp-deploy/deploy | release owner、audit、release evidence pack 消费方 | 保持 no-secret、redacted、可审计；不要把 raw logs 或 object bytes 当作 release record。 |
-| Store Console HTTP API | chain-services（`uvp-chain-services/service/src/api/routes/`） | Store workbench、operator scripts | route、错误码、proof rows 和 authz 语义需要和 DTO 同步；更新 Store 前端消费者与 route tests。 |
-| CLI 与运行配置 | executor-kit、chain-services config、deploy scripts | executor、release owner、staging operator | 私钥只从显式 env 读取；staging/profile 配置必须 fail closed；更新 CLI reference 与 profile tests。 |
+| 遗留 Store/order HTTP 路由 | chain-services（`uvp-chain-services/service/src/api/routes/`） | 仅 Phase B 迁移面，不是目标表面 | route、错误码、proof rows 和 authz 语义需要和 DTO 同步；更新 Store 前端消费者与 route tests。 |
+| CLI 与运行配置 | uvp-client、chain-services config、deploy scripts | executor、release owner、staging operator | 私钥只从显式 env 读取；staging/profile 配置必须 fail closed；更新 CLI reference 与 profile tests。 |
 
 ## Drift checklist
 
@@ -43,7 +43,7 @@ protocol-bindings
 compiler/statemachine replay
 chain-services indexer/projection/routes
 Product DTO tests
-Store / Order App / executor-kit consumers
+Order App / host / uvp-client consumers
 deploy scripts and release gates
 wiki reference pages
 release record or PRD trace

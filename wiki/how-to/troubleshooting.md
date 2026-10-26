@@ -36,7 +36,7 @@ pnpm test
 
 1. 确认这是有意的 public interface change。
 2. 更新 fixture。
-3. 检查 `protocol-bindings`、chain-services、executor-kit、deploy scripts。
+3. 检查 `protocol-bindings`、chain-services、uvp-client、deploy scripts。
 4. 补测试和 release note。
 
 不要为了让测试通过而静默改 fixture。

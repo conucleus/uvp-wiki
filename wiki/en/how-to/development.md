@@ -36,8 +36,8 @@ pnpm verify:protocol-freeze
 | `@uvp-eth/protocol-bindings` | `pnpm --filter @uvp-eth/protocol-bindings test` |
 | `@uvp-eth/product-dto` | `pnpm --filter @uvp-eth/product-dto test` |
 | `@uvp-eth/chain-services` | `pnpm --filter @uvp-eth/chain-services check` |
-| `@uvp-eth/executor-kit` | `pnpm --filter @uvp-eth/executor-kit test` |
-| `@uvp-eth/zhixu-store-web` | `pnpm --filter @uvp-eth/zhixu-store-web build` |
+| `@uvp-eth/uvp-client` | `pnpm --filter @uvp-eth/uvp-client test` |
+| `@uvp-eth/zhixu-registry` | `pnpm --filter @uvp-eth/zhixu-registry test` (Postgres) |
 | `@uvp-eth/order-app` | `pnpm --filter @uvp-eth/order-app readiness` |
 | `@uvp-eth/deploy` | `pnpm --filter @uvp-eth/deploy test` |
 
@@ -56,7 +56,7 @@ After changing a public interface (ABI, event topic, EIP-712 domain, canonical h
 
 1. Update or regenerate the fixture per the "ABI Fixture Drift" section in [Troubleshooting](troubleshooting.md).
 2. Run `pnpm verify:protocol-freeze`.
-3. Check the chain-services indexer, executor-kit, protocol-bindings, and deploy scripts.
+3. Check the chain-services indexer, uvp-client, protocol-bindings, and deploy scripts.
 4. Explain the drift in a release note or PRD trace.
 
 For the full interface map and owners, see [Public Interfaces](../reference/public-interfaces.md).

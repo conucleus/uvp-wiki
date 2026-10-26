@@ -15,7 +15,7 @@ An order passes through seven steps from static Zhixu to on-chain fact. The six-
 | Publication | Publisher, Protocol Bindings, StateMachine | EIP-712 publisher signature and Plan events. |
 | Identity resolution | Store, Identity Registry | Store offline records and subject/account binding. |
 | Order creation | Product BFF, Order participants | Creator signature, participant acceptance records, and order authorization. |
-| Order progression | Order App, executor-kit, StateMachine | Submitter signatures, Signal and Hook events. |
+| Order progression | Order App, uvp-client, StateMachine | Submitter signatures, Signal and Hook events. |
 | Display and verification | Chain Services, Product DTO | Replayable chain events, hashes, and projections. |
 
 ## 1. Author and Compile

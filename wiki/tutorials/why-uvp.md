@@ -56,7 +56,7 @@ UVP 的目标是成为科斯定理在 AI 时代的工程实践：把交易成本
 | 议约成本 | Zhixu DSL、Plan、plan hash、file resources、supplier requirements。 |
 | 协调成本 | Source、Signal、Hook、Trigger、Order、executor authorization。 |
 | 监督成本 | evidence metadata、payload hash、metadata URI、proof row、timeline。 |
-| 集成成本 | Product DTO、Chain Services、executor-kit、adapter/periphery boundary。 |
+| 集成成本 | Product DTO、Chain Services、uvp-client、adapter/periphery boundary。 |
 | 争议和抵赖成本 | EIP-712 签名、`SignalSubmitted`、`HookReady`、Identity Registry events、replayable chain proof。 |
 
 这张表把过去靠经验、合同、邮件、截图和平台后台维持的生产关系，拆成可以校验、索引、组合和重放的对象。

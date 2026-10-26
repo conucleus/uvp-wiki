@@ -97,7 +97,7 @@ after which received signals the next task opens
 which path handles failure, timeout, rejection, or reassignment
 ```
 
-Zhixu is a standard language that lets computers, on-chain contracts, enterprise systems, AI agents, Store, Order App, and executor-kit understand the same coordination boundary. Real contracts keep defining business responsibility; Zhixu writes the coordination boundary as executable signal rules.
+Zhixu is a standard language that lets computers, on-chain contracts, enterprise systems, AI agents, Store, Order App, and uvp-client understand the same coordination boundary. Real contracts keep defining business responsibility; Zhixu writes the coordination boundary as executable signal rules.
 
 When continuing to the core objects, start with [Core Concepts Entry](../concepts/README.md) and [The Zhixu DSL](../concepts/core/zhixu.md).
 

@@ -7,7 +7,9 @@ status: verified
 
 # Product API
 
-The Product API is the main entry point for ordinary participants, the Order App, executor-kit, and agent adapters to consume the rebuildable service layer. It translates chain-event projections into orders, tasks, timelines, proofs, and submission containers in ordinary user language.
+> Target boundary (ARCHITECTURE.md §2.1): after Phase B, chain-services keeps only chain projection and the generic read API; part of the Product routes documented here are legacy surfaces pending removal. Current state: `docs/IMPLEMENTATION_TRACE.md`.
+
+The Product API is the main entry point for ordinary participants, the Order App, uvp-client, and agent adapters to consume the rebuildable service layer. It translates chain-event projections into orders, tasks, timelines, proofs, and submission containers in ordinary user language.
 
 ## Code Entry Points
 

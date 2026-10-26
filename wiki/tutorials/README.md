@@ -22,7 +22,7 @@ status: verified
 
 完成第一遍之后，再进入工程路径：
 
-1. [Plan 与订单生命周期](../concepts/lifecycle.md)：用同一条订单看 Store、compiler、Identity Registry、state machine、Chain Services、Order App 和 executor-kit 的位置。
+1. [Plan 与订单生命周期](../concepts/lifecycle.md)：用同一条订单看 Store、compiler、Identity Registry、state machine、Chain Services、Order App 和 uvp-client 的位置。
 
 
 2. [架构总览](../concepts/architecture.md)：看模块边界、依赖方向、事实源和数据流。

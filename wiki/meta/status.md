@@ -18,7 +18,7 @@ status: verified
 | Identity Registry | `UVPIdentityRegistry` 记录线下 subject 与钱包绑定，并支持绑定撤销。 |
 | Chain Services | 从链事件重建 Plan、Order、task、proof、identity 与 deployment 投影，并承载链下工作流数据。 |
 | Store | 维护 Zhixu 展示、供应商资料、搜索匹配、推荐、联系与治理审计等 Store 数据。 |
-| Order App / executor-kit | 参与者读取被分配的任务、准备签名、提交业务动作并核对证明。 |
+| Order App / uvp-client | Order App 完成开单/邀请/接受/房间；uvp-client 在 browser/headless/cli 中提供签名、watch 与 signal 提交。 |
 
 ## 当前边界
 

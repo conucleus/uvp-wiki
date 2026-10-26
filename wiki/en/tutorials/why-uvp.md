@@ -56,7 +56,7 @@ The table below is an explanatory comparison: transaction-cost categories help e
 | Agreement cost | Zhixu DSL, Plan, plan hash, file resources, supplier requirements. |
 | Coordination cost | Source, Signal, Hook, Trigger, Order, executor authorization. |
 | Supervision cost | Evidence metadata, payload hash, metadata URI, proof row, timeline. |
-| Integration cost | Product DTO, Chain Services, executor-kit, adapter/periphery boundary. |
+| Integration cost | Product DTO, Chain Services, uvp-client, adapter/periphery boundary. |
 | Dispute and denial cost | EIP-712 signatures, `SignalSubmitted`, `HookReady`, Identity Registry events, replayable chain proof. |
 
 This table turns production relationships that used to depend on experience, contracts, emails, screenshots, and platform back offices into objects that can be verified, indexed, composed, and replayed.

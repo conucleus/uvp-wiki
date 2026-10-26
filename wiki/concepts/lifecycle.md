@@ -15,7 +15,7 @@ status: verified
 | 发布 | Publisher、Protocol Bindings、StateMachine | EIP-712 publisher 签名与 Plan 事件。 |
 | 身份解析 | Store、Identity Registry | Store 线下资料与 subject/account binding。 |
 | 创建订单 | Product BFF、Order participants | creator 签名、参与者接受记录与订单授权。 |
-| 推进订单 | Order App、executor-kit、StateMachine | submitter 签名、Signal 与 Hook 事件。 |
+| 推进订单 | Order App、uvp-client、StateMachine | submitter 签名、Signal 与 Hook 事件。 |
 | 展示与验证 | Chain Services、Product DTO | 可重放链事件、hash 与 projection。 |
 
 ## 1. 编写与编译

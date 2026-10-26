@@ -2,14 +2,14 @@
 title: Order App
 type: explanation
 audience: 参与者、前端工程师
-preread: order-app-vs-executor-kit.md
+preread: order-app-vs-uvp-client.md
 status: verified
 ---
 
 # Order App
 
-> Prerequisite reading: [Order App vs Executor Kit](order-app-vs-executor-kit.md)
-`uvp-order-app/app` is the ordinary participant interface for order fulfillment. Like executor-kit it is a signal producer, but its default reader is human: participants open tasks, check wallet responsibility, prepare evidence fingerprints, confirm signatures, submit, and read proof back.
+> Prerequisite reading: [Order App vs UVP Client](order-app-vs-uvp-client.md)
+`uvp-order-app/app` is the ordinary participant interface for order fulfillment. Like uvp-client it is a signal producer, but its default reader is human: participants open tasks, check wallet responsibility, prepare evidence fingerprints, confirm signatures, submit, and read proof back.
 
 It does not own order facts. Orders, signals, hooks, and proof come from replayable `UVPStateMachine` events; optional name resolution comes from `UVPIdentityRegistry`. The Order App consumes Product DTOs and signal containers exposed by Chain Services.
 
@@ -37,17 +37,17 @@ The following is a snapshot as of writing; the repository is authoritative.
 | Proof | `uvp-order-app/app/src/proof/` | Shows proof rows, submission status, and on-chain provenance. |
 | Notifications | `uvp-order-app/app/src/notifications/` | Shows coordination reminders without changing on-chain state. |
 
-## Split from Executor Kit
+## Split from UVP Client
 
-Order App faces human participants while executor-kit faces automation and enterprise integration; for the common boundary — neither can bypass order-level signal authorization, EIP-712 business signatures, first-writer-wins, and other protocol invariants — see [Common boundaries](order-app-vs-executor-kit.md#common-boundaries), with the invariant overview in [Protocol boundaries](../protocol-boundaries.md).
+Order App faces human participants while uvp-client faces automation and enterprise integration; for the common boundary — neither can bypass order-level signal authorization, EIP-712 business signatures, first-writer-wins, and other protocol invariants — see [Common boundaries](order-app-vs-uvp-client.md#common-boundaries), with the invariant overview in [Protocol boundaries](../protocol-boundaries.md).
 
 ## Interface language boundary
 
-Ordinary participant interfaces use only task language (todos, submit confirmation, credential fingerprints, proof); HookPlan, sourceId, ABI, calldata, and gas appear only in advanced or debug views — full statement in [Order App vs Executor Kit](order-app-vs-executor-kit.md).
+Ordinary participant interfaces use only task language (todos, submit confirmation, credential fingerprints, proof); HookPlan, sourceId, ABI, calldata, and gas appear only in advanced or debug views — full statement in [Order App vs UVP Client](order-app-vs-uvp-client.md).
 
 ## Related pages
 
-- [Order App vs Executor Kit](order-app-vs-executor-kit.md)
+- [Order App vs UVP Client](order-app-vs-uvp-client.md)
 - [Product DTO and User Surfaces](../product/README.md)
-- [Executor Kit](executor-kit.md)
+- [UVP Client](uvp-client.md)
 - [Chain Services](../services/chain-services.md)

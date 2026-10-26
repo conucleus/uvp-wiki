@@ -13,7 +13,7 @@ status: verified
 
 ## 事实源
 
-合约和链事件是 plan、order、signal、hook、publication、deployment cutover 的唯一事实源。后端、Store、Order App、executor-kit 和 periphery adapter 只能消费、投影、展示、中继或扩展核心状态，不能改写它们。数据流与判定规则详见 [数据流与事实源](data-flow-and-truth.md)。
+合约和链事件是 plan、order、signal、hook、publication、deployment cutover 的唯一事实源。后端、Store、Order App、uvp-client 和 periphery adapter 只能消费、投影、展示、中继或扩展核心状态，不能改写它们。数据流与判定规则详见 [数据流与事实源](data-flow-and-truth.md)。
 
 ## 可重建性
 
@@ -43,11 +43,11 @@ Order 一旦注册即是一条独立事实流；核心协议不为 Order 定义 
 
 ## 产品表面与服务边界
 
-Product API 可以准备 typed data、验证签名、调用 relayer 并返回 proof，但授权检查始终由合约执行；Store review 是平台 workflow，不等于 trust publication；Order App 与 executor-kit 不暴露 HookPlan/sourceId/ABI/calldata/gas 细节，也不能绕过订单级 signal 授权。角色名称只负责展示，权利来自链上授权状态。
+Product API 可以准备 typed data、验证签名、调用 relayer 并返回 proof，但授权检查始终由合约执行；Store review 是平台 workflow，不等于 trust publication；Order App 与 uvp-client 不暴露 HookPlan/sourceId/ABI/calldata/gas 细节，也不能绕过订单级 signal 授权。角色名称只负责展示，权利来自链上授权状态。
 
 ## 外围适配
 
-funding、USDC、资金托管、guarantee、settlement、支付、物流和企业系统 adapter 都属于 periphery 语境（`uvp-periphery/`）：它们围绕核心状态机运行，消费 `UVPStateMachine`、可选的 Identity Registry 名称解析、Product DTO 或 executor-kit 接口，但不得把资金、担保、付款、释放、退款、争议赔付等状态改造成新的核心事实源。
+funding、USDC、资金托管、guarantee、settlement、支付、物流和企业系统 adapter 都属于 periphery 语境（`uvp-periphery/`）：它们围绕核心状态机运行，消费 `UVPStateMachine`、可选的 Identity Registry 名称解析、Product DTO 或 uvp-client 接口，但不得把资金、担保、付款、释放、退款、争议赔付等状态改造成新的核心事实源。
 
 ## 公共接口纪律
 

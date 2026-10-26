@@ -66,7 +66,7 @@ Changes to ABI, bytecode, selectors, event topics, typed-data fields, canonical 
 CompactHook, event, selector, and EIP-712 fields are pinned by
 `fixtures/uvp-state-machine.v0.12.json`, the module fixtures, and
 `pnpm verify:protocol-freeze`. A change must update bindings, indexers,
-executor-kit, and bootstrap together; updating one fixture in isolation is not
+uvp-client, and bootstrap together; updating one fixture in isolation is not
 an accepted migration.
 
 ## Related Pages

@@ -13,7 +13,7 @@ status: verified
 
 ## 谁使用
 
-凝结核在 stage 上声明 fileResources；Store/Product API 用它展示协议与证据要求；Order App 和 executor-kit 把它翻译成上传与校验流程；operator 在 resource patch 时使用同样的句柄模型。
+凝结核在 stage 上声明 fileResources；Store/Product API 用它展示协议与证据要求；Order App 和 uvp-client 把它翻译成上传与校验流程；operator 在 resource patch 时使用同样的句柄模型。
 
 ## 产生什么结果
 
@@ -52,7 +52,7 @@ fileResources:
       objectKey: "protocols/payment-settlement-v1.json"
 ```
 
-这个 YAML 给 Store、Product API、executor-kit 或 adapter 一个资源句柄：可以显示协议、计算 hash、提示证据要求、检查验收规则。链上保存 hash、URI 或 patch event。
+这个 YAML 给 Store、Product API、uvp-client 或 adapter 一个资源句柄：可以显示协议、计算 hash、提示证据要求、检查验收规则。链上保存 hash、URI 或 patch event。
 
 ## fileType 的含义
 
@@ -92,7 +92,7 @@ Store 可以把资源句柄组织成：
 - manifest hash、metadata URI、content hash、ciphertext hash；
 - 是否缺资源、资源是否过期、是否需要 operator 审核。
 
-Order App 和 executor-kit 把它翻译成“需要上传什么证据、hash 是什么、proof 在哪里”。普通参与者界面不展示 bucket secret、storage credential、presigned URL 或内部对象路径。
+Order App 和 uvp-client 把它翻译成“需要上传什么证据、hash 是什么、proof 在哪里”。普通参与者界面不展示 bucket secret、storage credential、presigned URL 或内部对象路径。
 
 ## 不允许的用法
 

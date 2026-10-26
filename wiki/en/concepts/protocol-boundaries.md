@@ -15,7 +15,7 @@ One doctrinal sentence frames all the boundaries below: the system promises corr
 
 ## Source of Truth
 
-Contracts and chain events are the only source of truth for plan, order, signal, hook, publication, and deployment cutover state. Backends, Store, Order App, executor-kit, and periphery adapters may consume, project, present, relay, or extend core state — they cannot rewrite it. See [Data Flow and Source of Truth](data-flow-and-truth.md).
+Contracts and chain events are the only source of truth for plan, order, signal, hook, publication, and deployment cutover state. Backends, Store, Order App, uvp-client, and periphery adapters may consume, project, present, relay, or extend core state — they cannot rewrite it. See [Data Flow and Source of Truth](data-flow-and-truth.md).
 
 ## Rebuildability
 
@@ -45,11 +45,11 @@ Once registered, an Order is an independent fact stream; the core protocol defin
 
 ## Product Surfaces and Service Boundaries
 
-Product API may prepare typed data, verify signatures, call the relayer, and return proofs, but authorization checks always execute in the contract; Store review is platform workflow, not trust publication; Order App and executor-kit never expose HookPlan/sourceId/ABI/calldata/gas details and cannot bypass order-level signal authorization. Role names are display-only; rights come from on-chain authorization state.
+Product API may prepare typed data, verify signatures, call the relayer, and return proofs, but authorization checks always execute in the contract; Store review is platform workflow, not trust publication; Order App and uvp-client never expose HookPlan/sourceId/ABI/calldata/gas details and cannot bypass order-level signal authorization. Role names are display-only; rights come from on-chain authorization state.
 
 ## Periphery Adapters
 
-Funding, USDC, settlement custody, guarantee, payments, logistics, and enterprise-system adapters belong to periphery (`uvp-periphery/`): they run around the core state machine, consuming `UVPStateMachine`, optional Identity Registry name resolution, Product DTO, or executor-kit interfaces — they must not turn funding, guarantee, payment, release, refund, or disputed-payout state into new core facts.
+Funding, USDC, settlement custody, guarantee, payments, logistics, and enterprise-system adapters belong to periphery (`uvp-periphery/`): they run around the core state machine, consuming `UVPStateMachine`, optional Identity Registry name resolution, Product DTO, or uvp-client interfaces — they must not turn funding, guarantee, payment, release, refund, or disputed-payout state into new core facts.
 
 ## Public Interface Discipline
 

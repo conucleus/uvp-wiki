@@ -7,7 +7,7 @@ status: verified
 
 # Indexer 与投影
 
-Indexer 是可重建服务层的重放入口。它从链读取 `UVPDeploymentRegistry`、`UVPStateMachine` 和 `UVPIdentityRegistry` 事件，把日志归一化成服务内部事件，再投影成 Product、Store、executor-kit 和 ops 能查询的视图。
+Indexer 是可重建服务层的重放入口。它从链读取 `UVPDeploymentRegistry`、`UVPStateMachine` 和 `UVPIdentityRegistry` 事件，把日志归一化成服务内部事件，再投影成 Product、Store、uvp-client 和 ops 能查询的视图。
 
 它负责重放事实、建立读模型。投影数据库可以让 UI 快速查询订单、任务、proof 和 trust；擦掉数据库后必须能从配置的 deployment block 重新建立。
 
@@ -37,7 +37,7 @@ Indexer 至少要处理三类来源：
 | 投影 | 消费方 | 注意事项 |
 | --- | --- | --- |
 | order projection | Product API、Store order search。 | 必须带 `chainId`、`stateMachineAddress`、`deploymentId`。 |
-| task projection | Order App、executor-kit、Product `/me/tasks`。 | 来自 hook readiness 和 submitter authorization，不来自后台手工分配。 |
+| task projection | Order App、uvp-client、Product `/me/tasks`。 | 来自 hook readiness 和 submitter authorization，不来自后台手工分配。 |
 | timeline projection | Product proof、Store runtime proof。 | 每一行都要能回到 tx/block/event。 |
 | proof projection | UI proof drawer、审计、release evidence。 | 保存 event proof，不保存证据明文。 |
 | identity projection | Store catalog、Product catalog、supplier directory。 | revoked 保持 revoked/blocked 展示。 |

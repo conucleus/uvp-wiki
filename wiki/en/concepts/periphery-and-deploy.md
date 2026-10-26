@@ -19,7 +19,7 @@ status: verified
 - Industry demos or scenario adapters.
 - Executor demos.
 
-Periphery may consume `UVPStateMachine`, optional `UVPIdentityRegistry` name resolution, Product DTOs, or executor-kit. It must not turn funding, guarantee, payment, release, refund, or disputed-payout states into a new core source of truth.
+Periphery may consume `UVPStateMachine`, optional `UVPIdentityRegistry` name resolution, Product DTOs, or uvp-client. It must not turn funding, guarantee, payment, release, refund, or disputed-payout states into a new core source of truth.
 
 ## Scenario Adaptation Principle
 

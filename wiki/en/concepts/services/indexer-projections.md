@@ -7,7 +7,7 @@ status: verified
 
 # Indexer and Projections
 
-The indexer is the replay entry point of the rebuildable service layer. It reads `UVPDeploymentRegistry`, `UVPStateMachine`, and `UVPIdentityRegistry` events from chain, normalizes logs into internal service events, and projects views that Product, Store, executor-kit, and ops can query.
+The indexer is the replay entry point of the rebuildable service layer. It reads `UVPDeploymentRegistry`, `UVPStateMachine`, and `UVPIdentityRegistry` events from chain, normalizes logs into internal service events, and projects views that Product, Store, uvp-client, and ops can query.
 
 It is responsible for replaying facts and building read models. The projection database lets the UI quickly query orders, tasks, proof, and trust; after the database is wiped it must be rebuildable from the configured deployment block.
 
@@ -37,7 +37,7 @@ The indexer must handle at least three sources:
 | Projection | Consumers | Notes |
 | --- | --- | --- |
 | Order projection | Product API, Store order search. | Must carry `chainId`, `stateMachineAddress`, and `deploymentId`. |
-| Task projection | Order App, executor-kit, Product `/me/tasks`. | Derived from hook readiness and submitter authorization, not manual backend assignment. |
+| Task projection | Order App, uvp-client, Product `/me/tasks`. | Derived from hook readiness and submitter authorization, not manual backend assignment. |
 | Timeline projection | Product proof, Store runtime proof. | Every row must trace back to a tx/block/event. |
 | Proof projection | UI proof drawer, audits, release evidence. | Stores event proof, not plaintext evidence. |
 | Identity projection | Store catalog, Product catalog, supplier directory. | Revoked stays displayed as revoked/blocked. |

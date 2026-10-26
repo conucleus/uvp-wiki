@@ -17,57 +17,74 @@ pnpm lint
 pnpm verify:protocol-freeze
 ```
 
-## executor-kit CLI
+## uvp-client CLI
 
-完整语义见 [Executor Kit](../concepts/apps/executor-kit.md)。这里保留命令速查。
+完整语义见 [UVP Client](../concepts/apps/uvp-client.md)。CLI 只覆盖执行者命令：wallet、faucet、doctor、chain-once、chain-watch、chain-signal。
+
+```bash
+pnpm --filter @uvp-eth/uvp-client cli -- --help
+```
 
 生成或查看钱包：
 
 ```bash
-pnpm --filter @uvp-eth/executor-kit cli -- wallet new --env-file .env.local
-pnpm --filter @uvp-eth/executor-kit cli -- wallet address \
+pnpm --filter @uvp-eth/uvp-client cli -- wallet new --env-file .env.local
+pnpm --filter @uvp-eth/uvp-client cli -- wallet address \
   --private-key-env UVP_ETH_DEPLOYER_PRIVATE_KEY
 ```
 
-Product API doctor：
+非花费 doctor（config、RPC chain id/head、合约代码、signer；失败退出码 1）：
 
 ```bash
-pnpm --filter @uvp-eth/executor-kit cli -- doctor \
-  --chain-services-url http://127.0.0.1:8787 \
-  --wallet-address 0x0000000000000000000000000000000000000002
-```
-
-Product API task submit：
-
-```bash
-pnpm --filter @uvp-eth/executor-kit cli -- product prepare task_123 \
-  --chain-services-url http://127.0.0.1:8787 \
-  --wallet-address 0x0000000000000000000000000000000000000002 \
-  --evidence-id ev_123 \
-  --intent confirm_stage \
-  --prepared-file .uvp-prepared-submit.json
-
-UVP_PARTICIPANT_PRIVATE_KEY=0x... \
-pnpm --filter @uvp-eth/executor-kit cli -- product submit task_123 \
-  --chain-services-url http://127.0.0.1:8787 \
-  --prepared-file .uvp-prepared-submit.json \
-  --private-key-env UVP_PARTICIPANT_PRIVATE_KEY
-```
-
-Chain watcher dry-run（`--dry-run` 仍是显式测试辅助：只演练扫描与准备，不提交任何交易）。示例 config 的 `stateMachines[]` 已声明被扫描的 state machine，因此不传 `--state-machine`——两者并存会被直接拒绝，扫描集合必须只在一处声明：
-
-```bash
-pnpm --filter @uvp-eth/executor-kit cli -- chain-once \
+pnpm --filter @uvp-eth/uvp-client cli -- doctor \
+  --config uvp-client/package/fixtures/state-machine-executor.config.json \
   --rpc-url http://127.0.0.1:8545 \
   --chain-id 31337 \
-  --config uvp-executor-kit/package/fixtures/state-machine-executor.config.json \
+  --state-machine 0x0000000000000000000000000000000000000001
+```
+
+Chain watcher dry-run（`--dry-run` 只演练扫描与准备，不提交交易）。示例 config 的 `stateMachines[]` 已声明被扫描的 state machine，因此不传 `--state-machine`——两者并存会被直接拒绝，扫描集合必须只在一处声明：
+
+```bash
+pnpm --filter @uvp-eth/uvp-client cli -- chain-once \
+  --rpc-url http://127.0.0.1:8545 \
+  --chain-id 31337 \
+  --config uvp-client/package/fixtures/state-machine-executor.config.json \
   --wallet-address 0x0000000000000000000000000000000000000002 \
   --dry-run
 ```
 
-`--state-machine` 只在 config 未声明 `stateMachines[]` 时使用（二选一，同时给出即报错）。
+单笔 signal：
 
-`chain-once` 与 `jobs retry` 的退出码语义：扫描结果包含 error，或存在 failed/dead_letter job 时，进程以退出码 1 结束。调度器和 CI 应把非零退出视为本轮失败，而不是静默继续。
+```bash
+pnpm --filter @uvp-eth/uvp-client cli -- chain-signal \
+  --rpc-url http://127.0.0.1:8545 \
+  --state-machine 0x0000000000000000000000000000000000000001 \
+  --chain-id 31337 \
+  --plan-id 0x2222222222222222222222222222222222222222222222222222222222222222 \
+  --order-id 0x1111111111111111111111111111111111111111111111111111111111111111 \
+  --source slot-a \
+  --stage exec.main \
+  --signal-name cmp \
+  --payload-hash 0x3333333333333333333333333333333333333333333333333333333333333333 \
+  --wallet-address 0x0000000000000000000000000000000000000002 \
+  --dry-run
+```
+
+退出码：`chain-once`/`chain-watch` 在扫描结果含非 benign error，或存在 failed/dead_letter job 时以 1 结束。jobs 的 retry/dead/live 运维由 SDK（`retryStateMachineJob`、`deadLetterStateMachineJob`、`reviveStateMachineJob`）承担，不再是 CLI 子命令。
+
+## uvp-client 入口
+
+```ts
+import { ... } from '@uvp-eth/uvp-client/core';
+import { ... } from '@uvp-eth/uvp-client/browser';
+import { ... } from '@uvp-eth/uvp-client/headless';
+```
+
+- `core`：transport/auth、chain target、signal build/decode/submit、validation、evidence。
+- `browser`：Product V3 客户端、EIP-1193 签名、session/deadline/format、typed-data 校验；宿主注入 provider 与会话。
+- `headless`：私钥钱包、watcher/job store、doctor。
+- `cli`：`buildProgram`/`main`（bin `uvp-client`）。
 
 ## chain-services Storage
 
@@ -78,33 +95,3 @@ CHAIN_SERVICES_DATABASE_URL=postgres://uvp:uvp@127.0.0.1:5432/uvp_chain_services
 ```
 
 `CHAIN_SERVICES_DATABASE_URL` 全环境必填，本地与测试也不例外；缺失时启动即失败并报出键名。值必须是 `postgres://`（或 `postgresql://`）DSN：driver 开关 `CHAIN_SERVICES_DATABASE_DRIVER` 已删除，SQLite 与内存引擎已移除，没有隐式默认值。
-
-本地 Postgres 示例（一次性 docker 库，DSN 注入后运行命令，退出即销毁容器）：
-
-```bash
-cd uvp-chain-services/service
-CHAIN_SERVICES_MIGRATIONS_AUTO_RUN=true \
-./scripts/with-postgres.sh CHAIN_SERVICES_DATABASE_URL -- pnpm dev:api
-```
-
-## Frontend Config
-
-Store：
-
-```text
-VITE_UVP_CHAIN_SERVICES_URL
-VITE_UVP_STORE_ACCESS_LEVEL
-```
-
-Store 访问级别只来自这些环境变量与登录会话；不存在 `?storeAccess` query 参数，也没有 localStorage 覆盖链。
-
-Order App：
-
-```text
-VITE_UVP_CHAIN_SERVICES_URL
-VITE_UVP_ORDER_APP_WALLET_ADDRESS
-```
-
-不存在 `VITE_UVP_DEMO_MODE`、`VITE_UVP_DEMO_SELECTED`、`VITE_UVP_ORDER_APP_DEMO` 变量，没有 demo profile，也没有 `?fallback=demo` query 参数。
-
-Production/staging profile 只需拒绝 permissive authorization 等宽松配置——仓库不含任何 demo/fixture/mock 路径，不存在可以打开的 demo 或 test-control 开关。

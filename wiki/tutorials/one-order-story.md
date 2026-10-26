@@ -97,7 +97,7 @@ UVP 的第一个核心动作，是把“生产关系 + 信号边界”写成计�
 失败、超时、拒绝或改派时走哪条路径
 ```
 
-Zhixu 是一份让计算机、链上合约、企业系统、AI agent、Store、Order App 和 executor-kit 理解同一套协作边界的标准语言。现实合同继续约定商业责任，Zhixu 负责把协作边界写成可执行的信号规则。
+Zhixu 是一份让计算机、链上合约、企业系统、AI agent、Store、Order App 和 uvp-client 理解同一套协作边界的标准语言。现实合同继续约定商业责任，Zhixu 负责把协作边界写成可执行的信号规则。
 
 继续读核心对象时，从 [核心概念入口](../concepts/README.md) 和 [秩序 (Zhixu) DSL](../concepts/core/zhixu.md) 开始。
 

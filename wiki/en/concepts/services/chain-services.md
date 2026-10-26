@@ -9,13 +9,15 @@ status: verified
 
 `uvp-chain-services/service` is the rebuildable service layer of the UVP EVM track. It is not the source of protocol truth; contracts and chain events are. Chain Services provides rebuildable replay, projection, relaying, verification, and HTTP APIs. The compiler turns a Zhixu into deterministic artifacts, the state machine owns on-chain facts, and Chain Services owns off-chain projections and service operation.
 
-It is a forkable off-chain service package. Any participant, nucleus, supplier, auditor, or third-party integration can download, fork, compile, and run its own instance; as long as it respects the ABI, event, EIP-712, canonical hash, Product DTO, and Store/Product API boundaries, different instances can rebuild the same class of fact views from the same set of chain events.
+> Target boundary (ARCHITECTURE.md §2.1): only the chain indexer, projection, generic read API, optional relay, proof verifier, and chain health remain. `src/order` and `src/store` business modules are Phase B legacy surfaces still present; current implementation state is in `docs/IMPLEMENTATION_TRACE.md`.
+
+It is a forkable off-chain service package. Any participant, nucleus, auditor, or third-party integration can download, fork, compile, and run its own instance; as long as it respects the ABI, event, EIP-712, canonical hash, and generic read API boundaries, different instances can rebuild the same class of fact views from the same set of chain events.
 
 ```text
 UVPDeploymentRegistry / UVPStateMachine / UVPIdentityRegistry events
   -> chain-services indexer and replayed projections
   -> proof verifier / relayer boundary / workflow stores
-  -> Product API / Store Console API / executor-kit integration / ops views
+  -> generic read API / uvp-client integration / ops views
 ```
 
 ## Why It Is Rebuildable

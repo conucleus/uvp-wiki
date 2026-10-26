@@ -15,7 +15,7 @@ Hook 本身只是条件。带 `emitReady=true` 的 hook Ready 时，链上才会
 
 ## 谁使用
 
-凝结核在 stage 的 `receiveSignals` 里声明 hook 条件；编译器把它们规范化并编入 Plan；状态机在订单事件上求值；Product/Store/executor-kit 跟随 `HookReady` 创建任务和通知。跨源事实通过 `::ANCHOR(@source::stage.signal)` 订阅进入路由层，`mint: per-fact` 决定是否从每条事实代铸订单。
+凝结核在 stage 的 `receiveSignals` 里声明 hook 条件；编译器把它们规范化并编入 Plan；状态机在订单事件上求值；Product/Store/uvp-client 跟随 `HookReady` 创建任务和通知。跨源事实通过 `::ANCHOR(@source::stage.signal)` 订阅进入路由层，`mint: per-fact` 决定是否从每条事实代铸订单。
 
 ## 产生什么结果
 
@@ -80,7 +80,7 @@ Hook 表达式里的 `~A` 是存在逻辑里的缺席判断。它表示“当前
 
 ## Ready 与订单入口
 
-只有 `emitReady=true` 的 hook 在合约里第一次变成 `Ready` 时会发出 `HookReady`；`orderTriggerKind` 取 `none`、`mint` 或 `dock`。Product 任务创建、Store 通知和 executor-kit watcher 都跟随 `HookReady`，UI 草稿或后端临时状态只用于辅助展示。
+只有 `emitReady=true` 的 hook 在合约里第一次变成 `Ready` 时会发出 `HookReady`；`orderTriggerKind` 取 `none`、`mint` 或 `dock`。Product 任务创建、Store 通知和 uvp-client watcher 都跟随 `HookReady`，UI 草稿或后端临时状态只用于辅助展示。
 
 详细语义见 [Trigger](trigger.md)。
 

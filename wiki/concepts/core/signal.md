@@ -13,7 +13,7 @@ Signal 是订单状态机接受的最小业务输入。它代表“某个被授�
 
 ## 谁使用
 
-被授权的 submitter（参与方钱包、executor、adapter）提交 signal；合约校验并记录；Product/Store/executor-kit 把 `SignalSubmitted` 投影成任务完成状态和 proof row。
+被授权的 submitter（参与方钱包、executor、adapter）提交 signal；合约校验并记录；Product/Store/uvp-client 把 `SignalSubmitted` 投影成任务完成状态和 proof row。
 
 ## 产生什么结果
 

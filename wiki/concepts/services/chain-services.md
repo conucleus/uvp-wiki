@@ -9,13 +9,15 @@ status: verified
 
 `uvp-chain-services/service` 是 UVP EVM 轨道的可重建服务层。它不是协议事实源；合约和链事件才是协议事实源，Chain Services 提供可重建的 replay、projection、relaying、verification 和 HTTP API。compiler 负责把 Zhixu 变成确定性产物，state machine 负责链上事实，Chain Services 负责链下投影和服务运行。
 
-它是可 fork 的链下服务包。任何参与者、凝结核、供应商、审计方或第三方集成都可以下载、fork、编译并运行自己的实例；只要遵守 ABI、event、EIP-712、canonical hash、Product DTO 和 Store/Product API 边界，不同实例可以从同一组链事件重建同一类事实视图。
+它是可 fork 的链下服务包。任何参与者、凝结核、审计方或第三方集成都可以下载、fork、编译并运行自己的实例；只要遵守 ABI、event、EIP-712、canonical hash 和 generic read API 边界，不同实例可以从同一组链事件重建同一类事实视图。
+
+> 目标边界（ARCHITECTURE.md §2.1）：只保留 chain indexer、projection、generic read API、可选 relay、proof verifier 与 chain health。`src/order`、`src/store` 等业务模块是 Phase B 待迁移的遗留面，当前实现状态见 `docs/IMPLEMENTATION_TRACE.md`。
 
 ```text
 UVPDeploymentRegistry / UVPStateMachine / UVPIdentityRegistry events
   -> chain-services indexer and replayed projections
   -> proof verifier / relayer boundary / workflow stores
-  -> Product API / Store Console API / executor-kit integration / ops views
+  -> generic read API / uvp-client integration / ops views
 ```
 
 ## 为什么可重建

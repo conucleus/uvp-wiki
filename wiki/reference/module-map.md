@@ -13,10 +13,10 @@ status: verified
 | --- | --- | --- |
 | [uvp-core](https://github.com/conucleus/uvp-core) | `uvp-core/` | Rust 规范语义核心、golden corpus、CLI/FFI/N-API adapters。 |
 | [uvp-protocol](https://github.com/conucleus/uvp-protocol) | `uvp-protocol/` | compiler、HookPlan、state-machine reference、contracts、ABI/EIP-712、Product DTO。 |
-| [uvp-chain-services](https://github.com/conucleus/uvp-chain-services) | `uvp-chain-services/` | indexer、submission 广播（relayer 角色）、proof verifier、Product/Store API、projection、workflow runtime。 |
-| [zhixu-store](https://github.com/conucleus/zhixu-store) | `zhixu-store/` | Store/workbench frontend、catalog、supplier directory、identity/proof views。 |
-| [uvp-order-app](https://github.com/conucleus/uvp-order-app) | `uvp-order-app/` | participant Order App、task inbox、evidence/proof display、readiness checks。 |
-| [uvp-executor-kit](https://github.com/conucleus/uvp-executor-kit) | `uvp-executor-kit/` | executor CLI/SDK、chain watcher、Product API signal producer、adapter integration。 |
+| [uvp-chain-services](https://github.com/conucleus/uvp-chain-services) | `uvp-chain-services/` | chain indexer、projection、generic read API、可选 relay、proof verifier、chain health。 |
+| [zhixu-store](https://github.com/conucleus/zhixu-store) | `zhixu-store/` | 托管 `@uvp-eth/zhixu-registry`：permissionless 的 ZhixuRecord / IdentityClaim 登记数据层（无 UI、无审核）。 |
+| [uvp-order-app](https://github.com/conucleus/uvp-order-app) | `uvp-order-app/` | 单一参与者流程：钱包会话、订单草稿/邀请/finalize、订单房间。 |
+| [uvp-client](https://github.com/conucleus/uvp-client) | `uvp-client/` | 公共客户端四入口（core/browser/headless/cli）：transport、Product V3 客户端、EIP-1193 钱包、watcher、执行者 CLI。 |
 
 ## Workspace 模块
 
@@ -29,10 +29,10 @@ status: verified
 | `uvp-protocol/packages/protocol-bindings` | `@uvp-eth/protocol-bindings` | ABI、EIP-712、calldata、hash helpers | private keys、env、watcher、tx submit |
 | `uvp-protocol/contracts/uvp-contracts` | Foundry project | Solidity contracts、ABI fixture、contract tests | backend service code |
 | `uvp-protocol/packages/product-dto` | `@uvp-eth/product-dto` | product-facing DTO contracts | React、wallet、storage、chain client |
-| `uvp-chain-services/service` | `@uvp-eth/chain-services` | indexer、submission 广播（relayer 角色）、proof verifier、Product/Store APIs；详见 [Chain Services](../concepts/services/chain-services.md) | 协议事实源 |
-| `zhixu-store/app` | `@uvp-eth/zhixu-store-web` | Store/workbench frontend | old Go-coupled Store BFF |
-| `uvp-order-app/app` | `@uvp-eth/order-app` | participant task/signal console | Store Console、付款占位（不托管资金） |
-| `uvp-executor-kit/package` | `@uvp-eth/executor-kit` | executor CLI/SDK、chain watcher、Product API signal producer | privileged backend truth |
+| `uvp-chain-services/service` | `@uvp-eth/chain-services` | chain indexer、projection、generic read API、可选 relay、proof verifier；详见 [Chain Services](../concepts/services/chain-services.md) | 协议事实源、订单/Store 业务权威 |
+| `zhixu-store/registry` | `@uvp-eth/zhixu-registry` | ZhixuRecord / IdentityClaim 登记数据层（permissionless、无审核） | 商店/UI、订单授权、KYC |
+| `uvp-order-app/app` | `@uvp-eth/order-app` | 单一参与者流程（开单/邀请/接受/房间） | 订单状态所有权、托管资金 |
+| `uvp-client/package` | `@uvp-eth/uvp-client` | core/browser/headless SDK 入口 + executor CLI（watch/signal/doctor/wallet） | privileged backend truth、server |
 | `uvp-deploy/deploy` | `@uvp-eth/deploy` | deploy scripts、manifests、release records | external deploy repo（see `uvp-deploy` workspace） |
 | `uvp-deploy/apps/ops-console-web` | `@uvp-eth/ops-console-web` | operator console prototype | protocol runtime |
 | `uvp-periphery` | mixed | funding/payment/guarantee/agent adapters and demos | core protocol truth |
@@ -49,9 +49,9 @@ uvp-protocol/packages/statemachine
 uvp-protocol/packages/product-dto
 uvp-protocol/packages/protocol-bindings
 uvp-chain-services/service
-uvp-executor-kit/package
+uvp-client/package
 uvp-order-app/app
-zhixu-store/app
+zhixu-store/registry
 uvp-deploy/deploy
 uvp-deploy/apps/*
 uvp-periphery/executors/*
