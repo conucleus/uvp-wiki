@@ -25,7 +25,7 @@ status: verified
 | Derived signal module ABI | `0.5` | Derived signal 模块冻结 ABI（EIP-712 domain version `0.6` 不变）；B-03：`DerivedSignalSubmitted` 尾参补 `relation`。 |
 | Product submit domain | `0.15` | Product signal submit EIP-712 domain。 |
 | Order-link module ABI | `0.3` | Linked-order 模块冻结 ABI（trigger EIP-712 domain version `0.8`）。 |
-| Stage patch module ABI | `0.5` | Executor/resource patch 所在模块冻结 ABI（patch EIP-712 domains version `0.2`；executor patch 模式词表 assign/handoff 闭集、digest 含 authorizationsHash）。 |
+| Stage patch module ABI | `0.6` | Executor/resource patch 所在模块冻结 ABI（patch EIP-712 domains version `0.2`；executor patch 模式词表 assign/handoff 闭集、digest 含 authorizationsHash；0.6 移除 D13 的 assign/replace 入口，orderCreator 作为 selector 走统一 patch）。 |
 | Docking module ABI | `4.8` | 统一 Zhixu DockRoute：open 建单通道与 attach 挂接通道（接口名叶、mode word）——new 经 `openDockedOrder`（单参数 `OpenDockCallV1`）铸子单，routeHash 域 V3 preimage 钉 targetPlanId（静态路由该槽 = 目标 planId；动态路由零字槽 + 候选叶 V2 `UVP_DOCK_CANDIDATE_V2` 绑定选定目标 planId），open 必过目标侧同意门（目标 plan publisher 本人调用或其 `UVPDockOpenConsentV1` EIP-712 同意签名），镜像计划无法抢注路由；existing 经 `attachDockedOrder` 挂接既有目标单（不铸子单、同意门三腿之一）；每单总挂接边数账本 `dockEdgeCountOfOrder` 上限 `MAX_DOCK_EDGES = 8`（attach 前有界祖先检查防跨单环，最长路径由索引器派生）；EIP-712 domain version `4`。 |
 | Plan metadata module ABI | `0.6` | plan metadata/dock 接口端口校验（含接口名维度）。 |
 | StateMachine lens ABI | `0.4` | dock/order/hook 只读视图。 |
