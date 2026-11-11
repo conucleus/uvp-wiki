@@ -9,7 +9,7 @@ status: verified
 # 秩序 (Zhixu) DSL
 
 > 前置阅读：[核心概念](../README.md)
-`Zhixu` 是“秩序”的拼音。在本仓库里，秩序 (Zhixu) 是凝结核设计出的可复用协作规则书。它用 DSL 声明一类可复用的生产关系：有哪些阶段、每个阶段在哪条 source 因果链上、接收什么 signal、发出什么 signal、是否按事实代铸订单、默认 executor 是谁、哪些阶段能为其他阶段选择 executor、需要哪些资源，以及可选的 dock interface。
+`Zhixu` 是“秩序”的拼音。在本仓库里，秩序 (Zhixu) 是凝结核设计出的可复用协作规则书。它用 DSL 声明一类可复用的生产关系：有哪些阶段、每个阶段在哪条 source 因果链上、接收什么 signal、发出什么 signal、是否承担出生入口（trigger）、默认 executor 是谁、哪些阶段能为其他阶段选择 executor、需要哪些资源，以及可选的 dock interface。
 
 代码入口是 `uvp-protocol/packages/compiler/src/types/index.ts` 的 `ZhixuDefinition`。订单 (Order) 是这份规则书编译、注册之后的一次运行实例。
 
@@ -43,10 +43,8 @@ spec:
   stages:
     - name: intake
       source: customer
-      mint: per-fact
-      receiveSignals:
-        REQUESTED: "::ANCHOR(@customer::submit.requested)"
-      sendSignals: [{name: str}, {name: cmp}, {name: err}]
+      trigger: [requested]
+      sendSignals: [{name: requested}, {name: str}, {name: cmp}, {name: err}]
       executor:
         supplierType: organization
         supplierID: "{{ .intake_executor_uid }}"
@@ -71,7 +69,7 @@ spec:
             err: failed
 ```
 
-这段示例说明三件事：`mint: per-fact` 阶段通过 `ANCHOR(@...)` 订阅事实并按事实纯函数代铸一个订单；普通阶段通过 `receiveSignals` 继续推进；委托阶段把另一条 Zhixu 作为执行接口，并以目标端口名配置 `inputMap/signalMap`。linked 秩序的输出经 proof 校验和授权 submitter 映射后推动本地秩序继续运行。`signalMap` 的协议语义与运行时对接详见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md) 和 [Executor](executor.md)。
+这段示例说明三件事：`trigger` 阶段把 `requested` 声明为出生信号，空 `orderId` 提交命中后建单并写首事实；普通阶段通过 `receiveSignals` 继续推进；委托阶段把另一条 Zhixu 作为执行接口，并以目标端口名配置 `inputMap/signalMap`。linked 秩序的输出经 proof 校验和授权 submitter 映射后推动本地秩序继续运行。`signalMap` 的协议语义与运行时对接详见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md) 和 [Executor](executor.md)。
 
 ## 顶层字段
 
@@ -93,7 +91,7 @@ spec:
 | --- | --- |
 | `name` | 阶段名称，即 `stageIdentifier` 本身，在秩序内全局唯一。 |
 | `source` | 该阶段 signal 所属的因果链；用户角色由 Product/authorization 另行解释。 |
-| `mint` | 可选的出生策略，目前唯一取值为 `per-fact`；声明后每个订阅事实最多代铸一个订单。 |
+| `trigger` | 可选的出生信号集，必须是本 stage `sendSignals` 的子集；空/省略=不能建单，每个条目合成一条 order-trigger hook。 |
 | `receiveSignals` | hook key 到 Hook DSL 表达式的映射。 |
 | `sendSignals` | 阶段完成后可能发出的 signal，条目是对象 `{name, validWhen?}`——`validWhen` 是发射适格声明（表达式列表，见 [Signal](signal.md)）。 |
 | `executor` | 默认执行者配置，指向 supplier 或另一条 Zhixu。 |
@@ -102,17 +100,20 @@ spec:
 
 编译器把 stage 的 `name` 直接作为 `stageIdentifier`。例如 `supplier_sourcing` 会被哈希为链上的 `stageId`。
 
-## `receiveSignals` 与 `mint`
+## `receiveSignals` 与 `trigger`
 
-`receiveSignals` 定义 Hook 条件。普通表达式在当前订单上下文中求值；跨源订阅使用空标头的 `::ANCHOR(@source::stage.signal)`，由事实路由层逐事件投递。阶段是否是出生阶段只由 `mint: per-fact` 声明决定，不通过 `trigger` 或 `externalSignals` 声明入口：
+`receiveSignals` 定义同单 Hook 条件，表达式在当前订单上下文中求值。出生入口由 stage 的 `trigger` 显式声明：
 
 ```yaml
-mint: per-fact
-receiveSignals:
-  REQUESTED: "::ANCHOR(@customer::submit.requested)"
+trigger: [requested]
+sendSignals: [{name: requested}, {name: str}]
 ```
 
-`mint` 只能取 `per-fact`，出生阶段必须包含至少一个 `ANCHOR(@...)` 订阅，并使用静态的 individual/organization executor；编译器会拒绝自环和无界的跨源代铸环。没有 `mint` 的阶段可以用普通 `source::condition` hook，也可以用 `ANCHOR(@...)` 做通道监听；其订单身份由现有订单路由或执行器自报创建。`trigger`、`externalSignals`，以及订阅以外的 wrapper 形态（`::OUTSIDE@`、`::ANCHOR@(…)`）不是合法 DSL，编译器会显式拒绝。
+- `trigger` 可省略或为空（不能建单）；非空时必须是本 stage `sendSignals` 的子集、条目不重复，每个条目合成一条 order-trigger hook。一个 stage 可有多个 trigger 信号，一个 plan 可有多个 trigger stage，且 trigger stage 不必是首个 stage。
+- 空 `orderId` 提交触发 trigger 判定：signal 不在本 stage `trigger` 集合内即拒绝；命中时先在空订单上下文求值该信号的 `validWhen`，不通过拒绝 `SignalAdmissionRejected`，通过后按出生事实派生 oid、建单并写首事实；同一出生事实重试幂等。
+- 带 `orderId` 时 trigger 信号就是普通订单内信号，trigger 身份无关。
+- trigger stage 必须使用静态的非 `zhixu` executor（`supplierID` 必填），不能作为 executor patch 目标；编译器拒绝不满足该约束的 trigger stage。
+- 同秩序普通事实连接使用 `receiveSignals` 的 `source::condition`；跨秩序连接使用 `spec.dockInterface` 与 `executor.zhixuExecutorConfig`，不存在 Hook DSL 形式的跨秩序订阅。
 
 ## `selectedStages`
 

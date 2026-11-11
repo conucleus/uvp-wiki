@@ -19,7 +19,7 @@ status: verified
 
 ## 产生什么结果
 
-每个 source 参与 `signalKey` 的构成：同名 signal 在不同 source 下是不同的链上事实。source 让 hooks 依赖正确的因果线，也让一条 Order 能并行承载多条推进线并在 hook 处交汇。
+每个 source 参与 `signalKey` 的构成：同名 signal 在不同 source 下是不同的链上事实。source 让 hooks 依赖正确的因果线，也让一条 Order 能并行承载多条推进线并在 hook 处交汇。trigger 出生事实同样以 `source::stage.signal` 定位：出生信号属于哪个 source，订单的首事实就落在哪条因果线。
 
 ## 权威来自哪里
 

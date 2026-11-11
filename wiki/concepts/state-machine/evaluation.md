@@ -67,7 +67,7 @@ struct EvalValue {
 }
 ```
 
-`wait/ready/cxl` 是 hook 运行态；云侧语义层另有 `init`（尚未收敛的初始态）等中间态，但它不是链上 `Instruction[]` 的求值结果。跨源订阅统一使用 `::ANCHOR(@source::stage.signal)`；路由层按 source 类逐事件投递，`mint: per-fact` 决定是否从事实代铸订单，汇聚（撮合）语义由无锚监听、多条订阅与执行器配对表达。
+`wait/ready/cxl` 是 hook 运行态；云侧语义层另有 `init`（尚未收敛的初始态）等中间态，但它不是链上 `Instruction[]` 的求值结果。Hook 只在当前订单事件集上求值：trigger 信号出生时先在空订单上下文求值 `validWhen`，通过后写首事实；dock 投递信号进入同一订单事件集。汇聚（撮合）语义由多条同单条件与执行器配对表达。
 
 ## Operator 语义
 

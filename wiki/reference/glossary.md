@@ -25,9 +25,10 @@ status: verified
 | [Source](../concepts/core/source.md) | signal 所属的因果命名空间，回答“这个动作进入哪条业务推进线”。 | `source`、`sourceId`、`signalKey`。 |
 | [Signal](../concepts/core/signal.md) | 状态机为某个 Order 接受的最小业务事实。 | `submitSignal()`、`SignalSubmitted`、`SignalRecord`。 |
 | [Hook](../concepts/core/hook.md) | 状态机条件；不是 HTTP webhook，也不是回调。 | `CompiledHook`、`HookStatusChanged`。 |
-| [Trigger](../concepts/core/trigger.md) | 订单入口语义：`orderTriggerKind` 表达 mint/dock/none，`emitReady` 独立控制是否发出可执行任务的 `HookReady`。 | `orderTriggerKind`、`emitReady`、`HookReady`。 |
+| [Trigger](../concepts/core/trigger.md) | 订单入口语义：stage 的 `trigger` 信号合成 order-trigger hook；`orderTriggerKind` 表达 trigger/dock/none，`emitReady` 独立控制是否发出可执行任务的 `HookReady`。 | `stage.trigger`、`orderTriggerKind`、`triggers[]`、`emitReady`、`HookReady`。 |
+| Trigger signal / 出生信号 | stage `trigger` 集合中的 sendSignal；空 `orderId` 提交并过 admission 后创建订单、写入首事实。 | `trigger`、`SignalAdmissionRejected`、`NotTriggerSignal`。 |
 | [File Resource](../concepts/core/file-resources.md) | 阶段协议、证据模板、资源清单等链下材料的句柄，不是明文文件存储。 | `fileResources`、resource patch、metadata URI/hash。 |
-| OnchainHookPlan | 面向 EVM 注册和材料审核的紧凑链上产物。 | `OnchainHookPlanArtifact`、compact hooks、dependency indexes、selector bindings。 |
+| OnchainHookPlan | 面向 EVM 注册和材料审核的紧凑链上产物。 | `OnchainHookPlanArtifact`、compact hooks、dependency indexes、selector bindings、派生 `triggers[]`。 |
 | HookPlan IR | 编译器内部中间形态，不是 Store/import/deploy 的公开流程。 | `compileZhixuOnchainHookPlan()` 内部使用。 |
 
 ## 动作与事件

@@ -11,14 +11,14 @@ status: verified
 | --- | --- | --- |
 | Rust core package | `0.1.0` | Normative Hook evaluation core. |
 | Protocol semantics | `uvp.semantic.v1` | Consistency boundary for Hook parsing, evaluation, and replay. |
-| Cloud AST | `uvp.cloudAst.v1` | Cloud compiler AST wire schema. |
-| HookPlan artifact | `uvp.hookPlan.v4` | Compiler internal/public artifact. |
-| OnchainHookPlan | `uvp.onchainHookPlan.v4` | EVM compiled-artifact schema. |
-| Cloud artifact | `uvp.cloudArtifact.v5` | Cloud compiler artifact schema. |
+| Cloud AST | `uvp.cloudAst.v2` | Cloud compiler AST wire schema. |
+| HookPlan artifact | `uvp.hookPlan.v5` | Compiler internal/public artifact, including derived stage `trigger` lines. |
+| OnchainHookPlan | `uvp.onchainHookPlan.v5` | EVM compiled-artifact schema; `orderTriggerKind` is trigger/dock/none and the derived `triggers[]` enumerates birth lines. |
+| Cloud artifact | `uvp.cloudArtifact.v6` | Cloud compiler artifact schema. |
 | Dock interface artifact | `uvp.dockInterfaceArtifact.v2` | Target-side named-interface commitment artifact schema. |
 | Dock route artifact | `uvp.dockRoute.v4` | Resolved-route artifact schema (an unresolved dynamic route is `uvp.dockRoute.unresolved.v1`). |
 | Dock resolution manifest | `uvp.dock.resolution.v2` | Target-resolution manifest schema (a name directory; the chain track's publication surface embeds the definition in full on the same schema for content addressing). |
-| StateMachine ABI | `0.18` | Signed Plan commit/finalize (eight-field PlanCommit including executorCandidatesRoot and birthAuthorizer), composite `(planId, orderId)` orders, permissionless relayer, outside birth gated by the plan-committed birthAuthorizer (`UnauthorizedBirthSubmitter`), and the governance-fork `forkOrder` birth channel. B-03 self-contained events batch: `PlanCommitted` gains a trailing `birthAuthorizer`, `SignalSubmitted` a trailing `factStageId`, and `OrderForked` trailing `forkPayloadHash` + `replayedFactKeys` (fork replayed vs new facts are distinguishable). File patches enter through `submitSignalFor` (trailing `bytes32 filesDigest` and `FilePatch`; a pure file patch uses `signalId == 0`). The EIP-712 domain version is `0.16` (`UVPStateMachineSignal` gains a trailing `bytes32 filesDigest`). |
+| StateMachine ABI | `0.18` | Signed Plan commit/finalize (eight-field PlanCommit including executorCandidatesRoot and birthAuthorizer), composite `(planId, orderId)` orders, permissionless relayer, outside birth constrained by both the plan-committed birthAuthorizer (`UnauthorizedBirthSubmitter`) and the trigger signal's empty-order-context admission (`SignalAdmissionRejected`), and the governance-fork `forkOrder` birth channel. B-03 self-contained events batch: `PlanCommitted` gains a trailing `birthAuthorizer`, `SignalSubmitted` a trailing `factStageId`, and `OrderForked` trailing `forkPayloadHash` + `replayedFactKeys` (fork replayed vs new facts are distinguishable). File patches enter through `submitSignalFor` (trailing `bytes32 filesDigest` and `FilePatch`; a pure file patch uses `signalId == 0`). The EIP-712 domain version is `0.16` (`UVPStateMachineSignal` gains a trailing `bytes32 filesDigest`). |
 | Plan registration library ABI | `0.5` | The `UVPPlanRegistration` linked library hosting the externally segmented `commitPlan`/`finalizePlan`/`forkOrder` bodies (its artifact carries the state-machine event surface extended in the same B-03 batch). |
 | IdentityRegistry ABI | `0.1` | Thin offline subject-to-wallet identity binding. |
 | DeploymentRegistry ABI | `0.2` | Deployment cutover and canary records. |
@@ -31,5 +31,7 @@ status: verified
 | File resource module ABI | `0.1` | Stage file-map module: `key -> (contentHash, handle)`, strict `add/replace/remove` with mandatory `baseHash`, no nonce, first-win `patchHash` absorption. |
 | StateMachine lens ABI | `0.4` | Read-only dock/order/hook views. |
 | Deployment manifest | `uvp-eth.addresses.v1` | Deployment address-manifest schema. |
+
+The uvp-core analyze wire schema is `uvp.zhixuAnalysis.v2`: each stage emits normalized `triggers` (`<stage>.<signal>`) plus parsed hooks, consumed by the compiler and hook-core; it does not enter on-chain registration parameters.
 
 Plan runtime identity is derived from `publisher + runtimePlanHash`; `runtimePlanHash` covers hooks, capabilitiesRoot, dock roots, and executorCandidatesRoot. Order identity is always the composite key `(planId, orderId)`, so a bare `orderId` is not a global primary key. The Identity Registry only records subject/account bindings. Supplier capability, reputation, names, tags, contact details, search recommendations, and workflow state are stored independently by the Store. Chain projections in Chain Services are rebuildable. For the full boundary see [Protocol Boundaries](../concepts/protocol-boundaries.md).

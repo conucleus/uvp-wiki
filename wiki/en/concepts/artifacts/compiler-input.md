@@ -21,12 +21,14 @@ The compiler input is `ZhixuDefinition`. The compiler does more than move string
 | `stages[].name` | The stage identifier (`stageIdentifier`) itself, unique within the Zhixu. |
 | `stages[].source` | Input to hook source and `sourceId`. |
 | `stages[].receiveSignals` | Generates receive hooks. |
-| `stages[].mint` | Birth-stage declaration (the materialization seat for per-fact minting and dock birth anchors). |
+| `stages[].trigger` | Optional birth signal set, a subset of `stages[].sendSignals`; each entry synthesizes one order-trigger hook in the artifact and enters the derived `triggers[]` read surface. |
 | `stages[].executor` | Executor route and reachability. |
 | `stages[].selectedStages` | Selector binding and executor closure. |
 | `stages[].sendSignals` | Outbound signal declarations (entries are objects `{name, validWhen?}`: capability list plus emission admission artifacts). |
 | `stages[].fileResources` | Product resource requirements and resource patch input. |
 | `spec.dockInterface` | Named interface map, compiled into the dock interface commitment (interface roots). |
+
+The uvp-core analyze wire schema is `uvp.zhixuAnalysis.v2`: it emits each stage's normalized `triggers` (`<stage>.<signal>`) plus parsed hooks, and the compiler synthesizes order-trigger hooks from them.
 
 ## What the Compiler Rejects
 
@@ -36,6 +38,7 @@ Before hashing, the compiler rejects these shapes:
 - Duplicate stage names within a Zhixu.
 - `selectedStages` pointing to a stage that does not exist.
 - Executor routes that cannot be reached by a static executor or selector.
+- `trigger` entries that are not members of the stage's `sendSignals`, duplicate entries, or a trigger stage whose executor is not a static plain executor.
 - Invalid hook expression format.
 - Signal references that are not in `stage.signal` form.
 - Receive signals or signal maps that reference non-existent stages or signals.

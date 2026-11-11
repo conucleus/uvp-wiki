@@ -7,7 +7,7 @@ status: verified
 
 # On-chain Registration Parameters
 
-`OnchainHookPlanArtifact` is not yet the final transaction parameter set. The compiler further converts it into the compact structures required by `UVPStateMachine.commitPlan()`; the capability table and the binding table are folded off-chain into the single Merkle-tree `capabilitiesRoot`, committed together with the plan by the publisher at commit time, and `finalizePlan(bytes32)` only finalizes. The table size is decoupled from registration gas cost, with no entry cap. The current `uvp.onchainHookPlan.v3` also commits `planId`, `planHash`, dock route/interface roots, and the `capabilitiesRoot`.
+`OnchainHookPlanArtifact` is not yet the final transaction parameter set. The compiler further converts it into the compact structures required by `UVPStateMachine.commitPlan()`; the capability table and the binding table are folded off-chain into the single Merkle-tree `capabilitiesRoot`, committed together with the plan by the publisher at commit time, and `finalizePlan(bytes32)` only finalizes. The table size is decoupled from registration gas cost, with no entry cap. The current `uvp.onchainHookPlan.v5` also commits `planId`, `planHash`, dock route/interface roots, and the `capabilitiesRoot`; the artifact's derived `triggers[]` read surface enumerates every order-trigger hook's birth fact and does not enter the planHash preimage.
 
 ## CompactHook
 
@@ -18,13 +18,13 @@ struct CompactHook {
     bytes32 hookId;
     bytes32 stageId;
     bytes32 hookName;
-    uint8 flags; // ORDER_TRIGGER_MINT=1, ORDER_TRIGGER_DOCK=2, EMIT_READY=4
+    uint8 flags; // ORDER_TRIGGER_MINT=1 (reused by trigger birth hooks), ORDER_TRIGGER_DOCK=2, EMIT_READY=4
     Instruction[] instructions;
     bytes32[] dependencyKeys;
 }
 ```
 
-Human-readable labels, raw expressions, and AST debug information are not written to contract storage. They remain in the artifact and audit materials.
+Human-readable labels, raw expressions, and AST debug information are not written to contract storage. They remain in the artifact and audit materials. A plan may register several order-trigger hooks; birth selects one explicitly via `triggerHookId`, while `birthAuthorizer` is plan-wide.
 
 ## Dependency Index
 
@@ -64,7 +64,7 @@ pnpm verify:protocol-freeze
 Changes to ABI, bytecode, selectors, event topics, typed-data fields, canonical hashes, or artifact schemas should be captured in release notes and migration decisions.
 
 CompactHook, event, selector, and EIP-712 fields are pinned by
-`fixtures/uvp-state-machine.v0.17.json`, the module fixtures, and
+`fixtures/uvp-state-machine.v0.18.json`, the module fixtures, and
 `pnpm verify:protocol-freeze`. A change must update bindings, indexers,
 uvp-client, and bootstrap together; updating one fixture in isolation is not
 an accepted migration.

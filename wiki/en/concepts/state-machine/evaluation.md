@@ -67,7 +67,7 @@ struct EvalValue {
 }
 ```
 
-`wait/ready/cxl` are hook runtime statuses; the cloud-side semantic layer additionally has `init` (a not-yet-converged initial state), which is not an on-chain `Instruction[]` evaluation result. Cross-source subscriptions uniformly use `::ANCHOR(@source::stage.signal)`; the routing layer delivers facts by source class, `mint: per-fact` decides whether a fact derives an order, and aggregation (matching) semantics are expressed as anchorless listening plus multiple subscriptions paired by the executor.
+`wait/ready/cxl` are hook runtime statuses; the cloud-side semantic layer additionally has `init` (a not-yet-converged initial state), which is not an on-chain `Instruction[]` evaluation result. Hooks evaluate only over the current order's event set: a trigger signal is admitted in the empty-order context at birth and then written as the first fact, while dock-delivered facts enter the same order event set. Aggregation (matching) semantics are expressed as multiple in-order conditions paired by the executor.
 
 ## Operator Semantics
 

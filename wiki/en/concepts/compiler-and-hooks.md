@@ -14,8 +14,8 @@ The Compiler and Hook Core are the entry point through which protocol semantics 
 `uvp-protocol/packages/hook-core` is responsible for:
 
 - Parsing `source::condition`.
-- Supporting `&`, `|`, `~`, delay, and cross-source `::ANCHOR(@source::stage.signal)` subscriptions; the subscription is the only wrapper form for cross-source facts — every other wrapper (e.g. `::OUTSIDE@` or `::ANCHOR@(…)`) and `OUTSOURCE` fails at parse time.
-- Generating receive Hooks only from stage `receiveSignals`; there is no parallel `externalSignals` or trigger-wrapper semantics that bypass the AST.
+- Supporting `&`, `|`, `~`, and delay; Hook expressions are interpreted only over the current order's event set, and cross-order facts enter through docking rather than a subscription wrapper.
+- Generating receive Hooks from stage `receiveSignals` and synthesizing one order-trigger Hook per stage `trigger` signal; there is no `externalSignals` or subscription-wrapper semantics that bypasses the AST.
 - Interpreting `~A` as "the A signal has not yet appeared in the current order's event set". Once a signal appears it never disappears, so this is monotonic existence logic.
 - Extracting positive, negative, and timer dependencies.
 - Providing a local evaluator shared by the compiler and the reference runtime.
@@ -27,8 +27,8 @@ Hook Core output remains platform-neutral semantics with no Solidity ABI.
 `uvp-protocol/packages/compiler` is responsible for:
 
 - Loading YAML/JSON Zhixu.
-- Validating stages, `receiveSignals`, `mint`, `selectedStages`, executor reachability, and dock route/interface commitments.
-- Generating the `OnchainHookPlanArtifact`.
+- Validating stages, `receiveSignals`, `trigger` subset/uniqueness and static-executor constraints, `selectedStages`, executor reachability, and dock route/interface commitments.
+- Consuming uvp-core's analyze wire `uvp.zhixuAnalysis.v2`, synthesizing birth hooks from each stage's normalized `triggers`, and generating the `OnchainHookPlanArtifact` (including the derived `triggers[]` enumeration).
 - Generating Solidity `commitPlan`/`finalizePlan` parameters.
 - Computing `planId`, `planHash`, and hook/stage/source/signal/dependency/route ids.
 
@@ -53,9 +53,9 @@ The compiler's determinism guarantees every party derives the same plan hash. Co
 
 All of the following are compile-time rules, not runtime rules; for runtime evaluation see [Hook Evaluation](state-machine/evaluation.md).
 
-- `receiveSignals` keys are receive-hook names for the stage and values are their canonical expressions; `stage.trigger` and `externalSignals` are not read.
-- An Order entry is explicit in `orderTriggerKind`: `none`, `mint`, or `dock`; whether Ready is externally emitted is a separate `emitReady` boolean.
-- `mint: per-fact` is only for a birth stage: each fact satisfying its anchor mints one new Order; a dock birth must carry complete dock route/interface proof.
+- `receiveSignals` keys are receive-hook names for the stage and values are their canonical expressions; `trigger` entries are a subset of the stage's `sendSignals` and are synthesized into order-trigger hooks after analyze normalization.
+- An Order entry is explicit in `orderTriggerKind`: `none`, `trigger`, or `dock`; whether Ready is externally emitted is a separate `emitReady` boolean.
+- Each trigger signal synthesizes one order-trigger hook (single `SIGNAL` instruction, `emitReady=true`, registration bit reusing ORDER_TRIGGER_MINT); a stage/plan may declare several triggers and birth selects one explicitly via `triggerHookId`; a dock birth must carry complete dock route/interface proof.
 - `supplierType=zhixu` must provide `zhixuExecutorConfig`, whose `target.zhixu` is the peer definition's `metadata.name` (slug) or `null` for runtime selection — the DSL shell carries no derived identity — whose `interface`/`order.mode` select the target interface and order mode, and whose `inputMap`/`signalMap` use target interface port names; it does not use `supplierID`.
 - `inputMap`/`signalMap` must include at least one non-empty map (no specific business signals are forced); the bound ports must reference a single target source.
 - Hook expressions evaluate under monotonic existence logic: `A` means the signal has appeared, `~A` means it has not yet appeared; once a signal appears it never disappears.

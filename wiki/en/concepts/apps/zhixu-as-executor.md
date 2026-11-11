@@ -65,13 +65,13 @@ A settlement stage can use another Zhixu as an execution interface like this:
 
 The local stage's source is `settlement`; for the exact semantics of the `str/cmp/err` fields see [Protocol meaning of signalMap](#protocol-meaning-of-signalmap).
 
-The docking stage still needs a local `receiveSignals` hook. When it subscribes to a fact in another domain, use `::ANCHOR(@source::stage.signal)`. There is no separate `trigger` or `externalSignals` entry field:
+The docking stage's entry is a local `receiveSignals` hook; the birth entry belongs to a `trigger` stage (a trigger stage must be a static plain executor and cannot be a `zhixu` executor). There is no Hook-DSL cross-order subscription:
 
 ```yaml
 - name: dock_customs_clearance
   source: customs
   receiveSignals:
-    LINK_READY: "::ANCHOR(@customs::clearance.ready)"
+    LINK_READY: settlement::route.ready
   executor:
     supplierType: zhixu
     zhixuExecutorConfig:
@@ -88,7 +88,7 @@ The docking stage still needs a local `receiveSignals` hook. When it subscribes 
         err: failed
 ```
 
-`LINK_READY` is the local subscription hook name. The linked order's start, completion, or failure still returns to the local order through `signalMap`, docking links, proof checks, and authorized mapped signals.
+`LINK_READY` is the local hook name. The linked order's start, completion, or failure still returns to the local order through `signalMap`, docking links, proof checks, and authorized mapped signals; the order's birth entry is carried by another static stage's `trigger` signal.
 
 ## Protocol meaning of signalMap
 

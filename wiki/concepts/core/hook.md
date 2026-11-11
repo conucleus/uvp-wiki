@@ -9,17 +9,17 @@ status: verified
 # Hook
 
 > 前置阅读：[核心概念](../README.md)
-Hook 是状态机判断“某个阶段条件是否成立”的最小规则。它不是 HTTP webhook，也不是外部系统回调；它是 Order 事件集上的状态机条件。Zhixu stage 的 `receiveSignals` 每一项都会编译成一个 `kind=receive` hook；如果 stage 对接另一条 Zhixu，`inputMap`/`signalMap` 会作为 dock route/interface 数据固化，不再生成伪 hook。
+Hook 是状态机判断“某个阶段条件是否成立”的最小规则。它不是 HTTP webhook，也不是外部系统回调；它是 Order 事件集上的状态机条件。Zhixu stage 的 `receiveSignals` 每一项都会编译成一个 `kind=receive` hook；stage 的每个 `trigger` 信号还会合成一条 order-trigger hook（同一 `kind=receive`，`orderTriggerKind: trigger`）。如果 stage 对接另一条 Zhixu，`inputMap`/`signalMap` 会作为 dock route/interface 数据固化，不再生成伪 hook。
 
-Hook 本身只是条件。带 `emitReady=true` 的 hook Ready 时，链上才会发出 `HookReady`；`orderTriggerKind` 进一步说明该 Ready 是否会触发 mint 或 dock 入口。Product/Store 应只把已确认的 `HookReady` 投影成正式可执行任务。
+Hook 本身只是条件。带 `emitReady=true` 的 hook Ready 时，链上才会发出 `HookReady`；`orderTriggerKind` 进一步说明该 Ready 是触发、普通还是 dock 入口。Product/Store 应只把已确认的 `HookReady` 投影成正式可执行任务。
 
 ## 谁使用
 
-凝结核在 stage 的 `receiveSignals` 里声明 hook 条件；编译器把它们规范化并编入 Plan；状态机在订单事件上求值；Product/Store/uvp-client 跟随 `HookReady` 创建任务和通知。跨源事实通过 `::ANCHOR(@source::stage.signal)` 订阅进入路由层，`mint: per-fact` 决定是否从每条事实代铸订单。
+凝结核在 stage 的 `receiveSignals` 里声明同单 hook 条件，在 `trigger` 里声明出生信号；编译器把两者规范化并编入 Plan；状态机在订单事件上求值；Product/Store/uvp-client 跟随 `HookReady` 创建任务和通知。trigger 信号在空订单上下文过 admission 后建单并写入首事实。
 
 ## 产生什么结果
 
-hook 求值产生 `HookStatusChanged` 状态流转；`emitReady=true` 的 hook 第一次 Ready 时发出 `HookReady`，成为 Product task、Store intent 和 adapter job 的投影依据。`orderTriggerKind` 的取值为 `none`、`mint` 或 `dock`。
+hook 求值产生 `HookStatusChanged` 状态流转；`emitReady=true` 的 hook 第一次 Ready 时发出 `HookReady`，成为 Product task、Store intent 和 adapter job 的投影依据。`orderTriggerKind` 的取值为 `none`、`trigger` 或 `dock`；编译产物 `triggers[]` 逐一枚举 `trigger`/`dock` 的 order-trigger hook。
 
 ## 权威来自哪里
 
@@ -27,7 +27,7 @@ hook 条件的权威形态是链上 `UVPStateMachine.StoredHook`（由 Plan 注�
 
 ## Hook 表达式
 
-普通 Hook 表达式使用 `source::condition` 形式。`parseHookExpression()` 要求表达式有 source 和 condition；跨源订阅使用空标头 `::ANCHOR(@source::stage.signal)`：
+普通 Hook 表达式使用 `source::condition` 形式。`parseHookExpression()` 要求表达式有 source 和 condition；Hook 条件只在本订单事件集上求值，跨秩序事实通过 dock 进入本订单，而不是 Hook 订阅：
 
 ```text
 source::condition
@@ -50,7 +50,6 @@ Hook 表达式里的 `~A` 是存在逻辑里的缺席判断。它表示“当前
 | 节点 | 含义 |
 | --- | --- |
 | `signal` | 等待某个 `stage.signal` 出现。 |
-| `subscription` | `::ANCHOR(@source::stage.signal)` 跨源事实订阅：按 source 类逐事件路由；是否从事实代铸订单由 stage 的 `mint: per-fact` 决定。 |
 | `not` | 缺席条件，表示某个 signal 尚未出现；如果它后来出现，依赖该缺席条件的分支取消。 |
 | `and` | 多个条件都满足。 |
 | `or` | 任一分支满足。 |
@@ -60,7 +59,7 @@ Hook 表达式里的 `~A` 是存在逻辑里的缺席判断。它表示“当前
 
 ## HookPlan 里保存什么
 
-编译器为每个 `receiveSignals` 生成一个 `kind=receive` hook；不再有 stage 级 `trigger` 或 `externalSignals` 字段。若 executor 是 `supplierType=zhixu`，`inputMap`/`signalMap` 只描述目标 dock 端口，不能承载 Hook DSL；它们被编入 dock route/interface commitments，不生成伪 `signalMap` hook。
+编译器为每个 `receiveSignals` 生成一个 `kind=receive` hook，并为 stage 的每个 `trigger` 信号合成一条 order-trigger hook（单条 `SIGNAL` 指令、`emitReady=true`）。若 executor 是 `supplierType=zhixu`，`inputMap`/`signalMap` 只描述目标 dock 端口，不能承载 Hook DSL；它们被编入 dock route/interface commitments，不生成伪 `signalMap` hook。
 
 可读 hook 通常包含：
 
@@ -69,8 +68,8 @@ Hook 表达式里的 `~A` 是存在逻辑里的缺席判断。它表示“当前
 | `hookId` | 平台中立字符串，形如 `stageIdentifier#hookName`。 |
 | `kind` | 当前为 `receive`；dock 的 input/output 映射属于 route/interface commitment。 |
 | `stageIdentifier` | 这个 hook 属于哪个 stage。 |
-| `hookName` | hook 名称，来自 `receiveSignals` 的 key。 |
-| `orderTriggerKind` | `none`、`mint` 或 `dock`；标明 Ready 是否触发代铸或 dock 入口。 |
+| `hookName` | hook 名称，来自 `receiveSignals` 的 key；trigger 信号合成 hook 的 hookName 是该信号名。 |
+| `orderTriggerKind` | `none`、`trigger` 或 `dock`；标明 Ready 是否落在出生或 dock 入口。 |
 | `emitReady` | 是否在 Ready 时发出 `HookReady`。 |
 | `rawExpression` | 原始表达式。 |
 | `normalizedExpression` | 编译器规范化后的表达式。 |
@@ -80,13 +79,13 @@ Hook 表达式里的 `~A` 是存在逻辑里的缺席判断。它表示“当前
 
 ## Ready 与订单入口
 
-只有 `emitReady=true` 的 hook 在合约里第一次变成 `Ready` 时会发出 `HookReady`；`orderTriggerKind` 取 `none`、`mint` 或 `dock`。Product 任务创建、Store 通知和 uvp-client watcher 都跟随 `HookReady`，UI 草稿或后端临时状态只用于辅助展示。
+只有 `emitReady=true` 的 hook 在合约里第一次变成 `Ready` 时会发出 `HookReady`；`orderTriggerKind` 取 `none`、`trigger` 或 `dock`。Product 任务创建、Store 通知和 uvp-client watcher 都跟随 `HookReady`，UI 草稿或后端临时状态只用于辅助展示。
 
 详细语义见 [Trigger](trigger.md)。
 
 ## Hook 和链上计划的关系
 
-Hook 是单个条件；链上计划产物是某个 Zhixu 编译后所有 hook、依赖索引、executor routes 和 selector bindings 的集合。
+Hook 是单个条件；链上计划产物是某个 Zhixu 编译后所有 hook、依赖索引、executor routes 和 selector bindings 的集合，另用派生读面 `triggers[]` 枚举全部 order-trigger hook 的出生事实。
 
 ```text
 Zhixu stage.receiveSignals

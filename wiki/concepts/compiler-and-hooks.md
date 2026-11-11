@@ -14,8 +14,8 @@ Compiler 和 Hook Core 是协议语义进入链上前的入口。它们不处理
 `uvp-protocol/packages/hook-core` 负责：
 
 - 解析 `source::condition`。
-- 支持 `&`、`|`、`~`、delay，以及跨 source 的 `::ANCHOR(@source::stage.signal)` 订阅；订阅是跨源事实的唯一 wrapper 形态，`::OUTSIDE@`、旧 `::ANCHOR@(…)` 等其余 wrapper 与 `OUTSOURCE` 都在解析期报错。
-- 只为 stage 的 `receiveSignals` 生成 receive Hook；不存在一套绕过 AST 的 `externalSignals` 或 trigger wrapper 语义。
+- 支持 `&`、`|`、`~`、delay；Hook 表达式只在当前订单事件集上解释，跨秩序事实由 dock 投递进入，不使用订阅 wrapper。
+- 为 stage 的 `receiveSignals` 生成 receive Hook，并为 stage 的 `trigger` 信号合成 order-trigger Hook；不存在绕过 AST 的 `externalSignals` 或订阅 wrapper 语义。
 - 把 `~A` 解释为“A signal 尚未出现在当前订单事件集中”。signal 一旦出现就不会消失，所以这里是单调存在逻辑。
 - 抽取 positive、negative、timer dependencies。
 - 提供本地 evaluator，供 compiler 和 reference runtime 共享。
@@ -27,8 +27,8 @@ Hook Core 的输出仍然是平台中立语义，不含 Solidity ABI。
 `uvp-protocol/packages/compiler` 负责：
 
 - 加载 YAML/JSON Zhixu。
-- 校验 stage、`receiveSignals`、`mint`、`selectedStages`、executor reachability，以及 dock route/interface commitment。
-- 生成 `OnchainHookPlanArtifact`。
+- 校验 stage、`receiveSignals`、`trigger` 子集/唯一性与静态 executor 约束、`selectedStages`、executor reachability，以及 dock route/interface commitment。
+- 调用 uvp-core 的 analyze wire `uvp.zhixuAnalysis.v2`，按每 stage 规范化的 `triggers` 合成出生钩子并生成 `OnchainHookPlanArtifact`（含派生的 `triggers[]` 枚举）。
 - 生成 Solidity `commitPlan`/`finalizePlan` 参数。
 - 计算 `planId`、`planHash`、hook/stage/source/signal/dependency/route id。
 
@@ -53,9 +53,9 @@ Compiler 的确定性保证各方得到同一个 plan hash。合约注册 compac
 
 以下都是 compile 期规则，不是运行时规则；运行时求值见 [Hook 求值](state-machine/evaluation.md)。
 
-- `receiveSignals` 的 key 是本 stage 的 receive hook 名称，value 是该 hook 的规范化表达式；不读取 `stage.trigger` 或 `externalSignals`。
-- Hook 的订单入口由 `orderTriggerKind` 明确表达：`none`、`mint` 或 `dock`；Ready 事件是否对外发出由独立的 `emitReady` 布尔值表达。
-- `mint: per-fact` 只能用于出生 stage：每个满足锚点的事实铸造一个新订单；docking 出生必须带完整 dock route/interface proof。
+- `receiveSignals` 的 key 是本 stage 的 receive hook 名称，value 是该 hook 的规范化表达式；`trigger` 条目是本 stage `sendSignals` 的子集，由 analyze 规范化后合成 order-trigger hook。
+- Hook 的订单入口由 `orderTriggerKind` 明确表达：`none`、`trigger` 或 `dock`；Ready 事件是否对外发出由独立的 `emitReady` 布尔值表达。
+- 每个 trigger 信号合成一条 order-trigger hook（单条 `SIGNAL` 指令、`emitReady=true`，注册位复用 ORDER_TRIGGER_MINT）；一个 stage/plan 可有多个 trigger，出生时用 `triggerHookId` 显式选择；docking 出生必须带完整 dock route/interface proof。
 - `supplierType=zhixu` 必须提供 `zhixuExecutorConfig`，其中 `target.zhixu` 是 peer 定义的 `metadata.name`（slug）或 `null`（运行时选择），DSL 壳不携带派生身份；`interface`/`order.mode` 选定目标接口与订单方式，`inputMap`/`signalMap` 使用目标接口端口名；它不使用 `supplierID`。
 - `inputMap`/`signalMap` 至少一张非空（不强制特定业务信号），被绑定端口必须引用同一个目标 source。
 - Hook 表达式按单调存在逻辑求值：`A` 表示 signal 已出现，`~A` 表示 signal 尚未出现；signal 出现后不会消失。

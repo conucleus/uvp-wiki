@@ -29,6 +29,7 @@ Two places in a Zhixu stage relate directly to signals:
 
 | Field | Meaning |
 | --- | --- |
+| `trigger` | Optional birth signal set, a subset of the stage's `sendSignals`; omitted/empty means the stage cannot create orders, and each entry synthesizes one order-trigger hook. |
 | `receiveSignals` | Which input signals the stage waits for. Each key compiles into one [Hook](hook.md). |
 | `sendSignals` | Which output signals the stage may emit after execution; entries are objects `{name, validWhen?}` (see "Emission admission" below). |
 
@@ -49,7 +50,11 @@ The meaning: once the commercial offer completes, the buyer commitment stage is 
 
 ## Emission Admission (validWhen)
 
-A `sendSignals` entry may declare `validWhen`, an emission admission expression. When an externally submitted signal carrying such a declaration arrives, the engine first evaluates the expression against the facts already committed on the order (excluding the submission itself): the whole expression must be ready for the emission to be admitted, otherwise it is rejected with a typed error — on chain the entire transaction reverts with `SignalAdmissionRejected`, and nothing is written to the fact stream. The declaration form is a list of expressions (`[]string`: each item a complete `{source}::{condition}`, all items sharing one header source; folded into a single AND tree at compile time). Signals without `validWhen` are admitted unconditionally; duplicate submissions of an already-recorded fact are absorbed first-win without re-screening. The expression language, compile-time constraints, and evaluation semantics are owned by the single canonical grammar manual (`uvp-core/docs/zhixu-dsl-grammar.md` §5.6 emission-admission position); facts produced inside the engine (dock delivery, per-fact minting) do not pass this face.
+A `sendSignals` entry may declare `validWhen`, an emission admission expression. When an externally submitted signal carrying such a declaration arrives, the engine first evaluates the expression against the facts already committed on the order (excluding the submission itself): the whole expression must be ready for the emission to be admitted, otherwise it is rejected with a typed error — on chain the entire transaction reverts with `SignalAdmissionRejected`, and nothing is written to the fact stream. The declaration form is a list of expressions (`[]string`: each item a complete `{source}::{condition}`, all items sharing one header source; folded into a single AND tree at compile time). Signals without `validWhen` are admitted unconditionally; duplicate submissions of an already-recorded fact are absorbed first-win without re-screening. The expression language, compile-time constraints, and evaluation semantics are owned by the single canonical grammar manual (`uvp-core/docs/zhixu-dsl-grammar.md` §5.6 emission-admission position); facts produced inside the engine (dock delivery) do not pass this face.
+
+## Birth Signals and the First Fact
+
+A signal in the `trigger` set can be submitted as an ordinary in-order signal, and can also serve as the birth entry: when `orderId` is empty and the signal belongs to some stage's `trigger`, the contract first evaluates that signal's `validWhen` in the **empty-order context** (no facts/files; negative conditions true; existence/delay conditions false), then derives the order id from the birth fact, registers/creates the order, and writes the signal as the first fact. Re-delivery of the same birth fact is idempotent; an empty `orderId` with a non-trigger signal is rejected by name.
 
 ## From Text Name to On-chain Key
 

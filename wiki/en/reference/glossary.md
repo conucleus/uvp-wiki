@@ -25,9 +25,10 @@ This page explains project terms in plain language first, then gives the code an
 | [Source](../concepts/core/source.md) | The causal namespace a signal belongs to, answering which business-progression line an action enters. | `source`, `sourceId`, `signalKey`. |
 | [Signal](../concepts/core/signal.md) | The smallest business fact the state machine accepts for an Order. | `submitSignal()`, `SignalSubmitted`, `SignalRecord`. |
 | [Hook](../concepts/core/hook.md) | A state-machine condition; not an HTTP webhook, nor a callback. | `CompiledHook`, `HookStatusChanged`. |
-| [Trigger](../concepts/core/trigger.md) | Order-entry semantics: `orderTriggerKind` expresses mint/dock/none, while `emitReady` independently controls whether an actionable `HookReady` is emitted. | `orderTriggerKind`, `emitReady`, `HookReady`. |
+| [Trigger](../concepts/core/trigger.md) | Order-entry semantics: a stage `trigger` signal synthesizes an order-trigger hook; `orderTriggerKind` expresses trigger/dock/none, while `emitReady` independently controls whether an actionable `HookReady` is emitted. | `stage.trigger`, `orderTriggerKind`, `triggers[]`, `emitReady`, `HookReady`. |
+| Trigger signal | A sendSignal in the stage `trigger` set; submitting it with an empty `orderId` past admission creates the order and writes the first fact. | `trigger`, `SignalAdmissionRejected`, `NotTriggerSignal`. |
 | [File Resource](../concepts/core/file-resources.md) | A handle for off-chain materials such as stage protocols, evidence templates, and resource manifests; not plaintext file storage. | `fileResources`, resource patch, metadata URI/hash. |
-| OnchainHookPlan | The compact on-chain artifact for EVM registration and material review. | `OnchainHookPlanArtifact`, compact hooks, dependency indexes, selector bindings. |
+| OnchainHookPlan | The compact on-chain artifact for EVM registration and material review. | `OnchainHookPlanArtifact`, compact hooks, dependency indexes, selector bindings, derived `triggers[]`. |
 | HookPlan IR | The compiler-internal intermediate shape; not a public Store/import/deploy flow. | Used internally by `compileZhixuOnchainHookPlan()`. |
 
 ## Actions and Events

@@ -7,7 +7,7 @@ status: verified
 
 # 链上注册参数
 
-`OnchainHookPlanArtifact` 还不是最终交易参数。编译器把它压缩成紧凑结构后，CompactHook 等参数构成 `commitPlan()` 的提交载荷；能力表与绑定表在链下折叠为单棵 Merkle 树的 `capabilitiesRoot`，随 commit 一起被 publisher 承诺，`finalizePlan(bytes32)` 只落定稿。两表规模与注册 gas 成本脱钩，没有条目上限。当前 `uvp.onchainHookPlan.v3` 还承诺 `planId`、`planHash`、dock route/interface roots 和 `capabilitiesRoot`。
+`OnchainHookPlanArtifact` 还不是最终交易参数。编译器把它压缩成紧凑结构后，CompactHook 等参数构成 `commitPlan()` 的提交载荷；能力表与绑定表在链下折叠为单棵 Merkle 树的 `capabilitiesRoot`，随 commit 一起被 publisher 承诺，`finalizePlan(bytes32)` 只落定稿。两表规模与注册 gas 成本脱钩，没有条目上限。当前 `uvp.onchainHookPlan.v5` 还承诺 `planId`、`planHash`、dock route/interface roots 和 `capabilitiesRoot`；artifact 的派生读面 `triggers[]` 枚举全部 order-trigger hook 的出生事实，不进 planHash 承诺面。
 
 ## CompactHook
 
@@ -18,13 +18,13 @@ struct CompactHook {
     bytes32 hookId;
     bytes32 stageId;
     bytes32 hookName;
-    uint8 flags; // ORDER_TRIGGER_MINT=1, ORDER_TRIGGER_DOCK=2, EMIT_READY=4
+    uint8 flags; // ORDER_TRIGGER_MINT=1（trigger 出生钩子复用）, ORDER_TRIGGER_DOCK=2, EMIT_READY=4
     Instruction[] instructions;
     bytes32[] dependencyKeys;
 }
 ```
 
-人类可读标签、原始表达式、AST 调试信息不会写入合约存储。它们留在 artifact 和审计材料中。
+人类可读标签、原始表达式、AST 调试信息不会写入合约存储。它们留在 artifact 和审计材料中。一个 plan 可以注册多条 order-trigger hook；出生入口用 `triggerHookId` 显式选择，`birthAuthorizer` 是 plan 级配置。
 
 ## Dependency Index
 
@@ -64,7 +64,7 @@ pnpm verify:protocol-freeze
 ABI、bytecode、selector、event topic、typed-data 字段、canonical hash 或 artifact schema 的变化都应进入发布说明和迁移判断。
 
 CompactHook、事件、selector 和 EIP-712 字段已经由
-`fixtures/uvp-state-machine.v0.17.json`、各 module fixture 以及
+`fixtures/uvp-state-machine.v0.18.json`、各 module fixture 以及
 `pnpm verify:protocol-freeze` 固定；变更必须同步 bindings、indexer、executor
 和 bootstrap，不能只更新单侧 fixture。
 

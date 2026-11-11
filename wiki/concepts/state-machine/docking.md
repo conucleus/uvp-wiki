@@ -12,7 +12,7 @@ local order 把某个 stage 交给另一条 linked Zhixu / linked order 执行�
 linked order 中已经发生的 signal 映射回 local order。
 
 这不是 Store sandbox 草稿，也不是普通后端联动。正式运行态要落到
-`UVPDockingModule`（abiVersion 4.7）的事件和 proof 上；合约只接受
+`UVPDockingModule`（abiVersion 4.8）的事件和 proof 上；合约只接受
 已经通过 `dockRoutesRoot`、`dockInterfaceRoot` 和各自 Merkle proof 的
 route/interface，绑定与路由哈希都带 `interfaceNameId`（keccak(接口名)）维度。
 
@@ -79,9 +79,9 @@ dock instance 和 target definition 身份派生，防止跨 plan 抢占。
   `UVPDockEntrancePermitV2`（含 `interfaceNameId`，同域）——permit 是可选的
   交付预授权，同意是 open 的建立前提，两者分属不同 digest/nonce 账本。
 - `order.mode=existing`：链上支持。`attachDockedOrder`（`UVPDockingModule`
-  4.7）对等挂接既有目标单——不创建子订单，同意门为目标单 creator / 在任
+  4.8）对等挂接既有目标单——不创建子订单，同意门为目标单 creator / 在任
   执行者 / 目标 plan publisher 预授权三者之一，挂接后 input/output 走与
-  `new` 同一的交付面（语义见 uvp-core subscription-mint-spec §2.4）。
+  `new` 同一的交付面（语义见 [Trigger](../core/trigger.md)）。
 - `target: null`（动态选择）：链上支持。编译产物以 `unresolvedDockRoutes`
   （`uvp.dockRoute.unresolved.v1`）携带声明面（候选集从 resolution
   manifest 派生）；routeHash（域 V3）动态形态的目标槽为零字，
@@ -96,11 +96,15 @@ dock instance 和 target definition 身份派生，防止跨 plan 抢占。
 
 ## 订阅与入口
 
-local stage 的入口由 `receiveSignals` Hook 产生；跨源事实使用
-`::ANCHOR(@source::stage.signal)`，出生阶段另声明 `mint: per-fact`。
-`stage.trigger`、`externalSignals`、`triggerEntrance`，以及订阅以外的
-wrapper 形态（`::OUTSIDE@(...)`、`::ANCHOR@(…)`）不属于当前
-DSL，编译器会拒绝。
+local stage 的入口有两种显式来源：`receiveSignals` 的同单 Hook，或本 stage 的
+`trigger` 出生信号。`trigger` 是本 stage `sendSignals` 的可选子集，每个条目合成
+一条 order-trigger hook；编译产物 `triggers[]` 枚举全部 order-trigger hook
+（`orderTriggerKind` 为 `trigger` 或 `dock` 的入口），它只是派生读面、不进
+planHash 承诺面。空 `orderId` 提交 trigger 信号时先以空订单上下文求值
+`validWhen`，通过后建单并写首事实；带 `orderId` 时 trigger 信号就是普通订单信号。
+同秩序普通事实连接使用 `receiveSignals`；跨秩序连接使用
+`spec.dockInterface` 与 `executor.zhixuExecutorConfig`，不存在 Hook DSL 形式的
+跨秩序订阅 wrapper。
 
 linked Zhixu 的 `supplierType: zhixu` 配置声明目标接口名、`order.mode`，并将
 `inputMap` 和 `signalMap` 写成目标接口端口名；两张 map 至少一张非空。解析分两层：

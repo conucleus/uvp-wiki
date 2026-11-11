@@ -11,14 +11,14 @@ status: verified
 | --- | --- | --- |
 | Rust core package | `0.1.0` | Hook 规范求值核心。 |
 | 协议语义 | `uvp.semantic.v1` | Hook 解析、求值和 replay 一致性边界。 |
-| Cloud AST | `uvp.cloudAst.v1` | 云侧编译 AST wire schema。 |
-| HookPlan artifact | `uvp.hookPlan.v4` | 编译器内部/公共 artifact。 |
-| OnchainHookPlan | `uvp.onchainHookPlan.v4` | EVM 编译产物 schema。 |
-| Cloud artifact | `uvp.cloudArtifact.v5` | 云侧编译产物 schema。 |
+| Cloud AST | `uvp.cloudAst.v2` | 云侧编译 AST wire schema。 |
+| HookPlan artifact | `uvp.hookPlan.v5` | 编译器内部/公共 artifact，含 stage `trigger` 派生。 |
+| OnchainHookPlan | `uvp.onchainHookPlan.v5` | EVM 编译产物 schema；`orderTriggerKind` 为 trigger/dock/none，派生 `triggers[]` 枚举出生线。 |
+| Cloud artifact | `uvp.cloudArtifact.v6` | 云侧编译产物 schema。 |
 | Dock interface artifact | `uvp.dockInterfaceArtifact.v2` | 目标侧具名接口承诺产物 schema。 |
 | Dock route artifact | `uvp.dockRoute.v4` | 已解析 route 产物 schema（未解析动态 route 为 `uvp.dockRoute.unresolved.v1`）。 |
 | Dock resolution manifest | `uvp.dock.resolution.v2` | 目标解析 manifest schema（name 目录；链轨发布面在同一 schema 上内嵌定义全文做内容寻址）。 |
-| StateMachine ABI | `0.18` | signed Plan commit/finalize（八域 PlanCommit 含 executorCandidatesRoot、birthAuthorizer）、复合 `(planId, orderId)` 订单、permissionless relayer、outside 出生限计划承诺的 birthAuthorizer（`UnauthorizedBirthSubmitter` 闸）、治理分叉 `forkOrder` 出生通道。B-03 事件自包含批：`PlanCommitted` 尾参补 `birthAuthorizer`、`SignalSubmitted` 尾参补 `factStageId`、`OrderForked` 尾参补 `forkPayloadHash` + `replayedFactKeys`（fork 重放/新生事实可区分）。文件 patch 入口为 `submitSignalFor`（携 `bytes32 filesDigest` 与尾部 `FilePatch`，纯文件 patch 用 `signalId == 0`）；EIP-712 domain version `0.16`（`UVPStateMachineSignal` 尾部增 `bytes32 filesDigest`）。 |
+| StateMachine ABI | `0.18` | signed Plan commit/finalize（八域 PlanCommit 含 executorCandidatesRoot、birthAuthorizer）、复合 `(planId, orderId)` 订单、permissionless relayer、outside 出生由计划承诺的 birthAuthorizer 与 trigger 信号的空订单上下文 admission（`SignalAdmissionRejected`）约束、治理分叉 `forkOrder` 出生通道。B-03 事件自包含批：`PlanCommitted` 尾参补 `birthAuthorizer`、`SignalSubmitted` 尾参补 `factStageId`、`OrderForked` 尾参补 `forkPayloadHash` + `replayedFactKeys`（fork 重放/新生事实可区分）。文件 patch 入口为 `submitSignalFor`（携 `bytes32 filesDigest` 与尾部 `FilePatch`，纯文件 patch 用 `signalId == 0`）；EIP-712 domain version `0.16`（`UVPStateMachineSignal` 尾部增 `bytes32 filesDigest`）。 |
 | Plan registration library ABI | `0.5` | `commitPlan`/`finalizePlan`/`forkOrder` 执行体分段外置的 `UVPPlanRegistration` 链接库（库产物携带 B-03 同批扩展的状态机事件面）。 |
 | IdentityRegistry ABI | `0.1` | 线下 subject 与钱包的薄身份绑定。 |
 | DeploymentRegistry ABI | `0.2` | deployment cutover 与 canary 记录。 |
@@ -31,5 +31,7 @@ status: verified
 | File resource module ABI | `0.1` | 阶段文件映射模块：`key -> (contentHash, handle)`、strict `add/replace/remove` + 必填 `baseHash`、无 nonce、`patchHash` first-win 吸收。 |
 | StateMachine lens ABI | `0.4` | dock/order/hook 只读视图。 |
 | Deployment manifest | `uvp-eth.addresses.v1` | 部署地址清单 schema。 |
+
+uvp-core analyze 的 wire schema 为 `uvp.zhixuAnalysis.v2`：每个 stage 输出规范化 `triggers`（`<stage>.<signal>`）与 hook 解析结果，由 compiler/hook-core 消费；它不进入链上注册参数。
 
 Plan runtime identity 由 `publisher + runtimePlanHash` 导出；`runtimePlanHash` 覆盖 hooks、capabilitiesRoot、dock roots 和 executorCandidatesRoot。订单身份始终是复合键 `(planId, orderId)`，不能把 bare `orderId` 当作全局主键。Identity Registry 只记录 subject/account 绑定。Supplier capability、reputation、名称、标签、联系信息、搜索推荐和 workflow 状态由 Store 独立保存。Chain Services 的链上投影可重建。完整边界见 [协议边界](../concepts/protocol-boundaries.md)。

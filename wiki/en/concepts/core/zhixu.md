@@ -9,7 +9,7 @@ status: verified
 # Zhixu DSL
 
 > Prerequisite reading: [Core Concepts](../README.md)
-`Zhixu` is the pinyin for "order". In this repository, a Zhixu is the reusable coordination rulebook designed by a nucleus. It uses a DSL to declare one class of reusable production relations: which stages exist, which source causal chain each stage sits on, which signals it receives, which signals it emits, whether facts mint orders, who the default executor is, which stages may choose executors for other stages, which resources are required, and (optionally) which dock interface is published.
+`Zhixu` is the pinyin for "order". In this repository, a Zhixu is the reusable coordination rulebook designed by a nucleus. It uses a DSL to declare one class of reusable production relations: which stages exist, which source causal chain each stage sits on, which signals it receives, which signals it emits, whether it carries a birth entry (`trigger`), who the default executor is, which stages may choose executors for other stages, which resources are required, and (optionally) which dock interface is published.
 
 The code entry point is `ZhixuDefinition` in `uvp-protocol/packages/compiler/src/types/index.ts`. An Order is one runtime instance of this rulebook after it has been compiled and registered.
 
@@ -43,10 +43,8 @@ spec:
   stages:
     - name: intake
       source: customer
-      mint: per-fact
-      receiveSignals:
-        REQUESTED: "::ANCHOR(@customer::submit.requested)"
-      sendSignals: [{name: str}, {name: cmp}, {name: err}]
+      trigger: [requested]
+      sendSignals: [{name: requested}, {name: str}, {name: cmp}, {name: err}]
       executor:
         supplierType: organization
         supplierID: "{{ .intake_executor_uid }}"
@@ -71,7 +69,7 @@ spec:
             err: failed
 ```
 
-This example shows three things: a `mint: per-fact` stage subscribes to an `ANCHOR(@...)` fact and deterministically mints at most one order per fact; a normal stage advances through `receiveSignals`; and a delegated stage docks another Zhixu as its execution interface with target-port `inputMap`/`signalMap` entries. After proof validation and authorized submitter mapping, the linked order's output drives the local order forward. For the protocol semantics of `signalMap` and its runtime docking, see [Zhixu as Executor](../apps/zhixu-as-executor.md) and [Executor](executor.md).
+This example shows three things: a `trigger` stage declares `requested` as its birth signal, so an empty-`orderId` submission that hits it creates the order and writes the first fact; a normal stage advances through `receiveSignals`; and a delegated stage docks another Zhixu as its execution interface with target-port `inputMap`/`signalMap` entries. After proof validation and authorized submitter mapping, the linked order's output drives the local order forward. For the protocol semantics of `signalMap` and its runtime docking, see [Zhixu as Executor](../apps/zhixu-as-executor.md) and [Executor](executor.md).
 
 ## Top-Level Fields
 
@@ -93,7 +91,7 @@ This example shows three things: a `mint: per-fact` stage subscribes to an `ANCH
 | --- | --- |
 | `name` | Stage name; it is the `stageIdentifier` itself, globally unique within the Zhixu. |
 | `source` | The causal chain this stage's signals belong to; user roles are interpreted separately by Product/authorization. |
-| `mint` | Optional birth policy; the only value is `per-fact`, which mints at most one order per subscribed fact. |
+| `trigger` | Optional birth signal set, a subset of the stage's `sendSignals`; omitted/empty means the stage cannot create orders, and each entry synthesizes one order-trigger hook. |
 | `receiveSignals` | Mapping from hook key to Hook DSL expression. |
 | `sendSignals` | Signals the stage may emit after completion; entries are objects `{name, validWhen?}` — `validWhen` is an emission admission declaration (a list of expressions, see [Signal](signal.md)). |
 | `executor` | Default executor configuration pointing to a supplier or another Zhixu. |
@@ -102,17 +100,20 @@ This example shows three things: a `mint: per-fact` stage subscribes to an `ANCH
 
 The compiler uses a stage's `name` directly as the `stageIdentifier`. For example, `supplier_sourcing` is hashed into the on-chain `stageId`.
 
-## `receiveSignals` and `mint`
+## `receiveSignals` and `trigger`
 
-`receiveSignals` define Hook conditions. A normal expression is evaluated in the current order context; a cross-source subscription uses the empty-header `::ANCHOR(@source::stage.signal)` form and is delivered event by event by the routing layer. Whether a stage is a birth stage is determined only by `mint: per-fact`, not by `trigger` or `externalSignals` declarations:
+`receiveSignals` define in-order Hook conditions evaluated in the current order context. A birth entry is declared explicitly through the stage's `trigger`:
 
 ```yaml
-mint: per-fact
-receiveSignals:
-  REQUESTED: "::ANCHOR(@customer::submit.requested)"
+trigger: [requested]
+sendSignals: [{name: requested}, {name: str}]
 ```
 
-`mint` accepts only `per-fact`; a birth stage must contain at least one `ANCHOR(@...)` subscription and use a static individual/organization executor. The compiler rejects self-loops and unbounded cross-source re-mint cycles. A stage without `mint` may use a normal `source::condition` hook or an `ANCHOR(@...)` channel listener; its order identity comes from existing order routing or an executor's self-reported order. `trigger`, `externalSignals`, and wrapper forms other than the subscription (`::OUTSIDE@`, `::ANCHOR@(…)`) are not valid DSL and are rejected explicitly.
+- `trigger` may be omitted or empty (the stage cannot create orders). Non-empty: entries must be a subset of the stage's `sendSignals` with no duplicates, and each entry synthesizes one order-trigger hook. A stage may declare several trigger signals, a plan may have several trigger stages, and a trigger stage need not be the first stage.
+- An empty-`orderId` submission runs trigger determination: a signal outside that stage's `trigger` set is rejected; on a hit, the signal's `validWhen` is evaluated in the empty-order context first (failure rejects with `SignalAdmissionRejected`), then the order id is derived from the birth fact, the order is created, and the signal is written as the first fact; re-delivery of the same birth fact is idempotent.
+- With an `orderId`, a trigger signal is an ordinary in-order signal and trigger membership is irrelevant.
+- A trigger stage must use a static non-`zhixu` executor (with `supplierID`) and cannot be an executor-patch target; the compiler rejects trigger stages that violate this.
+- In-order fact connections use `receiveSignals` `source::condition` expressions; cross-order connections use `spec.dockInterface` plus `executor.zhixuExecutorConfig` — there is no Hook-DSL cross-order subscription.
 
 ## `selectedStages`
 

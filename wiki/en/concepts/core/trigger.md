@@ -10,17 +10,19 @@ status: verified
 
 > Prerequisite reading: [Core Concepts](../README.md)
 
-The current DSL has no stage-level `trigger` or `externalSignals` fields. Every
-`receiveSignals` entry is a Hook; the compiler uses `orderTriggerKind` and
-`emitReady` to describe that Hook's order-entry role.
+A stage-level `trigger` is the explicit birth entry: it declares a subset of the
+stage's `sendSignals`, and each trigger signal synthesizes one order-trigger hook.
+Every `receiveSignals` entry is still an in-order Hook; the compiler uses
+`orderTriggerKind` and `emitReady` to describe a Hook's order-entry role, and the
+compiled artifact enumerates every order-trigger hook in `triggers[]`.
 
 ## Three entry roles
 
 | `orderTriggerKind` | Meaning |
 | --- | --- |
 | `none` | A normal in-order Hook; Ready updates state and may be consumed by a later flow. |
-| `mint` | Birth-stage entry; `mint: per-fact` deterministically mints one order from each `ANCHOR(@...)` subscription fact. |
-| `dock` | Docking-stage entry; once Ready, an already committed dock route/interface can open the linked order. |
+| `trigger` | Birth entry; bound to one trigger signal of the stage, it creates the order when submitted with an empty `orderId`. |
+| `dock` | Docking entry; once Ready, an already committed dock route/interface can open or attach the linked order. |
 
 The first transition to Ready for a Hook with `emitReady=true` emits one
 `HookReady`. The event carries `(planId, orderId, hookId, stageId, hookName)`;
@@ -40,22 +42,33 @@ A normal stage uses an in-order expression:
   sendSignals: [{name: str}, {name: cmp}, {name: err}]
 ```
 
-A birth stage explicitly declares `mint: per-fact` and may use only a
-cross-source subscription as its entry:
+A birth stage declares the signals that may create an order through `trigger`;
+each entry must be a member of the stage's `sendSignals`:
 
 ```yaml
 - name: intake
   source: customer
-  mint: per-fact
-  receiveSignals:
-    REQUESTED: "::ANCHOR(@customer::submit.requested)"
-  sendSignals: [{name: str}, {name: cmp}, {name: err}]
+  trigger: [requested]
+  sendSignals: [{name: requested}, {name: str}, {name: cmp}, {name: err}]
 ```
 
-`per-fact` is currently the only `mint` value. A birth stage must use a static
-`individual` or `organization` executor; the compiler rejects self-loops and
-unbounded cross-source re-mint cycles. Re-delivery of one fact resolves to the
-same derived order and cannot create a second one.
+- `trigger` may be omitted or empty: the stage cannot create orders. Non-empty:
+  each signal synthesizes one order-trigger hook. A stage may declare several
+  trigger signals, a plan may have several trigger stages, and a trigger stage
+  need not be the first stage.
+- Submitting `(stage, signal, orderId?)`: with an `orderId` the signal is an
+  ordinary in-order signal and trigger membership is irrelevant; with an empty
+  `orderId` the signal must belong to that stage's `trigger` set, otherwise it is
+  rejected with the named not-a-trigger error.
+- On a trigger hit, the signal's `validWhen` is evaluated in the empty-order
+  context first (no facts/files; negative conditions true; existence/delay
+  conditions false); failure rejects with `SignalAdmissionRejected`. On success
+  the order id is derived from the birth fact, the order is registered/created,
+  and the signal is written as the first fact.
+- Re-delivery of the same birth fact is idempotent (same order id, no second
+  order); the submitting side keeps `birthKey`/`factKey` idempotency semantics.
+- A trigger stage must use a static `individual`/`organization` executor (with a
+  `supplierID`); it cannot be a `zhixu` executor or an executor-patch target.
 
 ## Dock entries
 
@@ -89,25 +102,33 @@ rule as `metadata.name`), interface existence, port direction,
 root, and the single input binding of `mode=new` are all validated at compile
 time. `mode=existing` creates no child order; it attaches an existing target
 order as a peer — carried by both tracks, on-chain via `attachDockedOrder`
-(`UVPDockingModule` 4.7), sharing the same delivery surface as `new` after the
+(`UVPDockingModule` 4.8), sharing the same delivery surface as `new` after the
 attach (see [Docked Zhixu Runtime](../state-machine/docking.md)).
 
 ## Forms the compiler explicitly rejects
 
 The following forms are not valid DSL; the compiler explicitly rejects:
 
-- `stage.trigger` and `stage.externalSignals`;
-- executor `triggerEntrance`;
+- fields outside the stage closed set, and executor `triggerEntrance`;
+- `trigger` entries that are not members of the stage's `sendSignals`, duplicate
+  entries, or a trigger stage whose executor is not a static plain executor;
 - combining `supplierType: zhixu` with `supplierID`;
 - putting `source::stage.signal` Hook DSL in a `signalMap` value;
-- wrapper forms other than the subscription (e.g. `::OUTSIDE@(...)` or `::ANCHOR@(…)`).
+- cross-order subscription wrappers — in-order conditions use only
+  `source::condition` expressions.
 
-For a cross-source fact, use `::ANCHOR(@source::stage.signal)`; to mint an
-order from that fact, additionally declare `mint: per-fact` on the stage.
+In-order fact connections use `receiveSignals`; cross-order connections use
+`spec.dockInterface` plus `executor.zhixuExecutorConfig`; `trigger` is the
+explicit birth entry.
 
 ## Runtime and proof
 
 ```text
+trigger signal submitted with empty orderId
+  -> admission (validWhen) in the empty-order context
+  -> OrderRegistered + first fact
+  -> order-trigger HookReady
+
 receive Hook evaluates
   -> HookStatusChanged
   -> (if emitReady) HookReady(planId, orderId, hookId, stageId, hookName)

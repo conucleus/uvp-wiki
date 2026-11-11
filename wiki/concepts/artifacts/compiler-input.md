@@ -21,12 +21,14 @@ status: verified
 | `stages[].name` | stage 标识（`stageIdentifier`）本身，秩序内唯一。 |
 | `stages[].source` | hook source 和 `sourceId` 输入。 |
 | `stages[].receiveSignals` | 生成 receive hook。 |
-| `stages[].mint` | 出生阶段声明（per-fact 代铸/dock 出生锚相关物化位）。 |
+| `stages[].trigger` | 可选的出生信号集，是 `stages[].sendSignals` 的子集；每个条目在产物中合成一条 order-trigger hook，并进入派生读面 `triggers[]`。 |
 | `stages[].executor` | executor route 和 reachability。 |
 | `stages[].selectedStages` | selector binding 和 executor closure。 |
 | `stages[].sendSignals` | 出站 signal 声明（条目对象 `{name, validWhen?}`：能力清单 + 发射适格产物）。 |
 | `stages[].fileResources` | 产品资源要求和 resource patch 输入。 |
 | `spec.dockInterface` | 具名接口 map，编译为 dock 接口承诺（interface roots）。 |
+
+uvp-core analyze 的 wire schema 是 `uvp.zhixuAnalysis.v2`：它输出每 stage 规范化的 `triggers`（`<stage>.<signal>`）与 hook 解析结果，编译器据此合成 order-trigger hook。
 
 ## 编译器会拒绝什么
 
@@ -36,6 +38,7 @@ status: verified
 - stage 名在秩序内重复。
 - `selectedStages` 指向不存在的 stage。
 - executor route 无法被静态 executor 或 selector 触达。
+- `trigger` 条目不在本 stage `sendSignals` 内、重复，或 trigger stage 的 executor 不是静态 plain executor。
 - hook 表达式格式不合法。
 - signal 引用不是 `stage.signal` 形式。
 - receive signal 或 signal map 引用不存在的阶段或信号。

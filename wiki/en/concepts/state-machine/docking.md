@@ -13,7 +13,7 @@ order, then map a signal that already happened in the linked order back into the
 local order.
 
 This is not a Store sandbox draft and not a normal backend integration. The
-formal runtime path must land in the `UVPDockingModule` (abiVersion 4.7)
+formal runtime path must land in the `UVPDockingModule` (abiVersion 4.8)
 events and proof; the contract accepts only routes/interfaces
 covered by their committed `dockRoutesRoot`, `dockInterfaceRoot`, and Merkle
 proofs, and every binding/route hash carries an `interfaceNameId`
@@ -89,11 +89,11 @@ instance and target definition identity, preventing cross-plan preemption.
   is an optional delivery pre-authorization, the consent is the establishment
   precondition of open, and the two live in separate digest/nonce ledgers.
 - `order.mode=existing`: supported on-chain. `attachDockedOrder`
-  (`UVPDockingModule` 4.7) attaches an existing target order as a peer — no
+  (`UVPDockingModule` 4.8) attaches an existing target order as a peer — no
   child order is created; the consent gate is one of three legs (target order
   creator / incumbent executor / target plan publisher pre-authorization), and
   after attaching, inputs/outputs share the same delivery surface as `new`
-  (semantics: uvp-core subscription-mint-spec §2.4).
+  (semantics: [Trigger](../core/trigger.md)).
 - `target: null` (dynamic selection): supported on-chain. The compiled
   artifact carries the declaration surface as `unresolvedDockRoutes`
   (`uvp.dockRoute.unresolved.v1`; the candidate set derives from the
@@ -112,12 +112,18 @@ For the per-syntax-point acceptance comparison across the two tracks see
 
 ## Subscriptions and Entries
 
-The local stage entry is produced by a `receiveSignals` Hook. A cross-source
-fact uses `::ANCHOR(@source::stage.signal)`; a birth stage additionally
-declares `mint: per-fact`. `stage.trigger`, `externalSignals`,
-`triggerEntrance`, and wrapper forms other than the subscription
-(`::OUTSIDE@(...)`, `::ANCHOR@(…)`) are not part of the current DSL
-and are rejected by the compiler.
+A local stage entry has two explicit sources: an in-order `receiveSignals`
+Hook, or one of the stage's `trigger` birth signals. `trigger` is an optional
+subset of the stage's `sendSignals`, and each entry synthesizes one
+order-trigger hook; the compiled artifact's `triggers[]` enumerates every
+order-trigger hook (`orderTriggerKind` `trigger` or `dock`), and is a derived
+read surface that never enters the planHash preimage. Submitting a trigger
+signal with an empty `orderId` first evaluates `validWhen` in the empty-order
+context, then creates the order and writes the first fact; with an `orderId` the
+trigger signal is an ordinary in-order signal. In-order fact connections use
+`receiveSignals`; cross-order connections use `spec.dockInterface` plus
+`executor.zhixuExecutorConfig` — there is no Hook-DSL cross-order subscription
+wrapper.
 
 The `supplierType: zhixu` configuration declares the target interface name and
 `order.mode`, and expresses `inputMap`/`signalMap` as target interface port

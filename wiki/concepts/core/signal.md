@@ -29,6 +29,7 @@ Zhixu stage 里有两处和 signal 直接相关：
 
 | 字段 | 含义 |
 | --- | --- |
+| `trigger` | 可选出生信号集，是本 stage `sendSignals` 的子集；空/省略=不能建单，每个条目合成一条 order-trigger hook。 |
 | `receiveSignals` | 当前 stage 等待哪些输入 signal。每个 key 会编译成一个 [Hook](hook.md)。 |
 | `sendSignals` | 当前 stage 执行后可能发出哪些输出 signal，条目是对象 `{name, validWhen?}`（见下节"发射适格"）。 |
 
@@ -49,7 +50,11 @@ buyer_commit:
 
 ## 发射适格（validWhen）
 
-`sendSignals` 条目可以声明 `validWhen`（发射适格表达式）。声明了它的 signal 在**外部提交**到达时先过一道判定：引擎对提交前已成立的事实（不含本次提交本身）求值这条表达式，整棵表达式就绪才准入，否则以类型化错误拒绝——链上整笔 revert `SignalAdmissionRejected`，事实流不落任何行。声明形态是表达式列表（`[]string`：每项完整的 `{source}::{condition}`、全体项 header source 一致；编译期折叠为一棵 AND）。不声明 `validWhen` 的 signal 无条件准入；已落库事实的重复提交按 first-win 幂等吸收，不看适格。表达式语言、编译期约束与求值语义的权威在语言层正本（`uvp-core/docs/zhixu-dsl-grammar.md` §5.6 发射适格位）；引擎内部产生的事实（dock 投递、per-fact 铸单）不经此面。
+`sendSignals` 条目可以声明 `validWhen`（发射适格表达式）。声明了它的 signal 在**外部提交**到达时先过一道判定：引擎对提交前已成立的事实（不含本次提交本身）求值这条表达式，整棵表达式就绪才准入，否则以类型化错误拒绝——链上整笔 revert `SignalAdmissionRejected`，事实流不落任何行。声明形态是表达式列表（`[]string`：每项完整的 `{source}::{condition}`、全体项 header source 一致；编译期折叠为一棵 AND）。不声明 `validWhen` 的 signal 无条件准入；已落库事实的重复提交按 first-win 幂等吸收，不看适格。表达式语言、编译期约束与求值语义的权威在语言层正本（`uvp-core/docs/zhixu-dsl-grammar.md` §5.6 发射适格位）；引擎内部产生的事实（dock 投递）不经此面。
+
+## 出生信号与首事实
+
+`trigger` 集合里的 signal 既能作为普通订单内 signal 提交，也能作为出生入口：提交时 `orderId` 为空且 signal 命中某个 stage 的 `trigger`，合约先在**空订单上下文**求值该信号的 `validWhen`（无 facts/files；负条件为真；存在/延时条件为假），通过后再按出生事实派生 oid、登记/创建订单，并把该 signal 写为首事实。同一出生事实重试幂等；空 `orderId` 提交非 trigger signal 被具名拒绝。
 
 ## 文本名到链上 key
 

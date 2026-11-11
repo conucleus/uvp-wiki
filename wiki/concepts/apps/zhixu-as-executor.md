@@ -65,13 +65,13 @@ local order 和 linked order 都是独立的 `UVPStateMachine` order。它们各
 
 本地 stage 的 source 是 `settlement`；`str/cmp/err` 各字段的确切语义见下文 [signalMap 的协议含义](#signalmap-的协议含义)。
 
-对接阶段的入口仍然必须是本地 `receiveSignals` hook；如果它订阅另一个域的事实，使用 `::ANCHOR(@source::stage.signal)`。不存在独立的 `trigger` 或 `externalSignals` 入口字段：
+对接阶段的入口是本地 `receiveSignals` hook；出生入口属于 `trigger` stage（trigger stage 必须是静态 plain executor，不能是 `zhixu` executor）。不存在 Hook DSL 形式的跨秩序订阅：
 
 ```yaml
 - name: dock_customs_clearance
   source: customs
   receiveSignals:
-    LINK_READY: "::ANCHOR(@customs::clearance.ready)"
+    LINK_READY: settlement::route.ready
   executor:
     supplierType: zhixu
     zhixuExecutorConfig:
@@ -88,7 +88,7 @@ local order 和 linked order 都是独立的 `UVPStateMachine` order。它们各
         err: failed
 ```
 
-`LINK_READY` 是本地订阅 hook 的名称；linked order 的开始、完成或失败仍然通过 `signalMap`、docking link、proof 校验和授权 mapped signal 回填到本地 order。
+`LINK_READY` 是本地 hook 的名称；linked order 的开始、完成或失败仍然通过 `signalMap`、docking link、proof 校验和授权 mapped signal 回填到本地 order。订单的出生入口由另一条 static stage 的 `trigger` 信号承担。
 
 ## signalMap 的协议含义
 
