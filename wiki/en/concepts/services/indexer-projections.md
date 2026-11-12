@@ -18,7 +18,10 @@ It is responsible for replaying facts and building read models. The projection d
 | `src/indexer/viem-event-source.ts` | Reads contract logs from EVM RPC and preserves chain id, contract address, block, tx, and log index. |
 | `src/indexer/events.ts` | Normalizes raw contract logs into `ChainEvent`, including state-machine, Identity Registry, and deployment registry events. |
 | `src/indexer/service.ts` | Indexer runtime entry point, supporting normal sync and `rebuild:indexer`. |
-| `src/indexer/projections.ts` | Rebuilds order, task, timeline, and proof projections from state-machine events. |
+| `src/indexer/replay.ts` | Unified event ordering and replay orchestration; `rebuildOrderProjections` is the single projection-rebuild entry. |
+| `src/indexer/projections/` | Per-object projection rebuild files: `order.ts`, `signal.ts`, `stage.ts`, `stage-files.ts`, `dock.ts`, `plan.ts`, `proof.ts`, `snapshot.ts`, `task.ts`. |
+| `src/projection/plan-artifacts.ts`, `dock-artifacts.ts` | Postgres stores and index resolvers for the compiled-plan and Dock artifact tables; a missing artifact fails closed. |
+| `src/cli/record-plan-artifact.ts`, `record-dock-artifact.ts` | Production write entries for `plan_artifacts` / `dock_artifacts` (artifact identity checked). |
 | `src/indexer/identity-projections.ts` | Rebuilds subject/account identity projections from Identity Registry events. |
 | `src/storage/projection-store.ts` | Projection store contract, implemented by the Postgres adapter (Postgres-only). |
 
@@ -29,7 +32,7 @@ The indexer must handle at least three sources:
 | Source | Representative events | Projection purpose |
 | --- | --- | --- |
 | `UVPDeploymentRegistry` | Active deployment / cutover events. | Know the current state-machine address, deployment version, and release context. |
-| `UVPStateMachine` | `OrderRegistered`, `SignalSubmitted`, `HookStatusChanged`, `HookReady`, `TimerPoked`, stage/resource patch events. | Rebuild orders, tasks, status, timelines, and proof rows. |
+| `UVPStateMachine` | `OrderRegistered`, `SignalSubmitted`, `HookStatusChanged`, `HookReady`, `TimerPoked`, `StageExecutorPatchApplied`, `StageDockExecutorSelected`, `DockBindingPoked`, `DockOutputSubmitted`, `StageFilePatchApplied`, `StageFileOpApplied`. | Rebuild orders, tasks, stage executors, dock bindings and windows, stage file maps, status, timelines, and proof rows. |
 | `UVPIdentityRegistry` | `IdentityBindingRegistered`, `IdentityBindingRevoked`. | Rebuild the subject/account identity directory and revocation history; never filters Plans or capability. |
 
 ## Output Projections
@@ -41,6 +44,7 @@ The indexer must handle at least three sources:
 | Timeline projection | Product proof, Store runtime proof. | Every row must trace back to a tx/block/event. |
 | Proof projection | UI proof drawer, audits, release evidence. | Stores event proof, not plaintext evidence. |
 | Identity projection | Store catalog, Product catalog, supplier directory. | Revoked stays displayed as revoked/blocked. |
+| Dock projection | Chain read snapshot, Store dock read faces. | Static Docks (`uvp.dock.v1`) and bindings (`uvp.dockBinding.v1`): binding identity and output emission come from events; current A/B windows are a read-time live enrichment from the `dockOutputWindow` view and are never persisted. |
 | Sync status | Readiness, diagnostics, reconcile. | Exposes finality/reorg/sync lag; syncing states stay pending. |
 
 For DTO field definitions, see [Product DTO](../product/dto.md).

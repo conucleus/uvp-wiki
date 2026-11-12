@@ -1,166 +1,80 @@
 ---
-title: Docked Zhixu Runtime
+title: Dock and Binding
 type: explanation
 audience: 工程贡献者
+preread: ../core/trigger.md
 status: verified
 ---
 
-# Docked Zhixu Runtime
+# Dock and Binding
 
-Docked Zhixu is the order-to-order docking capability inside the state-machine
-runtime. It lets a local order hand one stage to another linked Zhixu / linked
-order, then map a signal that already happened in the linked order back into the
-local order.
+> Prerequisite reading: [Birth Signals and Order Entries](../core/trigger.md)
 
-This is not a Store sandbox draft and not a normal backend integration. The
-formal runtime path must land in the `UVPDockingModule` (abiVersion 4.8)
-events and proof; the contract accepts only routes/interfaces
-covered by their committed `dockRoutesRoot`, `dockInterfaceRoot`, and Merkle
-proofs, and every binding/route hash carries an `interfaceNameId`
-(keccak of the interface name) dimension.
+A Dock is the single channel for cross-order collaboration: one Zhixu (side B) publishes an independent `kind: Dock` document declaring "which output signal of which stage is emitted when which fact condition on which source of another Zhixu (side A) holds." At runtime the B order selects a dock executor on its attach stage, writes the A order id, and pokes the window; when the A/B windows intersect, the B output signals are emitted into the B order.
+
+Both orders are independent `UVPStateMachine` orders with the composite identity `(planId, orderId)`. A Dock maps facts that already happened in the A order into emission conditions on the B order; order creation still comes from each order's own birth channel. The invariant overview is in [Protocol Boundaries](../protocol-boundaries.md).
 
 ## State-Machine Objects
 
 | Object | Meaning |
 | --- | --- |
-| local order | The current order, identified by `(localPlanId, localOrderId)`, waiting for a peer Zhixu's output to move a local stage forward. |
-| linked order | Another Zhixu order docked into this one, identified by `(targetPlanId, linkedOrderId)`, with its own plan, authorization, signals, and proof. |
-| dock instance | One concrete docking relation containing local stage, route, target plan/order, interface, mode, source seam, input/output roots, and the parent-chain edge position (`depth`). |
-| input binding | A binding from a local Hook to a target interface input port, deduplicated by `inputBindingHash`. |
-| output binding | A mapping from a target interface output port to a local source/signal, deduplicated by `outputBindingHash`. |
+| Dock document | The B-side `kind: Dock` definition: `spec.from{zhixu,source}` / `spec.to{zhixu,stage}` / `spec.signalMap`; the compiled artifact is `uvp.dock.v1`, identity `dkid = zd-<32hex>`. |
+| dock stage | The B-side target stage declaring `executor.supplierType: dock` and `receiveSignals`; its hooks carry the `HOOK_FLAG_DOCK_EXECUTOR` flag. |
+| dock executor selection | The order-level patch that selects a dock executor once on the attach stage of one B order; it stays fixed afterwards. |
+| binding | The A→B relation determined by the `dock_link` file entry (A order id); its on-chain identity is the seven-word `bindingId`. |
+| output window | One row per B output signal: the A window (the A-side `validWhen` program) and the B window (the B-side `sendSignals.validWhen` admission). |
 
-## Chain Events
+## Registration: the B-Side Dock Declaration
 
-| Event | Meaning |
-| --- | --- |
-| `DockOpened` | Atomically records the dock instance, local/target plan/order, `interfaceNameId`, route, depth (this edge's parent-chain position = parent ledger + 1), and opener (`mode=new` mints a child order). |
-| `DockAttached` | For a `mode=existing` docking onto an existing target order: records the dock instance and docking facts (the indexed `linkedOrderId` carries the target-side "who attached to me" projection; N:1 batching). |
-| `DockInputSubmitted` | Records an input delivered to the linked order under a binding. |
-| `DockOutputSubmitted` | Records a linked output mapped back to the local order under a binding. |
+`UVPDockRegistry` (ABI 0.1) holds the static Dock registry. `registerDock` writes the from/to plans, `from.source`, `to.stage`, docHash, and every output's window instruction program (atoms + `SIGNAL` / `NOT` / `AND` / `OR` / `DELAY`). Registration is permissionless, and every output and atom must prove membership against the corresponding plan's `capabilitiesRoot`, so a Dock only references declared signals.
 
-Dock outputs carry no terminal semantics: there is no dock-level terminal event,
-and whether a local stage finishes is driven only by the local stage/order's own
-completion semantics.
+- Identity: `dkid = bytes32(bytes16(docHash))`; `docHash` derives from the Dock document content (domain `uvp:dock-uid:v1`, excluding `metadata.name` / `metadata.annotations`).
+- Read surface: `getDock(dkid)` / `dockOutputCount(dkid)` / `getDockOutput(dkid, outputIndex)`; the argument is the **dkid word** (the artifact `dkid` right-padded).
+- Event: `DockRegistered` carries the full outputs, atoms, and A-window programs.
+- The cloud-track registration endpoint and error codes are in the Dock endpoints of `uvp-cloud.md`; per-syntax acceptance differences across tracks are in `uvp-chain.md` Appendix B in the `uvp-eth` repo.
 
-`UVPStateMachineLens.getActiveDock`, `dockInputDelivered`,
-`dockOutputDelivered`, `dockByLocalRoute`, and `dockByTargetOrder` are the
-authoritative views for the active relation; there are no
-`getActiveDockedOrderLink` or `getActiveDockedSignalBinding` views.
+## Executor Selection: a One-Time Decision of the B Order
 
-## Runtime Path
+The attach stage's dock executor is selected through the order-level stage patch: `UVPStagePatchModule` (ABI 0.9) exposes `selectStageDockExecutor` / `selectStageDockExecutorFor`, which take a `StageDockExecutorSelection`; the selector stage signs it with EIP-712 (domain `stageExecutorPatch` 0.4; the direct call path uses `msg.sender` as selector).
+
+The contract checks three things: the stage's hooks carry `HOOK_FLAG_DOCK_EXECUTOR`, the selector binding relation holds, and the executor holds order-level authorization for every Dock output signal. Replaying the same dkid + executor is absorbed idempotently; replacing the selection is rejected loudly (`StageDockExecutorAlreadySelected`). The `StageDockExecutorSelected` event records dockId, fromPlanId, executor, selector, and patchHash. Once selected, the executor stays fixed and the dock stage only follows this one-time selection path (generic executor patches reject with `StageExecutorPatchForbiddenOnDockStage`).
+
+## Binding: the A Order Id Is the Relation
+
+A binding is determined by the attach stage's file-map entry `dock_link`: the key is `keccak("dock_link")` and the value is the canonical A order id (`0x` + 64 hex). Writing establishes the binding, rewriting switches it, and the same A order id returns to the same binding.
+
+The on-chain binding identity is seven 32-byte words:
 
 ```text
-local stage HookReady(planId, orderId, hookId, ...)
-  -> Store/Product or adapter selects a published target Zhixu by definition name
-  -> openDockedOrder (single-argument OpenDockCallV1) validates route/interface roots, permit, the target-side consent gate, and the edge budget
-  -> one transaction creates the linked order and submits the birth-anchor input (the single input binding of a mode=new route)
-  -> the linked order runs under its own Plan, authorization, and executor
-  -> submitDockedInput delivers later local signal inputs as needed
-  -> linked SignalSubmitted appears
-  -> submitDockedSignal submits the output binding
-  -> local order receives mapped SignalSubmitted and DockOutputSubmitted proof
-  -> local hooks continue evaluation
+bindingId = keccak256(abi.encode("uvp.dock.binding_id.v1",
+  dkid, toPlanId, toOrderId, toStageId, fromPlanId, fromOrderId))
 ```
 
-Every cross-plan reference must retain `planId`. An `orderId` is not a global key
-and cannot be used alone to look up or merge docks, signals, or proofs.
-`dockInstanceId` also includes the local plan namespace, the mode word, and
-`interfaceNameId` in its preimage; the route hash (domain V3,
-`UVP_DOCK_ROUTE_V3`) pins targetPlanId in its preimage's target slot for static
-routes, so a mirror plan that copies interface commitments still cannot satisfy
-a committed route's identity; `linkedOrderId` is derived from the dock
-instance and target definition identity, preventing cross-plan preemption.
+The `contentHash` of the `dock_link` file record authenticates the revealed payload only at poke time: a payload that disagrees with the record reverts with `DockBindingContentHashMismatch`. Binding identity, events, views, and fact provenance all use `bindingId`.
 
-## Mode Boundaries: new / existing / dynamic selection
+## Windows and Emission: Poke
 
-- `order.mode=new`: fully supported on-chain. Each route carries exactly one
-  input binding (the birth anchor); `openDockedOrder` creates the child order,
-  registers the link, and writes the birth-anchor fact in one transaction.
-  Establishment must pass the **target-side consent gate**: a caller that is
-  itself the target plan publisher (the same authority as the new-route child
-  order creator — the two legs coincide) signs nothing; any other caller must
-  carry the publisher's EIP-712 consent signature — typed data
-  `UVPDockOpenConsentV1` (domain `UVPDockingModule` version "4"; ten-field
-  digest: targetPlanId / interfaceNameId / localPlanId / localOrderId / routeId
-  / routeHash / dockInstanceId / linkedOrderId / nonce / deadline, with its own
-  nonce ledger); an empty signature from a non-publisher reverts
-  (`DockOpenConsentRequired`). The entrance permit typed-data is
-  `UVPDockEntrancePermitV2` (with `interfaceNameId`; same domain) — the permit
-  is an optional delivery pre-authorization, the consent is the establishment
-  precondition of open, and the two live in separate digest/nonce ledgers.
-- `order.mode=existing`: supported on-chain. `attachDockedOrder`
-  (`UVPDockingModule` 4.8) attaches an existing target order as a peer — no
-  child order is created; the consent gate is one of three legs (target order
-  creator / incumbent executor / target plan publisher pre-authorization), and
-  after attaching, inputs/outputs share the same delivery surface as `new`
-  (semantics: [Trigger](../core/trigger.md)).
-- `target: null` (dynamic selection): supported on-chain. The compiled
-  artifact carries the declaration surface as `unresolvedDockRoutes`
-  (`uvp.dockRoute.unresolved.v1`; the candidate set derives from the
-  resolution manifest); the route hash (domain V3) leaves the target slot
-  zero in its dynamic form, and `attachDockedOrder` settles the target with a
-  candidate-leaf (`UVP_DOCK_CANDIDATE_V2`, binding the selected target's
-  planId) membership proof, pinned for the instance's lifetime. The only
-  dynamic route the chain track rejects is `order.mode=new`
-  (`UNRESOLVED_DOCK_MODE`). The cloud runtime
-  reads dock route selection records to fill in the target (resolved by name,
-  validated against the local interface/port declaration, with the instance
-  established on DB natural keys).
+`pokeDockBinding(planId, orderId, targetStageId, payloadContent, fromOrderId, outputCapabilityProofs[])` is the permissionless evaluation entry:
 
-For the per-syntax-point acceptance comparison across the two tracks see
-`uvp-chain.md` Appendix B in the `uvp-eth` repo.
+1. verify the `dock_link` payload and content hash, and confirm the A order belongs to the Dock's from plan;
+2. evaluate the A window over A-order facts with `evaluateDockWindow` (the same evaluator as hooks; `~` closes on fact arrival, `+T` delays the anchor);
+3. for every output, re-check the B-side `sendSignals.validWhen` admission (Ready over the pre-state);
+4. write every satisfied output into the B order through `submitDockOutputSignalFromModule`, first-win per output; an output whose A/B windows have not yet intersected stays pending.
 
-## Subscriptions and Entries
+Events: `DockBindingPoked` (once per transaction, with bindingId, fromOrderId, executor, and emittedCount) and `DockOutputSubmitted` (once per output, with bindingId, outputIndex, signalId). The B fact's provenance carries the `bindingId`.
 
-A local stage entry has two explicit sources: an in-order `receiveSignals`
-Hook, or one of the stage's `trigger` birth signals. `trigger` is an optional
-subset of the stage's `sendSignals`, and each entry synthesizes one
-order-trigger hook; the compiled artifact's `triggers[]` enumerates every
-order-trigger hook (`orderTriggerKind` `trigger` or `dock`), and is a derived
-read surface that never enters the planHash preimage. Submitting a trigger
-signal with an empty `orderId` first evaluates `validWhen` in the empty-order
-context, then creates the order and writes the first fact; with an `orderId` the
-trigger signal is an ordinary in-order signal. In-order fact connections use
-`receiveSignals`; cross-order connections use `spec.dockInterface` plus
-`executor.zhixuExecutorConfig` — there is no Hook-DSL cross-order subscription
-wrapper.
+## Read Surface and Replay
 
-The `supplierType: zhixu` configuration declares the target interface name and
-`order.mode`, and expresses `inputMap`/`signalMap` as target interface port
-names; at least one of the two maps must be non-empty. Resolution has two
-layers: the core linker looks names up in the `uvp.dock.resolution.v2`
-manifest's name directory and performs structural validation; the chain
-track's publication surface embeds the target definition in full in the same
-schema, and the TS compiler recomputes the content-derived identity
-(`zx-<32hex>`) and artifact/interface roots as a content-addressing check
-(chain-track internal). `signalMap` does not carry Hook DSL and does not
-complete local business work merely by being configured.
-
-## Edge Budget and Idempotency
-
-The per-order total dock-edge ledger `dockEdgeCountOfOrder` is the single
-authority: open mints the dock child order and counts an edge (child ledger =
-parent ledger + 1), while attach counts an edge and takes the max (target
-ledger raised to max(own, parent ledger + 1)). The caller-reported `parentDepth`
-must match the ledger (`DockDepthMismatch` otherwise), and a ledger that has
-reached `MAX_DOCK_EDGES = 8` is rejected (`DockDepthExceeded`, meaning the
-per-order total dock-edge cap is exceeded). Before attach, a bounded ancestor
-check walks the `dockParentOfOrder` parent-chain pointers for at most 8 hops
-and rejects if the target order appears inside the parent's ancestor chain
-(`DockAncestorCycle`, preventing cross-order cycles). The longest path is not
-maintained on-chain; indexers derive it from the `DockOpened` / `DockAttached`
-event graph. Open, birth-anchor input, linked-order registration, and
-`DockOpened` complete in one EVM transaction; any failure rolls everything
-back. After dock identity, route, endpoint, and permit checks pass, a repeated
-open returns `false` without consuming the permit nonce. Repeated input/output
-returns an idempotent result or an explicit conflict.
+- On-chain reads: `getStageDockBinding(planId, orderId, targetStageId, fromOrderId)` reports the current binding (dock, executor, fromPlanId, bindingId); `dockOutputWindow(...)` reports current A/B window satisfaction, relative `dueInSeconds`, and emitted status. Historical window times are carried by on-chain events.
+- Chain-read DTO: `uvp.dockBinding.v1` (`binding_id`, `dkid`, from/to identities, output windows and emitted flags, `pending`), assembled by chain-services from events and read views; projections must be rebuildable from events.
+- Replay: binding state is rebuilt from the dock executor selection record, the `dock_link` file entry, and poke/emission events; replay converges to the same binding set and the same B fact set.
 
 ## Boundaries
 
-- The local and linked orders are independent on-chain orders, each with `(planId, orderId)`, authorization, events, and lifecycle.
-- The linked Zhixu has its own plan publication, order registration, signal authorization, and proof.
-- A Store docking session is only trial composition and review material; formal proof comes from the birth event per mode (`DockOpened` for `mode=new`, `DockAttached` for `mode=existing` — attaching does not emit `DockOpened`), the delivery events shared by both modes (`DockInputSubmitted` / `DockOutputSubmitted`), and events on both orders.
-- `submitDockedSignal` maps a signal that already exists in the linked order and satisfies the binding; it does not create business facts for the linked order and never forces a terminal state on either side.
-- Unknown, pending, reverted, and retryable states must remain distinct in adapters/Store and must not be rendered as success or silently dropped.
+- Both orders are independent: `(planId, orderId)` composite identity; cross-plan references always carry `planId`, and the two sides are linked by the composite identity.
+- Terminal state is driven only by the local stage/order end; a Dock output only expresses the B signal mapped from A-window facts.
+- The target `to.stage` declares its binding surface through `receiveSignals`; birth is carried by birth signals only ([Birth Signals and Order Entries](../core/trigger.md)).
+- Store trial composition, review, and dock sessions are off-chain workflow material; formal facts are `DockRegistered`, `StageDockExecutorSelected`, `DockBindingPoked`, `DockOutputSubmitted`, and the events of both orders.
+- Unknown, pending, reverted, and retryable states stay distinct in the rendered result.
 
-For the canonical narrative from the executor's perspective, see [Docked Zhixu / Zhixu as Executor](../apps/zhixu-as-executor.md).
+For the executor-perspective narrative, see [Dock Collaboration](../apps/zhixu-as-executor.md).

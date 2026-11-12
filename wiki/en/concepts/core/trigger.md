@@ -1,142 +1,84 @@
 ---
-title: Ready and Order Entries
+title: Birth Signals and Order Entries
 type: explanation
 audience: 协议读者
 preread: ../README.md
 status: verified
 ---
 
-# Ready and Order Entries
+# Birth Signals and Order Entries
 
 > Prerequisite reading: [Core Concepts](../README.md)
 
-A stage-level `trigger` is the explicit birth entry: it declares a subset of the
-stage's `sendSignals`, and each trigger signal synthesizes one order-trigger hook.
-Every `receiveSignals` entry is still an in-order Hook; the compiler uses
-`orderTriggerKind` and `emitReady` to describe a Hook's order-entry role, and the
-compiled artifact enumerates every order-trigger hook in `triggers[]`.
+This page answers two questions: where orders come from, and how stages materialize. Birth is expressed by `trigger: true` on a `sendSignals` entry: the compiler synthesizes one order-trigger hook per birth signal, while every `receiveSignals` entry remains an in-order Hook.
 
-## Three entry roles
-
-| `orderTriggerKind` | Meaning |
-| --- | --- |
-| `none` | A normal in-order Hook; Ready updates state and may be consumed by a later flow. |
-| `trigger` | Birth entry; bound to one trigger signal of the stage, it creates the order when submitted with an empty `orderId`. |
-| `dock` | Docking entry; once Ready, an already committed dock route/interface can open or attach the linked order. |
-
-The first transition to Ready for a Hook with `emitReady=true` emits one
-`HookReady`. The event carries `(planId, orderId, hookId, stageId, hookName)`;
-`planId` must be retained with the order and must never be inferred from a bare
-`orderId`. An internal Hook with `emitReady=false` may still evaluate but emits
-no `HookReady`.
-
-## Normal and birth stages
-
-A normal stage uses an in-order expression:
-
-```yaml
-- name: review
-  source: buyer
-  receiveSignals:
-    READY: seller::submit.cmp
-  sendSignals: [{name: str}, {name: cmp}, {name: err}]
-```
-
-A birth stage declares the signals that may create an order through `trigger`;
-each entry must be a member of the stage's `sendSignals`:
+## Birth Declaration
 
 ```yaml
 - name: intake
   source: customer
-  trigger: [requested]
-  sendSignals: [{name: requested}, {name: str}, {name: cmp}, {name: err}]
+  sendSignals:
+    - name: requested
+      trigger: true
+    - name: str
+    - name: cmp
+    - name: err
+  executor: { supplierType: organization, supplierID: customer-desk }
 ```
 
-- `trigger` may be omitted or empty: the stage cannot create orders. Non-empty:
-  each signal synthesizes one order-trigger hook. A stage may declare several
-  trigger signals, a plan may have several trigger stages, and a trigger stage
-  need not be the first stage.
-- Submitting `(stage, signal, orderId?)`: with an `orderId` the signal is an
-  ordinary in-order signal and trigger membership is irrelevant; with an empty
-  `orderId` the signal must belong to that stage's `trigger` set, otherwise it is
-  rejected with the named not-a-trigger error.
-- On a trigger hit, the signal's `validWhen` is evaluated in the empty-order
-  context first (no facts/files; negative conditions true; existence/delay
-  conditions false); failure rejects with `SignalAdmissionRejected`. On success
-  the order id is derived from the birth fact, the order is registered/created,
-  and the signal is written as the first fact.
-- Re-delivery of the same birth fact is idempotent (same order id, no second
-  order); the submitting side keeps `birthKey`/`factKey` idempotency semantics.
-- A trigger stage must use a static `individual`/`organization` executor (with a
-  `supplierID`); it cannot be a `zhixu` executor or an executor-patch target.
+- A birth entry belongs to the stage's `sendSignals`, is unique within the stage, is fixed at compile time, and enters the plan commitment surface.
+- A stage may declare several birth signals, and a plan may have several birth stages; a birth stage need not be the first stage.
+- The birth stage's executor is a static plain executor (`individual`/`organization` with a non-empty `supplierID`); birth authority never follows a dock binding or a runtime patch.
+- The compiled artifact enumerates birth entries in `triggers[]`; `orderTriggerKind` is the closed set `none | trigger`, and `emitReady` marks whether the hook's first Ready emits `HookReady`.
 
-## Dock entries
+## Submission and Birth Decision
 
-A `supplierType: zhixu` stage describes its dock through
-`zhixuExecutorConfig`; it does not use `supplierID`, `triggerEntrance`, or
-Hook-DSL-shaped `signalMap` values:
+- Empty `orderId` + birth signal → birth submission: `validWhen` is first evaluated in the empty-order context (no facts/files; negative conditions hold, existence and delay-maturity conditions do not); a failure reverts with `SignalAdmissionRejected`. On success the order id is derived from the birth fact, the order is registered/created, and the signal is written as the first fact.
+- Empty `orderId` + non-birth signal → a named rejection (a `NotTriggerSignal`-class entry error).
+- A birth signal carrying an `orderId` is handled as an ordinary in-order signal; birth identity applies to empty-`orderId` submission.
+- Re-delivering the same birth fact is idempotent: the same definition, stage, signal, and payload/idempotency key derive the same order id; the submitting side carries `factKey` idempotency semantics.
+- The birth fact itself is the order's first fact, settled first-win.
 
-```yaml
-executor:
-  supplierType: zhixu
-  zhixuExecutorConfig:
-    target:
-      zhixu: customs-clearance
-    interface: clearance_service
-    order:
-      mode: new
-    inputMap:
-      READY: execute     # mode=new: exactly one input binding (the birth anchor)
-    signalMap:
-      str: started
-      cmp: completed
-      err: failed
-```
+## Three Birth Channels (Chain Runtime)
 
-`inputMap` keys must be local `receiveSignals` channels and values must be
-input-port names of the target interface; `signalMap` keys must be local
-`sendSignals` and values must be output-port names of the target interface. At
-least one of the two maps must be non-empty. The target name (slug shape, same
-rule as `metadata.name`), interface existence, port direction,
-`order.mode ∈ the target interface's orderModes`, the interface root, the route
-root, and the single input binding of `mode=new` are all validated at compile
-time. `mode=existing` creates no child order; it attaches an existing target
-order as a peer — carried by both tracks, on-chain via `attachDockedOrder`
-(`UVPDockingModule` 4.8), sharing the same delivery surface as `new` after the
-attach (see [Docked Zhixu Runtime](../state-machine/docking.md)).
+| Channel | Summary |
+| --- | --- |
+| outside-trigger open submission | The plan-authorized birth submitter (`birthAuthorizer`) submits the birth signal with EIP-712: the signed entry is `triggerOrderFromOutsideFor`, and the contract entry is `triggerOrderFromOutsideByAuthorizer`. |
+| order-link derived creation | The from-signal trigger entry of `UVPOrderLinkModule` derives an order and links it back to its origin. |
+| Governance fork `forkOrder` | Replays the parent order's history fact by fact into a new order with lineage, serving mid-flight exception succession. |
 
-## Forms the compiler explicitly rejects
+The cloud-track engine creates orders from an empty `orderId` + birth signal. A Dock establishes a binding on an existing order and emits B output signals; orders always come from the birth channels above.
 
-The following forms are not valid DSL; the compiler explicitly rejects:
+## Materialization Gate
 
-- fields outside the stage closed set, and executor `triggerEntrance`;
-- `trigger` entries that are not members of the stage's `sendSignals`, duplicate
-  entries, or a trigger stage whose executor is not a static plain executor;
-- combining `supplierType: zhixu` with `supplierID`;
-- putting `source::stage.signal` Hook DSL in a `signalMap` value;
-- cross-order subscription wrappers — in-order conditions use only
-  `source::condition` expressions.
+A chain stage can only materialize through its own order-trigger hook or an EMIT_READY hook, and every stage needs at least one materialization path:
 
-In-order fact connections use `receiveSignals`; cross-order connections use
-`spec.dockInterface` plus `executor.zhixuExecutorConfig`; `trigger` is the
-explicit birth entry.
+- Birth stage: each birth signal synthesizes one order-trigger hook; it materializes even without `receiveSignals`.
+- Other stages: a receive hook of a stage with a static executor (plain or dock) compiles to EMIT_READY.
+- A stage with neither birth signals nor `receiveSignals` compiles to zero hooks and can never materialize; `uvp-core analyze` rejects it at compile time.
+- Dock stage: its receive hooks carry the `HOOK_FLAG_DOCK_EXECUTOR` flag (flags bit 16), and its executor is written by a one-time order-level selection; a dock stage has no order-trigger hook.
 
-## Runtime and proof
+The full hook flag set: `1 = ORDER_TRIGGER_MINT`, `4 = EMIT_READY`, `8 = ADMISSION`, `16 = DOCK_EXECUTOR`.
+
+## Runtime and Proof
 
 ```text
-trigger signal submitted with empty orderId
-  -> admission (validWhen) in the empty-order context
+birth signal submitted with an empty orderId
+  -> admission (validWhen evaluated in the empty-order context)
   -> OrderRegistered + first fact
   -> order-trigger HookReady
 
-receive Hook evaluates
+receive hook evaluates
   -> HookStatusChanged
   -> (if emitReady) HookReady(planId, orderId, hookId, stageId, hookName)
-  -> Product/Store projects a task or dock workflow
-  -> authorized signal / dock event supplies the next fact
+  -> later facts arrive from authorized signals or Dock emission
 ```
 
-`HookReady` means that a task or docking entry can be processed; it does not
-mean that business work is complete. Completion, failure, and cancellation
-must be expressed through an authorized `SignalSubmitted` or a docking-module
-proof event. Unknown or retrying states must not be rendered as success.
+`HookReady` means only that a task or entry can be processed, not that business work is complete. Completion, failure, and cancellation are expressed by authorized `SignalSubmitted` or Dock emission events; unknown or retrying states are rendered as explicit states.
+
+## Acceptance Surface
+
+- The stage field closed set: `name`, `source`, `executor`, `selectedStages`, `sendSignals`, `receiveSignals`, `fileResources`, `fileWriters`.
+- Birth entries lie within the stage's `sendSignals` and are unique; a birth stage uses a static plain executor.
+- In-order fact connections use only `receiveSignals` `source::condition` expressions; cross-order collaboration uses an independent `kind: Dock` document plus the target stage's `executor.supplierType: dock`, as described in [Dock and Binding](../state-machine/docking.md) and [Dock Collaboration](../apps/zhixu-as-executor.md).
+- Definition shape, field-level validation, and per-track acceptance follow the `uvp-core` language manual and `uvp-chain.md` Appendix B in the `uvp-eth` repo.

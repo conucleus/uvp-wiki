@@ -67,7 +67,7 @@ struct EvalValue {
 }
 ```
 
-`wait/ready/cxl` 是 hook 运行态；云侧语义层另有 `init`（尚未收敛的初始态）等中间态，但它不是链上 `Instruction[]` 的求值结果。Hook 只在当前订单事件集上求值：trigger 信号出生时先在空订单上下文求值 `validWhen`，通过后写首事实；dock 投递信号进入同一订单事件集。汇聚（撮合）语义由多条同单条件与执行器配对表达。
+`wait/ready/cxl` 是 hook 运行态；云侧语义层另有 `init`（尚未收敛的初始态）等中间态，但它不是链上 `Instruction[]` 的求值结果。Hook 只在当前订单事件集上求值：出生信号在空订单上下文判 Ready 后写为首事实；Dock 在 A/B 窗口满足时发射的 B 输出信号写入同一订单事件集。汇聚（撮合）语义由多条同单条件与执行器配对表达。
 
 ## Operator 语义
 
@@ -86,8 +86,7 @@ struct EvalValue {
 `submitSignal()` 按 `(planId, orderId, sourceId, signalId)` 去重：同一订单
 作用域内的 `signalKey` 只有第一次提交会写入 `SignalRecord`（first-writer-wins），
 重复的外部提交被幂等吸收、不重复推进（`SignalAlreadyExists` revert 保留给引擎
-内部写入口）。提交时合约检查 submitter 是否持有显式订单级授权，或是否是当前 active
-executor overlay 委任的钱包；两者都不满足时提交被拒绝。授权模型详见
+内部写入口）。提交时合约检查 submitter 是否持有该 `source`/`signal` 的显式订单级授权；executor patch 与 dock 执行者选择生效时把对应授权集写入订单。授权模型详见
 [Signal 授权](../trust/signal-authorization.md)。任何 replay oracle、索引和
 Product API 都必须携带 `planId`，不能用 bare `orderId` 跨 plan 归并。
 

@@ -57,6 +57,6 @@ Neither entry can bypass:
 - payload hashes;
 - first-writer-wins signal semantics;
 - chain event proofs;
-- the active executor overlay.
+- order-level explicit `SignalAuthorization` plus EIP-712 signatures; executor patches are checked against their own patch authorization surface.
 
 Order App owns no order state; uvp-client owns no order state, session, or private key.

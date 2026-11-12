@@ -16,7 +16,7 @@ CHAIN_SERVICES_DATABASE_URL=postgres://user:password@host:5432/database
 CHAIN_SERVICES_MIGRATIONS_AUTO_RUN=false
 ```
 
-`CHAIN_SERVICES_DATABASE_URL` is required in every environment — including local runs and unit-test setups. When it is missing, startup fails with a configuration error that names the key and how to provision a database. The value must be a `postgres://` (or `postgresql://`) DSN: the `CHAIN_SERVICES_DATABASE_DRIVER` switch has been removed, the SQLite and in-memory engines are gone, and there is no implicit default or any mode that starts without Postgres.
+`CHAIN_SERVICES_DATABASE_URL` is required in every environment — including local runs and unit-test setups. When it is missing, startup fails with a configuration error that names the key and how to provision a database. The value must be a `postgres://` (or `postgresql://`) DSN: Postgres is the only storage engine, and there is no implicit default or any mode that starts without it.
 
 | Storage rule | Requirement |
 | --- | --- |
@@ -34,19 +34,18 @@ CHAIN_SERVICES_MIGRATIONS_AUTO_RUN=false
 | --- | --- |
 | `src/storage/factory.ts` | Creates the Postgres store set from env (Postgres-only). |
 | `src/storage/projection-store.ts` | Projection storage contract. |
-| `src/storage/postgres.ts`, `postgres-client.ts`, `postgres-rows.ts` | PostgreSQL adapter. |
+| `src/storage/postgres.ts`, `postgres-client.ts` | PostgreSQL adapter. |
 | `src/storage/postgres-migrations.ts` | Migration runner: `NNNN_name.sql` loading, checksum ledger, retired-migration checks. |
 | `src/config/env.ts`, `preflight.ts` | Runtime env parsing and fail-closed checks. |
-| `src/security/redaction.ts`, `audit.ts` | Redaction and audit support. |
+| `src/security/audit.ts` | Audit support; redaction is provided by `@uvp-eth/service-runtime`'s `redactSecrets`. |
 
 ## Migrations
 
-The historical numbered migrations have been collapsed into a single net schema; the authoritative source is the `service/migrations/postgres/` directory. Migration bytes follow the dev live line — no cross-version upgrade path is promised; numbered migration files are never edited, and structural changes open a new numbered migration.
+There is a single baseline migration, authoritative under `service/migrations/postgres/`. Migration bytes follow the dev live line — no cross-version upgrade path is promised; numbered migration files are never edited, and structural changes open a new numbered migration.
 
 | Migration | Contents |
 | --- | --- |
-| `0001_schema` | A single pg_dump net schema: chain event projections, business helper tables, and workflow-state structures. |
-| `0002_plan_artifacts` | `plan_artifacts` compiled-plan table (row-immutable; the only plan-vocabulary source for index enrichment and submission proofs) plus supplier tag-column cleanup. |
+| `0001_schema` | A single pg_dump net schema: the 7 chain/projection tables (`chain_event_log`, `chain_index_cursor`, `chain_projection_snapshot`, `chain_projection_sync_state`, `indexer_pending_post_commit`, `plan_artifacts`, `dock_artifacts`) plus functions, triggers, indexes, and constraints. |
 
 - The runner records each migration's version and sha256 checksum in the `chain_services_migrations` ledger; a checksum mismatch against an applied migration refuses startup, and the database must be reconciled against the ledger and recreated.
 - An applied version whose file no longer exists in the directory also refuses startup (retired-migration check), so migration history cannot be silently rewritten.
@@ -65,7 +64,7 @@ The Base Sepolia / testnet profile must reject:
 - A missing `UVPStateMachine` / `UVPIdentityRegistry` address manifest.
 - Broadcast disabled while still claiming staging readiness (non-local environments require an explicitly configured broadcast adapter; otherwise startup fails with a configuration error).
 
-Note that there is no demo fallback to reject: the Product API has no demo data source — an empty projection returns an empty array or `detail_unavailable` — and no `?fallback=demo` parameter or `UVP_PRODUCT_DEMO_MODE` key exists. The same holds for E2E fixture controls: the e2e-controls module and `UVP_PRODUCT_E2E_FIXTURES` have been removed, so fail-closed enforcement is about required explicit configuration, not about switching demo modes off.
+Every runtime starts from explicit configuration: the Product API only reads projections — an empty projection returns an empty array, a missing detail returns `detail_unavailable`, and there is no `?fallback=demo` parameter or `UVP_PRODUCT_DEMO_MODE` key. Fail-closed enforcement is about required explicit configuration.
 
 Readiness can say whether a service instance runs with the correct configuration; on-chain plan/order/signal/trust facts still come from events.
 

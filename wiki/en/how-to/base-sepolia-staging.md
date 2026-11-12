@@ -25,7 +25,7 @@ UVP_BASE_SEPOLIA_BROADCAST_CONFIRMATION=I_UNDERSTAND_THIS_BROADCASTS_BASE_SEPOLI
 pnpm deploy:base-sepolia
 ```
 
-This entry deploys `UVPStateMachine`, the six frozen modules, `UVPDeploymentRegistry`, and `UVPIdentityRegistry`, records the deployment, and writes the address manifest (`uvp-eth.addresses.v1`). It is the contract-only entry: it stops here and does not register a Plan — the plan/order/dock smoke continues in the bootstrap entry below.
+This entry deploys `UVPStateMachine`, the seven frozen modules (stage patch, plan metadata, derived signal, order link, dock registry, file resource, lens), `UVPDeploymentRegistry`, and `UVPIdentityRegistry`, records the deployment, and writes the address manifest (`uvp-eth.addresses.v1`). It is the contract-only entry: it stops here and does not register a Plan — the plan/order smoke continues in the bootstrap entry below.
 
 ## Deploy and Run the Protocol Smoke
 
@@ -36,7 +36,7 @@ UVP_BASE_SEPOLIA_BROADCAST_CONFIRMATION=I_UNDERSTAND_THIS_BROADCASTS_BASE_SEPOLI
 uvp-deploy/deploy/scripts/bootstrap-base-sepolia.sh
 ```
 
-The smoke continues by creating an Order, writing signal authorizations, submitting scenario signals, and cross-checking chain events against replay results.
+The smoke continues by registering the compiled plan, creating a trigger Order, writing signal authorizations, submitting scenario signals, and cross-checking chain events against replay results.
 
 ## Safety Gate
 

@@ -63,7 +63,7 @@ flowchart LR
   StoreAPI --> ObjectStore
 ```
 
-这张图里的 Postgres、对象存储和 API 都是产品运行层。它们可以缓存、检索、展示和中继，但协议事实仍以合约事件、签名、hash、URI 和可重放 event provenance 为准。事实流沿「Zhixu -> Plan artifact -> PlanCommitted/PlanFinalized -> 订单注册与授权 -> Signal/Hook/timer/stage patch/docking 事件 -> 可重放投影」推进；数据库、对象存储、通知队列、Store draft、operator audit 和 submission status 都是投影或 workflow 状态，不能替代 `UVPStateMachine`、`UVPIdentityRegistry` 和链事件。
+这张图里的 Postgres、对象存储和 API 都是产品运行层。它们可以缓存、检索、展示和中继，但协议事实仍以合约事件、签名、hash、URI 和可重放 event provenance 为准。事实流沿「Zhixu -> Plan artifact -> PlanCommitted/PlanFinalized -> 订单注册与授权 -> Signal/Hook/timer/stage patch/dock binding 事件 -> 可重放投影」推进；数据库、对象存储、通知队列、Store draft、operator audit 和 submission status 都是投影或 workflow 状态，不能替代 `UVPStateMachine`、`UVPIdentityRegistry` 和链事件。
 
 ## 分层边界
 
@@ -71,7 +71,7 @@ flowchart LR
 | --- | --- | --- | --- |
 | 语义和编译 | `uvp-protocol/packages/hook-core/`、`uvp-protocol/packages/compiler/` | 解析 Zhixu、求值 Hook 语义、生成 deterministic artifact 和 hash。 | 注册订单、保存业务证据明文、替参与者签名。 |
 | 链上事实 | `uvp-protocol/contracts/uvp-contracts/` | Plan、Order、Signal、Hook、身份绑定、deployment cutover 的事实记录。 | Product 展示、Store workflow、私有文件存储。 |
-| 服务层（可重建） | `uvp-chain-services/service/`、`uvp-protocol/packages/product-dto/` | chain indexer、projection、generic read API、可选 relay、proof verifier，以及各产品共享的 DTO contract。 | 成为 plan/order/signal/trust 的事实源，或生成业务签名。 |
+| 服务层（可重建） | `uvp-chain-services/service/`、`uvp-protocol/packages/chain-read-contract/` | chain indexer、projection、generic read API、可选 relay、proof verifier，以及各产品共享的 DTO contract。 | 成为 plan/order/signal/trust 的事实源，或生成业务签名。 |
 | 产品表面 | `uvp-order-app/app/`、`zhixu-store/registry/` | 把链上事实翻译成订单、任务、proof；registry 只登记自述与身份声明。 | 改写合约事实、绕过 order-level authorization。 |
 | 公共客户端 | `uvp-client/package/` | core/browser/headless SDK 与执行者 CLI：transport、Product V3 client、EIP-1193 签名、watcher、signal build/submit。 | 托管默认私钥、替业务方承担签名责任。 |
 | 部署和证据 | `uvp-deploy/` | release `deploy/`：address manifest、release record、compatibility matrix、staging gate；QA `qa/`：Anvil/Base Sepolia rehearsal、chaos。 | 重新定义协议语义或隐藏失败证据。 |
@@ -84,7 +84,7 @@ flowchart LR
 | 链上执行 | `uvp-protocol/contracts/uvp-contracts/` | ABI、events、EIP-712 domain、`UVPStateMachine`、modules、`UVPIdentityRegistry`。 |
 | Replay/reference | `uvp-protocol/packages/statemachine/` | reference reducer、event replay、runtime semantic tests。 |
 | Bindings | `uvp-protocol/packages/protocol-bindings/` | browser-safe ABI、typed-data builders、hash helpers、calldata builders。 |
-| 服务层 | `uvp-chain-services/service/`、`uvp-protocol/packages/product-dto/` | 可 fork 的 chain indexer、projection、generic read API、可选 relay、proof verifier；Product order/task/proof DTO。 |
+| 服务层 | `uvp-chain-services/service/`、`uvp-protocol/packages/chain-read-contract/` | 可 fork 的 chain indexer、projection、generic read API、可选 relay、proof verifier；Product order/task/proof DTO。 |
 | Product surfaces | `uvp-order-app/app/`、`zhixu-store/registry/` | participant order/task UI、proof display；registry data layer。 |
 | Public client | `uvp-client/package/` | core/browser/headless SDK + executor CLI。 |
 | Deploy/evidence | `uvp-deploy/` | 部署域按车道：release `deploy/`（manifests/records/matrix）、QA `qa/`（Anvil harness、chaos）、ops `ops/`（console、runbooks）。 |

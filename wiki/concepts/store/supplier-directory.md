@@ -32,7 +32,7 @@ Capability passport 先展示身份、能力资料、可用阶段和 proof，再
 | Capability | logistics、customs、inspection、pricing、quality-review、document-verification 等 catalog tags；可承接 stage、支持的 Product task intent、是否可做 selector。 | Store metadata + audit。 |
 | Contact / Operations | 联系人、通知渠道、SLA、可用区域与时段、升级路径、operational notes。 | Store metadata；不进链上明文。 |
 | Participation / Runtime | recent orders、open tasks、historical proof、failure/timeout history、active executor records。 | `UVPStateMachine` / Product projection。 |
-| Docking | peer Zhixu subject、supported signalMap、adapter endpoints、sandbox sessions。 | Store workflow + proof；身份绑定看 Identity Registry。 |
+| Dock | 可参与的 `kind: Dock` 静态声明（`dkid`）、`signalMap` 输出面、adapter endpoints、试配记录。 | Store workflow + 链上 `DockRegistered` 投影；身份绑定看 Identity Registry。 |
 
 ## 供应商组织路径
 
@@ -57,6 +57,6 @@ Capability passport 先展示身份、能力资料、可用阶段和 proof，再
 - 联系人或通知成功属于 operational workflow；业务完成看链上 signal/proof（[../protocol-boundaries.md](../protocol-boundaries.md)）。
 - supplier profile 用作能力材料；当前订单提交权限看 signal authorization。
 
-## 作为 Zhixu Supplier
+## 作为 Dock 对接方
 
-当 supplier 的 `supplierType=zhixu` 时，它表示一条可被其他秩序调用的 peer 秩序能力：Store 按定义 name 展示 peer Zhixu、版本化 Plan、发布的具名接口（`orderModes` 与端口），以及调用方的 `inputMap`/`signalMap` 映射。docking proof 以出生事件（`mode=new` 的 `DockOpened`、`mode=existing` 的 `DockAttached`）与交付事件 `DockInputSubmitted` / `DockOutputSubmitted` 等事件，加上两边订单的 signal/proof 表达；不能依赖私有的 Docked 事件名。local order 必须在 order registration、后续授权路径或 docking 事件路径中明确允许 mapped signal 推进。接入流程与字段细节见 [Zhixu 作为执行接口](../apps/zhixu-as-executor.md)。
+一条 Zhixu 以两种角色进入跨秩序协作：作为 B 侧发布独立 `kind: Dock` 文档，把自身某个 `executor.supplierType: dock` 阶段开放成 A 侧事实驱动的输出面；或作为 A 侧被 `spec.from.zhixu` / `spec.from.source` 引用，提供事实源。Store 按定义 uid（`zx-<32hex>`）展示 peer Zhixu、版本化 Plan、相关 Dock 声明的 `signalMap` 输出面，以及链上事实：`DockRegistered`、`StageDockExecutorSelected`、`DockBindingPoked`、`DockOutputSubmitted` 与两侧订单的 signal / proof。B 订单推进以自身授权 signal / proof 为准。接入流程与字段细节见 [Dock 协作](../apps/zhixu-as-executor.md)。

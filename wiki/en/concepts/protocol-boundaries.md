@@ -23,7 +23,7 @@ Every off-chain store — indexer databases, Product BFF databases, Store workfl
 
 ## Read-Model Boundary
 
-Store metadata is a read model: supplier capabilities, tags, reputation, search ranking, recommendations, contact info, review status, notification status, docking sessions, and operator audits are off-chain commercial and workflow data owned by Store or Product surfaces. Whether business actually progresses is always decided by registry/state-machine events (`PlanFinalized`, `OrderRegistered`, `SignalSubmitted`, `HookReady`). Canonical example: `approved_for_broadcast` only means Store is willing to take the next step; whether a Plan is usable depends on finalization in `UVPStateMachine`.
+Store metadata is a read model: supplier capabilities, tags, reputation, search ranking, recommendations, contact info, review status, notification status, Dock declarations and sandbox records, and operator audits are off-chain commercial and workflow data owned by Store or Product surfaces. Whether business actually progresses is always decided by registry/state-machine events (`PlanFinalized`, `OrderRegistered`, `SignalSubmitted`, `HookReady`). Canonical example: `approved_for_broadcast` only means Store is willing to take the next step; whether a Plan is usable depends on finalization in `UVPStateMachine`.
 
 ## Identity Boundary
 
@@ -32,16 +32,16 @@ Store metadata is a read model: supplier capabilities, tags, reputation, search 
 ## Authorization and Signatures
 
 - Business signatures come only from authorized participants' wallets; a relayer may broadcast transactions and pay gas but never creates business signatures.
-- Signal submission is gated by order-level `SignalSubmitterAuthorized` and the active executor overlay, signed as EIP-712 typed data.
+- Signal submission is gated by order-level `SignalSubmitterAuthorized`, signed as EIP-712 typed data.
 - Each `(planId, orderId, sourceId, signalId)` accepts exactly one successful write (first-writer-wins); later duplicate external submissions are absorbed idempotently (no repeated advance), with the `SignalAlreadyExists` revert reserved for engine-internal write entry points. Details: [Signal](core/signal.md) and [EIP-712 and Relayer](trust/eip712-relayer.md).
 
 ## Plan Lifecycle
 
-A Plan is committed via `commitPlan()` binding the publisher signature (committing to `hooksHash`, `capabilitiesRoot`, and the two dock roots), then finalized via `finalizePlan()`; only finalized Plans can create Orders. Plan identity derives from publisher plus committed content (`planId = hash(publisher, planHash)`). Modules frozen at deployment cannot be swapped by the owner; upgrades require deploying a new StateMachine and an explicit Deployment Registry cutover. See [Contracts and Registries](contracts-and-registries.md), [Canonical Hash](artifacts/canonical-hashes.md), and [Plan and Order Lifecycle](lifecycle.md).
+A Plan is committed via `commitPlan()` binding the publisher signature (the six PlanCommit fields: publisher / hooksHash / capabilitiesRoot / executorCandidatesRoot / birthAuthorizer / deadline), then finalized via `finalizePlan()`; only finalized Plans can create Orders. Plan identity derives from publisher plus committed content (`planId = hash(publisher, planHash)`). Modules frozen at deployment cannot be swapped by the owner; upgrades require deploying a new StateMachine and an explicit Deployment Registry cutover. See [Contracts and Registries](contracts-and-registries.md), [Canonical Hash](artifacts/canonical-hashes.md), and [Plan and Order Lifecycle](lifecycle.md).
 
 ## Order and Evidence Boundary
 
-Once registered, an Order is an independent fact stream; the core protocol defines no terminal running/completed/cancelled states, and product-visible completion comes from authorized signals and proofs. Contracts, invoices, logistics documents, photos, OCR text, and other business materials never go on chain in plaintext — chains store only payloadHash, metadata URIs, resource manifest hashes, signatures, and events. A proof row should trace to tx, block, log, contract, chain id, event, and payload context. See [File Resources](core/file-resources.md) and [Evidence, Proof, and File Resource](services/evidence-proof.md).
+Once registered, an Order is an independent fact stream; the core protocol defines no terminal running/completed/cancelled states, and product-visible completion comes from authorized signals and proofs. Contracts, invoices, logistics documents, photos, OCR text, and other business materials never go on chain in plaintext — chains store only payloadHash, metadata URIs, stage file mappings (content hashes and handles), signatures, and events. A proof row should trace to tx, block, log, contract, chain id, event, and payload context. See [File Resources](core/file-resources.md) and [Evidence, Proof, and File Resource](services/evidence-proof.md).
 
 ## Product Surfaces and Service Boundaries
 

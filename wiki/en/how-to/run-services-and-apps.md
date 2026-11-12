@@ -9,7 +9,9 @@ status: verified
 
 ## chain-services API
 
-The storage engine is PostgreSQL only: deployment, local runs, and tests use the same engine, and `CHAIN_SERVICES_DATABASE_URL` (which must be a `postgres://` DSN) is required in every environment — the service refuses to start when it is missing or not a Postgres DSN. The driver switch and the SQLite/in-memory engines have been removed.
+`@uvp-eth/chain-services` owns chain projection and generic chain reads: indexer rebuilds, the `/chain/*` read surface, identity-binding reads, and operations routes. Business write paths (Product BFF, Store Console, submission orchestration) are owned by the used-car application backend.
+
+Postgres is the only storage engine: deployment, local runs, and tests use the same engine, and `CHAIN_SERVICES_DATABASE_URL` (which must be a `postgres://` DSN) is required in every environment — the service refuses to start when it is missing or not a Postgres DSN.
 
 Local run (a disposable docker postgres on a random port; the DSN is injected into `CHAIN_SERVICES_DATABASE_URL` and the container is destroyed on exit):
 
@@ -28,45 +30,35 @@ pnpm --filter @uvp-eth/chain-services dev:indexer
 pnpm --filter @uvp-eth/chain-services rebuild:indexer
 ```
 
-There is no standalone relayer process: broadcast capability is embedded in the API service's submission paths (submissions/stage-patches broadcast adapters and the product BFF; see [Relayer](../concepts/services/relayer.md)).
+Record plan artifacts and Dock artifacts (with Postgres ready):
 
-Postgres is the only storage engine (memory/SQLite have been removed); staging/testnet profiles must not use localhost RPC either (background in [Protocol Boundaries](../concepts/protocol-boundaries.md)). There are no demo or E2E fixture modes anywhere in the service layer — whatever profile you declare is exactly what runs.
+```bash
+pnpm --filter @uvp-eth/chain-services plan-artifact:record -- \
+  --file <plan-artifact.json> --chain-id <n> --plan-id <bytes32>
+pnpm --filter @uvp-eth/chain-services dock-artifact:record -- \
+  --file <uvp.dock.v1.json> --chain-id <n>
+```
+
+Broadcast and signing belong to the application backend's submission paths and uvp-client's direct submission path: the chain process only indexes chain events and serves chain reads; it holds no private keys and broadcasts no transactions. Every profile connects to a real chain and a real Postgres, and the profile you declare is exactly what runs (background in [Protocol Boundaries](../concepts/protocol-boundaries.md)).
 
 ## Store Workbench
 
-```bash
-pnpm --filter @uvp-eth/zhixu-store-web dev
-```
-
-Connect to the real Product API:
-
-```bash
-VITE_UVP_CHAIN_SERVICES_URL=http://127.0.0.1:8787 \
-pnpm --filter @uvp-eth/zhixu-store-web dev
-```
-
-The Store write API should show errors on missing API base URL, `403`, `404`, `409`, or `422`; it must not silently mock (background in [Protocol Boundaries](../concepts/protocol-boundaries.md)).
+The Store workbench and Store Console API are provided by the used-car application repository; the `zhixu-store/registry` package in this repository is the non-user-facing data-layer library (`ZhixuRecord` / `IdentityClaim` registration, library only). See the application repository README for startup and configuration.
 
 ## Order App
 
+Order App is the browser-based direct-chain order console (demo B): it connects an injected wallet, loads a plan artifact, signs `commitPlan` + `finalizePlan` to register the plan, signs `triggerOrderFromOutsideFor` to birth an order, then reads on-chain facts and events and submits signals. It needs no backend, session token, drafts, or invites.
+
 ```bash
 pnpm --filter @uvp-eth/order-app dev
 ```
 
-The Order App always talks to a real Product API; there is no demo script and no demo data source. Point it at your local instance:
+Build-time environment variables:
 
-```bash
-VITE_UVP_CHAIN_SERVICES_URL=http://127.0.0.1:8787 \
-pnpm --filter @uvp-eth/order-app dev
-```
-
-Specify the participant wallet filter:
-
-```bash
-VITE_UVP_ORDER_APP_WALLET_ADDRESS=0x0000000000000000000000000000000000000002 \
-VITE_UVP_CHAIN_SERVICES_URL=http://127.0.0.1:8787 \
-pnpm --filter @uvp-eth/order-app dev
-```
+- `VITE_UVP_STATE_MACHINE` (required): the `UVPStateMachine` contract address.
+- `VITE_CHAIN_ID` (required): chain id; the wallet network must match.
+- `VITE_RPC_URL` (required): read-only RPC (for facts/events and transaction prechecks).
+- `VITE_UVP_FROM_BLOCK` (optional, defaults to 0): event scan start.
 
 Readiness gate:
 
@@ -101,6 +93,6 @@ pnpm --filter @uvp-eth/uvp-client cli -- chain-once \
   --dry-run
 ```
 
-Host apps (Order App / used-car host) get the Product V3 client and EIP-1193 signing from `@uvp-eth/uvp-client/browser`; private keys are read only from environment variables explicitly named by `--private-key-env` (background in [Protocol Boundaries](../concepts/protocol-boundaries.md)).
+Host apps get the Product V3 client and EIP-1193 signing from `@uvp-eth/uvp-client/browser`; private keys are read only from environment variables explicitly named by `--private-key-env` (background in [Protocol Boundaries](../concepts/protocol-boundaries.md)).
 
 If a service fails to start or behaves unexpectedly, start with [Troubleshooting](troubleshooting.md) (common symptoms include Product API returning empty results or `detail_unavailable`, Order App showing no tasks, and Relayer not broadcasting).

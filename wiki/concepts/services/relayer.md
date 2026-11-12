@@ -28,7 +28,7 @@ participant signs EIP-712 payload
   -> indexer sees emitted chain event
 ```
 
-Relayer key 只代表 gas payer，不代表业务主体。业务动作的 authority 来自 EIP-712 签名、order-level signal authorization、active executor overlay 或 selector patch authorization。
+Relayer key 只代表 gas payer，不代表业务主体。业务动作的 authority 来自 EIP-712 签名、order-level signal authorization 与 selector patch 授权。
 
 ## 广播适配器语义
 

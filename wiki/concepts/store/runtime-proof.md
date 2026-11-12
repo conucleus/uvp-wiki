@@ -24,7 +24,7 @@ Store 的履约视图把订单、任务、供应商参与、证据 hash 和链�
 | Evidence 绑定 | Product evidence metadata、content hash、metadata hash、payload hash。 |
 | Supplier 历史参与 | order/task projection + supplier metadata/identity projection。 |
 | Plan 与身份 | `UVPStateMachine` Plan finalization + `UVPIdentityRegistry` identity binding projection。 |
-| Docked linked order | local/linked relation metadata + 两边 state-machine proof + mapped local signal。 |
+| Dock 注册与 binding | `DockRegistered` 静态登记、`StageDockExecutorSelected` 执行者选择、`DockBindingPoked` / `DockOutputSubmitted` output 发射的 projection；当前 A/B 窗口读 `getStageDockBinding` / `dockOutputWindow`。 |
 
 ## Store 应展示什么
 
@@ -34,7 +34,7 @@ Store 的履约视图把订单、任务、供应商参与、证据 hash 和链�
 - indexer syncing/rebuild 状态；
 - evidence hash 和 metadata URI，不展示业务文件明文。
 - receive hook、ready time、assigned executor、blocked reason；
-- local/linked order proof chain，当 stage 由 peer Zhixu 执行时。
+- dock 阶段的执行者选择与 binding proof chain（`StageDockExecutorSelected` → `DockBindingPoked` → `DockOutputSubmitted`），当 stage 由 dock 执行者承接时。
 
 ## Proof 卡片最低字段
 
@@ -56,4 +56,4 @@ Store 的履约视图把订单、任务、供应商参与、证据 hash 和链�
 - notification delivered 是联系状态；signal submitted 看 `SignalSubmitted`。
 - Store note 或 operator review 是运营记录；业务完成看 signal/proof（contact 不等于履约，见 [../protocol-boundaries.md](../protocol-boundaries.md)）。
 - local DB row 是可重建读模型，读模型与权威来源的对应关系见 [README.md](README.md)「信息对象与权威来源」表。
-- linked order complete 要通过 local order 上的授权 mapped signal 或 `DockOutputSubmitted` 才能推动 local order；关系、输入、输出、终止状态分别以 docking module 事件为准。
+- 订单上的 dock 输出以 `DockOutputSubmitted` 与 `bindingId` 表达；B 订单推进看该订单的授权 signal / proof；A 窗口当前值看 `getStageDockBinding` / `dockOutputWindow`（窗口历史不在链上）。

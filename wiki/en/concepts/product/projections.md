@@ -62,7 +62,10 @@ This key enters Product proof rows, helping users confirm "which event, on which
 | `SignalSubmitterAuthorized` | Save the authorization and mark matching tasks assignable. |
 | `SignalSubmitted` | Save the signal and mark matching tasks submitted. |
 | `StageExecutorPatchApplied` | Save the executor overlay and update the target stage task's assignee. |
-| `StageResourcePatchApplied` | Save the resource overlay. |
+| `StageFilePatchApplied` / `StageFileOpApplied` | Save stage file-map rewrites: the patch batch and each op's `add` / `replace` / `remove`, replayed in log order. |
+| `DockRegistered` | Record the static Dock (outputs, atoms, A-window program) for chain-read projections. |
+| `StageDockExecutorSelected` | Save the one-time dock executor selection (target stage, dkid, executor, selector). |
+| `DockBindingPoked` / `DockOutputSubmitted` | Save binding window evaluation and per-output emission facts; binding identity is `bindingId`. |
 | `StageExecutorActivated` | Add executor activation proof. |
 | `HookStatusChanged` | Update hook status and `dueAt`; cancel tasks when cancelled. |
 | `HookReady` | Create or open a task; the Order stays registered. |

@@ -14,6 +14,6 @@ UVP separates identity resolution, Plan publication, and order-level action auth
 | Subpage | Description |
 | --- | --- |
 | [Identity Registry](domains.md) | The Store-operated identity resolution domain: what subject-to-wallet bindings and their revocation mean. |
-| [Signal Authorization](signal-authorization.md) | Order-level explicit authorization and dynamic delegation via Executor patches. |
+| [Signal Authorization](signal-authorization.md) | Order-level explicit authorization and the authorization sets written by stage patches. |
 | [EIP-712 and Relayer](eip712-relayer.md) | The typed-data shape of business signatures, and the boundary that a relayer broadcasts but never decides. |
-| [Stage Patch Authorization](stage-patch.md) | How executor/resource patches reuse the order-level authorization model. |
+| [Stage Patch Authorization](stage-patch.md) | How executor patches and stage file patches reuse the order-level authorization model. |

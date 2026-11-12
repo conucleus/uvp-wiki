@@ -54,7 +54,7 @@ The table below is an explanatory comparison: transaction-cost categories help e
 | --- | --- |
 | Search cost | Store, Supplier Directory, identity projection, Product catalog. |
 | Agreement cost | Zhixu DSL, Plan, plan hash, file resources, supplier requirements. |
-| Coordination cost | Source, Signal, Hook, Trigger, Order, executor authorization. |
+| Coordination cost | Source, Signal, Hook, Trigger, Dock, Order, executor authorization. |
 | Supervision cost | Evidence metadata, payload hash, metadata URI, proof row, timeline. |
 | Integration cost | Product DTO, Chain Services, uvp-client, adapter/periphery boundary. |
 | Dispute and denial cost | EIP-712 signatures, `SignalSubmitted`, `HookReady`, Identity Registry events, replayable chain proof. |
@@ -69,7 +69,7 @@ That claim only works if AI is operating over verifiable coordination objects, n
 
 **AI's comfort zone is text, and UVP provides a language that turns text into executable coordination rules.** Zhixu DSL is YAML-like, so LLMs can understand, generate, and compose it; the compiler's deterministic translation and the state machine's on-chain enforcement guarantee that the same DSL always produces the same coordination boundary. AI does not need hands. It needs to articulate "who starts first, who waits on whom, what evidence counts as completion," then route signals to real-world customs brokers, logistics providers, and funders who become its hands.
 
-**StateMachine records Plan publication, while the Identity Registry records subject-to-wallet mappings.** A Zhixu's operating history comes from Order events, evidence hashes, and proof projections. An AI Organizer can retrieve published Zhixu modules, compose them through Docking, and assign humans, enterprises, or AI agents that satisfy Store or Order policy to executor positions.
+**StateMachine records Plan publication, while the Identity Registry records subject-to-wallet mappings.** A Zhixu's operating history comes from Order events, evidence hashes, and proof projections. An AI Organizer can retrieve published Zhixu modules, compose them through Dock declarations, and assign humans, enterprises, or AI agents that satisfy Store or Order policy to executor positions.
 
 **An AI Organizer generates and composes coordination rules; real-world subjects authorize and execute them.** A human states the objective and approves critical boundaries, the AI produces Zhixu DSL, the compiler fixes its version, and UVP coordinates humans, enterprises, and AI agents through signal boundaries. Humans remain responsible for authorization, supervision, and exception handling, while chain records preserve the provenance of each critical action.
 

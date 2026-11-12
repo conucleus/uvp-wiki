@@ -18,7 +18,7 @@ The Store can maintain contact and notification workflows because real fulfillme
 - task reminders, HookReady delivery intents, failure reasons;
 - operator notes, SLAs, availability windows, escalation contacts;
 - adapter endpoint metadata or MCP/enterprise integration references.
-- peer Zhixu docking contact, such as owner, operator, callback adapter, and support window.
+- Dock peer contacts, such as the maintainers of the from/to orders, the dock executor, adapter endpoints, and support windows.
 
 ## Sources and boundaries
 
@@ -26,7 +26,7 @@ The Store can maintain contact and notification workflows because real fulfillme
 - Notification state only shows whether the Store/chain-services attempted to contact or remind someone; contact is not fulfillment, see [../protocol-boundaries.md](../protocol-boundaries.md).
 - Business completion must be expressed by an on-chain signal from an authorized submitter ([../protocol-boundaries.md](../protocol-boundaries.md)).
 - Contact details, credentials, private notes, certificates, contracts, invoices, and evidence plaintext should not go on chain.
-- For docked Zhixu, a notification means "the linked order's executor has been reminded or the adapter has been called"; linked-order registration, completion, and mapped backfill look at on-chain proof.
+- A notification to a Dock peer means the dock executor or adapter has been reminded; whether a binding exists is read from the `dock_link` file record and `StageDockExecutorSelected`, and whether an output was emitted is read from `DockOutputSubmitted`. Notification state never changes protocol facts.
 
 ## Relationship with chain services
 

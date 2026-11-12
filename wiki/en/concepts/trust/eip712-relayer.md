@@ -11,11 +11,13 @@ A relayer can help broadcast transactions, but it cannot make business decisions
 
 ## Typed Data
 
-`protocol-bindings` defines browser-safe EIP-712 helpers. The current `UVPStateMachine` domain is:
+`protocol-bindings` defines browser-safe EIP-712 helpers. Domain versions follow the single mechanical source `uvp-deploy/deploy/compatibility/uvp-stack.v1.json`:
 
 ```text
-name = UVPStateMachine
-version = 0.15
+UVPStateMachine (productSubmit)   version = 0.17
+UVPOrderLinkModule               version = 0.8
+UVPDerivedSignalModule           version = 0.6
+UVPStagePatchModule              version = 0.4
 ```
 
 The primary type for signal submission is:
@@ -35,11 +37,12 @@ payloadHash
 idempotencyKey
 submitter
 deadline
+filesDigest
 ```
 
-`submitSignalFor()` in the contract recovers the signing address and requires the recovered signer to equal `submitter`.
+Signal submission uses direct `submitSignal`, and the business identity is `msg.sender`; the `submitter` field appears in the `UVPStateMachineSignal` signing envelope, and product submit signing builds typed data for the deployed contract's domain version.
 
-The call tails of `submitSignal`/`submitSignalFor` may carry `attribution` (sourceId, signalId, stageId, capabilityProof) and `selectorBinding` (selectorStageId, proof) parameters: all-zero means no claim — when the plan declares a capability vocabulary, submitting an off-vocabulary fact without a proof is always rejected (revert `InvalidSignalCapability`); only zero-vocabulary plans admit them. These tail parameters do not enter the EIP-712 signing envelope; the typehash and the signed digest stay unchanged.
+The call tail of `submitSignal` may carry `attribution` (sourceId, signalId, stageId, capabilityProof), `filesDigest`, and `FilePatch` (the stage file patch): an all-zero attribution means no claim — when the plan declares a capability vocabulary, submitting an off-vocabulary fact without a proof is always rejected (revert `InvalidSignalCapability`), while zero-vocabulary plans admit them. These tail parameters do not enter the EIP-712 signing envelope; the typehash and the signed digest stay unchanged.
 
 ## Relayer Boundary
 
@@ -61,6 +64,6 @@ A relayer cannot:
 
 The signature carries a `deadline`. An expired signature cannot be submitted later, which prevents old business authorizations from being replayed long after they were granted.
 
-## Direct Submission and Forwarded Submission
+## Direct Submission
 
-A participant may also call `submitSignal()` directly, provided `msg.sender` is itself an authorized submitter. The forwarded path uses `submitSignalFor()`, but the final business identity is still the `submitter` inside the signature.
+A participant calls `submitSignal()` directly, and the business identity is `msg.sender` (the authorized submitter). A contract executor can be called by a relayer / keeper and still be the submitter when the call reaches the state machine.

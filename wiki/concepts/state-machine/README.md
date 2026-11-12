@@ -15,7 +15,7 @@ status: verified
 
 | 组件 | 职责 |
 | --- | --- |
-| `UVPStateMachine` | 签名提交并冻结 Plan、注册 Order、保存 signal records、求值 hooks、发出 `HookReady`、处理 executor/resource overlay。 |
+| `UVPStateMachine` | 签名提交并冻结 Plan、注册 Order、保存 signal records、求值 hooks、发出 `HookReady`、处理 executor patch 与阶段文件 patch。 |
 | `UVPIdentityRegistry` | Store 运营的薄身份目录，只记录主体与钱包绑定及按 binding 撤销。 |
 | `UVPDeploymentRegistry` | 记录部署 cutover 和 release/deployment 线索。 |
 | statemachine package | reference transition model 和 replay tests，用来防止服务投影偏离合约语义。 |
@@ -29,10 +29,10 @@ status: verified
 | --- | --- |
 | [Hook 求值](evaluation.md) | compact hook instruction 如何求值，`submitSignal()` 的去重与授权检查。 |
 | [计时器与状态](timers-and-status.md) | hook 状态、`dueAt`、`pokeTimer()` 和一次性 `HookReady`。 |
-| [Stage Overlay：Executor Patch 与 Resource Patch](stage-overlay.md) | executor patch、resource patch 如何在订单级覆盖计划（索引页）。 |
-| [Executor Patch](executor-patch.md) | 订单级执行者选择、交接与替换。 |
-| [Resource Patch](resource-patch.md) | 订单级资源 manifest 覆盖。 |
-| [Docked Zhixu Runtime](docking.md) | local order、linked order、docking link 和 mapped signal 如何落到状态机事件。 |
+| [Stage Overlay：Executor Patch 与阶段文件 Patch](stage-overlay.md) | executor patch 与阶段文件 patch 如何在订单级覆盖计划（索引页）。 |
+| [Executor Patch](executor-patch.md) | 订单级执行者选择与交接。 |
+| [阶段文件 Patch](file-patch.md) | 订单级阶段文件映射改写（add/replace/remove、baseHash、事件与回放）。 |
+| [Dock 与 Binding](docking.md) | 静态 Dock 声明、dock 执行者选择、`dock_link` binding 与 A/B 窗口 poke 发射如何落到状态机事件。 |
 | [事件 Replay](replay.md) | reference reducer 如何用链事件复算状态并校验合约输出。 |
 
-原速查条目去向：`commitPlan()` / `finalizePlan()` 两步注册见[生命周期](../lifecycle.md)与[链上注册参数](../artifacts/solidity-registration.md)；trigger 入口与订单级授权见 [Signal 授权](../trust/signal-authorization.md)。
+原速查条目去向：`commitPlan()` / `finalizePlan()` 两步注册见[生命周期](../lifecycle.md)与[链上注册参数](../artifacts/solidity-registration.md)；出生入口与订单级授权见 [出生信号与订单入口](../core/trigger.md) 与 [Signal 授权](../trust/signal-authorization.md)。

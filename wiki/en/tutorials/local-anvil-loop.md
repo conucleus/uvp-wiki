@@ -49,7 +49,7 @@ The script will:
 
 1. Start or connect to local Anvil.
 2. Build the workspace and contracts.
-3. Deploy `UVPDeploymentRegistry`, `UVPIdentityRegistry`, `UVPStateMachine`, and the six modules; then freeze the modules.
+3. Deploy `UVPDeploymentRegistry`, `UVPIdentityRegistry`, `UVPStateMachine`, and the seven modules (stage patch, derived signal, dock registry, plan metadata, order link, lens, file resource); then freeze the modules.
 4. Compile the UVP update Zhixu YAML, targeting `platform.type=blockchain`, `platform.provider=eth`, and `platform.network=base`.
 5. Publish the current Plan with the publisher's signature.
 6. Create an Order from creator-signed trigger typed data and write signal submitter authorizations.

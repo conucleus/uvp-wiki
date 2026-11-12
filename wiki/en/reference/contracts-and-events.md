@@ -7,68 +7,89 @@ status: verified
 
 # Contracts and Events
 
-Contract source lives in `uvp-protocol/contracts/uvp-contracts/`.
+Contract source lives in `uvp-protocol/contracts/uvp-contracts/`, with frozen ABI fixtures in `fixtures/` in the same directory. ABI, event names, EIP-712 domains, and canonical hashes are public interfaces; any change requires an explicit fixture update and adapter review.
 
-## Contracts
+## Contracts and Modules
 
 | Contract | Purpose |
 | --- | --- |
-| `UVPIdentityRegistry` | Offline subject-to-wallet identity binding with per-binding revocation. |
-| `UVPStateMachine` | Plan/order/signal/hook/timer/stage overlay runtime. |
-| `UVPPlanRegistration` | Plan-lifecycle linked library: `commitPlan` / `finalizePlan` and all registration boundary checks, writing main-contract storage via DELEGATECALL. |
-| `UVPPlanMetadataModule` | Plan metadata storage and verification: the `capabilitiesRoot` (capability/binding Merkle tree) and dock route/interface Merkle roots — storage, leaf formulas, and proof verification. |
-| `UVPStagePatchModule` | Applying stage executor/resource patches and recording active patches (`applyStageExecutorPatch` / `applyStageResourcePatch`). |
+| `UVPIdentityRegistry` | Offline subject-to-wallet identity binding with per-binding revocation (owner-controlled). |
+| `UVPStateMachine` | Core state machine: plan commit/finalize, trigger birth, signal submission, hook evaluation, timers, module write-backs, and module-set configuration/freeze. |
+| `UVPPlanRegistration` | Plan-lifecycle linked library: `commitPlan` / `finalizePlan` / `forkOrder` and all registration boundary checks, writing main-contract storage via DELEGATECALL. |
+| `UVPPlanMetadataModule` | Plan metadata: storage, leaf formulas, and membership-proof verification for `capabilitiesRoot` (the Merkle tree over signal-capability, stage-selector-binding, and file-writer capability leaves). |
+| `UVPStagePatchModule` | Order-level executor patch (`applyStageExecutorPatch` / `applyStageExecutorPatchFor`, mode closed set `assign`/`handoff`); one-time dock executor selection (`selectStageDockExecutor` / `selectStageDockExecutorFor`); binding evaluation and output emission (`pokeDockBinding`). |
+| `UVPDockRegistry` | Static Dock registry: `registerDock` stores from/to plans, source/stage ids, `docHash`, and each output's A-side window instruction program and atoms; read surface `getDock` / `dockOutputCount` / `getDockOutput`. |
+| `UVPFileResourceModule` | Owner of the stage file map: `key -> (contentHash, handle)`; `applyStageFilePatch` applies `add` / `replace` / `remove` and accepts only directory calls from `UVPStateMachine`. |
 | `UVPDerivedSignalModule` | Signed submission entry for order-to-order derived signals, binding both ends to the `(planId, orderId)` composite identity. |
-| `UVPOrderLinkModule` | Order-to-order derived creation: signed `triggerOrderFromSignalFor` and `OrderTriggerLink` registration. |
-| `UVPDockingModule` | Unified Zhixu DockRoute: `openDockedOrder` (single-argument `OpenDockCallV1`, gated by target-plan-publisher consent) atomically creates the linked order and records the entrance fact; `attachDockedOrder` attaches an existing target order as a peer; `submitDockedInput` / `submitDockedSignal` write deliveries back. |
-| `UVPStateMachineLens` | Read-only lens view aggregation over the state machine and its modules (active patches, docking, plan metadata). |
+| `UVPOrderLinkModule` | Order-to-order derived creation: signed `triggerOrderFromSignalFor` and `OrderLinked` registration. |
+| `UVPStateMachineLens` | Read-only lens over the state machine and its modules: active executor patch, dock executor selection, dock binding and output windows, plan metadata views. |
 | `UVPDeploymentRegistry` | Versioned state-machine deployment cutover ledger. |
 | `ECDSA` | Minimal signature recovery helper. |
-| `UVPSignatures` | Shared signature structs for relayed state-machine signal submission. |
+| `UVPSignatures` | Shared signature struct for relayed state-machine signal submission. |
 
 ## Public Interface
 
 The `UVPStateMachine` public boundary includes:
 
-- constructor args;
-- module configuration and one-time `freezeModules`;
-- signed `commitPlan` and one-time `finalizePlan`;
-- signed `triggerOrderFromOutsideFor` (the open birth entry on the state machine);
-- signed `triggerOrderFromSignalFor` on the order-link module contract `UVPOrderLinkModule` (order-to-order derived creation; on the state machine itself only the module-callable `triggerOrderFromSignalFromModule` exists);
-- `submitSignal`;
-- `submitSignalFor`;
-- the docking module's `openDockedOrder` (`order.mode=new`; the single `OpenDockCallV1` argument wraps the v2 request body plus the target-side consent `DockTargetConsentV1`), which atomically creates the linked order and docking relation;
-- the docking module's `submitDockedInput` / `submitDockedSignal`;
-- `applyStageExecutorPatch` / `applyStageExecutorPatchFor`;
-- `applyStageResourcePatch` / `applyStageResourcePatchFor`;
-- EIP-712 digest helpers;
-- `DOMAIN_SEPARATOR`;
-- `pokeTimer`;
-- order/plan/hook/status/signal authorization view helpers;
-- stage overlay view helpers;
+- the no-argument constructor;
+- module configuration and one-time `freezeModules`; module slots accept only addresses with code, and stay fixed after the freeze;
+- the publisher-signed six-field `PlanCommit` (publisher, hooksHash, capabilitiesRoot, executorCandidatesRoot, birthAuthorizer, deadline) submitted through `commitPlan` by any relayer; `finalizePlan(bytes32)` is permissionless;
+- birth channels: outside trigger (`triggerOrderFromOutsideFor`; when `birthAuthorizer` is a contract, the unsigned direct entry `triggerOrderFromOutsideByAuthorizer`), the order-link module's `triggerOrderFromSignalFor`, and the governance fork `forkOrder`; the orderId is derived purely from birth facts and callers never self-report it;
+- `submitSignal`: the only external signal write entry, with identity fixed to `msg.sender` (a contract executor can be paid for by a relayer/keeper); calldata carries a trailing `bytes32 filesDigest` and `FilePatch filePatch`, where `signalId == 0` means a pure file patch;
+- module-only write-backs (order-link `triggerOrderFromSignalFromModule`, derived `submitDerivedSignalFromModule`, dock output `submitDockOutputSignalFromModule`, stage executor activation, and so on);
+- dock directory and queries: `dockRegistry` / `setDockRegistry`, the dock stage/hook flag query `stageHasDockExecutorHook`, A-window evaluation `evaluateDockWindow`, and the B-window admission query `isSignalAdmissionSatisfied`;
+- `pokeTimer`, `getHookStatus`, `isSignalSubmitterAuthorized`, `getSignalAuthorization`, `sourceSignalCount`, `lastSignalSubmitter`, native per-stage counting `stageSignalState`, fork helpers, plan runtime hash helpers, `DOMAIN_SEPARATOR`;
 - event topics, function selectors, ABI hash, bytecode hash.
 
-Changing any of this must update the fixture and review adapters. Current Order identity is resolved as
-`(planId, orderId)`; indexers, replay, Product DTOs, and adapters must not infer the Plan from a bare global
-`orderId`.
+The module public boundaries include:
 
-## Event Field Extensions (B-03, ABI v0.16)
+- stage patch: executor patch (the signed entry carries `bindingProof` + `candidateProof` + `executorAuthorizations`), dock executor selection, `pokeDockBinding`;
+- dock registry: `registerDock` / `getDock` / `dockOutputCount` / `getDockOutput`;
+- file resource: `applyStageFilePatch` (state-machine directory calls only), `getStageFile`, `stageFilesHash`, `filePatchDigest`;
+- derived signal: `submitDerivedSignal` / `submitDerivedSignalFor`;
+- order-link: `triggerOrderFromSignalFor`, `getTriggerOriginLink`, `targetOrderRelation`;
+- plan metadata: `capabilitiesRoot`, `hasCapabilityVocabulary`, `verifySignalCapability`, `verifyStageSelectorBinding`, `verifyFileWriter`;
+- lens: executor patch / dock selection / binding views and plan metadata helpers.
 
-Self-contained event extensions (next ABI version batch, 2026-10): the indexer can fully rebuild the authorization surface, per-stage attribution, fork lineage, and governance state from events alone, without view calls. New fields are always appended at the tail of the parameter list; existing field order is untouched; EIP-712 domain versions do not change (event extensions do not alter the signing surface).
+## ABI and EIP-712 Domain Versions
 
-| Event | Appended field (tail) | Type | Purpose |
-| --- | --- | --- | --- |
-| `PlanCommitted` | `birthAuthorizer` | `address` | Outside-birth gate authorizer; rebuilding the authorization surface no longer needs the `planBirthAuthorizer` view. |
-| `SignalSubmitted` | `factStageId` | `bytes32` | Fact attribution stage (0 = off-vocabulary fact); per-stage attribution/counters rebuild without the `stageSignalState` view. |
-| `OrderForked` | `forkPayloadHash` | `bytes32` | Fork order-id derivation payload (`forkOrderIdFor(planId, parentOrderId, forkPayloadHash)`); the lineage chain is recomputable. |
-| `OrderForked` | `replayedFactKeys` | `bytes32[]` | Replayed fact key list (`keccak256(abi.encode(sourceId, signalId))`, same formula as the on-chain `_signalKey`) — a `SignalSubmitted` whose key is in the list is a parent-fact replay; anything else is a fact newly born on the fork order. |
-| `DerivedSignalSubmitted` | `relation` | `uint8` | Target-order relation (0 = from==target same-order production, 1 = triggerOrigin write-back); the derived-channel authorization surface rebuilds without order-link views. |
+The single mechanical reference for versions and frozen ABIs is the compatibility matrix `uvp-deploy/deploy/compatibility/uvp-stack.v1.json`; the authoritative implementation is the contract constants themselves. Signers must build EIP-712 typed data for the domain version of the deployed contract.
 
-Fields the events already carried but the indexer used to drop, now consumed: `HookStatusChanged.previousStatus` (pre-transition status) and `StageMaterialized.triggerHookId/sourceId/signalId` (stage birth trigger). The governance events `OwnershipTransferred` and `StateMachineModulesFrozen` now land in a projection (`contractGovernance`), so governance state is fully rebuildable.
+| Boundary | Frozen ABI | EIP-712 domain |
+| --- | --- | --- |
+| `UVPStateMachine` / productSubmit | `0.19` | `0.17` |
+| `UVPPlanRegistration` | `0.6` | main domain `0.17` (shared constants with the state machine) |
+| `UVPStagePatchModule` | `0.9` | `stageExecutorPatch` `0.4` |
+| `UVPDockRegistry` | `0.1` | none (registration is permissionless) |
+| `UVPPlanMetadataModule` | `0.8` | none |
+| `UVPOrderLinkModule` | `0.3` | `orderLink` `0.8` |
+| `UVPDerivedSignalModule` | `0.5` | `derivedSignal` `0.6` |
+| `UVPFileResourceModule` | `0.1` | none (submitted with direct `submitSignal`) |
+| `UVPIdentityRegistry` | `0.1` | none |
+| `UVPDeploymentRegistry` | `0.2` | none |
+| `UVPStateMachineLens` | `0.6` | none |
+
+Order identity is the composite key `(planId, orderId)`: indexers, replay, Product DTOs, and adapters address by composite identity and never treat a bare `orderId` as a global primary key. A Dock is not a birth channel; order creation uses only the three birth channels listed on this page.
+
+## Dock Registration and Binding
+
+- **Registration (permissionless)**: `registerDock(fromPlanId, fromSourceId, toPlanId, toStageId, toSourceId, docHash, outputs[])`; each output carries the B-side signal, the A-side window instruction program (atoms + `SIGNAL` / `NOT` / `AND` / `OR` / `DELAY`), and per-atom/per-output capability proofs, which the contract verifies as membership proofs through `UVPPlanMetadataModule` (`DockOutputCapabilityNotFound` / `DockAtomCapabilityNotFound`).
+- **Identity**: `dkid = bytes32(bytes16(docHash))`, where docHash derives from Dock document content (the `uvp.dock.v1` artifact's `dkid = zd-<32hex>`); re-registration reverts `DockAlreadyRegistered`. The read surface `getDock` / `dockOutputCount` / `getDockOutput` takes a **dkid word** (artifact `dkid` right-padded with zeros), not the fromPlanId used at registration.
+- **Dock executor selection (one-time)**: the selector calls `selectStageDockExecutor`, or `selectStageDockExecutorFor` with the selector's EIP-712 signature (domain `stageExecutorPatch` 0.4); the contract checks the stage's `HOOK_FLAG_DOCK_EXECUTOR` mark, the selector binding, and that the executor holds order-level authorization for every dock output. Replays of the same dkid + executor are absorbed idempotently; a different selection reverts `StageDockExecutorAlreadySelected`.
+- **Binding (seven words, no payload hash)**: `bindingId = keccak256(abi.encode("uvp.dock.binding_id.v1", dkid, toPlanId, toOrderId, toStageId, fromPlanId, fromOrderId))`; the binding is determined by the attached stage's `dock_link` file entry, whose value is the canonical A order id (`0x` + 64 hex). The `dock_link` record's `contentHash` only authenticates the revealed payload in poke; mismatch reverts `DockBindingContentHashMismatch`.
+- **Window and emission**: `pokeDockBinding` evaluates the A window against A facts at `block.timestamp` (the same evaluator as hooks; `~` closes on fact arrival and `+T` delays the anchor), then re-checks the B-side `sendSignals.validWhen` admission; each output emits first-win (an already-recorded B fact is never overwritten). Historical window times are not on chain; the read views `getStageDockBinding` / `dockOutputWindow` expose only the current state and relative `dueInSeconds`.
+
+## Stage File Map
+
+- The owner is `UVPFileResourceModule`; the core `UVPStateMachine` calls it only through the `fileResourceModule()` directory, and the module treats `msg.sender == stateMachine` as its only trust gate.
+- Entries are `key -> (contentHash, handle)`; `handle` is an opaque, bounded (≤512-byte) reference that the engine never resolves or stores as plaintext. The chain defines no `fileType` and carries no type/storage semantics.
+- Ops are `add` (key absent) / `replace` (key present) / `remove` (key present), strictly preconditioned and whole-patch atomic; `baseHash` is mandatory and equals the stage's current file version (`filesHash = keccak256(abi.encode(oldHash, patchHash))`, rolling), and a mismatch rejects the whole request.
+- The map always holds exactly one current value per key, with no nonce; an already-applied `patchHash` is absorbed first-win.
+- The entry point is the trailing `bytes32 filesDigest` + `FilePatch` on direct `submitSignal`; `signalId == 0` is a pure file patch — it does not increment business signal counts, does not evaluate hooks, and does not run admission.
 
 ## Stable Events
 
-Indexer and replay tooling should treat these event names as public interface:
+Indexer and replay tooling should treat these event names as public interfaces:
 
 ```text
 OwnershipTransferred
@@ -76,37 +97,67 @@ StateMachineModuleSet
 StateMachineModulesFrozen
 PlanCommitted
 PlanFinalized
+PlanRegistered
 PlanPublisherRecorded
 OrderRelayerRecorded
-SignalSubmitterAuthorized
-PlanRegistered
 OrderRegistered
-OrderTriggered
-OrderLinked
 OrderMaterialized
-StageMaterialized
+OrderTriggered
+SignalSubmitterAuthorized
+SignalSubmitterRevoked
 SignalSubmitted
-DerivedSignalSubmitted
-DockOpened
-DockAttached
-DockInputSubmitted
-DockOutputSubmitted
-DockOutputSatisfied
-StageExecutorPatchApplied
-StageResourcePatchApplied
+StageMaterialized
 StageExecutorActivated
+StageExecutorPatchApplied
 OrderForked
 HookStatusChanged
 HookReady
 TimerPoked
-DeploymentRegistered
-DeploymentCanaryMarked
-DeploymentActivated
-DeploymentDeprecated
-DeploymentRetired
-IdentityBindingRegistered
-IdentityBindingRevoked
 ```
+
+Module events:
+
+```text
+DockRegistered                    # UVPDockRegistry
+StageDockExecutorSelected         # UVPStagePatchModule
+DockBindingPoked                  # UVPStagePatchModule
+DockOutputSubmitted               # UVPStagePatchModule
+StageFilePatchApplied             # UVPFileResourceModule
+StageFileOpApplied                # UVPFileResourceModule
+OrderLinked                       # UVPOrderLinkModule
+DerivedSignalSubmitted            # UVPDerivedSignalModule
+DeploymentRegistered              # UVPDeploymentRegistry
+DeploymentCanaryMarked            # UVPDeploymentRegistry
+DeploymentActivated               # UVPDeploymentRegistry
+DeploymentDeprecated              # UVPDeploymentRegistry
+DeploymentRetired                 # UVPDeploymentRegistry
+IdentityBindingRegistered         # UVPIdentityRegistry
+IdentityBindingRevoked            # UVPIdentityRegistry
+```
+
+Module events carry the composite `(planId, orderId)` identity; `DockRegistered` carries the complete outputs, atoms, and A-window programs.
+
+## Self-contained Event Fields
+
+Event parameters alone are enough to rebuild the authorization surface, per-stage attribution, fork lineage, and governance state, without view calls:
+
+| Event | Self-contained fields | Purpose |
+| --- | --- | --- |
+| `PlanCommitted` | `hooksHash`, `capabilitiesRoot`, `executorCandidatesRoot`, `birthAuthorizer` | Rebuild the plan commitment surface and the outside-birth authorizer. |
+| `SignalSubmitted` | `factStageId` | Fact attribution stage (0 = off-vocabulary fact); per-stage attribution and counters rebuild from it. |
+| `OrderForked` | `forkPayloadHash`, `replayedFactKeys` | Fork order-id derivation payload and lineage; keys in the list are parent-fact replays, anything else is newly born on the fork order. |
+| `DerivedSignalSubmitted` | `relation` | Target-order relation (0 = from==target same-order production, 1 = triggerOrigin write-back). |
+| `StageDockExecutorSelected` | `dockId`, `fromPlanId`, `executor`, `selector`, `patchHash`, `patchNonce`, `metadataURI` | Rebuild the dock executor selection. |
+| `DockBindingPoked` | `dockId`, `bindingId`, `fromPlanId`, `fromOrderId`, `executor`, `emittedCount` | Rebuild binding window evaluation and emission batches. |
+| `DockOutputSubmitted` | `bindingId`, `outputIndex`, `signalId`, `executor` | Per-output emission facts and provenance. |
+| `StageFilePatchApplied` | `patchHash`, `baseHash`, `writerStageId`, `opCount` | File patch batches. |
+| `StageFileOpApplied` | `kind`, `key`, `contentHash`, `handle` | Per-op file map entries, replayed in log order. |
+
+`HookStatusChanged.previousStatus` (pre-transition status) and `StageMaterialized.triggerHookId/sourceId/signalId` (stage materialization birth trigger) also feed projections; the governance events `OwnershipTransferred` and `StateMachineModulesFrozen` land in the `contractGovernance` projection, so governance state is fully rebuildable.
+
+## Named Error Surface
+
+Dock-path errors are named by cause: `DockBindingContentHashMismatch` (the `dock_link` payload body does not match the recorded hash), `DockBindingPayloadMissing` (the attached stage has no `dock_link` file entry), `DockExecutorAuthorizationMissing` (the executor lacks order-level authorization for some dock output), `DockOrderPlanMismatch` (the A order does not belong to the dock's from plan), and `StageDockExecutorAlreadySelected` (re-selecting an already selected dock executor). Registration and file paths follow the same discipline: `DockAlreadyRegistered`, `DockOutputCapabilityNotFound`, `DockAtomCapabilityNotFound`; `FileBaseHashMismatch`, `FileWriterUnauthorized`, `FileOpKindInvalid`, `FileKeyExists`, `FileKeyMissing`.
 
 ## Fixture Verification
 

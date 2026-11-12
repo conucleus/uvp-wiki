@@ -44,7 +44,7 @@ The engineering implementation then breaks this relationship into compiled artif
 | Source | [Source Causal Chain](core/source.md) | How the causal context of a signal chains, forks, and converges. |
 | Hook | [Hook](core/hook.md) | How readiness and state changes derive from signal conditions. |
 | Trigger | [Trigger](core/trigger.md) | Which hook opens actionable tasks when Ready and emits `HookReady`. |
-| File Resources | [File Resources](core/file-resources.md) | How stage resource handles point to off-chain protocols, evidence templates, or resource manifests. |
+| File Resources | [File Resources](core/file-resources.md) | How stage file mappings (content hash + handle) point to off-chain protocols, evidence templates, or file resources. |
 
 ### Read When You Need Organization and Material Review
 
@@ -58,7 +58,7 @@ The engineering implementation then breaks this relationship into compiled artif
 
 Supplier is how the Store organizes real-world fulfillment subjects: nuclei can describe requirements in their order design, while Store maintains profiles, capability tags, contacts, matching, and proof materials; `UVPIdentityRegistry` only registers subject-to-wallet bindings. Actual task authorization still comes from Order signatures and order-level authorization; capability tags are not a protocol precondition.
 
-Executor is the runtime execution binding of an order: a static Zhixu may declare a default executor, stages with stage-executor-patch capability may choose the active executor at runtime, and the contract ultimately decides whether a signal is accepted using order-level authorization, the active executor overlay, and EIP-712 signatures.
+Executor is the runtime execution binding of an order: a static Zhixu may declare a default executor; stages with stage-executor-patch capability may assign or hand off an executor at runtime; dock-stage executors are selected once through `selectStageDockExecutor`. The contract ultimately decides whether a signal is accepted using order-level authorization and EIP-712 signatures.
 
 ## Zhixu, Nuclei, and Suppliers Reappear in the Store
 
@@ -81,7 +81,7 @@ The same objects carry different emphasis in different sections:
 | Chapter | Description |
 | --- | --- |
 | [Architecture](architecture.md) | Module boundaries, dependency direction, source of truth, and data flow. |
-| [State Machine](state-machine/README.md) | How the contract stores signals, evaluates hooks, and handles timers and stage overlays; part of the core component chain. |
+| [State Machine](state-machine/README.md) | How the contract stores signals, evaluates hooks, and handles timers and order-level patches (executor patch and stage file patch); part of the core component chain. |
 | [Artifacts and Hashes](artifacts-and-hashes.md) | Compiled artifacts, canonical hashes, stable IDs, and registration parameters. |
 | [Trust and Authorization](trust/README.md) | Identity Registry, Plan publication, order-level signal authorization, EIP-712, and the relayer boundary. |
 | [Product Surfaces](product/README.md) | How chain-services project chain events into orders, tasks, and proofs ordinary users can read. |
@@ -94,10 +94,10 @@ The same objects carry different emphasis in different sections:
 - Indexer databases must be rebuildable from events and cannot become the source of truth.
 - Relayers may sponsor or forward transactions, but must not generate business signatures for participants.
 - Supplier identity (material review) and order-level signal authorization are layered separately.
-- Executor/resource patches affect only a single Order; Plans stay static versions.
-- `supplierType=zhixu` drives the local order through proof validation, `openDockedOrder`, docking events, and authorized signal mapping.
-- A receive Hook with `emitReady=true` opens an actionable task when Ready; on-chain order identity is created by the trigger order entry point and resolved as `(planId, orderId)`.
-- `fileResources` are resource handles; business file plaintext stays off-chain.
+- Executor patches and stage file patches affect only a single Order; Plans stay static versions.
+- Cross-order collaboration is carried by a static `kind: Dock` declaration on the B side (`from`/`to`/`signalMap`): the attaching stage declares a dock executor with `supplierType: dock` and selects it once; the binding is determined by that stage's `dock_link` file entry, and `pokeDockBinding` emits B-side signals output by output inside the A/B window.
+- A receive Hook with `emitReady=true` opens an actionable task when Ready; on-chain orders are created through the three birth channels (outside-trigger / order-link / fork) and resolved as `(planId, orderId)`.
+- Stage file mappings (`fileResources` declarations plus `UVPFileResourceModule` key -> content hash + handle) carry file references; plaintext business documents stay off chain.
 - Store metadata organizes objects and catalogs; plan/supplier identity comes from registry events.
 - Store admins own platform workflow; nuclei own governance inside their Zhixu; Identity Registry operators own identity verification and binding.
 - UVP Client is the executor integration surface, working around the state machine and Product API.

@@ -54,7 +54,7 @@ UVP 的目标是成为科斯定理在 AI 时代的工程实践：把交易成本
 | --- | --- |
 | 搜索成本 | Store、Supplier Directory、identity projection、Product catalog。 |
 | 议约成本 | Zhixu DSL、Plan、plan hash、file resources、supplier requirements。 |
-| 协调成本 | Source、Signal、Hook、Trigger、Order、executor authorization。 |
+| 协调成本 | Source、Signal、Hook、Trigger、Dock、Order、executor authorization。 |
 | 监督成本 | evidence metadata、payload hash、metadata URI、proof row、timeline。 |
 | 集成成本 | Product DTO、Chain Services、uvp-client、adapter/periphery boundary。 |
 | 争议和抵赖成本 | EIP-712 签名、`SignalSubmitted`、`HookReady`、Identity Registry events、replayable chain proof。 |
@@ -69,7 +69,7 @@ AI agent 可以完成单个任务：写代码、审单、报价、生成文件�
 
 **AI 的舒适区是文字，UVP 给了一套让文字变成协作规则的语言。** Zhixu DSL 的形态接近 YAML，LLM 可以理解、生成、组装；但编译器的确定性翻译和链上状态机的强制执行，保证同样的 DSL 永远产生同样的协作边界。AI 不需要长手长脚，它只需要说清楚“谁先开始、谁等谁、什么证据算完成”，然后把现实中的报关行、物流商、资金方当作手脚来接收 signal。
 
-**StateMachine 记录 Plan 发布，Identity Registry 记录主体与钱包。** Zhixu 的历史运行记录来自订单事件、evidence hash 和 proof projection。AI Organizer 可以检索已发布的 Zhixu 模块，通过 Docking 组装协作图，再把满足 Store 或订单策略的人类、企业或 AI agent 放在 executor 位置上。
+**StateMachine 记录 Plan 发布，Identity Registry 记录主体与钱包。** Zhixu 的历史运行记录来自订单事件、evidence hash 和 proof projection。AI Organizer 可以检索已发布的 Zhixu 模块，通过 Dock 声明组装协作图，再把满足 Store 或订单策略的人类、企业或 AI agent 放在 executor 位置上。
 
 **AI Organizer 生成和组合协作规则，现实主体负责授权与执行。** 人提出目标并批准关键边界，AI 生成 Zhixu DSL，编译器确定版本，UVP 按 signal 边界协调人、企业和 AI agent。人继续承担授权、监督和例外处理责任，链上记录保留每个关键动作的责任来源。
 

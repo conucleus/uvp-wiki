@@ -12,11 +12,11 @@ The on-chain fact layer consists of `UVPStateMachine`, the frozen functional mod
 ## UVPStateMachine and Modules
 
 - The publisher signs to commit a Plan; any relayer broadcasts.
-- The publisher's signature commits to `hooksHash`, `capabilitiesRoot`, and the two dock roots; `finalizePlan` only finalizes.
+- The publisher's signature commits the six PlanCommit fields: publisher / hooksHash / capabilitiesRoot / executorCandidatesRoot / birthAuthorizer / deadline; `capabilitiesRoot` folds the signal capability, selector binding, and file writer capability tables, and `finalizePlan` only finalizes.
 - Only finalized Plans are allowed to create Orders.
 - Creator/submitter signatures create order-level rights; relayers need no allowlist.
-- Signal, HookReady, stage patch, resource patch, docking, and derived signals all leave replayable events.
-- Once configured, the six modules' addresses are permanently frozen.
+- Signal, HookReady, stage patch, stage file patch, Dock registration and bindings, and derived signals all leave replayable events.
+- Once configured, the seven modules' addresses (stage patch, derived signal, dock registry, plan metadata, order link, lens, file resource) are permanently frozen.
 
 ## UVPIdentityRegistry
 

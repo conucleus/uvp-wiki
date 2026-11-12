@@ -17,7 +17,7 @@ Permissions and audit in the Store constrain platform workflow. Audit records pr
 | --- | --- | --- |
 | Nucleation workbench permissions | Import Zhixu, maintain design material, organize supplier requirements, submit publication material. | Does not automatically gain trust publication or order signal authorization. |
 | Store platform permissions | review, catalog tags, visibility, publication request, revocation request, audit export. | Does not design internal rules for the Nucleus and does not decide on-chain trust. |
-| On-chain business permissions | register order, submit signal, stage patch, resource patch. | Decided by contracts, EIP-712, order authorization, and the active overlay. |
+| On-chain business permissions | register order, submit signal, stage patch, stage file patch. | Decided by contracts, EIP-712, and order-level authorization. |
 
 ## Sensitive actions
 
@@ -25,7 +25,7 @@ Permissions and audit in the Store constrain platform workflow. Audit records pr
 - design/fairness/material review;
 - changing platform catalog tags, risk labels, visibility, active recommendation;
 - creating/updating supplier profiles, contact metadata, platform capability tags;
-- saving docking sessions, approving signalMap review material;
+- saving Dock declaration drafts and trial-pairing records, reviewing signalMap material;
 - requesting plan/supplier publication or revocation;
 - inspecting failed governance broadcasts or index state;
 - marking revoked plans/suppliers as hidden from new-order creation.
@@ -40,7 +40,7 @@ The Store should distinguish capabilities such as read, nucleation_operator, ope
 | --- | --- |
 | read | Search, view proof, view public metadata. |
 | nucleation_operator | Maintain drafts, design material, and supplier requirements under its own Nucleus. |
-| operator | Edit platform metadata, supplier profile, contact, docking sandbox. |
+| operator | Edit platform metadata, supplier profile, contact, and Dock declarations / trial-pairing records. |
 | reviewer | Review publication material, capability material, fairness/transparency material. |
 | governance_admin | Start or confirm identity binding register/revoke requests. |
 | auditor | View the audit trail, export review/proof bundles. |
@@ -53,7 +53,7 @@ The Store should distinguish capabilities such as read, nucleation_operator, ope
 | A metadata field, platform tag, or contact was changed. | The supplier is already trusted. |
 | A Nucleus submitted design material or publication material. | The Store reviewer has completed review, or the publisher has signed publication. |
 | A governance request was created or a broadcast attempted. | The tx has been accepted by the chain and indexed. |
-| A docking session was saved or reviewed. | The linked-order proof has already been mapped onto the local order. |
+| A Dock declaration draft or trial-pairing record was saved or reviewed. | The Dock is registered (`DockRegistered`), a binding exists (`StageDockExecutorSelected` + `dock_link` file record), or an output was emitted (`DockOutputSubmitted`). |
 
 A public claim only becomes true after the corresponding chain event is observed.
 

@@ -7,74 +7,46 @@ status: verified
 
 # Submissions and Stage Patch
 
-Submissions track prepared, signed, broadcast, failed, confirmed, and retryable submission states. Stage Patch is the selector-authorization path for changing the executor or resource manifest of a target stage within a given order; the Plan itself remains a static version.
-
-## Submissions Code Entry Points
-
-| File | Responsibility |
-| --- | --- |
-| `src/submissions/service.ts` | Submission creation, status transitions, retry, lookup. |
-| `src/submissions/store.ts` | Storage contract. |
-| `src/submissions/sqlite-store.ts`, `postgres-store.ts` | Durable submission store. |
-| `src/submissions/typed-data.ts` | Submission-related typed data and signature verification helpers. |
-| `src/submissions/broadcast-adapter.ts` | Broadcast adapter interface. |
-| `src/submissions/safe-broadcast-adapter.ts` | Protected broadcast boundary. |
-| `src/api/routes/submissions.ts` | HTTP submission route. |
-
-## Order BFF Code Entry Points
-
-| File | Responsibility |
-| --- | --- |
-| `src/product/bff/service.ts` | Draft, invite, participant, submit workflow. |
-| `src/product/bff/authorization.ts` | Product authorization builder. |
-| `src/product/bff/trigger.ts` | Broadcast adaptation and submission path for order registration/trigger. |
-| `src/product/bff/store.ts` | BFF storage contract. |
-| `src/product/bff/sqlite-store.ts`, `postgres-store.ts` | Durable draft/workflow store. |
-| `src/product/bff/types.ts` | Draft, invite, participant, registration types. |
-| `src/api/routes/product-bff.ts` | HTTP route. |
+This page states the boundary between off-chain submission paths and stage patches: signing and direct/relay delivery are done by participant wallets, `uvp-client`, and the application side; chain-services only indexes events, rebuilds projections, and serves chain reads — it does not broadcast transactions or create business signatures.
 
 ## Submission Lifecycle
 
 ```text
 prepare typed data
-  -> evidence / payload hash binding
+  -> payload hash binding
   -> participant signs EIP-712 typed data
-  -> submit signed payload
+  -> submit signed payload (direct or relay)
   -> verify signer and payload structure
-  -> broadcast, or record "not_attempted" (local explicit dry-run: no nonce reserved, audit records skipped)
+  -> broadcast
   -> track tx hash / failure / retry
   -> indexer confirms chain event
 ```
 
-The signal submission entry point does not make ordinary users handle sourceId, signalId, ABI, or gas. It first prepares a readable summary and EIP-712 typed data, which the authorized wallet then signs.
+- Business signatures can only come from authorized participant wallets; a relayer pays gas and broadcasts but creates no business signature.
+- Submission state is operational state: it says whether a transaction was sent, failed, or confirmed; order progress comes from `SignalSubmitted`, `HookReady`, or stage patch events.
+- Product business rows, wallet sessions, and submission orchestration belong to the application side; chain-services keeps only chain projections and generic chain reads.
 
-Submission state is operational state. It can say whether a transaction was sent, failed, or confirmed; whether the order advances to the next stage comes from `SignalSubmitted`, `HookReady`, or stage patch events.
-
-## Stage Patch Code Entry Points
-
-| File | Responsibility |
-| --- | --- |
-| `src/stage-patches/service.ts` | Prepare/submit an executor patch or resource patch. |
-| `src/stage-patches/typed-data.ts` | Selector-signed EIP-712 typed data. |
-| `src/stage-patches/broadcast-adapter.ts` | Patch broadcast adapter. |
-| `src/stage-patches/store.ts` | Patch workflow storage. |
-| `src/api/routes/stage-patches.ts` | Product task patch routes. |
-
-## The Two Kinds of Stage Patch
-
-An executor patch selects or replaces a given order's active executor; a resource patch binds a stage resource manifest. The typed data is maintained jointly by protocol bindings and Chain Services; whether the patch is ultimately accepted is still decided by contract permissions, signatures, and nonces.
+## The Two Kinds of Stage Patch Authorization Action
 
 | Patch | What it changes | Boundary |
 | --- | --- | --- |
-| Executor patch | The active executor of the target stage within one order. | Plan and supplier directory stay unchanged; other signals are still checked against authorization. |
-| Resource patch | The resource handle / manifest of the target stage within one order. | Evidence plaintext stays off chain; File Resource policy is still interpreted at the resource layer. |
+| Executor patch | The active executor of the target stage within one order. | The Plan static version is unchanged; candidate executors are committed by `executorCandidatesRoot`, and the selector's EIP-712 signature plus order-level authorization take effect together. |
+| Stage file patch | The target stage's file map within one order (`key -> contentHash + handle`). | The body stays off chain; `baseHash` is mandatory and the patch is whole-and-atomic; events `StageFilePatchApplied` / `StageFileOpApplied`. |
+
+- Executor patch entry: `UVPStagePatchModule.applyStageExecutorPatch` / `applyStageExecutorPatchFor` (the `assign` / `handoff` modes; `candidateProof` membership proof), event `StageExecutorPatchApplied`.
+- Dock executor selection: `selectStageDockExecutor` / `selectStageDockExecutorFor` selects once, event `StageDockExecutorSelected`; binding and output emission events are `DockBindingPoked` / `DockOutputSubmitted`.
+- Stage file patch entry: `filesDigest` / `FilePatch` at the tail of direct `submitSignal` (`signalId == 0` means a pure file patch), applied through `UVPFileResourceModule.applyStageFilePatch` as `add` / `replace` / `remove`.
+- Both patch kinds are order-level facts and the projection rebuilds them from the same event stream; typed data, call builders, and digests are maintained by `uvp-client/package/src/core/` and `uvp-protocol/packages/protocol-bindings/`.
+
+## Projection Entries
+
+The chain-services projection entries are `src/indexer/projections/stage.ts` (`StageExecutorPatchApplied` / `StageDockExecutorSelected` / hook lifecycle), `src/indexer/projections/stage-files.ts` (`StageFilePatchApplied` / `StageFileOpApplied`), and `src/indexer/projections/dock.ts` (bindings and outputs); generic chain reads live in `src/api/routes/chain-read.ts`.
 
 ## Boundaries
 
-The following boundaries are the [protocol boundary overview](../protocol-boundaries.md) made concrete on the submission path; for patch authorization and trust semantics see also [Stage Patch Authorization](../trust/stage-patch.md).
+The boundaries below make the [protocol boundary overview](../protocol-boundaries.md) concrete on the submission path; for patch authorization and trust semantics see also [Stage Patch Authorization](../trust/stage-patch.md).
 
 - The selector signature must come from the authorized selector, not from the relayer.
-- A patch only affects a single order's overlay and does not modify the plan version.
-- The active executor overlay affects subsequent signal authorization checks; signals that already happened remain governed by events.
-- A resource manifest is handles and hashes; evidence plaintext stays off chain.
-- Patch workflow rows can be rebuilt or audited; the contract event is the on-chain proof.
+- A patch only affects a single order's executor or file references and does not modify the plan version.
+- Business completion and patch outcomes are determined by on-chain events; submission state does not advance orders.
+- The file map stores only a contentHash and an opaque handle; business bodies stay off chain.

@@ -67,7 +67,7 @@ struct EvalValue {
 }
 ```
 
-`wait/ready/cxl` are hook runtime statuses; the cloud-side semantic layer additionally has `init` (a not-yet-converged initial state), which is not an on-chain `Instruction[]` evaluation result. Hooks evaluate only over the current order's event set: a trigger signal is admitted in the empty-order context at birth and then written as the first fact, while dock-delivered facts enter the same order event set. Aggregation (matching) semantics are expressed as multiple in-order conditions paired by the executor.
+`wait/ready/cxl` are hook runtime statuses; the cloud-side semantic layer additionally has `init` (a not-yet-converged initial state), which is not an on-chain `Instruction[]` evaluation result. Hooks evaluate only over the current order's event set: a birth signal is admitted in the empty-order context and then written as the first fact, while B output signals emitted by a Dock into a satisfied A/B window enter the same order event set. Aggregation (matching) semantics are expressed as multiple in-order conditions paired by the executor.
 
 ## Operator Semantics
 
@@ -88,9 +88,7 @@ one order scope only the first submission writes a `SignalRecord`
 (first-writer-wins); later duplicate external submissions are absorbed
 idempotently without repeated advance (the `SignalAlreadyExists` revert is
 reserved for engine-internal write entry points).
-The contract also checks whether the submitter holds an
-explicit order-level authorization, or is the wallet currently delegated by the
-active executor overlay; when neither holds, the submission is rejected. Every
+The contract checks whether the submitter holds an explicit order-level authorization for that `source`/`signal`; an executor patch or a dock-executor selection writes the corresponding authorization set into the order when it takes effect. Every
 replay oracle, index, and Product API must carry `planId` and must not merge
 orders across plans by bare `orderId`. For the authorization model, see
 [Signal Authorization](../trust/signal-authorization.md).

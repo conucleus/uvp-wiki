@@ -30,7 +30,7 @@ task -> evidence/input -> prepare typed data -> business signature -> submit -> 
 | `taskId` | Product task。 |
 | `orderId` | 所属订单。 |
 | `stageId` | 对应 stage。 |
-| `actionKind` | `submit_signal`、`stage_executor_patch` 或 `stage_resource_patch`。 |
+| `actionKind` | `submit_signal` 或 `stage_executor_patch`；阶段文件 patch 作为 `submit_signal` 的 `FilePatch` 附带面表达（`signalId == 0` 为纯文件 patch）。 |
 | `requiredInputs` | 用户或系统需要提供的输入。 |
 | `evidenceSpec` | 发布者配置的结构化证据要求（key/label/inputKind/accept 等）；任务证据规则的唯一来源，缺失即无凭证槽位。 |
 | `acceptedActor` | 被接受的钱包、supplier subject、trust status。 |
@@ -43,23 +43,11 @@ task -> evidence/input -> prepare typed data -> business signature -> submit -> 
 
 ## Product API 映射
 
-普通 signal：
+产品侧 prepare/submit 端点由 used-car 应用仓 backend 维护（路径单源在应用仓 `app-contract`），本仓不核验端点名；协议侧提交面固定为：
 
-```text
-GET /product/tasks/:taskId
-POST /product/tasks/:taskId/prepare-submit
-POST /product/tasks/:taskId/submit
-GET /product/submissions/:submissionId
-```
-
-Stage patch：
-
-```text
-POST /product/tasks/:taskId/prepare-stage-executor-patch
-POST /product/tasks/:taskId/submit-stage-executor-patch
-POST /product/tasks/:taskId/prepare-stage-resource-patch
-POST /product/tasks/:taskId/submit-stage-resource-patch
-```
+- 普通 signal：direct `submitSignal`（身份固定 `msg.sender`；尾部 `bytes32 filesDigest` + `FilePatch`）。
+- executor patch：`UVPStagePatchModule` 的 `StageExecutorPatch` typed data → `applyStageExecutorPatchFor`（域 `stageExecutorPatch` 0.4，mode 闭集 `assign`/`handoff`）。
+- 阶段文件 patch：随 direct `submitSignal` 尾部 `FilePatch` 提交（`signalId == 0` 为纯文件 patch），由 `UVPFileResourceModule.applyStageFilePatch` 落 `add` / `replace` / `remove`。
 
 ## 安全规则
 

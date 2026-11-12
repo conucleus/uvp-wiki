@@ -14,8 +14,8 @@ The Compiler and Hook Core are the entry point through which protocol semantics 
 `uvp-protocol/packages/hook-core` is responsible for:
 
 - Parsing `source::condition`.
-- Supporting `&`, `|`, `~`, and delay; Hook expressions are interpreted only over the current order's event set, and cross-order facts enter through docking rather than a subscription wrapper.
-- Generating receive Hooks from stage `receiveSignals` and synthesizing one order-trigger Hook per stage `trigger` signal; there is no `externalSignals` or subscription-wrapper semantics that bypasses the AST.
+- Supporting `&`, `|`, `~`, and delay; Hook expressions are interpreted only over the current order's fact set; cross-order facts enter as in-order facts emitted by a static Dock's binding before a hook consumes them.
+- Generating receive Hooks from stage `receiveSignals` and synthesizing one order-trigger Hook per `sendSignals` entry marked `trigger: true`.
 - Interpreting `~A` as "the A signal has not yet appeared in the current order's event set". Once a signal appears it never disappears, so this is monotonic existence logic.
 - Extracting positive, negative, and timer dependencies.
 - Providing a local evaluator shared by the compiler and the reference runtime.
@@ -27,8 +27,8 @@ Hook Core output remains platform-neutral semantics with no Solidity ABI.
 `uvp-protocol/packages/compiler` is responsible for:
 
 - Loading YAML/JSON Zhixu.
-- Validating stages, `receiveSignals`, `trigger` subset/uniqueness and static-executor constraints, `selectedStages`, executor reachability, and dock route/interface commitments.
-- Consuming uvp-core's analyze wire `uvp.zhixuAnalysis.v2`, synthesizing birth hooks from each stage's normalized `triggers`, and generating the `OnchainHookPlanArtifact` (including the derived `triggers[]` enumeration).
+- Validating stages, `receiveSignals`, `sendSignals[].trigger` entries, static-executor constraints, `selectedStages`, executor reachability, and `fileWriters` references.
+- Consuming uvp-core's analyze wire `uvp.zhixuAnalysis.v4`, synthesizing birth hooks from each stage's normalized birth signal names, and generating the `OnchainHookPlanArtifact` (including the derived `triggers[]` enumeration); a separate `kind: Dock` document goes through `analyzeDock` into `uvp.dock.v1`.
 - Generating Solidity `commitPlan`/`finalizePlan` parameters.
 - Computing `planId`, `planHash`, and hook/stage/source/signal/dependency/route ids.
 
@@ -38,7 +38,7 @@ Hook Core output remains platform-neutral semantics with no Solidity ABI.
 | --- | --- | --- |
 | uvp-core | Normative implementation of the Hook DSL, AST, evaluation, dependency extraction, positive anchors, and canonical semantic version. | Solidity ABI, wallet authorization, and Product task language are handled by later layers. |
 | hook-core | TypeScript adapter over uvp-core semantics plus version assertions; introduces no separate semantics. | Must not fork parsing/evaluation rules away from uvp-core. |
-| compiler | Order input schema, OnchainHookPlan, commitPlan/finalizePlan args, canonical hash; calls uvp-core semantics, with HookPlan only as internal IR. | Order participant selection, supplier identity judgment, linked-order registration, and payment/settlement-custody logic belong to products, registries, or periphery. |
+| compiler | Order input schema, OnchainHookPlan, commitPlan/finalizePlan args, canonical hash; calls uvp-core semantics, with HookPlan only as internal IR. | Order participant selection, supplier identity judgment, runtime Dock selection/binding, and payment/settlement-custody logic belong to products, registries, deployment tooling, or periphery. |
 | artifact/hash | The stable boundary of `planId`, `planHash`, `hookId`, `sourceId`, `signalId`, `signalKey`. | Store draft state and Product DB primary keys are read models. |
 
 ## Compiler Input/Output Boundary
@@ -53,10 +53,9 @@ The compiler's determinism guarantees every party derives the same plan hash. Co
 
 All of the following are compile-time rules, not runtime rules; for runtime evaluation see [Hook Evaluation](state-machine/evaluation.md).
 
-- `receiveSignals` keys are receive-hook names for the stage and values are their canonical expressions; `trigger` entries are a subset of the stage's `sendSignals` and are synthesized into order-trigger hooks after analyze normalization.
-- An Order entry is explicit in `orderTriggerKind`: `none`, `trigger`, or `dock`; whether Ready is externally emitted is a separate `emitReady` boolean.
-- Each trigger signal synthesizes one order-trigger hook (single `SIGNAL` instruction, `emitReady=true`, registration bit reusing ORDER_TRIGGER_MINT); a stage/plan may declare several triggers and birth selects one explicitly via `triggerHookId`; a dock birth must carry complete dock route/interface proof.
-- `supplierType=zhixu` must provide `zhixuExecutorConfig`, whose `target.zhixu` is the peer definition's `metadata.name` (slug) or `null` for runtime selection — the DSL shell carries no derived identity — whose `interface`/`order.mode` select the target interface and order mode, and whose `inputMap`/`signalMap` use target interface port names; it does not use `supplierID`.
-- `inputMap`/`signalMap` must include at least one non-empty map (no specific business signals are forced); the bound ports must reference a single target source.
+- `receiveSignals` keys are receive-hook names for the stage and values are their canonical expressions; `sendSignals` entries marked `trigger: true` are synthesized into order-trigger hooks after analyze normalization.
+- An Order entry is explicit in `orderTriggerKind` (closed set `none` / `trigger`); whether Ready is externally emitted is a separate `emitReady` boolean; dock stages are distinguished by the `HOOK_FLAG_DOCK_EXECUTOR` marker.
+- Each birth signal synthesizes one order-trigger hook (single `SIGNAL` instruction, `emitReady=true`, registering the `ORDER_TRIGGER_MINT` bit); a stage/plan may declare several birth signals, and birth selects one explicitly via `triggerHookId` + `triggerStageId`.
+- A stage with `supplierType: dock` is carried by another Zhixu: the B side publishes a separate `kind: Dock` document (`spec.from` / `spec.to` / `spec.signalMap`) whose `signalMap` values are Hook-DSL emission-admission expressions with header source fixed to `spec.from.source`; `analyzeDock` compiles that document into `uvp.dock.v1`. The attach stage declares only `supplierType: dock` (the B side needs no `supplierID`); the executor is selected once on the order via `selectStageDockExecutor`, and the binding is carried by the `dock_link` file entry plus `pokeDockBinding`'s A/B time-window emission.
 - Hook expressions evaluate under monotonic existence logic: `A` means the signal has appeared, `~A` means it has not yet appeared; once a signal appears it never disappears.
 - Hook expressions must have a positive anchor; a pure-absence condition cannot become an advancing hook.

@@ -13,7 +13,7 @@ status: verified
 
 ## Protocol Bindings 的位置
 
-`@uvp-eth/protocol-bindings` 是浏览器安全的协议绑定包。它提供 ABI 常量、typed-data builders、calldata builders、地址/bytes32 校验、stage patch helpers 和 resource manifest hash helpers。
+`@uvp-eth/protocol-bindings` 是浏览器安全的协议绑定包。它提供 ABI 常量、typed-data builders、calldata builders、地址/bytes32 校验、stage patch helpers、dock 选择 / poke / 注册 calldata builders、file patch digest helper（`filePatchDigest`）以及 capability 叶与 proof helpers（`signalCapabilityLeaf`、`selectorBindingProofFor`、`fileWriterProofFor`、`capabilitiesRootOf`）。
 
 它不读环境变量，不保存私钥，不提交交易，也不做业务授权判断。Order App、uvp-client、Chain Services 和 deploy scripts 可以复用它来避免各自手写 ABI、typed data 或 calldata。
 
@@ -23,13 +23,13 @@ status: verified
 | --- | --- | --- | --- |
 | Solidity ABI / bytecode / function selector | `uvp-protocol/contracts/uvp-contracts` | protocol-bindings、chain-services、uvp-client、deploy scripts、release gates | 更新 fixture、bindings、contract tests、deploy/replay tests 和 release note。 |
 | Event name / topic / indexed fields | contracts | indexer、statemachine replay、Product projection、proof verifier | 更新 replay oracle、projection tests、contracts/events reference。 |
-| EIP-712 domain / typed data | contracts、protocol-bindings | Product submit、relayer、uvp-client、wallet UI | 更新 digest helpers、signing tests、staging domain check；staging 不能回退到旧 `0.1` domain。 |
+| EIP-712 domain / typed data | contracts、protocol-bindings | Product submit、relayer、uvp-client、wallet UI | 更新 digest helpers、signing tests、staging domain 检查；staging 按当前 productSubmit 域版本签名。 |
 | Canonical hash / artifact schema | compiler、hook-core、statemachine | Plan publication、commitPlan/finalizePlan、release evidence | 更新 golden fixtures、canonical hash docs、compiler/statemachine tests。 |
 | Product DTO | product-dto | chain-services、Order App、uvp-client、periphery adapter | 更新 DTO tests、route tests、frontend/API consumers 和 ordinary-user copy。 |
 | Product API | chain-services | Order App/宿主（经 uvp-client/browser）、企业脚本/AI agent（经 uvp-client） | 更新 API reference、route tests、browser E2E、failure language。 |
 | Deployment manifest | uvp-deploy/deploy | chain-services、staging scripts、release records | 只提交 curated manifest/evidence；local generated address files 默认不提交。 |
 | Release evidence schema | uvp-deploy/deploy | release owner、audit、release evidence pack 消费方 | 保持 no-secret、redacted、可审计；不要把 raw logs 或 object bytes 当作 release record。 |
-| 遗留 Store/order HTTP 路由 | chain-services（`uvp-chain-services/service/src/api/routes/`） | 仅 Phase B 迁移面，不是目标表面 | route、错误码、proof rows 和 authz 语义需要和 DTO 同步；更新 Store 前端消费者与 route tests。 |
+| 链读与运维 HTTP 路由 | chain-services（`uvp-chain-services/service/src/api/routes/`） | Order App / 宿主 / 应用仓 backend 等链读消费方 | route 形状以 `@uvp-eth/chain-read-contract` wire DTO 为准；更新 route 契约测试与 wiki 参考页。 |
 | CLI 与运行配置 | uvp-client、chain-services config、deploy scripts | executor、release owner、staging operator | 私钥只从显式 env 读取；staging/profile 配置必须 fail closed；更新 CLI reference 与 profile tests。 |
 
 ## Drift checklist
@@ -54,7 +54,7 @@ release record or PRD trace
 - Store metadata 是平台 workflow 和材料状态，Identity Registry binding 是主体与钱包的链上对应记录；详见 [读模型边界](../concepts/protocol-boundaries.md#读模型边界)。
 - Product BFF database 是可重建读模型，plan/order/signal/hook 的 source of truth 是链上事件；详见 [事实源](../concepts/protocol-boundaries.md#事实源)。
 - Relayer 配置是广播配置，业务授权来自 order authorization 和签名；详见 [授权与签名](../concepts/protocol-boundaries.md#授权与签名)。
-- 产品表面不存在 demo fallback、fixture catalog 或 mock frontend mode：空投影按设计返回空结果，没有可以打开的 demo profile；操作辅助不改变协议事实。完整边界见 [协议边界](../concepts/protocol-boundaries.md)。
+- 产品表面以链上投影为准：空投影返回空结果，没有 demo profile 可切换；操作辅助不改变协议事实。完整边界见 [协议边界](../concepts/protocol-boundaries.md)。
 - Funding、USDC、资金托管、guarantee、settlement adapter 属于 adapter/periphery；详见 [外围适配](../concepts/protocol-boundaries.md#外围适配)。
 
 ## 相关参考

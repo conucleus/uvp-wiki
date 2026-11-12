@@ -11,11 +11,13 @@ Relayer 可以帮助广播交易，但不能替参与方做业务决定。业务
 
 ## Typed Data
 
-`protocol-bindings` 定义了浏览器可用的 EIP-712 helper。`UVPStateMachine` 当前 domain：
+`protocol-bindings` 定义了浏览器可用的 EIP-712 helper。各域版本以 `uvp-deploy/deploy/compatibility/uvp-stack.v1.json` 为唯一机械对照：
 
 ```text
-name = UVPStateMachine
-version = 0.15
+UVPStateMachine（productSubmit）  version = 0.17
+UVPOrderLinkModule               version = 0.8
+UVPDerivedSignalModule           version = 0.6
+UVPStagePatchModule              version = 0.4
 ```
 
 Signal 提交的 primary type 是：
@@ -35,11 +37,12 @@ payloadHash
 idempotencyKey
 submitter
 deadline
+filesDigest
 ```
 
-合约的 `submitSignalFor()` 会恢复签名地址，并要求恢复出的 signer 等于 `submitter`。
+Signal 提交走 direct `submitSignal`，业务身份是 `msg.sender`；`submitter` 字段出现在 `UVPStateMachineSignal` 签名信封中，产品提交签名按所部署合约的域版本构造 typed data。
 
-`submitSignal`/`submitSignalFor` 的调用尾部可携带 `attribution`（sourceId、signalId、stageId、capabilityProof）与 `selectorBinding`（selectorStageId、proof）参数：全零表示不声明——plan 声明了能力词表时，提交词表外事实未携证即必拒（revert `InvalidSignalCapability`），仅零词表 plan 放行。这些尾参不进入 EIP-712 签名信封，typehash 与签名摘要保持不变。
+`submitSignal` 的调用尾部可携带 `attribution`（sourceId、signalId、stageId、capabilityProof）、`filesDigest` 与 `FilePatch`（阶段文件 patch）：attribution 全零表示不声明——plan 声明了能力词表时，提交词表外事实未携证即必拒（revert `InvalidSignalCapability`），仅零词表 plan 放行。这些尾参不进入 EIP-712 签名信封，typehash 与签名摘要保持不变。
 
 ## Relayer 的边界
 
@@ -61,6 +64,6 @@ Relayer 不可以：
 
 签名带 `deadline`。过期签名不能继续提交，避免旧业务授权在很久以后被重放。
 
-## 直接提交和转发提交
+## Direct 提交
 
-参与方也可以直接调用 `submitSignal()`，前提是 `msg.sender` 本身就是授权 submitter。转发路径使用 `submitSignalFor()`，但最终业务身份仍然是签名里的 `submitter`。
+参与者直接调用 `submitSignal()`，业务身份是 `msg.sender`（授权 submitter）。contract executor 可由 relayer / keeper 代付调用其 own `submitSignal`，到状态机时 `msg.sender` 仍是该执行者。

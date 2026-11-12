@@ -28,7 +28,7 @@ participant signs EIP-712 payload
   -> indexer sees emitted chain event
 ```
 
-The relayer key represents only the gas payer, never a business actor. Authority for business actions comes from EIP-712 signatures, order-level signal authorization, the active executor overlay, or selector patch authorization.
+The relayer key represents only the gas payer, never a business actor. Authority for business actions comes from EIP-712 signatures, order-level signal authorization, and selector patch authorization.
 
 ## Broadcast Adapter Semantics
 

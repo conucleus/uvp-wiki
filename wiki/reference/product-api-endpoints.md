@@ -7,24 +7,58 @@ status: verified
 
 # Product API 端点速查
 
-Product API 位于 `@uvp-eth/chain-services`，把 StateMachine 事件投影与 Store 链下资料组合成 Store、Order App 和 uvp-client 使用的 DTO。
+`@uvp-eth/chain-services` 在本仓承担链读与运维面：把链事件投影成通用链读路由（`/chain/*`）、身份绑定读面与运维门。Product 业务写路径（draft、invite、task action、evidence、submission 编排）与 Store Console 工作台端点由 used-car 应用仓 backend 拥有；其 HTTP 路径、表与签名 key 以应用仓 API 契约为准。
 
-## Catalog、Orders 与 Tasks
+> 待确认：应用仓 Product / Store 端点名不在本仓核验范围；引用具体路径前以应用仓 `app-contract` 的路径契约为准。
+
+## 本仓链读与运维端点
 
 ```text
-GET /product/zhixus
-GET /product/zhixus/:zhixuId
-GET /product/orders
-GET /product/orders/:orderId
-GET /product/orders/:orderId/timeline
-GET /product/orders/:orderId/proof
-GET /product/tasks
-GET /product/tasks/:taskId
-GET /product/me
-GET /product/me/orders
-GET /product/me/tasks
-GET /product/me/tasks/:taskId
-GET /product/me/activity-feed
+GET  /chain/orders
+GET  /chain/orders/:orderId
+GET  /chain/orders/:orderId/tasks
+GET  /chain/tasks
+GET  /chain/tasks/:taskId
+GET  /chain/sync-state
+GET  /chain/snapshot
+GET  /chain/plans/:planId/:planHash/admissions
+GET  /chain/plans/:planId/:planHash/triggers
+GET  /identity/bindings
+GET  /healthz
+GET  /readyz
+GET  /admin/diagnostics
+GET  /admin/ops/status
+GET  /admin/ops/summary
+POST /admin/ops/projections/rebuild
+GET  /admin/ops/indexer/pending-steps
+POST /admin/ops/indexer/pending-steps/retry
+```
+
+链读语义：
+
+- `/chain/orders` 与 `/chain/orders/:orderId` 都以 `{ orders }` 返回；订单 id 按 plan 作用域，单条读在无投影时返回 404，不退化成空。
+- `/chain/orders/:orderId/tasks`、`/chain/tasks`、`/chain/tasks/:taskId` 给任务投影；任务只由链事件生成。
+- `/chain/sync-state`、`/chain/snapshot` 给同步状态与快照。snapshot 含静态 Dock（`uvp.dock.v1`）与 DockBinding/per-output 投影（`uvp.dockBinding.v1`）：binding 身份、emitted 事实来自链上事件，A/B 窗口的当前 `satisfied` 与相对 `dueInSeconds` 是读时对 `UVPStagePatchModule.dockOutputWindow` view 的 live enrichment，不持久、不构成历史。
+- `/chain/plans/:planId/:planHash/admissions` 与 `/triggers` 读计划编译产物（`plan_artifacts`）；出生线由 `triggers[]` 枚举。
+- `/identity/bindings` 是身份绑定只读投影。
+- 运维面：`/healthz`、`/readyz`、`/admin/diagnostics`、`/admin/ops/*` 要求运维 admin 凭据。
+
+## Product 业务端点（应用仓 backend 拥有）
+
+```text
+GET  /product/zhixus
+GET  /product/zhixus/:zhixuId
+GET  /product/orders
+GET  /product/orders/:orderId
+GET  /product/orders/:orderId/timeline
+GET  /product/orders/:orderId/proof
+GET  /product/tasks
+GET  /product/tasks/:taskId
+GET  /product/me
+GET  /product/me/orders
+GET  /product/me/tasks
+GET  /product/me/tasks/:taskId
+GET  /product/me/activity-feed
 ```
 
 Plan 发布状态来自 `UVPStateMachine.PlanRegistered` 投影。任务来自 `HookReady`，执行钱包来自 Plan 声明的 signal capability 与订单级 `SignalSubmitterAuthorized`。角色名称只负责展示。
@@ -51,7 +85,7 @@ POST /product/invites/:inviteId/accept
 POST /product/invites/:inviteId/reject
 ```
 
-业务档案（order-triggers、邀请预览）按上节口径要求会话身份/invite token；`triggerId` 为不可枚举随机 id。草稿读取与参与者名单限创建者或已接受参与者。
+业务档案（order-triggers、邀请预览）按上节口径要求会话身份/invite token；`triggerId` 为不可枚举随机 id。草稿读取与参与者名单限创建者或已接受参与者。BFF 持久化 draft 与 workflow 状态；真正让订单存在的是 `UVPStateMachine` 的出生事件，真正推进任务的是 `SignalSubmitted`、`HookReady` 等链事件。
 
 ## Submission 与 Evidence
 
@@ -64,22 +98,19 @@ POST /product/tasks/:taskId/submit
 GET  /product/submissions/:submissionId
 ```
 
-`prepare-submit` 生成 EIP-712 typed data。`submit` 验证签名并交给 relayer；链上结果以 `SignalSubmitted` 为准。
+`prepare-submit` 生成 EIP-712 typed data。`submit` 验证签名并交给 relayer；链上结果以 `SignalSubmitted` 为准。协议侧 signal 写入口是 direct `submitSignal`（身份固定 `msg.sender`，合约 executor 可由 relayer 代付）。
 
-## Order Overlay
+## Order Overlay（协议面）
 
-```text
-POST /product/tasks/:taskId/prepare-stage-executor-patch
-POST /product/tasks/:taskId/submit-stage-executor-patch
-POST /product/tasks/:taskId/prepare-stage-resource-patch
-POST /product/tasks/:taskId/submit-stage-resource-patch
-```
+executor patch：`UVPStagePatchModule` 的 `StageExecutorPatch` typed data（域 `stageExecutorPatch` 0.4，mode 闭集 `assign`/`handoff`）→ `applyStageExecutorPatchFor`；signed 入口携带 `bindingProof`、`candidateProof` 与 `executorAuthorizations`。
 
-Executor patch 处理订单级 executor selection、handoff 和 replacement。Resource patch 绑定 `resourceKey`、`manifestHash`、`policyHash` 与 `manifestURI`。
+阶段文件 patch：随 direct `submitSignal` 尾部 `bytes32 filesDigest` + `FilePatch` 提交（`signalId == 0` 为纯文件 patch），由 `UVPFileResourceModule.applyStageFilePatch` 落 `add` / `replace` / `remove`；`baseHash` 必填并等于该 stage 当前文件版本。
+
+产品侧的 typed data 准备与提交编排由应用仓 backend 维护，端点名以应用仓 API 契约为准。
 
 ## Store Console
 
-Store Console 同样位于 chain-services，按能力（capability）授权：钱包先经 challenge/verify 建立会话，后续请求以会话凭证标识身份；`store.read` 是匿名可用的公开读能力，写操作各自要求对应的 `store.*` 能力（如 `store.draft.review`、`store.version.activate`、`store.supplier.review`、`store.docking.create`、`store.listing.manage`）。
+Store Console 同样位于应用仓，按能力（capability）授权：钱包先经 challenge/verify 建立会话，后续请求以会话凭证标识身份；`store.read` 是匿名可用的公开读能力，写操作各自要求对应的 `store.*` 能力（如 `store.draft.review`、`store.version.activate`、`store.supplier.review`、`store.listing.manage`）。
 
 会话与身份：
 
@@ -139,14 +170,9 @@ POST /store/suppliers/:supplierId/notification-profile
 POST /store/suppliers/:supplierId/notification-profile/prepare
 ```
 
-Docking 工作台：
+Dock 工作台（Store 链下 workflow）：
 
-```text
-POST /store/docking-sessions
-GET  /store/docking-sessions/:sessionId
-POST /store/docking-sessions/:sessionId/validate
-POST /store/docking-sessions/:sessionId/save-draft-map
-```
+Dock 试拼会话、validate 与 draft map 属 Store 链下材料；应用仓维护其端点与存储。链上事实以 `DockRegistered`、`StageDockExecutorSelected`、`DockBindingPoked`、`DockOutputSubmitted` 与两侧订单事件为准。
 
 Listing 与页面装饰：
 
@@ -179,18 +205,15 @@ POST /store/join-applications/:applicationId/reject
 POST /store/join-applications/:applicationId/revoke
 ```
 
-Draft、docking session、listing、装饰、供应商名称、能力标签、匹配资料与审核记录属于 Store 的链下事实。Identity Registry 投影只提供 `subjectId` 与钱包的公开对应关系。
+Draft、Dock 试拼会话、listing、装饰、供应商名称、能力标签、匹配资料与审核记录属于 Store 的链下事实。Identity Registry 投影只提供 `subjectId` 与钱包的公开对应关系。
 
 ## Readiness
 
-```text
-GET /product/staging/readiness
-```
-
-该接口输出脱敏的部署、索引、存储、角色输入与 Product 状态摘要；条件不足时返回 `503 not_ready`。摘要含部署清单、角色输入姿态与样本任务的参与者钱包，属于运营细节——要求治理 admin 凭据（与 `/admin/diagnostics` 同门；公共聚合健康位走 `/healthz`、`/readyz`）。
+本仓运维就绪走 `GET /readyz` 与 `GET /admin/diagnostics`；staging readiness 摘要（部署、索引、存储、角色输入与样本参与方钱包）属应用仓/运维面，要求治理 admin 凭据。
 
 ## 相关页面
 
+- 链读 DTO 与字段：[Chain Services](../concepts/services/chain-services.md)
 - DTO 字段与状态映射：[Product DTO](../concepts/product/dto.md)
 - 本地启动 API 与前端：[运行服务和前端](../how-to/run-services-and-apps.md)
 - 服务语义与边界：[Product API（概念）](../concepts/services/product-api.md)

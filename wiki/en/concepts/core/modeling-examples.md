@@ -9,7 +9,7 @@ status: prototype
 # Source Modeling Examples
 
 > Prerequisite reading: [Source Causal Chain](source.md)
-This page collects advanced modeling examples for Source causal chains. Status is marked prototype: these examples are teaching-oriented modeling ideas, not yet audited example-by-example against implementations and product projections; for protocol semantics, [Source Causal Chain](source.md) is authoritative.
+This page collects advanced modeling examples for Source causal chains. Status is marked prototype: these examples are teaching-oriented modeling ideas, not yet audited example-by-example against implementations and product projections; for protocol semantics, [Source Causal Chain](source.md) and the language-layer manual `uvp-core/docs/zhixu-dsl-grammar.md` are authoritative.
 
 ## Who Uses It
 
@@ -25,7 +25,7 @@ The examples are modeling advice only; protocol semantics and `signalKey` rules 
 
 ## Deal Matching and a New Fulfillment Source
 
-Before a deal, seller preparation and buyer preparation can be two independent sources. After the deal, a new joint fulfillment source can emerge, or a new Order instance can be created:
+Before a deal, seller preparation and buyer preparation can be two independent sources. After the deal, a new joint fulfillment source can emerge, or a birth signal (`sendSignals[].trigger: true`) can derive a new Order with an empty order id:
 
 ```text
 seller-prep source
@@ -38,7 +38,7 @@ buyer-prep source
        -> acceptance
 ```
 
-More complex dynamic multi-party matching is usually expressed through new sources, docked linked Orders, or Store/Product workflows.
+More complex dynamic multi-party matching is usually expressed through new sources, in-order hooks, or the combination of "independent orders + static Dock subscription".
 
 ## Petroleum Fractionation
 
@@ -53,9 +53,11 @@ crude_intake
        -> lubricant source
 ```
 
+The fractionation modeling pattern is per-fact order birth: each incoming birth fact is declared as a birth signal on its stage, and submitting it with an empty order id derives one order (language manual §6).
+
 ## Produce Collection
 
-A produce collector may buy oranges from many farms. If the number of farms is fixed in the Plan, multiple explicit farmer sources can be modeled. If the farm count is dynamic at runtime, each farm's harvest-and-pack flow usually fits better as a docked linked Order or sub-Zhixu.
+A produce collector may buy oranges from many farms. If the number of farms is fixed in the Plan, multiple explicit farmer sources can be modeled. If the farm count is dynamic at runtime, each farm's harvest-and-pack flow fits better as an independent order, with the B side publishing a static Dock that reports farmer completion facts back to the collector order (`executor.supplierType: dock` + runtime binding).
 
 ```text
 collector_intake
@@ -67,3 +69,5 @@ collector_intake
        -> consolidated logistics
        -> payment settlement
 ```
+
+Cross-order emission conditions are declared by the separate `kind: Dock` document's `signalMap`; Dock does not create orders, and "all collected or not" is the anchoring executor's private judgment — see [Executor](executor.md).

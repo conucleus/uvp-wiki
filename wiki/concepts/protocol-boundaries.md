@@ -21,7 +21,7 @@ Indexer 数据库、Product BFF database、Store workflow 状态等一切链下�
 
 ## 读模型边界
 
-Store metadata 是读模型：供应商能力、标签、声誉、搜索排序、推荐、联系信息、审核状态、通知状态、docking session 与 operator audit 都是 Store 或 Product 侧的链下商业与 workflow 数据，不构成协议事实。业务是否推进永远看 registry/state-machine 事件（如 `PlanFinalized`、`OrderRegistered`、`SignalSubmitted`、`HookReady`）。典型例子：`approved_for_broadcast` 只表示 Store 愿意执行下一步，Plan 是否可用以 `UVPStateMachine` 中是否 finalized 为准。
+Store metadata 是读模型：供应商能力、标签、声誉、搜索排序、推荐、联系信息、审核状态、通知状态、Dock 声明与试配记录与 operator audit 都是 Store 或 Product 侧的链下商业与 workflow 数据，不构成协议事实。业务是否推进永远看 registry/state-machine 事件（如 `PlanFinalized`、`OrderRegistered`、`SignalSubmitted`、`HookReady`）。典型例子：`approved_for_broadcast` 只表示 Store 愿意执行下一步，Plan 是否可用以 `UVPStateMachine` 中是否 finalized 为准。
 
 ## 身份边界
 
@@ -30,16 +30,16 @@ Store metadata 是读模型：供应商能力、标签、声誉、搜索排序�
 ## 授权与签名
 
 - 业务签名只能来自被授权参与方的钱包；relayer 可以广播交易、代付 gas，但不生成业务签名。
-- Signal 提交受订单级 `SignalSubmitterAuthorized` 与 active executor overlay 约束，签名采用 EIP-712 typed data。
+- Signal 提交受订单级 `SignalSubmitterAuthorized` 授权约束，签名采用 EIP-712 typed data。
 - 同一个 `(planId, orderId, sourceId, signalId)` 只允许一次成功写入（first-writer-wins）；重复的外部提交被幂等吸收（不重复推进），`SignalAlreadyExists` revert 保留给引擎内部写入口。技术细节见 [Signal](core/signal.md) 与 [EIP-712 与 Relayer](trust/eip712-relayer.md)。
 
 ## Plan 生命周期
 
-Plan 通过 `commitPlan()` 提交并绑定 publisher 签名（承诺 `hooksHash`、`capabilitiesRoot` 与两个 dock roots），再经 `finalizePlan()` 落定稿；只有 finalized Plan 可以创建 Order。Plan 身份由发布者与提交内容共同确定（`planId = hash(publisher, planHash)`）。部署时冻结的 modules 不能被 owner 替换；升级必须部署新 StateMachine 并经 Deployment Registry 显式 cutover。详见 [Contracts 与 Registries](contracts-and-registries.md)、[Canonical Hash](artifacts/canonical-hashes.md) 与 [Plan 与订单生命周期](lifecycle.md)。
+Plan 通过 `commitPlan()` 提交并绑定 publisher 签名（PlanCommit 六字段：publisher / hooksHash / capabilitiesRoot / executorCandidatesRoot / birthAuthorizer / deadline），再经 `finalizePlan()` 落定稿；只有 finalized Plan 可以创建 Order。Plan 身份由发布者与提交内容共同确定（`planId = hash(publisher, planHash)`）。部署时冻结的 modules 不能被 owner 替换；升级必须部署新 StateMachine 并经 Deployment Registry 显式 cutover。详见 [Contracts 与 Registries](contracts-and-registries.md)、[Canonical Hash](artifacts/canonical-hashes.md) 与 [Plan 与订单生命周期](lifecycle.md)。
 
 ## 订单与证据边界
 
-Order 一旦注册即是一条独立事实流；核心协议不为 Order 定义 running/completed/cancelled 等终态，Product 展示的完成度来自授权 signal 与 proof。合同、发票、物流单据、照片、OCR 原文等业务材料不明文上链——链上只保存 payloadHash、metadata URI、资源 manifest hash、签名与事件。Proof row 应能追溯到 tx、block、log、合约、chain id、事件与 payload context。详见 [File Resources](core/file-resources.md)、[Evidence、Proof 与 File Resource](services/evidence-proof.md)。
+Order 一旦注册即是一条独立事实流；核心协议不为 Order 定义 running/completed/cancelled 等终态，Product 展示的完成度来自授权 signal 与 proof。合同、发票、物流单据、照片、OCR 原文等业务材料不明文上链——链上只保存 payloadHash、metadata URI、阶段文件映射（内容哈希与句柄）、签名与事件。Proof row 应能追溯到 tx、block、log、合约、chain id、事件与 payload context。详见 [File Resources](core/file-resources.md)、[Evidence、Proof 与 File Resource](services/evidence-proof.md)。
 
 ## 产品表面与服务边界
 

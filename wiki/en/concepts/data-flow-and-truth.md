@@ -25,25 +25,25 @@ The main data flow advances along "compiled artifacts -> Plan registration -> or
 | Whether a Plan is usable | The publisher signature plus `PlanCommitted` / `PlanFinalized`. |
 | Which real-world subject a wallet maps to | `UVPIdentityRegistry` binding/revocation events; capability judgment remains with Store. |
 | Whether a deployment version is active | `UVPDeploymentRegistry` cutover events. |
-| Whether the stage executor overlay was applied | Stage Patch Module's `StageExecutorPatchApplied` and the StateMachine's `StageExecutorActivated`. |
-| Whether the stage resource manifest was updated | `StageResourcePatchApplied`. |
-| Whether a linked Zhixu relationship exists | Docking Module's birth event (`DockOpened` for `mode=new`, `DockAttached` for `mode=existing`; including both local/linked Plan and Order identities). |
-| Whether docked input/output was mapped and submitted | `DockInputSubmitted` / `DockOutputSubmitted`. |
+| Whether the stage executor changed | Stage Patch Module's `StageExecutorPatchApplied` and the StateMachine's `StageExecutorActivated`. |
+| Whether the stage file map was updated | `StageFilePatchApplied` / `StageFileOpApplied`. |
+| Whether the Dock declaration is registered and the dock executor selected | `UVPDockRegistry`'s `DockRegistered`; `StageDockExecutorSelected` (selected once on the attach stage). |
+| Whether a dock binding is established / emitted | `DockBindingPoked` (A/B windows and binding) and `DockOutputSubmitted` (B-side output facts carrying the binding id). |
 
 ## Cacheable but Must Be Rebuildable
 
 | Data | Rule |
 | --- | --- |
 | `StateMachineOrderProjection` | Rebuilt from state-machine events. |
-| `StateMachineTaskProjection` | Rebuilt from `HookReady`, authorizations, stage overlays, and signal events. |
+| `StateMachineTaskProjection` | Rebuilt from `HookReady`, authorizations, executor patches / stage file patches, and signal events. |
 | Product proof rows | Generated from event provenance. |
 | Supplier identity projection | Rebuilt from Identity Registry events. |
-| Stage patch and docking projections | Rebuilt from the `StageExecutorPatchApplied`, `StageResourcePatchApplied`, `DockOpened` / `DockAttached`, `DockInputSubmitted`, and `DockOutputSubmitted` event families. |
+| Stage patch and dock binding projections | Rebuilt from the `StageExecutorPatchApplied`, `StageFilePatchApplied` / `StageFileOpApplied`, `StageDockExecutorSelected`, `DockBindingPoked`, and `DockOutputSubmitted` event families. |
 | Store catalog state | May merge metadata; Plan publication and identity-binding status must come from chain events. |
 
 ## Operational Aids Only
 
-Relayer retry status, notification delivery status, and Store drafts are operational aids only. They cannot change Plan publication state, whether an Order exists, whether a Signal was accepted, or whether a Hook is ready. The same applies to governance ledger entries with `executionMode: "simulated"`: reconcile skips them, and staging-readiness treats them as unsatisfied. There are no browser E2E fixture stores or local demo data sources left in the service layer to mistake for truth — an empty projection simply returns empty output.
+Relayer retry status, notification delivery status, and Store drafts are operational aids only. They cannot change Plan publication state, whether an Order exists, whether a Signal was accepted, or whether a Hook is ready. The same applies to governance ledger entries with `executionMode: "simulated"`: reconcile skips them, and staging-readiness treats them as unsatisfied.
 
 ## Reorg Handling
 

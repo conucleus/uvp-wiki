@@ -49,7 +49,7 @@ uvp-deploy/qa/scripts/bootstrap-local-anvil.sh --self-update
 
 1. 启动或连接本地 Anvil。
 2. 构建 workspace 和合约。
-3. 部署 `UVPDeploymentRegistry`、`UVPIdentityRegistry`、`UVPStateMachine` 与六个 modules，并冻结 modules。
+3. 部署 `UVPDeploymentRegistry`、`UVPIdentityRegistry`、`UVPStateMachine` 与七个 modules（stage patch、derived signal、dock registry、plan metadata、order link、lens、file resource），并冻结 modules。
 4. 编译 UVP update Zhixu YAML，目标为 `platform.type=blockchain`、
    `platform.provider=eth`、`platform.network=base`。
 5. 由 publisher 签名并发布当前 Plan。

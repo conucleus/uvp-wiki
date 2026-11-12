@@ -17,7 +17,7 @@ Store 里的权限和 audit 约束平台 workflow。Audit 记录证明某个 Sto
 | --- | --- | --- |
 | 凝结核工作台权限 | 导入 Zhixu、维护设计材料、组织 supplier requirements、提交发布材料。 | 不自动获得 trust publication 或 order signal authorization。 |
 | Store 平台权限 | review、catalog tag、visibility、publication request、revocation request、audit export。 | 不替凝结核设计内部规则，不判定链上 trust。 |
-| 链上业务权限 | register order、submit signal、stage patch、resource patch。 | 由合约、EIP-712、order authorization 和 active overlay 决定。 |
+| 链上业务权限 | register order、submit signal、stage patch、阶段文件 patch。 | 由合约、EIP-712 与订单级授权决定。 |
 
 ## 敏感动作
 
@@ -25,7 +25,7 @@ Store 里的权限和 audit 约束平台 workflow。Audit 记录证明某个 Sto
 - design/fairness/material review；
 - change platform catalog tags、risk label、visibility、active recommendation；
 - create/update supplier profile、contact metadata、platform capability tags；
-- save docking session、approve signalMap review material；
+- 保存 Dock 声明草稿与试配记录、审核 signalMap 材料；
 - request plan/supplier publication or revocation；
 - inspect failed governance broadcast or index state；
 - mark revoked plan/supplier as hidden from new-order creation。
@@ -40,7 +40,7 @@ Store 应区分 read、nucleation_operator、operator、reviewer、governance_ad
 | --- | --- |
 | read | 搜索、查看 proof、查看 public metadata。 |
 | nucleation_operator | 维护自己凝结核下的 draft、设计材料、supplier requirements。 |
-| operator | 编辑平台 metadata、supplier profile、contact、docking sandbox。 |
+| operator | 编辑平台 metadata、supplier profile、contact、Dock 声明与试配记录。 |
 | reviewer | review 发布材料、capability 材料、fairness/透明性材料。 |
 | governance_admin | 发起或确认 identity binding register/revoke request。 |
 | auditor | 查看 audit trail、导出 review/proof 包。 |
@@ -53,7 +53,7 @@ Store 应区分 read、nucleation_operator、operator、reviewer、governance_ad
 | 某个 metadata 字段、platform tag 或 contact 被修改。 | supplier 已经 trusted。 |
 | 某个凝结核提交了设计材料或发布材料。 | Store reviewer 已完成审核，或 publisher 已签名发布。 |
 | 某个 governance request 被创建或广播尝试。 | tx 已经被链接受并 index。 |
-| 某个 docking session 被保存或 review。 | linked order proof 已经映射到 local order。 |
+| 某个 Dock 声明草稿或试配记录被保存或 review。 | Dock 已经注册（`DockRegistered`）、binding 已经建立（`StageDockExecutorSelected` + `dock_link` 文件项），或 output 已经发射（`DockOutputSubmitted`）。 |
 
 Public claim 只有在对应链事件被观察到后才成立。
 

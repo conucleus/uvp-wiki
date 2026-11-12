@@ -25,16 +25,16 @@ supplier 资料进入 Store 目录和匹配展示；身份核验产生 `Identity
 
 ## 权威来自哪里
 
-目录能力与推荐是 Store 链下判断；提交 Signal 的权利来自 Order 级授权与当前 executor overlay（见 [Executor](executor.md)），合约只认授权与签名。
+目录能力与推荐是 Store 链下判断；提交 Signal 的权利来自订单级显式 `SignalAuthorization` 与 EIP-712 签名（见 [Executor](executor.md)），合约只认授权与签名。
 
 | 概念 | 来源 |
 | --- | --- |
 | 身份绑定 | `IdentityBindingRegistered` / `IdentityBindingRevoked`。 |
 | 能力与推荐 | Store metadata 和 Store 自己的模型。 |
-| 提交 Signal 的权利 | Order 级授权与当前 executor overlay。 |
+| 提交 Signal 的权利 | 订单级显式 `SignalAuthorization` 与 EIP-712 签名。 |
 
 撤销身份绑定会停止目录的默认解析，但不会回滚已经发生的 Order、签名或链上事实，也不能阻止用户直接使用裸地址。
 
 Supplier 和 Executor 始终是两个概念：Supplier 是 Store 的身份与能力目录对象；Executor 是某个 Order 动作实际获得授权的账户。一个 Supplier 可以对应多个账户，也可以在不同 Order 中使用不同 Executor。
 
-一条 Zhixu 需要对接另一条 Zhixu 时，使用 docking 的 order link、signal mapping 和 proof 机制，不把另一条 Zhixu 注册成 Supplier DSL 对象；详见 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md)。
+一条 Zhixu 需要与另一条 Zhixu 协作时，由 B 侧发布独立 `kind: Dock` 文档声明静态 A→B 发射条件，目标阶段以 `executor.supplierType: dock` 承接，运行期在挂接 stage 选中 dock 执行者并写入 A 单号形成 binding；Supplier 只表达本 Store 目录中的能力主体。详见 [Executor](executor.md) 与 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md)。

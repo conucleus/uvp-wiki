@@ -1,152 +1,122 @@
 ---
-title: Zhixu as an Execution Interface
+title: Dock Collaboration
 type: explanation
 audience: 协议读者、集成工程师
-preread: ../core/executor.md
+preread: ../state-machine/docking.md
 status: verified
 ---
 
-# Zhixu as an Execution Interface
+# Dock Collaboration
 
-> Prerequisite reading: [Executor](../core/executor.md)
-One Zhixu can act as another Zhixu's stage executor. Executor here means an execution interface: it receives the stage task the local order opens, runs by its own rules, and maps the agreed signals back to the local order.
+> Prerequisite reading: [Dock and Binding](../state-machine/docking.md)
 
-## Core model
+The single form of cross-order collaboration is a Dock: side B publishes an independent `kind: Dock` document declaring A→B emission conditions; a B order selects a dock executor once on its attach stage, writes the `dock_link` (A order id) to establish the binding, and pokes the A/B windows so satisfied B output signals are emitted into the B order. Side A keeps its own order, authorization, and lifecycle.
+
+## Core Model
 
 ```text
-local Zhixu / local order
-  -> stage.executor.supplierType = zhixu
-  -> zhixuExecutorConfig.target carries the peer definition's content-derived uid (zx-<32hex>) or is null (runtime selection); the shell's own metadata.uid is not authorable
-  -> interface selects the target interface; order.mode declares new (child order) or existing (attach)
-  -> inputMap/signalMap bind local hooks/signals to target port names
-  -> local receive hook becomes ready and opens execution
-  -> linked Zhixu / linked order runs with its own plan and authorization
-  -> linked proof is checked
-  -> authorized mapped signal is submitted to the local order
+Side B publishes a Dock document:
+  spec.from = content-derived uid of Zhixu A + source
+  spec.to   = content-derived uid of Zhixu B + stage (that stage declares supplierType: dock)
+  spec.signalMap: B output signal name -> A-side validWhen expression
+
+B order runtime:
+  1. select a dock executor once on the attach stage (stage patch; fixed afterwards)
+  2. write dock_link = A order id into the file map -> binding
+  3. poke: when the A window (A order facts) and the B window (emission admission) intersect,
+     write the B output signals into the B order
+  4. B-stage hooks consume those signals and continue the local flow
+
+A order: emits facts as usual; its order id and lifecycle keep their original identity
 ```
 
-The local order and the linked order are both independent `UVPStateMachine` orders. Each has its own plan, authorization, events, and proof; they do not share and do not need an aggregated lifecycle state. The docking relation states which signals between the two orders can dock; the runtime relation is recorded by docking-link and mapped-signal events.
+Both orders are independent `UVPStateMachine` orders with the composite identity `(planId, orderId)`; every cross-plan reference carries `planId`. A Dock only maps facts to emission conditions; order creation comes from each order's own birth channel (see [Birth Signals and Order Entries](../core/trigger.md)).
 
-## Why this design
+## YAML Form
 
-Real fulfillment is often completed by several independent orders cooperating. A local order for cross-border supply can hand sourcing, customs clearance, settlement, logistics, and on-site delivery to different Zhixu executors. Nesting is also allowed: a local settlement stage can pick the `payment-settlement` Zhixu as its executor, while inside `payment-settlement` its `fiat_bridge` stage can in turn pick `fiat-payout-bridge` as executor. The local order does not need to expand the linked Zhixu's full internal flow; it only needs to know the exposed signal interface, proof, and trust status.
-
-This brings several benefits:
-
-- linked Zhixu are reusable: one `customs-clearance` can serve many local orders;
-- linked Zhixu are independently governed: their own plan hash, trust publication, and supplier network stay auditable;
-- linked Zhixu evolve independently: the local order picks an active peer Zhixu version through Store configuration;
-- linked Zhixu keep internal context: the local order consumes only verifiable proof and mapped signals.
-
-## YAML form
-
-A settlement stage can use another Zhixu as an execution interface like this:
+The B-side target stage declares the dock executor and the binding surface:
 
 ```yaml
-- name: fiat_bridge
-  source: settlement
-  receiveSignals:
-    ROUTE_FIAT: settlement::route.use_fiat_bridge
+- name: packing
+  source: seller
   executor:
-    supplierType: zhixu
-    zhixuExecutorConfig:
-      target:
-        zhixu: zx-9c41f0d27a3e5b86c4d1af0b7e285c36   # the target definition's content-derived uid (zx-<32hex>; D003 rejects name slugs)
-      interface: payout_service
-      order:
-        mode: new
-      inputMap:
-        ROUTE_FIAT: payout       # mode=new: exactly one input binding (birth anchor)
-      signalMap:
-        str: payout_started
-        cmp: payout_completed
-        err: payout_failed
+    supplierType: dock
+  receiveSignals:
+    START: "seller::packing.start"
+  sendSignals: [{name: start}, {name: cmp}]
 ```
 
-The local stage's source is `settlement`; for the exact semantics of the `str/cmp/err` fields see [Protocol meaning of signalMap](#protocol-meaning-of-signalmap).
-
-The docking stage's entry is a local `receiveSignals` hook; the birth entry belongs to a `trigger` stage (a trigger stage must be a static plain executor and cannot be a `zhixu` executor). There is no Hook-DSL cross-order subscription:
+Side B publishes the independent Dock document (`uvp.dock.v1`):
 
 ```yaml
-- name: dock_customs_clearance
-  source: customs
-  receiveSignals:
-    LINK_READY: settlement::route.ready
-  executor:
-    supplierType: zhixu
-    zhixuExecutorConfig:
-      target:
-        zhixu: zx-9c41f0d27a3e5b86c4d1af0b7e285c36
-      interface: clearance_service
-      order:
-        mode: new
-      inputMap:
-        LINK_READY: execute      # the birth anchor (single input binding)
-      signalMap:
-        str: started
-        cmp: completed
-        err: failed
+apiVersion: uvp/v0
+kind: Dock
+metadata:
+  name: packing_service
+spec:
+  from:
+    zhixu: zx-9c41f0d27a3e5b86c4d1af0b7e285c36   # content-derived uid of side A
+    source: seller
+  to:
+    zhixu: zx-2f7a1c9b4e6d8053a1c2b3d4e5f60718     # content-derived uid of side B
+    stage: packing
+  signalMap:
+    cmp: "seller::washing.cmp"
 ```
 
-`LINK_READY` is the local hook name. The linked order's start, completion, or failure still returns to the local order through `signalMap`, docking links, proof checks, and authorized mapped signals; the order's birth entry is carried by another static stage's `trigger` signal.
-
-## Protocol meaning of signalMap
-
-The `signalMap` is the semantic contract through which the local stage accepts the linked Zhixu's output.
-
-| Local signal key | Meaning |
+| Field | Constraint |
 | --- | --- |
-| `str` | Signal that the linked Zhixu started or accepted the delegation. Commonly used but not required. |
-| `cmp` | Signal that the linked Zhixu completed. Commonly used but not required. |
-| `err` | Signal that the linked Zhixu failed, rejected, or hit an exception. Optional, but most real workflows should configure it. |
+| `spec.from.zhixu` / `.source` | content-derived uid of a published definition; the source is declared by one of its stages. |
+| `spec.to.zhixu` / `.stage` | content-derived uid of a published definition; the stage takes `supplierType: dock`, and its output signals are declared in `sendSignals`. |
+| `spec.signalMap` | key is a B-side output signal name (∈ `to.stage.sendSignals`); value is an A-side Filter expression whose header source is `from.source` and whose atoms lie on declared signals of `from.source` stages. |
 
-The `signalMap` keys must be local stage `sendSignals` and its values must be output-port names of the target interface. The `inputMap` keys must be local `receiveSignals` channel names and its values must be input-port names of the target interface. At least one of the two maps must be non-empty — whether `str/cmp/err` are needed is decided by the actual workflow, and the compiler does not require any particular business signal. The compiler validates the target reference (content-derived uid shape `zx-<32hex>`, D003), interface existence and port direction, `order.mode ∈ interface orderModes`, the single input binding of `mode=new`, port-name syntax, and interface/route roots; `signalMap` does not carry Hook DSL.
+## Why This Design
 
-## Docked runtime path
+- **B-side static subscription**: the contract is fixed at compile time (`uvp.dock.v1`); runtime only evaluates identity and windows, and new document content yields a new `dkid`.
+- **A/B are peers with independent governance**: each side has its own plan, authorization, orders, and proofs; side B decides which A facts to read and which outputs to emit.
+- **One-time dock-executor selection**: responsibility is fixed inside the order, re-selection has a named rejection, and the executor must hold order-level authorization for every Dock output signal.
+- **Binding expressed by the A order id**: the same A order returns to the same binding and capabilities replay; the binding identity is the seven-word `bindingId`.
+
+## Runtime Path
 
 ```text
-a receive hook on the local order becomes Ready
-  -> Product/Store creates the local stage task
-  -> Store selects or confirms the peer Zhixu version
-  -> Product/adapter registers or locates the linked order
-  -> the linked order executes per its own Plan, authorization, executor
-  -> the linked order produces str/cmp/err proof
-  -> adapter or Product workflow checks proof and signalMap
-  -> openDockedOrder / submitDockedInput / submitDockedSignal or an authorized submitter maps the local signal
-  -> the matching hook on the local order goes Ready / Cancelled / next stage
+A order fact submitted
+  -> pokeDockBinding (permissionless: reads dock_link, verifies the content hash, evaluates the A window)
+  -> B-side sendSignals.validWhen admission re-check
+  -> satisfied outputs written into the B order (first-win per output, provenance carries bindingId)
+  -> B-stage hooks evaluate / later stages advance
+  -> events land in the chain-read projection (uvp.dockBinding.v1)
 ```
 
-Numbering schemes can coexist: on-chain local/linked `orderId`s are created by their own trigger-order entries; Product tasks, Store docking sessions, and adapter jobs may carry their own execution numbers, while runtime proof still resolves back to on-chain order/signal/docking events.
-
-## Runtime proof
-
-A complete docked Zhixu proof covers at least:
+## Proof and Read Surfaces
 
 | Question | Proof source |
 | --- | --- |
-| Why did the local stage open for execution? | The local order's `HookReady`. |
-| Why is the link-stage entrance valid? | Local `HookReady` plus the birth proof per mode (`DockOpened` for `mode=new`, `DockAttached` for `mode=existing`), plus interface/route membership proof for the target input port. |
-| Which plan did the linked Zhixu use? | The linked order's `OrderRegistered` and linked plan projection. |
-| Is the linked Zhixu's Plan usable? | The linked StateMachine's `PlanCommitted/PlanFinalized` projection. |
-| How did the linked order advance? | The linked order's `SignalSubmitted` / hook proof. |
-| How does the local order continue? | The mapped signal on the local order, from either an authorized submitter or `DockOutputSubmitted`. |
+| Is the Dock declaration registered? | `DockRegistered` and `getDock(dkid)`. |
+| Who takes the B stage? | `StageDockExecutorSelected` and `getActiveStageDockSelection` / `activeStageExecutor`. |
+| What is the binding identity? | The seven-word `bindingId` and the `dock_link` file record. |
+| What are the current A/B windows? | `dockOutputWindow` / `getStageDockBinding` and the `uvp.dockBinding.v1` read surface (relative `dueInSeconds`, no persisted window history). |
+| Was a B output emitted? | `DockOutputSubmitted` and `SignalSubmitted` on the B order. |
+| How is it replayed? | The selection record + `dock_link` + `DockBindingPoked` / `DockOutputSubmitted` events. |
 
-The Store can assemble these proofs into one fulfillment card; status truth still comes from each side's own on-chain events.
-
-## Store docking workflow
-
-The Store should run docked Zhixu as an auditable workflow:
+## Store Workflow
 
 ```text
-choose local stage
-  -> search available peer Zhixu by definition name
-  -> check linked plan publication and active version
-  -> validate inputMap/signalMap against the target interface's declared ports
-  -> save docking session draft
-  -> operator review
-  -> publish or bind into the local order workflow
-  -> openDockedOrder records the local/linked relation
-  -> submitDockedSignal or authorized submitter maps the local signal
+choose the B order and attach stage
+  -> publish or select the Dock declaration (obtaining the dkid)
+  -> select the dock executor once
+  -> write dock_link (A order id)
+  -> poke and monitor the window / pending / emitted read surfaces
+  -> operator approval stays an off-chain workflow; formal facts come from chain events
 ```
 
-Sandbox validation is trial pairing and review material. Formal runtime requires plan publication, order registration, signal authorization, docking links, and proof.
+Trial composition, review, and dock sessions are off-chain workflow material; formal runtime facts are Dock registration, executor selection, binding, and emission events.
+
+## Boundaries
+
+- A/B orders are independent with identity `(planId, orderId)`; cross-plan references carry `planId`, and the two sides are linked by the composite identity.
+- A Dock establishes a binding on an existing B order and emits output signals; orders are created by their own order's birth channel.
+- Terminal state is driven only by the local stage/order end; output signals express B facts mapped from the A window.
+- Store records and chain facts divide as stated in [Protocol Boundaries](../protocol-boundaries.md): chain events are the fact source, and off-chain layers only project and hold workflow state.
+
+For the executor-perspective binding details, see [Dock and Binding](../state-machine/docking.md).

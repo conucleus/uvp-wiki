@@ -30,7 +30,7 @@ Minimal contents:
 | `taskId` | Product task. |
 | `orderId` | Owning order. |
 | `stageId` | Corresponding stage. |
-| `actionKind` | `submit_signal`, `stage_executor_patch`, or `stage_resource_patch`. |
+| `actionKind` | `submit_signal` or `stage_executor_patch`; a stage file patch is expressed as the `FilePatch` companion surface of `submit_signal` (`signalId == 0` is a pure file patch). |
 | `requiredInputs` | Inputs the user or system must provide. |
 | `evidenceSpec` | Publisher-configured structured evidence requirements (key/label/inputKind/accept, ...); the sole source of task evidence rules — absent spec means no evidence slots. |
 | `acceptedActor` | Accepted wallet, supplier subject, trust status. |
@@ -43,23 +43,11 @@ These fields can be derived from the existing `ProductTaskDTO`, prepare/submit A
 
 ## Product API mapping
 
-Ordinary signal:
+Product-side prepare/submit endpoints are maintained by the used-car application backend (the application `app-contract` is the single path source); this repository does not verify endpoint names. The protocol-side submission surfaces are fixed:
 
-```text
-GET /product/tasks/:taskId
-POST /product/tasks/:taskId/prepare-submit
-POST /product/tasks/:taskId/submit
-GET /product/submissions/:submissionId
-```
-
-Stage patch:
-
-```text
-POST /product/tasks/:taskId/prepare-stage-executor-patch
-POST /product/tasks/:taskId/submit-stage-executor-patch
-POST /product/tasks/:taskId/prepare-stage-resource-patch
-POST /product/tasks/:taskId/submit-stage-resource-patch
-```
+- Ordinary signal: direct `submitSignal` (identity fixed to `msg.sender`; trailing `bytes32 filesDigest` + `FilePatch`).
+- Executor patch: `UVPStagePatchModule`'s `StageExecutorPatch` typed data → `applyStageExecutorPatchFor` (domain `stageExecutorPatch` 0.4, mode closed set `assign`/`handoff`).
+- Stage file patch: submitted as the trailing `FilePatch` on direct `submitSignal` (`signalId == 0` is a pure file patch) and applied by `UVPFileResourceModule.applyStageFilePatch` as `add` / `replace` / `remove`.
 
 ## Security rules
 

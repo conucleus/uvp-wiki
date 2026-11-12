@@ -7,7 +7,7 @@ status: verified
 
 # Signal Authorization
 
-Order-level signal authorization answers one very specific question: within this order, which wallet may submit which source/signal. There are two contract paths: explicit authorization written when the Order is registered, and dynamic delegation created by an Executor patch within Plan capabilities.
+Order-level signal authorization answers one very specific question: within this order, which wallet may submit which source/signal. Authorization always resolves to order-level explicit authorization records, written through two paths: when the Order is registered, and by a stage patch within Plan capabilities.
 
 ## Contract Authorization Structure
 
@@ -26,18 +26,18 @@ struct SignalAuthorization {
 The contract stores it as:
 
 ```text
-_signalAuthorizations[orderId][signalKey][submitter]
+_signalAuthorizations[planId][orderId][signalKey][submitter]
 ```
 
-When a signal is submitted, the contract checks whether `planId + orderId + signalKey + submitter` has valid explicit authorization or dynamic executor delegation.
+When a signal is submitted, the contract checks whether `planId + orderId + signalKey + submitter` has a valid order-level explicit authorization.
 
-## Dynamic Delegation from Executor Patch
+## Authorization Sets Written by Stage Patches
 
-The compiler turns stage `sendSignals` into Plan `signalCapabilities` (folded into `capabilitiesRoot` on-chain). When a valid Executor patch selects a wallet for a target stage, the contract automatically creates delegation only for those predeclared current-order `(sourceId, signalId)` pairs, with eligibility proven by the submitter carrying a capability proof (all-zero means no claim):
+The compiler turns stage `sendSignals` into Plan `signalCapabilities` (folded into `capabilitiesRoot` on-chain). When a valid stage patch selects a wallet for a target stage, the patch's EIP-712 signature carries `authorizationsHash`, and the contract writes those predeclared current-order `(sourceId, signalId)` authorizations as order-level explicit authorizations; eligibility is proven by the submitter carrying a capability proof (all-zero means no claim):
 
 - The new executor can be a wallet that appears after Order creation; it need not be pre-listed as an authorized candidate.
-- The selector's power comes from the `StageSelectorBinding`, internal patch-signal authorization, and signature/mode constraints.
-- The executor's signal power comes from the Plan capability committed in the capability tree combined with the valid patch.
+- The selector's power comes from the `StageSelectorBinding`, internal patch-signal authorization, and the EIP-712 signature/mode constraints.
+- The executor's signal power comes from the Plan capability committed in the capability tree combined with the authorization set written by the valid patch.
 - A patch can change only the executor; it cannot add a Signal the Plan did not declare.
 - First-writer-wins still applies; an existing Signal never changes because of a handoff.
 
@@ -75,7 +75,7 @@ submitter = participant/business submitter address
 
 The business submitter signs the corresponding trigger or signal typed data; the registrar/relayer is only responsible for broadcasting. The broadcasting address does not gain business-submission authority by doing so. Authorization keys and events must retain `(planId, orderId)` and must not assign facts to a Plan from a bare `orderId`.
 
-A docked Zhixu docking entry is expressed by `orderTriggerKind: dock` plus committed dock route/interface proofs; a trigger birth entry establishes the same order-level authorization for the birth signal's actual source/signal. The later `str/cmp/err` mapping for a linked order still follows `signalMap`, the docking relation, and mapped-signal authorization checks.
+The dock stage executor selection follows the same stage-patch path: `selectStageDockExecutor` / `selectStageDockExecutorFor` takes a selector-signed EIP-712 selection whose authorization set must cover every output signal of the Dock (otherwise revert `DockExecutorAuthorizationMissing`), and those authorizations are written as order-level explicit authorizations. The `dock_link` file record, the binding, and `pokeDockBinding` only emit outputs under existing order-level authorization and the A/B windows; they add no order-level authorization. The A-side window is evaluated from the `spec.signalMap` expressions, and each B-side output's emission admission is rechecked against `sendSignals.validWhen`.
 
 ## Authorization and Task Display
 

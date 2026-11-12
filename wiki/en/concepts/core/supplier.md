@@ -25,16 +25,16 @@ Supplier profiles enter the Store catalog and matching display; identity verific
 
 ## Where Authority Comes From
 
-Catalog capability and recommendation are Store's off-chain judgments; the right to submit Signals comes from Order-level authorization and the current executor overlay (see [Executor](executor.md)); contracts recognize only authorization and signatures.
+Catalog capability and recommendation are Store's off-chain judgments; the right to submit Signals comes from the order-level explicit `SignalAuthorization` and EIP-712 signatures (see [Executor](executor.md)); contracts recognize only authorization and signatures.
 
 | Concept | Source |
 | --- | --- |
 | Identity binding | `IdentityBindingRegistered` / `IdentityBindingRevoked`. |
 | Capability and recommendation | Store metadata and Store's own model. |
-| Right to submit signals | Order-level authorization and current executor overlay. |
+| Right to submit signals | Order-level explicit `SignalAuthorization` and EIP-712 signatures. |
 
 Revoking an identity binding stops default catalog resolution but does not roll back Orders, signatures, or on-chain facts that already happened, nor does it stop users from using bare addresses directly.
 
 Supplier and Executor are always two concepts: Supplier is Store's identity-and-capability catalog object; Executor is the account actually authorized for one Order action. One Supplier may map to several accounts and may use different Executors in different Orders.
 
-When one Zhixu needs to dock with another Zhixu, it uses docking's order link, signal mapping, and proof mechanisms rather than registering the other Zhixu as a Supplier DSL object; see [Zhixu as Executor](../apps/zhixu-as-executor.md).
+When one Zhixu collaborates with another, the B side publishes a separate `kind: Dock` document declaring static A→B emission conditions, the target stage declares `executor.supplierType: dock`, and at runtime the order selects a dock executor on the attach stage and writes the A order id to form a binding; Supplier only expresses capability subjects in this Store's catalog. See [Executor](executor.md) and [Zhixu as Executor](../apps/zhixu-as-executor.md).

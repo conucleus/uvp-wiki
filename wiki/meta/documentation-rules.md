@@ -94,9 +94,9 @@ PRD 仍放在 `docs/product/`。Release record 仍放在 `uvp-deploy/deploy/rele
 - 说明相关状态属于读模型还是链上事件（引用协议边界，不复述）；
 - 保持凝结核内部治理、Store 平台 workflow、Store or external institution 外部材料审核三者边界清晰。
 
-改 Executor / uvp-client / docked Zhixu 路径时：
+改 Executor / uvp-client / Dock 路径时：
 
-- 更新 [UVP Client](../concepts/apps/uvp-client.md)、[Zhixu 作为 Executor](../concepts/apps/zhixu-as-executor.md)、[Order App](../concepts/apps/order-app.md)；
+- 更新 [UVP Client](../concepts/apps/uvp-client.md)、[Dock 协作](../concepts/apps/zhixu-as-executor.md)、[Dock 与 Binding](../concepts/state-machine/docking.md)、[Order App](../concepts/apps/order-app.md)；
 - CLI 语法同步 [CLI 与配置](../reference/cli-and-config.md)。
 
 改 release/staging gate 时：

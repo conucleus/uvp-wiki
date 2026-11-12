@@ -24,7 +24,7 @@ The Store's fulfillment view organizes orders, tasks, supplier participation, ev
 | Evidence binding | Product evidence metadata, content hash, metadata hash, payload hash. |
 | Supplier historical participation | order/task projection + supplier metadata/identity projection. |
 | Plan and identity | `UVPStateMachine` Plan finalization + `UVPIdentityRegistry` identity binding projection. |
-| Docked linked order | local/linked relation metadata + both sides' state-machine proof + mapped local signal. |
+| Dock registration and binding | The `DockRegistered` static registration, `StageDockExecutorSelected` executor selection, and `DockBindingPoked` / `DockOutputSubmitted` output emission projections; current A/B windows are read from `getStageDockBinding` / `dockOutputWindow`. |
 
 ## What the Store should show
 
@@ -34,7 +34,7 @@ The Store's fulfillment view organizes orders, tasks, supplier participation, ev
 - indexer syncing/rebuild status;
 - evidence hash and metadata URI, without showing business file plaintext.
 - receive hook, ready time, assigned executor, blocked reason;
-- local/linked order proof chain when a stage is executed by a peer Zhixu.
+- the dock-stage executor selection and binding proof chain (`StageDockExecutorSelected` → `DockBindingPoked` → `DockOutputSubmitted`) when a stage is received by a dock executor.
 
 ## Minimum fields for a proof card
 
@@ -56,4 +56,4 @@ The Store's fulfillment view organizes orders, tasks, supplier participation, ev
 - notification delivered is a contact status; signal submitted looks at `SignalSubmitted`.
 - Store notes or operator reviews are operational records; business completion looks at signal/proof (contact is not fulfillment, see [../protocol-boundaries.md](../protocol-boundaries.md)).
 - A local DB row is a rebuildable read model; for how read models map to authority sources see the [README.md](README.md) "Information objects and authority sources" table.
-- Linked-order completion advances the local order only through an authorized mapped signal or `DockOutputSubmitted` on the local order; docking events are the authority for relation, input, output, and terminal state.
+- A dock output on an order is expressed by `DockOutputSubmitted` and the `bindingId`; B-order progress follows that order's authorized signals / proof; current A-window values come from `getStageDockBinding` / `dockOutputWindow` (window history is not on chain).

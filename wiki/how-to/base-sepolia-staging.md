@@ -25,7 +25,7 @@ UVP_BASE_SEPOLIA_BROADCAST_CONFIRMATION=I_UNDERSTAND_THIS_BROADCASTS_BASE_SEPOLI
 pnpm deploy:base-sepolia
 ```
 
-该入口部署 `UVPStateMachine`、六个冻结 modules、`UVPDeploymentRegistry` 和 `UVPIdentityRegistry`，登记 deployment，并写入地址清单（`uvp-eth.addresses.v1`）。它是 contract-only 入口：到此为止，不注册 Plan——plan/order/dock smoke 由下面的 bootstrap 入口继续。
+该入口部署 `UVPStateMachine`、七个冻结 modules（stage patch、plan metadata、derived signal、order link、dock registry、file resource、lens）、`UVPDeploymentRegistry` 和 `UVPIdentityRegistry`，登记 deployment，并写入地址清单（`uvp-eth.addresses.v1`）。它是 contract-only 入口：到此为止，不注册 Plan——plan/order smoke 由下面的 bootstrap 入口继续。
 
 ## 部署并运行协议 Smoke
 
@@ -36,7 +36,7 @@ UVP_BASE_SEPOLIA_BROADCAST_CONFIRMATION=I_UNDERSTAND_THIS_BROADCASTS_BASE_SEPOLI
 uvp-deploy/deploy/scripts/bootstrap-base-sepolia.sh
 ```
 
-Smoke 会继续创建 Order、写入 Signal 授权、提交场景 Signal，并核对链事件与 replay 结果。
+Smoke 会继续注册编译产物中的 plan、创建 trigger Order、写入 signal 授权、提交场景 signal，并核对链事件与 replay 结果。
 
 ## 安全门
 

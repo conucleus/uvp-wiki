@@ -7,24 +7,58 @@ status: verified
 
 # Product API Endpoints
 
-The Product API lives in `@uvp-eth/chain-services`. It combines StateMachine event projections with Store-managed off-chain records into the DTOs used by Store, Order App, and uvp-client.
+In this repository `@uvp-eth/chain-services` carries the chain-read and operations surface: it projects chain events into generic chain-read routes (`/chain/*`), identity-binding reads, and operations gates. Product business write paths (drafts, invites, task actions, evidence, submission orchestration) and Store Console workbench endpoints are owned by the used-car application backend; their HTTP paths, tables, and signing keys follow that repository's API contract.
 
-## Catalog, Orders, and Tasks
+> Pending confirmation: application Product / Store endpoint names are outside this repository's verification scope; consult the application `app-contract` path contract before citing specific paths.
+
+## Chain-read and operations endpoints in this repository
 
 ```text
-GET /product/zhixus
-GET /product/zhixus/:zhixuId
-GET /product/orders
-GET /product/orders/:orderId
-GET /product/orders/:orderId/timeline
-GET /product/orders/:orderId/proof
-GET /product/tasks
-GET /product/tasks/:taskId
-GET /product/me
-GET /product/me/orders
-GET /product/me/tasks
-GET /product/me/tasks/:taskId
-GET /product/me/activity-feed
+GET  /chain/orders
+GET  /chain/orders/:orderId
+GET  /chain/orders/:orderId/tasks
+GET  /chain/tasks
+GET  /chain/tasks/:taskId
+GET  /chain/sync-state
+GET  /chain/snapshot
+GET  /chain/plans/:planId/:planHash/admissions
+GET  /chain/plans/:planId/:planHash/triggers
+GET  /identity/bindings
+GET  /healthz
+GET  /readyz
+GET  /admin/diagnostics
+GET  /admin/ops/status
+GET  /admin/ops/summary
+POST /admin/ops/projections/rebuild
+GET  /admin/ops/indexer/pending-steps
+POST /admin/ops/indexer/pending-steps/retry
+```
+
+Chain-read semantics:
+
+- `/chain/orders` and `/chain/orders/:orderId` both return `{ orders }`; order ids are plan-scoped, and a single read returns 404 when no projection exists rather than degrading to empty.
+- `/chain/orders/:orderId/tasks`, `/chain/tasks`, and `/chain/tasks/:taskId` return task projections; tasks are generated only by chain events.
+- `/chain/sync-state` and `/chain/snapshot` return sync state and a snapshot. The snapshot includes static Docks (`uvp.dock.v1`) and the DockBinding/per-output projection (`uvp.dockBinding.v1`): binding identity and emitted facts come from chain events, while the current A/B window `satisfied` flag and relative `dueInSeconds` are live enrichment from the `UVPStagePatchModule.dockOutputWindow` view at read time — not persisted, not history.
+- `/chain/plans/:planId/:planHash/admissions` and `/triggers` read the plan compilation artifact (`plan_artifacts`); birth lines are enumerated by `triggers[]`.
+- `/identity/bindings` is the read-only identity-binding projection.
+- Operations surface: `/healthz`, `/readyz`, `/admin/diagnostics`, and `/admin/ops/*` require operations admin credentials.
+
+## Product business endpoints (owned by the application backend)
+
+```text
+GET  /product/zhixus
+GET  /product/zhixus/:zhixuId
+GET  /product/orders
+GET  /product/orders/:orderId
+GET  /product/orders/:orderId/timeline
+GET  /product/orders/:orderId/proof
+GET  /product/tasks
+GET  /product/tasks/:taskId
+GET  /product/me
+GET  /product/me/orders
+GET  /product/me/tasks
+GET  /product/me/tasks/:taskId
+GET  /product/me/activity-feed
 ```
 
 Plan publication status comes from the `UVPStateMachine.PlanRegistered` projection. Tasks come from `HookReady`; executor wallets come from Plan-declared signal capabilities and order-level `SignalSubmitterAuthorized`. Role names are display only.
@@ -51,7 +85,7 @@ POST /product/invites/:inviteId/accept
 POST /product/invites/:inviteId/reject
 ```
 
-Business records (order triggers, invite preview) require a session identity / invite token per the policy above; `triggerId` is a non-enumerable random id. Draft reads and participant lists are limited to the creator or accepted participants.
+Business records (order triggers, invite preview) require a session identity / invite token per the policy above; `triggerId` is a non-enumerable random id. Draft reads and participant lists are limited to the creator or accepted participants. The BFF persists draft and workflow state; what actually makes an order exist is a birth event on `UVPStateMachine`, and what actually advances tasks are chain events such as `SignalSubmitted` and `HookReady`.
 
 ## Submission and Evidence
 
@@ -64,22 +98,19 @@ POST /product/tasks/:taskId/submit
 GET  /product/submissions/:submissionId
 ```
 
-`prepare-submit` produces EIP-712 typed data. `submit` verifies the signature and hands the request to the relayer; the on-chain result is authoritative via `SignalSubmitted`.
+`prepare-submit` produces EIP-712 typed data. `submit` verifies the signature and hands the request to the relayer; the on-chain result is authoritative via `SignalSubmitted`. The protocol-side signal entry is direct `submitSignal` (identity fixed to `msg.sender`; a contract executor may be paid for by a relayer).
 
-## Order Overlay
+## Order Overlay (protocol side)
 
-```text
-POST /product/tasks/:taskId/prepare-stage-executor-patch
-POST /product/tasks/:taskId/submit-stage-executor-patch
-POST /product/tasks/:taskId/prepare-stage-resource-patch
-POST /product/tasks/:taskId/submit-stage-resource-patch
-```
+Executor patch: `UVPStagePatchModule`'s `StageExecutorPatch` typed data (domain `stageExecutorPatch` 0.4, mode closed set `assign`/`handoff`) → `applyStageExecutorPatchFor`; the signed entry carries `bindingProof`, `candidateProof`, and `executorAuthorizations`.
 
-Executor patches handle order-level executor selection, handoff, and replacement. Resource patches bind `resourceKey`, `manifestHash`, `policyHash`, and `manifestURI`.
+Stage file patch: submitted as the trailing `bytes32 filesDigest` + `FilePatch` on direct `submitSignal` (`signalId == 0` is a pure file patch), and applied by `UVPFileResourceModule.applyStageFilePatch` as `add` / `replace` / `remove`; `baseHash` is mandatory and equals the stage's current file version.
+
+The application backend owns product-side typed-data preparation and submission orchestration; endpoint names follow the application API contract.
 
 ## Store Console
 
-The Store Console also lives in chain-services and is authorized by capability: a wallet first establishes a session via challenge/verify, later requests identify themselves with the session credential; `store.read` is the anonymous public read capability, and each write requires its own `store.*` capability (e.g. `store.draft.review`, `store.version.activate`, `store.supplier.review`, `store.docking.create`, `store.listing.manage`).
+The Store Console also lives in the application repository and is authorized by capability: a wallet first establishes a session via challenge/verify, and later requests identify themselves with the session credential; `store.read` is the anonymous public read capability, and each write requires its own `store.*` capability (e.g. `store.draft.review`, `store.version.activate`, `store.supplier.review`, `store.listing.manage`).
 
 Sessions and identity:
 
@@ -139,14 +170,9 @@ POST /store/suppliers/:supplierId/notification-profile
 POST /store/suppliers/:supplierId/notification-profile/prepare
 ```
 
-Docking workbench:
+Dock workbench (Store off-chain workflow):
 
-```text
-POST /store/docking-sessions
-GET  /store/docking-sessions/:sessionId
-POST /store/docking-sessions/:sessionId/validate
-POST /store/docking-sessions/:sessionId/save-draft-map
-```
+Dock assembly sessions, validation, and draft maps are Store off-chain materials; the application repository owns their endpoints and storage. On-chain facts are `DockRegistered`, `StageDockExecutorSelected`, `DockBindingPoked`, `DockOutputSubmitted`, and the two orders' events.
 
 Listings and page decoration:
 
@@ -179,18 +205,15 @@ POST /store/join-applications/:applicationId/reject
 POST /store/join-applications/:applicationId/revoke
 ```
 
-Drafts, docking sessions, listings, decoration, supplier names, capability tags, matching profiles, and review records are Store off-chain facts. The Identity Registry projection only provides the public correspondence between `subjectId` and wallets.
+Drafts, Dock assembly sessions, listings, decoration, supplier names, capability tags, matching profiles, and review records are Store off-chain facts. The Identity Registry projection only provides the public correspondence between `subjectId` and wallets.
 
 ## Readiness
 
-```text
-GET /product/staging/readiness
-```
-
-This endpoint outputs a redacted summary of deployment, indexing, storage, role inputs, and Product state; it returns `503 not_ready` when conditions are insufficient. The summary includes the deployment inventory, role-input posture, and participant wallets of sample tasks — operational detail that requires governance admin credentials (same gate as `/admin/diagnostics`; public aggregate health lives at `/healthz` and `/readyz`).
+Operational readiness in this repository is `GET /readyz` and `GET /admin/diagnostics`; the staging readiness summary (deployment, indexing, storage, role inputs, and sample participant wallets) belongs to the application/operations surface and requires governance admin credentials.
 
 ## Related Pages
 
+- Chain-read DTOs and fields: [Chain Services](../concepts/services/chain-services.md)
 - DTO fields and status mapping: [Product DTO](../concepts/product/dto.md)
 - Start the API and frontends locally: [Run Services and Frontends](../how-to/run-services-and-apps.md)
 - Service semantics and boundaries: [Product API (concept)](../concepts/services/product-api.md)

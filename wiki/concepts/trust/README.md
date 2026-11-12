@@ -14,6 +14,6 @@ UVP 把身份解析、Plan 发布与订单级动作授权拆开：Registry 说�
 | 子页 | 说明 |
 | --- | --- |
 | [Identity Registry](domains.md) | Store 运营的身份解析域：subject 与钱包绑定及撤销的含义。 |
-| [Signal 授权](signal-authorization.md) | 订单级显式授权与 Executor patch 动态委任。 |
+| [Signal 授权](signal-authorization.md) | 订单级显式授权与 stage patch 写入的授权集。 |
 | [EIP-712 与 Relayer](eip712-relayer.md) | 业务签名的 typed data 形态，以及 relayer 只广播不决策的边界。 |
-| [Stage Patch 授权](stage-patch.md) | executor/resource patch 如何复用订单级授权模型。 |
+| [Stage Patch 授权](stage-patch.md) | executor patch 与阶段文件 patch 如何复用订单级授权模型。 |

@@ -25,20 +25,20 @@ status: verified
 | Plan 是否可用 | publisher 签名及 `PlanCommitted` / `PlanFinalized`。 |
 | 钱包对应哪个现实主体 | `UVPIdentityRegistry` 的 binding/revocation 事件；能力判断仍属 Store。 |
 | 部署版本是否 active | `UVPDeploymentRegistry` 的 cutover 事件。 |
-| stage executor overlay 是否应用 | Stage Patch Module 的 `StageExecutorPatchApplied` 与 StateMachine 的 `StageExecutorActivated`。 |
-| stage resource manifest 是否更新 | `StageResourcePatchApplied`。 |
-| linked Zhixu 关系是否存在 | Docking Module 的出生事件（`mode=new` 为 `DockOpened`，`mode=existing` 为 `DockAttached`；含 local/linked plan 与 order）。 |
-| docked input/output 是否映射、提交 | `DockInputSubmitted` / `DockOutputSubmitted`。 |
+| stage executor 是否变更 | Stage Patch Module 的 `StageExecutorPatchApplied` 与 StateMachine 的 `StageExecutorActivated`。 |
+| 阶段文件映射是否更新 | `StageFilePatchApplied` / `StageFileOpApplied`。 |
+| Dock 声明是否注册、dock 执行者是否选定 | `UVPDockRegistry` 的 `DockRegistered`；`StageDockExecutorSelected`（挂接 stage 一次性选定）。 |
+| dock binding 是否建立/发射 | `DockBindingPoked`（A/B 窗口与 binding）与 `DockOutputSubmitted`（B 侧输出事实，携 binding id）。 |
 
 ## 可以缓存但必须可重建
 
 | 数据 | 规则 |
 | --- | --- |
 | `StateMachineOrderProjection` | 从 state-machine 事件重建。 |
-| `StateMachineTaskProjection` | 从 `HookReady`、授权、stage overlay、signal 事件重建。 |
+| `StateMachineTaskProjection` | 从 `HookReady`、授权、executor patch / 阶段文件 patch、signal 事件重建。 |
 | Product proof rows | 从事件 provenance 生成。 |
 | supplier identity projection | 从 Identity Registry 事件重建。 |
-| stage patch 与 docking projection | 从 `StageExecutorPatchApplied`、`StageResourcePatchApplied`、`DockOpened` / `DockAttached`、`DockInputSubmitted`、`DockOutputSubmitted` 事件族重建。 |
+| stage patch 与 dock binding projection | 从 `StageExecutorPatchApplied`、`StageFilePatchApplied` / `StageFileOpApplied`、`StageDockExecutorSelected`、`DockBindingPoked`、`DockOutputSubmitted` 事件族重建。 |
 | Store catalog 状态 | 可以合并 metadata；Plan 发布与身份绑定状态必须来自链事件。 |
 
 ## 只能作为操作辅助

@@ -1,152 +1,121 @@
 ---
-title: Zhixu 作为 Executor
+title: Dock 协作
 type: explanation
 audience: 协议读者、集成工程师
-preread: ../core/executor.md
+preread: ../state-machine/docking.md
 status: verified
 ---
 
-# Zhixu 作为 Executor
+# Dock 协作
 
-> 前置阅读：[Executor](../core/executor.md)
-一条 Zhixu 可以作为另一条 Zhixu 的 stage executor。这里的 executor 是执行接口：它接收本地秩序开放的阶段任务，按自己的规则运行，并把约定信号映射回本地秩序。
+> 前置阅读：[Dock 与 Binding](../state-machine/docking.md)
+
+跨秩序协作的唯一形态是 Dock：B 侧发布独立 `kind: Dock` 文档声明 A→B 发射条件；B 订单在挂接 stage 一次性选定 dock 执行者，写入 `dock_link`（A 单号）建立 binding，poke 求 A/B 窗口并把满足的 B 输出信号发射到 B 订单。A 侧保持自己的订单、授权与生命周期。
 
 ## 核心模型
 
 ```text
-local Zhixu / local order
-  -> stage.executor.supplierType = zhixu
-  -> zhixuExecutorConfig.target 携带 peer 定义的内容派生 uid（zx-<32hex>）或为 null（运行时选择）；壳自身的 metadata.uid 不可书写
-  -> interface 指定目标接口名；order.mode 声明 new（建子单）或 existing（接既有单）
-  -> inputMap/signalMap bind local hooks/signals to target port names
-  -> local receive hook becomes ready and opens execution
-  -> linked Zhixu / linked order runs with its own plan and authorization
-  -> linked proof is checked
-  -> authorized mapped signal is submitted to local order
+B 侧发布 Dock 文档：
+  spec.from = A 秩序的内容派生 uid + source
+  spec.to   = B 秩序的内容派生 uid + stage（该 stage 声明 supplierType: dock）
+  spec.signalMap：B 输出信号名 -> A 侧 validWhen 表达式
+
+B 订单运行期：
+  1. 挂接 stage 一次性选定 dock 执行者（stage patch；选中后固定）
+  2. 文件映射写入 dock_link = A 单号 -> binding
+  3. poke：A 窗口（A 订单事实）与 B 窗口（发射适格）交集时，把 B 输出信号写入 B 订单
+  4. B 阶段 hooks 消费这些信号，继续推进本地流程
+
+A 订单：事实照常产生，订单号与生命周期保持原身份
 ```
 
-local order 和 linked order 都是独立的 `UVPStateMachine` order。它们各自有自己的 plan、授权、事件和 proof，不共享也不需要聚合生命周期状态。Docking relation 说明两条秩序之间哪些 signal 可以对接；运行态关系由 docking link 和 mapped signal 事件记录。
-
-## 为什么要这样设计
-
-真实履约经常由多个独立秩序协作完成。跨境供货的本地秩序可以把寻源、清关、结算、物流、现场交付分别交给不同 Zhixu 执行；嵌套也允许：本地结算 stage 可以选择 `payment-settlement` 这条 Zhixu 作为 executor，而 `payment-settlement` 内部的 `fiat_bridge` stage 又可以选择 `fiat-payout-bridge` 作为 executor。local order 不需要展开 linked Zhixu 的全部内部流程，只需要知道它暴露的 signal 接口、proof 和 trust 状态。
-
-这样带来几个好处：
-
-- linked Zhixu 可以复用：同一条 `customs-clearance` 可以服务很多 local order。
-- linked Zhixu 可以独立治理：自己的 plan hash、trust publication、supplier network 可审计。
-- linked Zhixu 可以独立演进：local order 通过 Store 配置选择某个 active peer Zhixu 版本。
-- linked Zhixu 可以保留内部上下文：local order 只消费可验证 proof 和映射 signal。
+两侧订单都是独立的 `UVPStateMachine` 订单，身份为复合键 `(planId, orderId)`；跨 plan 引用必须携带 `planId`。Dock 只做事实到发射条件的映射，订单创建由各自秩序的出生通道完成（见 [出生信号与订单入口](../core/trigger.md)）。
 
 ## YAML 形态
 
-一个结算 stage 可以这样把另一条 Zhixu 作为执行接口：
+B 侧目标 stage 声明 dock 执行者与绑定面：
 
 ```yaml
-- name: fiat_bridge
-  source: settlement
-  receiveSignals:
-    ROUTE_FIAT: settlement::route.use_fiat_bridge
+- name: packing
+  source: seller
   executor:
-    supplierType: zhixu
-    zhixuExecutorConfig:
-      target:
-        zhixu: zx-9c41f0d27a3e5b86c4d1af0b7e285c36   # 目标定义的内容派生 uid（zx-<32hex>，D003 拒绝 name slug）
-      interface: payout_service
-      order:
-        mode: new
-      inputMap:
-        ROUTE_FIAT: payout       # mode=new：恰好一条 input 绑定（出生锚）
-      signalMap:
-        str: payout_started
-        cmp: payout_completed
-        err: payout_failed
+    supplierType: dock
+  receiveSignals:
+    START: "seller::packing.start"
+  sendSignals: [{name: start}, {name: cmp}]
 ```
 
-本地 stage 的 source 是 `settlement`；`str/cmp/err` 各字段的确切语义见下文 [signalMap 的协议含义](#signalmap-的协议含义)。
-
-对接阶段的入口是本地 `receiveSignals` hook；出生入口属于 `trigger` stage（trigger stage 必须是静态 plain executor，不能是 `zhixu` executor）。不存在 Hook DSL 形式的跨秩序订阅：
+B 侧发布独立 Dock 文档（`uvp.dock.v1`）：
 
 ```yaml
-- name: dock_customs_clearance
-  source: customs
-  receiveSignals:
-    LINK_READY: settlement::route.ready
-  executor:
-    supplierType: zhixu
-    zhixuExecutorConfig:
-      target:
-        zhixu: zx-9c41f0d27a3e5b86c4d1af0b7e285c36
-      interface: clearance_service
-      order:
-        mode: new
-      inputMap:
-        LINK_READY: execute     # 出生锚（唯一 input 绑定）
-      signalMap:
-        str: started
-        cmp: completed
-        err: failed
+apiVersion: uvp/v0
+kind: Dock
+metadata:
+  name: packing_service
+spec:
+  from:
+    zhixu: zx-9c41f0d27a3e5b86c4d1af0b7e285c36   # A 侧定义的内容派生 uid
+    source: seller
+  to:
+    zhixu: zx-2f7a1c9b4e6d8053a1c2b3d4e5f60718     # B 侧定义的内容派生 uid
+    stage: packing
+  signalMap:
+    cmp: "seller::washing.cmp"
 ```
 
-`LINK_READY` 是本地 hook 的名称；linked order 的开始、完成或失败仍然通过 `signalMap`、docking link、proof 校验和授权 mapped signal 回填到本地 order。订单的出生入口由另一条 static stage 的 `trigger` 信号承担。
-
-## signalMap 的协议含义
-
-`signalMap` 是 local stage 接受 linked Zhixu 输出的语义契约。
-
-| 本地 signal key | 语义 |
+| 字段 | 约束 |
 | --- | --- |
-| `str` | linked Zhixu 开始或已接收委托的信号。常用但非必填。 |
-| `cmp` | linked Zhixu 完成的信号。常用但非必填。 |
-| `err` | linked Zhixu 失败、拒绝或异常的信号。可选但大多数真实 workflow 应配置。 |
+| `spec.from.zhixu` / `.source` | 已发布定义的内容派生 uid；source 由该定义的某个 stage 声明。 |
+| `spec.to.zhixu` / `.stage` | 已发布定义的内容派生 uid；stage 以 `supplierType: dock` 承接，输出信号由 `sendSignals` 声明。 |
+| `spec.signalMap` | key 是 B 侧输出信号名（∈ `to.stage.sendSignals`）；value 是 A 侧 Filter 表达式，header source = `from.source`，atoms 落在 `from.source` 的阶段已声明信号上。 |
 
-`signalMap` 的 key 必须是本地 stage 的 `sendSignals`，value 必须是目标接口的 output 端口名；`inputMap` 的 key 必须是本地 `receiveSignals` 通道，value 必须是目标接口的 input 端口名。两张 map 至少一张非空——是否需要 `str/cmp/err` 由实际 workflow 决定，编译器不要求特定业务信号。编译器会校验 target 引用（内容派生 uid 形态 `zx-<32hex>`，D003）、接口存在与端口方向、`order.mode ∈ 目标接口 orderModes`、`mode=new` 恰好一条 input 绑定、端口名字符集及接口/route roots；`signalMap` 不承载 Hook DSL。
+## 为什么这样设计
 
-## Docked 运行时路径
+- **B 侧声明静态订阅**：契约在编译期固定（`uvp.dock.v1`），运行期只做身份与窗口求值，Dock 文档内容变即新 `dkid`。
+- **A/B 对等、独立治理**：两侧各自有 plan、授权、订单与证明；B 侧自主决定接收哪些 A 事实、发哪些输出信号。
+- **dock 执行者一次性选择**：责任在订单内固定，换选有具名拒绝；执行者必须对 Dock 全部输出信号持有订单级授权。
+- **binding 以 A 单号表达**：同一 A 单回到同一 binding，能力可回放；binding 身份是 7 word 的 `bindingId`。
+
+## 运行时路径
 
 ```text
-local order 某个 receive hook Ready
-  -> Product/Store 创建 local stage task
-  -> Store 选择或确认 peer Zhixu 版本
-  -> Product/adapter 注册或定位 linked order
-  -> linked order 按自己的 Plan、授权、executor 执行
-  -> linked order 产生 str/cmp/err proof
-  -> adapter 或 Product workflow 校验 proof 和 signalMap
-  -> openDockedOrder / submitDockedInput / submitDockedSignal 或授权 submitter 映射 local signal
-  -> local order 对应 hook Ready / Cancelled / next stage
+A 订单事实提交
+  -> pokeDockBinding（permissionless：读 dock_link、校验内容哈希、求 A 窗口）
+  -> B 侧 sendSignals.validWhen 适格复核
+  -> 满足的 output 写入 B 订单（逐 output first-win，provenance 携带 bindingId）
+  -> B 阶段 hooks 求值 / 后续阶段推进
+  -> 事件进入 chain read 投影（uvp.dockBinding.v1）
 ```
 
-编号体系可以并存：链上 local/linked `orderId` 由各自的 trigger order 入口创建；Product task、Store docking session、adapter job 可以有自己的执行编号，运行态 proof 仍回到链上 order/signal/docking events。
-
-## 运行时证明
-
-一个完整的 docked Zhixu proof 至少覆盖：
+## 证明与读面
 
 | 问题 | 证明来源 |
 | --- | --- |
-| local stage 为什么开放执行 | local order 的 `HookReady`。 |
-| link stage 的入口为何有效 | local `HookReady` 与按模式的出生 proof（`mode=new` 的 `DockOpened`、`mode=existing` 的 `DockAttached`），以及目标 input 端口的 interface/route membership proof。 |
-| linked Zhixu 使用哪个计划 | linked order 的 `OrderRegistered` 和 linked plan projection。 |
-| linked Zhixu 的 Plan 是否可用 | linked StateMachine 的 `PlanCommitted/PlanFinalized` projection。 |
-| linked order 如何推进 | linked order 的 `SignalSubmitted` / hook proof。 |
-| local order 如何继续 | local order 上的 mapped signal，来源可以是授权 submitter 或 `DockOutputSubmitted`。 |
+| Dock 声明是否已注册 | `DockRegistered` 与 `getDock(dkid)`。 |
+| 谁承接 B 阶段 | `StageDockExecutorSelected` 与 `getActiveStageDockSelection` / `activeStageExecutor`。 |
+| binding 身份是什么 | 7 word 的 `bindingId` 与 `dock_link` 文件记录。 |
+| A/B 窗口当前状态 | `dockOutputWindow` / `getStageDockBinding` 与 `uvp.dockBinding.v1` 读面（相对 `dueInSeconds`，无持久窗口历史）。 |
+| B 输出是否发射 | `DockOutputSubmitted` 与 B 订单上的 `SignalSubmitted`。 |
+| 如何回放 | 选择记录 + `dock_link` + `DockBindingPoked` / `DockOutputSubmitted` 事件重建。 |
 
-Store 可以把这些 proof 拼成一张履约卡片；状态真相仍来自两边各自的链上事件。
-
-## Store Docking 工作流
-
-Store 应把 docked Zhixu 管成一个可审核 workflow：
+## Store 工作流
 
 ```text
-选择 local stage
-  -> 按定义 name 检索可用 peer Zhixu
-  -> 检查 linked plan publication 和 active version
-  -> 校验 inputMap/signalMap 与目标接口声明的端口匹配
-  -> 保存 docking session draft
-  -> operator review
-  -> 发布或绑定到 local order workflow
-  -> openDockedOrder 记录 local/linked relation
-  -> submitDockedSignal 或授权 submitter 映射 local signal
+选择 B 订单与挂接 stage
+  -> 发布或选择 Dock 声明（得到 dkid）
+  -> 一次性选定 dock 执行者
+  -> 写入 dock_link（A 单号）
+  -> poke 并监控窗口 / pending / emitted 读面
+  -> operator 审批属于链下 workflow；正式事实看链事件
 ```
 
-Sandbox validation 是试拼和审核材料。正式运行需要 plan publication、order registration、signal authorization、docking link 和 proof。
+试拼、审核与 dock 会话是链下 workflow 材料；正式运行以 Dock 注册、执行者选择、binding 与发射事件为准。
+
+## 边界
+
+- A/B 订单独立，身份是 `(planId, orderId)`；跨 plan 引用带 `planId`，关联两侧一律使用复合身份。
+- Dock 在既有 B 订单上建立 binding 并发射输出信号；订单由所属秩序的出生通道创建。
+- 终态只由本地阶段/订单结束驱动；输出信号表达的是映射自 A 窗口的 B 事实。
+- store 记录与链上事实分工见 [协议边界](../protocol-boundaries.md)：链上事件是事实源，链下只做投影与 workflow 状态。
+
+执行者视角的绑定细节见 [Dock 与 Binding](../state-machine/docking.md)。

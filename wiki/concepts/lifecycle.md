@@ -20,19 +20,19 @@ status: verified
 
 ## 1. 编写与编译
 
-Store 或开发者编写 Zhixu；Compiler 生成 hooks、selector bindings、signal capabilities、`hooksHash`、`capabilitiesRoot`、dock roots 和 runtime `planHash`。编译阶段只做规则结构校验，不认证现实供应商能力。
+Store 或开发者编写 Zhixu；Compiler 生成 hooks、selector bindings、signal capabilities、file-writer capability leaves、`hooksHash`、`capabilitiesRoot`、`executorCandidatesRoot` 和 runtime `planHash`。编译阶段只做规则结构校验，不认证现实供应商能力。
 
 ## 2. 配置并冻结 StateMachine
 
-部署 StateMachine 与六个 modules，设置地址后调用 `freezeModules()`。冻结后 owner 不能替换 module；升级必须部署新 StateMachine，并通过 Deployment Registry 显式切换。
+部署 StateMachine 与七个 modules（stage patch、derived signal、dock registry、plan metadata、order link、lens、file resource），设置地址后调用 `freezeModules()`。冻结后 owner 不能替换 module；升级必须部署新 StateMachine，并通过 Deployment Registry 显式切换。
 
 ## 3. 签名提交 Plan
 
-publisher 签署 PlanCommit（`publisher + hooksHash + capabilitiesRoot + dockRoutesRoot + dockInterfaceRoot + deadline`）。任意 relayer 调用 `commitPlan`，合约验证完整 hooks 的 hash 和 publisher 签名，导出 `planId = hash(publisher, planHash)`——`planHash` 覆盖 hooks、capabilitiesRoot、两个 dock roots 与 executorCandidatesRoot。
+publisher 签署六字段 PlanCommit（`publisher + hooksHash + capabilitiesRoot + executorCandidatesRoot + birthAuthorizer + deadline`）。任意 relayer 调用 `commitPlan`，合约验证完整 hooks 的 hash 和 publisher 签名，导出 `planId = hash(publisher, planHash)`——`planHash` = runtime hash 三元组（hooks、capabilitiesRoot、executorCandidatesRoot）；`birthAuthorizer` 只进 commit digest 与链上存储，不进 `planHash`。
 
 ## 4. 定稿 Plan
 
-能力表与绑定表已折叠为 `capabilitiesRoot`，随 commit 一并被 publisher 承诺。任意调用者调用 `finalizePlan(planId)` 定稿（permissionless），本步只落定稿、不提交表数据。只有 finalized Plan 能创建 Order。
+三张能力表已折叠为 `capabilitiesRoot`、执行者候选集折叠为 `executorCandidatesRoot`，随 commit 一并被 publisher 承诺。任意调用者调用 `finalizePlan(planId)` 定稿（permissionless），本步只落定稿、不提交表数据。只有 finalized Plan 能创建 Order。
 
 ## 5. 身份目录（可选）
 
@@ -40,7 +40,7 @@ Store 可以在线下核验主体后，在自己的 `UVPIdentityRegistry` 登记
 
 ## 6. Trigger 创建 Order
 
-creator/submitter 签 trigger typed data；任意 relayer 广播。合约绑定 finalized `planId`、写入订单级 signal authorizations、记录 trigger fact 并 materialize 初始 stage。没有 registrar allowlist。
+出生在 DSL 声明面由 `sendSignals` 条目上的 `trigger: true` 表达：链轨 outside 出生由计划承诺的 `birthAuthorizer` 签 typed data 提交（或合约直接入口），order-link 与治理分叉 fork 各有独立入口；任意 relayer 可广播。合约绑定 finalized `planId`、写入订单级 signal authorizations、记录出生事实并 materialize 初始 stage。
 
 ## 7. 业务执行与投影
 

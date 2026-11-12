@@ -63,7 +63,7 @@ flowchart LR
   StoreAPI --> ObjectStore
 ```
 
-Postgres, object storage, and APIs in this diagram are product runtime layers. They may cache, retrieve, display, and relay, but protocol facts remain contract events, signatures, hashes, URIs, and replayable event provenance. The flow of truth advances along "Zhixu -> Plan artifact -> PlanCommitted/PlanFinalized -> order registration and authorization -> Signal/Hook/timer/stage patch/docking events -> replayable projection"; databases, object storage, notification queues, Store drafts, operator audits, and submission status are all projections or workflow state and cannot replace `UVPStateMachine`, `UVPIdentityRegistry`, or chain events.
+Postgres, object storage, and APIs in this diagram are product runtime layers. They may cache, retrieve, display, and relay, but protocol facts remain contract events, signatures, hashes, URIs, and replayable event provenance. The flow of truth advances along "Zhixu -> Plan artifact -> PlanCommitted/PlanFinalized -> order registration and authorization -> Signal/Hook/timer/stage patch/dock binding events -> replayable projection"; databases, object storage, notification queues, Store drafts, operator audits, and submission status are all projections or workflow state and cannot replace `UVPStateMachine`, `UVPIdentityRegistry`, or chain events.
 
 ## Layered Boundaries
 
@@ -71,7 +71,7 @@ Postgres, object storage, and APIs in this diagram are product runtime layers. T
 | --- | --- | --- | --- |
 | Semantics and compilation | `uvp-protocol/packages/hook-core/`, `uvp-protocol/packages/compiler/` | Parsing Zhixu, evaluating Hook semantics, generating deterministic artifacts and hashes. | Registering orders, storing business evidence plaintext, signing for participants. |
 | On-chain facts | `uvp-protocol/contracts/uvp-contracts/` | Fact records for Plans, Orders, Signals, Hooks, identity bindings, and deployment cutovers. | Product display, Store workflows, private file storage. |
-| Service layer (rebuildable) | `uvp-chain-services/service/`, `uvp-protocol/packages/product-dto/` | Chain indexer, projections, generic read API, optional relay, proof verifier, and the DTO contracts shared by products. | Becoming the source of truth for plan/order/signal/trust, or producing business signatures. |
+| Service layer (rebuildable) | `uvp-chain-services/service/`, `uvp-protocol/packages/chain-read-contract/` | Chain indexer, projections, generic read API, optional relay, proof verifier, and the DTO contracts shared by products. | Becoming the source of truth for plan/order/signal/trust, or producing business signatures. |
 | Product surfaces | `uvp-order-app/app/`, `zhixu-store/registry/` | Translating on-chain facts into orders, tasks, and proof; the registry only records self-descriptions and identity claims. | Rewriting contract facts, bypassing order-level authorization. |
 | Public client | `uvp-client/package/` | core/browser/headless SDK and executor CLI: transport, Product V3 client, EIP-1193 signing, watcher, signal build/submit. | Custodying default private keys, taking over signature responsibility from businesses. |
 | Deployment and evidence | `uvp-deploy/` | Release `deploy/`: address manifests, release records, compatibility matrix, staging gates. QA `qa/`: Anvil/Base Sepolia rehearsal, chaos. | Redefining protocol semantics or hiding failure evidence. |
@@ -84,7 +84,7 @@ Postgres, object storage, and APIs in this diagram are product runtime layers. T
 | On-chain execution | `uvp-protocol/contracts/uvp-contracts/` | ABI, events, EIP-712 domain, `UVPStateMachine`, modules, `UVPIdentityRegistry`. |
 | Replay/reference | `uvp-protocol/packages/statemachine/` | Reference reducer, event replay, runtime semantic tests. |
 | Bindings | `uvp-protocol/packages/protocol-bindings/` | Browser-safe ABI, typed-data builders, hash helpers, calldata builders. |
-| Service layer | `uvp-chain-services/service/`, `uvp-protocol/packages/product-dto/` | Forkable chain indexer, projections, generic read API, optional relay, proof verifier; Product order/task/proof DTOs. |
+| Service layer | `uvp-chain-services/service/`, `uvp-protocol/packages/chain-read-contract/` | Forkable chain indexer, projections, generic read API, optional relay, proof verifier; Product order/task/proof DTOs. |
 | Product surfaces | `uvp-order-app/app/`, `zhixu-store/registry/` | Participant order/task UI, proof display; registry data layer. |
 | Public client | `uvp-client/package/` | core/browser/headless SDK + executor CLI. |
 | Deploy/evidence | `uvp-deploy/` | Deployment domain by lane: release `deploy/` (manifests/records/matrix), QA `qa/` (Anvil harness, chaos), ops `ops/` (console, runbooks). |

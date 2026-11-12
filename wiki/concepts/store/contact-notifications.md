@@ -18,7 +18,7 @@ Store 可以维护联系和通知工作流，因为真实履约需要找到人�
 - task reminder、HookReady delivery intent、failure reason；
 - operator note、SLA、可用时段、升级联系人；
 - adapter endpoint metadata 或 MCP/enterprise integration reference。
-- peer Zhixu docking contact，例如 owner、operator、callback adapter、support window。
+- Dock 对接联系人，例如 from/to 两侧秩序维护者、dock 执行者、adapter endpoint、支持窗口。
 
 ## 来源和边界
 
@@ -26,7 +26,7 @@ Store 可以维护联系和通知工作流，因为真实履约需要找到人�
 - 通知状态只能说明 Store/chain-services 是否尝试联系或提醒；contact 不等于履约，见 [../protocol-boundaries.md](../protocol-boundaries.md)。
 - 业务完成必须由授权 submitter 的链上 signal 表示（[../protocol-boundaries.md](../protocol-boundaries.md)）。
 - 联系方式、凭证、私密 note、证件、合同、invoice、evidence plaintext 不应上链。
-- 对 docked Zhixu 的通知表示“linked 秩序执行方已被提醒或 adapter 已被调用”；linked order 注册、完成和映射回填看链上 proof。
+- 对 Dock 对接方的通知表示相应 dock 执行者或 adapter 已被提醒；binding 是否建立看 `dock_link` 文件项与 `StageDockExecutorSelected`，output 是否发射看 `DockOutputSubmitted`。通知状态不改变协议事实。
 
 ## 与 chain-services 的关系
 

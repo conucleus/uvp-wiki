@@ -1,139 +1,80 @@
 ---
-title: Docked Zhixu Runtime
+title: Dock 与 Binding
 type: explanation
 audience: 工程贡献者
+preread: ../core/trigger.md
 status: verified
 ---
 
-# Docked Zhixu Runtime
+# Dock 与 Binding
 
-Docked Zhixu 是状态机运行时里的 order-to-order 对接能力。它允许一条
-local order 把某个 stage 交给另一条 linked Zhixu / linked order 执行，再把
-linked order 中已经发生的 signal 映射回 local order。
+> 前置阅读：[出生信号与订单入口](../core/trigger.md)
 
-这不是 Store sandbox 草稿，也不是普通后端联动。正式运行态要落到
-`UVPDockingModule`（abiVersion 4.8）的事件和 proof 上；合约只接受
-已经通过 `dockRoutesRoot`、`dockInterfaceRoot` 和各自 Merkle proof 的
-route/interface，绑定与路由哈希都带 `interfaceNameId`（keccak(接口名)）维度。
+Dock 是跨秩序协作的唯一通道：一条秩序（B 侧）以独立 `kind: Dock` 文档声明“它的哪个阶段的哪条输出信号，在另一条秩序（A 侧）的哪条 source 上满足什么事实条件时发射”。运行期在 B 订单的挂接阶段选定 dock 执行者、写入 A 单号并 poke 求窗口，A/B 窗口交集时把 B 输出信号发射到 B 订单。
+
+两侧订单都是独立的 `UVPStateMachine` 订单，身份是复合键 `(planId, orderId)`；Dock 把 A 订单里已发生的事实映射成 B 订单的发射条件，订单创建仍由各自秩序的出生通道完成。协议不变量总纲见 [协议边界](../protocol-boundaries.md)。
 
 ## 状态机对象
 
 | 对象 | 含义 |
 | --- | --- |
-| local order | 当前订单，身份是 `(localPlanId, localOrderId)`，等待 peer Zhixu 的输出推动本地阶段。 |
-| linked order | 被 dock 进来的另一条 Zhixu order，身份是 `(targetPlanId, linkedOrderId)`，有自己的 plan、授权、signal 和 proof。 |
-| dock instance | 一次具体对接，绑定 local stage、route、target plan/order、interface、mode、source seam、inputs/outputs roots 和父链边序位（depth）。 |
-| input binding | local Hook 到目标接口 input 端口的绑定，按 `inputBindingHash` 去重。 |
-| output binding | 目标接口 output 端口到 local source/signal 的映射，按 `outputBindingHash` 去重。 |
+| Dock 文档 | B 侧发布的 `kind: Dock` 定义：`spec.from{zhixu,source}` / `spec.to{zhixu,stage}` / `spec.signalMap`；编译产物为 `uvp.dock.v1`，身份 `dkid = zd-<32hex>`。 |
+| dock 阶段 | B 侧目标 stage，声明 `executor.supplierType: dock` 与 `receiveSignals`；其 hooks 带 `HOOK_FLAG_DOCK_EXECUTOR` 标记。 |
+| dock 执行者选择 | 某个 B 订单在挂接 stage 上一次性选定 dock 执行者的订单级 patch；选中后固定。 |
+| binding | 由 `dock_link` 文件项（A 单号）确定的 A→B 关系；链上身份为 7 个 32-byte word 的 `bindingId`。 |
+| output 窗口 | 每个 B 输出信号一行：A 窗口（A 侧 `validWhen` 程序）+ B 窗口（B 侧 `sendSignals.validWhen` 适格）。 |
 
-## 链上事件
+## 注册：B 侧声明 Dock
 
-| 事件 | 说明 |
-| --- | --- |
-| `DockOpened` | 原子记录 dock instance、local/target plan/order、`interfaceNameId`、route、depth（本条边的父链序位 = 父账本 +1）和 opener（`mode=new` 铸子单）。 |
-| `DockAttached` | `mode=existing` 挂接既有目标单时记录 dock instance 与对接事实（indexed `linkedOrderId` 承载目标侧"谁挂了我"投影，N:1 拼批）。 |
-| `DockInputSubmitted` | 记录 input binding 已按绑定投递到 linked order。 |
-| `DockOutputSubmitted` | 记录 linked output 已按 binding 映射回 local order。 |
+`UVPDockRegistry`（ABI 0.1）持有静态 Dock 注册表。`registerDock` 写入 from/to plan、`from.source`、`to.stage`、docHash 与每个 output 的窗口指令计划（atoms + `SIGNAL` / `NOT` / `AND` / `OR` / `DELAY`）；注册 permissionless，每个 output 与 atom 都要通过对应 plan 的 `capabilitiesRoot` 成员证明，因此 Dock 只引用已声明的信号。
 
-接口输出没有终态语义：不存在 dock 级 terminal 事件，本地阶段是否结束只由本地
-阶段/订单的结束语义驱动。
+- 身份：`dkid = bytes32(bytes16(docHash))`；`docHash` 由 Dock 文档内容派生（domain `uvp:dock-uid:v1`，剔除 `metadata.name` / `metadata.annotations`）。
+- 读面：`getDock(dkid)` / `dockOutputCount(dkid)` / `getDockOutput(dkid, outputIndex)`，入参是 **dkid word**（artifact `dkid` 右补零）。
+- 事件：`DockRegistered` 携带完整 outputs、atoms 与 A 窗口程序。
+- 云轨注册入口与错误码见 `uvp-cloud.md` 的 Dock 端点；两轨接受域差异见 `uvp-eth` 仓 `uvp-chain.md` 附录 B。
 
-`UVPStateMachineLens.getActiveDock`、`dockInputDelivered`、
-`dockOutputDelivered`、`dockByLocalRoute` 和 `dockByTargetOrder` 是读取当前
-对接状态的权威 view；不存在 `getActiveDockedOrderLink`、
-`getActiveDockedSignalBinding` 视图。
+## 执行者选择：B 订单的一次性决定
 
-## 运行路径
+挂接 stage 的 dock 执行者由订单级 stage patch 选定：`UVPStagePatchModule`（ABI 0.9）的 `selectStageDockExecutor` / `selectStageDockExecutorFor` 接收 `StageDockExecutorSelection`，selector 阶段用 EIP-712 签名（域 `stageExecutorPatch` 0.4；直接调用路径以 `msg.sender` 为 selector）。
+
+合约校验三件事：该 stage 的 hooks 带 `HOOK_FLAG_DOCK_EXECUTOR`、selector 的 binding 关系、执行者对 Dock 全部输出信号的订单级授权。同 dkid + executor 的重放幂等吸收，换选响亮拒绝（`StageDockExecutorAlreadySelected`）；事件 `StageDockExecutorSelected` 记录 dockId、fromPlanId、executor、selector 与 patchHash。选中后固定，dock 阶段的执行者只走这条一次性选择路径（通用 executor patch 由 `StageExecutorPatchForbiddenOnDockStage` 拒绝）。
+
+## Binding：A 单号即关系
+
+binding 由挂接 stage 的文件映射项 `dock_link` 确定：key 为 `keccak("dock_link")`，value 是 canonical A 订单号（`0x` + 64 hex）。写入即建立、改写即切换；同一 A 单回到同一 binding。
+
+链上 binding 身份为 7 个 32-byte word：
 
 ```text
-local stage HookReady(planId, orderId, hookId, ...)
-  -> Store/Product 或 adapter 按定义 name 选定已发布的 target Zhixu
-  -> openDockedOrder（单参数 OpenDockCallV1）校验 route/interface roots、permit、目标侧同意门和边数预算
-  -> 原子创建 linked order 并提交出生锚 input（mode=new 的唯一 input 绑定）
-  -> linked order 按自己的 Plan、授权和 executor 运行
-  -> submitDockedInput 投递后续 local signal input（按需）
-  -> linked SignalSubmitted 出现
-  -> submitDockedSignal 提交 output binding
-  -> local order 出现映射 SignalSubmitted 和 DockOutputSubmitted proof
-  -> local hooks 继续求值
+bindingId = keccak256(abi.encode("uvp.dock.binding_id.v1",
+  dkid, toPlanId, toOrderId, toStageId, fromPlanId, fromOrderId))
 ```
 
-跨 plan 的每个引用都必须保留 `planId`。`orderId` 不是全局键，不能用 bare
-`orderId` 查找或合并 dock、signal、proof。`dockInstanceId` 的 preimage 也
-包含 local plan namespace、modeWord 和 `interfaceNameId`；routeHash（域 V3
-`UVP_DOCK_ROUTE_V3`）preimage 的目标槽钉 targetPlanId（静态路由），镜像
-计划复制接口承诺也无法满足已提交 route 的身份；`linkedOrderId` 从
-dock instance 和 target definition 身份派生，防止跨 plan 抢占。
+`dock_link` 文件记录的 `contentHash` 只在 poke 时认证载荷正文：正文与记录不一致即 `DockBindingContentHashMismatch`。binding 身份、事件、view 与事实 provenance 都只使用 `bindingId`。
 
-## 模式边界：new / existing / 动态选择
+## 窗口与发射：poke
 
-- `order.mode=new`：链上完整支持。每条 route 恰好一条 input 绑定（出生锚），
-  `openDockedOrder` 在一笔交易内创建子订单、登记 link 并写入出生锚事实。
-  建立必过**目标侧同意门**：调用方即目标 plan publisher（new 路由子订单
-  creator 与之同源，两腿合一）免签，否则必须携 publisher 的 EIP-712 同意
-  签名——typed data `UVPDockOpenConsentV1`（域 `UVPDockingModule`
-  version "4"，十字段 digest：targetPlanId / interfaceNameId / localPlanId /
-  localOrderId / routeId / routeHash / dockInstanceId / linkedOrderId /
-  nonce / deadline，独立 nonce 账本），空签名且非 publisher 即拒绝
-  （`DockOpenConsentRequired`）。entrance permit 的 typed-data 是
-  `UVPDockEntrancePermitV2`（含 `interfaceNameId`，同域）——permit 是可选的
-  交付预授权，同意是 open 的建立前提，两者分属不同 digest/nonce 账本。
-- `order.mode=existing`：链上支持。`attachDockedOrder`（`UVPDockingModule`
-  4.8）对等挂接既有目标单——不创建子订单，同意门为目标单 creator / 在任
-  执行者 / 目标 plan publisher 预授权三者之一，挂接后 input/output 走与
-  `new` 同一的交付面（语义见 [Trigger](../core/trigger.md)）。
-- `target: null`（动态选择）：链上支持。编译产物以 `unresolvedDockRoutes`
-  （`uvp.dockRoute.unresolved.v1`）携带声明面（候选集从 resolution
-  manifest 派生）；routeHash（域 V3）动态形态的目标槽为零字，
-  `attachDockedOrder` 携候选叶（`UVP_DOCK_CANDIDATE_V2`，绑定选定目标
-  planId）membership proof 选定目标并终身钉住；唯 `order.mode=new` 的
-  动态路由被链轨编译拒绝（`UNRESOLVED_DOCK_MODE`）。云轨运行时读取 dock
-  route selection 记录补齐目标（按 name 解析，校验接口/端口满足本地声明，
-  DB 自然键建立实例）。
+`pokeDockBinding(planId, orderId, targetStageId, payloadContent, fromOrderId, outputCapabilityProofs[])` 是 permissionless 的求值入口：
 
-两轨逐语法点的接受/拒绝对照见 `uvp-eth` 仓 `uvp-chain.md`
-附录 B。
+1. 校验 `dock_link` 载荷与内容哈希，确认 A 订单属于 Dock 的 from plan；
+2. 用 `evaluateDockWindow` 在 A 订单事实上求 A 窗口（与 hook 同一求值器；`~` 在事实到达时关闭、`+T` 延迟锚点）；
+3. 对每个 output 复核 B 侧 `sendSignals.validWhen` 适格（pre-state 判 Ready）；
+4. 已满足的 output 通过 `submitDockOutputSignalFromModule` 写入 B 订单，逐 output first-win；A/B 窗口尚未交集时该 output 保持待发射。
 
-## 订阅与入口
+事件：`DockBindingPoked`（每笔一次，含 bindingId、fromOrderId、executor 与 emittedCount）与 `DockOutputSubmitted`（每 output 一次，含 bindingId、outputIndex、signalId）。B 事实的 provenance 携带 `bindingId`。
 
-local stage 的入口有两种显式来源：`receiveSignals` 的同单 Hook，或本 stage 的
-`trigger` 出生信号。`trigger` 是本 stage `sendSignals` 的可选子集，每个条目合成
-一条 order-trigger hook；编译产物 `triggers[]` 枚举全部 order-trigger hook
-（`orderTriggerKind` 为 `trigger` 或 `dock` 的入口），它只是派生读面、不进
-planHash 承诺面。空 `orderId` 提交 trigger 信号时先以空订单上下文求值
-`validWhen`，通过后建单并写首事实；带 `orderId` 时 trigger 信号就是普通订单信号。
-同秩序普通事实连接使用 `receiveSignals`；跨秩序连接使用
-`spec.dockInterface` 与 `executor.zhixuExecutorConfig`，不存在 Hook DSL 形式的
-跨秩序订阅 wrapper。
+## 读面与回放
 
-linked Zhixu 的 `supplierType: zhixu` 配置声明目标接口名、`order.mode`，并将
-`inputMap` 和 `signalMap` 写成目标接口端口名；两张 map 至少一张非空。解析分两层：
-core linker 按 `uvp.dock.resolution.v2` manifest 的 name 目录查找并做结构性校验；
-链轨发布面的 manifest 在同一 schema 上内嵌目标定义全文，由 TS 编译器重算内容
-派生身份（zx-<32hex>）与 artifact/interface roots 做内容寻址（链轨内幕）。
-`signalMap` 不承载 Hook DSL，也不会凭配置自动完成 local 业务。
-
-## 边数预算与幂等
-
-每单总挂接边数账本 `dockEdgeCountOfOrder` 是唯一权威：open 建 dock 单计边
-（子订单账本 = 父账本 + 1），attach 计边取 max（目标账本抬升到
-max(自身, 父账本 + 1)）。请求自报的 `parentDepth` 必须与账本一致（否则
-`DockDepthMismatch`），账本达到 `MAX_DOCK_EDGES = 8` 即拒绝
-（`DockDepthExceeded`，语义为每单总挂接边数超限）。attach 前另有有界祖先
-检查：沿 `dockParentOfOrder` 父链指针上溯至多 8 跳，目标订单出现在父单
-祖先链内即拒绝（`DockAncestorCycle`，防跨单环）。最长路径不由链上维护，
-索引器从 `DockOpened` / `DockAttached` 事件图派生。open、出生锚
-input、linked-order registration 和 `DockOpened` 在一笔 EVM 事务中完成；任一
-步骤失败全部回滚。重复 open 在 dock 身份、route、endpoint 和 permit 校验
-通过后返回 `false`，不会再次消耗 permit nonce；重复 input/output 同样返回
-幂等结果或明确冲突。
+- 链上读面：`getStageDockBinding(planId, orderId, targetStageId, fromOrderId)` 报告当前 binding（dock、executor、fromPlanId、bindingId）；`dockOutputWindow(...)` 给出当前 A/B 窗口是否满足、相对 `dueInSeconds` 与 emitted 状态。历史窗口时间以上链事件为准。
+- 链读 DTO：`uvp.dockBinding.v1`（`binding_id`、`dkid`、from/to 身份、outputs 窗口与 emitted、`pending`），由 chain-services 从事件与读面组合；投影要能从事件重建。
+- 回放：binding 状态由（dock 执行者选择记录、`dock_link` 文件项、poke/发射事件）重建；回放收敛到同一 binding 集合与同一 B 事实集合。
 
 ## 边界
 
-- local order 和 linked order 都是独立链上订单，各自有 `(planId, orderId)`、授权、事件和生命周期。
-- linked Zhixu 的 plan publication、order registration、signal authorization 和 proof 独立存在。
-- Store docking session 只是试拼和审核材料；正式 proof 按模式看出生事件（`mode=new` 为 `DockOpened`，`mode=existing` 为 `DockAttached`，挂接不 emit `DockOpened`）、两模式同族的交付事件 `DockInputSubmitted` / `DockOutputSubmitted`，以及两边订单事件。
-- `submitDockedSignal` 只映射 linked order 已存在且满足 binding 的 signal，不替 linked order 生成业务事实，也不会把任何一方自动置为终态。
-- unknown、pending、reverted 和 retryable 状态必须由 adapter/Store 分别表达，不能渲染成成功或静默空结果。
+- 两侧订单独立：`(planId, orderId)` 复合身份，跨 plan 引用必须携带 `planId`；关联两侧一律使用复合身份。
+- 终态只由本地阶段/订单结束驱动，Dock 输出只表达 A 窗口事实映射出的 B 信号。
+- 目标侧 `to.stage` 以 `receiveSignals` 声明绑定面；出生只由出生信号承载（[出生信号与订单入口](../core/trigger.md)）。
+- Store 的试拼、审核与 dock 会话属于链下 workflow 材料；正式事实看 `DockRegistered`、`StageDockExecutorSelected`、`DockBindingPoked`、`DockOutputSubmitted` 与两侧订单事件。
+- 未知、pending、reverted、retryable 状态分别表达为不同结果。
 
-执行者视角的 canonical 叙事见 [Docked Zhixu / Zhixu 作为 Executor](../apps/zhixu-as-executor.md)。
+执行者视角的协作叙事见 [Dock 协作](../apps/zhixu-as-executor.md)。

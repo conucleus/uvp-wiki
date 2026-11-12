@@ -44,7 +44,7 @@ status: verified
 | Source | [Source 因果链](core/source.md) | signal 所在的因果语境如何串联、分叉和交汇。 |
 | Hook | [Hook](core/hook.md) | readiness 和状态变化如何从 signal 条件求出。 |
 | Trigger | [Trigger](core/trigger.md) | 哪个 hook Ready 后打开可处理任务并发出 `HookReady`。 |
-| File Resources | [File Resources](core/file-resources.md) | stage 资源句柄如何指向链下协议、证据模板或资源 manifest。 |
+| File Resources | [File Resources](core/file-resources.md) | 阶段文件映射（内容哈希+句柄）如何指向链下协议、证据模板或文件资源。 |
 
 ### 需要解释组织和材料审核时再读
 
@@ -58,7 +58,7 @@ status: verified
 
 Supplier 是 Store 对现实履约主体的组织方式：凝结核可以在秩序设计里描述需求，Store 维护 profile、能力 tags、联系、匹配和 proof 材料；`UVPIdentityRegistry` 只登记 subject 与钱包。真正的任务授权仍来自 Order 的签名和订单级授权，能力标签不是协议前置条件。
 
-Executor 是订单运行时的执行绑定：静态秩序可以声明默认 executor，具备 stage executor patch 能力的 stage 可以选择 active executor，合约最终用 order-level authorization、active executor overlay 和 EIP-712 签名决定 signal 是否被接受。
+Executor 是订单运行时的执行绑定：静态秩序可以声明默认 executor；具备 stage executor patch 能力的 stage 可以在运行时指派或交接执行者；dock 阶段的执行者经 `selectStageDockExecutor` 一次性选定。合约最终用订单级授权和 EIP-712 签名决定 signal 是否被接受。
 
 ## Store 中也会再次出现 Zhixu、凝结核和 Supplier
 
@@ -81,7 +81,7 @@ Executor 是订单运行时的执行绑定：静态秩序可以声明默认 exec
 | 篇章 | 说明 |
 | --- | --- |
 | [架构](architecture.md) | 模块边界、依赖方向、事实源和数据流。 |
-| [状态机](state-machine/README.md) | 合约如何保存 signal、求值 hook、处理 timer 和 stage overlay；它属于核心组件链路。 |
+| [状态机](state-machine/README.md) | 合约如何保存 signal、求值 hook、处理 timer 与订单级 patch（executor patch、阶段文件 patch）；它属于核心组件链路。 |
 | [产物与哈希](artifacts-and-hashes.md) | 编译产物、canonical hash、稳定 ID 和注册参数。 |
 | [信任与授权](trust/README.md) | Identity Registry、Plan 发布、订单级 signal 授权、EIP-712 和 relayer 边界。 |
 | [产品表面](product/README.md) | chain-services 如何把链事件投影成普通用户能读懂的订单、任务和证明。 |
@@ -94,10 +94,10 @@ Executor 是订单运行时的执行绑定：静态秩序可以声明默认 exec
 - Indexer 数据库必须能从事件重建，不能成为事实源。
 - Relayer 可以代付或转发交易，但不能替参与方生成业务签名。
 - Supplier identity（材料审核）与订单 signal 授权分层。
-- Executor/resource patch 只影响单个 Order，Plan 保持静态版本。
-- `supplierType=zhixu` 通过 proof 校验、`openDockedOrder`、docking events 和授权 signal 映射推动 local order。
-- 带 `emitReady=true` 的 receive Hook Ready 打开可处理任务；链上订单身份由 trigger order 入口创建，并按 `(planId, orderId)` 解析。
-- `fileResources` 是资源句柄，业务文件明文留在链下。
+- Executor patch 与阶段文件 patch 只影响单个 Order，Plan 保持静态版本。
+- 跨秩序协作由 B 侧独立 `kind: Dock` 静态声明（`from`/`to`/`signalMap`）承载：挂接 stage 以 `supplierType: dock` 声明 dock 执行者并一次性选定，binding 由该 stage 的 `dock_link` 文件项确定，A/B 时间窗内 `pokeDockBinding` 逐 output 发射 B 侧信号。
+- 带 `emitReady=true` 的 receive Hook Ready 打开可处理任务；链上订单由三条出生通道（outside-trigger / order-link / fork）创建，并按 `(planId, orderId)` 解析。
+- 阶段文件映射（`fileResources` 声明 + `UVPFileResourceModule` 的 key→内容哈希+句柄）承载文件引用，业务文件明文留在链下。
 - Store metadata 组织对象与目录；plan/supplier identity 来自 registry events。
 - Store admin 负责平台 workflow；凝结核负责秩序内部治理；Identity Registry operator 负责身份核验与 binding。
 - UVP Client 是执行者集成面，围绕状态机和 Product API 工作。

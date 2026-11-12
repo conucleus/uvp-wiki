@@ -15,7 +15,7 @@ Storage 是可重建服务层的工作流和投影缓存。存储引擎只有 Po
 CHAIN_SERVICES_DATABASE_URL=postgres://user:password@host:5432/database
 ```
 
-`CHAIN_SERVICES_DATABASE_URL` 是全环境必填键——本地运行和单元测试也不例外；缺失时启动即失败，报错信息包含键名与起库提示。值必须是 `postgres://`（或 `postgresql://`）DSN：driver 开关 `CHAIN_SERVICES_DATABASE_DRIVER` 已删除，SQLite 与内存引擎已移除，没有隐式默认值，也没有绕开 Postgres 启动的模式。
+`CHAIN_SERVICES_DATABASE_URL` 是全环境必填键——本地运行和单元测试也不例外；缺失时启动即失败，报错信息包含键名与起库提示。值必须是 `postgres://`（或 `postgresql://`）DSN：存储引擎只有 Postgres，没有隐式默认值，也没有绕开 Postgres 启动的模式。
 
 | 存储口径 | 要求 |
 | --- | --- |
@@ -33,19 +33,18 @@ CHAIN_SERVICES_DATABASE_URL=postgres://user:password@host:5432/database
 | --- | --- |
 | `src/storage/factory.ts` | 根据 env 创建 Postgres store 集合（PG-only）。 |
 | `src/storage/projection-store.ts` | projection storage contract。 |
-| `src/storage/postgres.ts`、`postgres-client.ts`、`postgres-rows.ts` | PostgreSQL adapter。 |
+| `src/storage/postgres.ts`、`postgres-client.ts` | PostgreSQL adapter。 |
 | `src/storage/postgres-migrations.ts` | migration runner：`NNNN_name.sql` 装载、checksum 台账、退役迁移检查。 |
 | `src/config/env.ts`、`preflight.ts` | runtime env parse 和 fail-closed 检查。 |
-| `src/security/redaction.ts`、`audit.ts` | redaction 和 audit support。 |
+| `src/security/audit.ts` | audit support；redaction 由 `@uvp-eth/service-runtime` 的 `redactSecrets` 承担。 |
 
 ## Migrations
 
-历史编号迁移已折叠为单份净 schema；最新以 `service/migrations/postgres/` 目录为准。迁移字节以 dev 活线为准，不承诺跨版本升级路径；已编号的迁移文件不再修改，结构变化时开新编号迁移。
+迁移只有单一基线，以 `service/migrations/postgres/` 目录为准。迁移字节以 dev 活线为准，不承诺跨版本升级路径；已编号的迁移文件不再修改，结构变化时开新编号迁移。
 
 | Migration | 内容 |
 | --- | --- |
-| `0001_schema` | 单份 pg_dump 净 schema：链事件投影、业务辅助表与 workflow state 的全部表结构。 |
-| `0002_plan_artifacts` | 计划编译产物表 `plan_artifacts`（行级不可变；索引富集与提交造证的唯一 plan 词表源）+ supplier 标签列清理。 |
+| `0001_schema` | 单份 pg_dump 净 schema：7 张 chain/投影表（`chain_event_log`、`chain_index_cursor`、`chain_projection_snapshot`、`chain_projection_sync_state`、`indexer_pending_post_commit`、`plan_artifacts`、`dock_artifacts`）及函数、触发器、索引与约束。 |
 
 - runner 在 `chain_services_migrations` 台账记录每个迁移的 version 与 sha256 checksum；已应用迁移的文件 checksum 失配即拒启，需按台账清账后重建该库。
 - 台账中存在目录里已无对应文件的迁移版本同样拒启（退役检查），避免迁移历史被静默改写。
@@ -66,7 +65,7 @@ Base Sepolia / testnet profile 必须拒绝：
 
 非 local 环境（或 relayer broadcastEnabled=true）缺少广播适配器时，启动即以配置错误失败，不会半配置运行。
 
-这份清单里没有 demo fallback 和 E2E fixture controls：它们不是待拒绝的开关，而是已经不存在。Product API 没有 demo 数据源——空投影返回空数组、缺失明细返回 `detail_unavailable`，不存在 `?fallback=demo` 参数和 `UVP_PRODUCT_DEMO_MODE` 键；e2e-controls 模块与 `UVP_PRODUCT_E2E_FIXTURES` 也已删除。fail-closed 检查的对象是「缺显式配置」，不是「关闭某个 demo 模式」。
+每个 runtime 都以显式配置启动：Product API 只读投影——空投影返回空数组、缺失明细返回 `detail_unavailable`，不存在 `?fallback=demo` 参数和 `UVP_PRODUCT_DEMO_MODE` 键。fail-closed 检查的对象是「缺显式配置」。
 
 Readiness 可以说明“这个服务实例是否按正确配置运行”；链上 plan/order/signal/trust 事实仍来自事件。
 

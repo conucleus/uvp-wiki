@@ -17,7 +17,7 @@ Signal 是订单状态机接受的最小业务输入。它代表“某个被授�
 
 ## 产生什么结果
 
-一次成功提交写入不可变的 `SignalRecord` 并发出 `SignalSubmitted`；它推动依赖该 signal 的 [Hook](hook.md) 求值，可能触发 `HookStatusChanged` 或 `HookReady`。
+一次成功提交写入不可变的 signal record 并发出 `SignalSubmitted`；它推动依赖该 signal 的 [Hook](hook.md) 求值，可能触发 `HookStatusChanged` 或 `HookReady`。
 
 ## 权威来自哪里
 
@@ -29,9 +29,8 @@ Zhixu stage 里有两处和 signal 直接相关：
 
 | 字段 | 含义 |
 | --- | --- |
-| `trigger` | 可选出生信号集，是本 stage `sendSignals` 的子集；空/省略=不能建单，每个条目合成一条 order-trigger hook。 |
-| `receiveSignals` | 当前 stage 等待哪些输入 signal。每个 key 会编译成一个 [Hook](hook.md)。 |
-| `sendSignals` | 当前 stage 执行后可能发出哪些输出 signal，条目是对象 `{name, validWhen?}`（见下节"发射适格"）。 |
+| `sendSignals` | 当前 stage 执行后可能发出哪些输出 signal，条目是对象 `{name, validWhen?, trigger?}`；`trigger: true` 标记出生信号，`validWhen` 是发射适格声明。 |
+| `receiveSignals` | 当前 stage 等待哪些订单内输入 signal。每个 key 会编译成一个 [Hook](hook.md)。 |
 
 例如一个买方承诺 stage：
 
@@ -50,11 +49,15 @@ buyer_commit:
 
 ## 发射适格（validWhen）
 
-`sendSignals` 条目可以声明 `validWhen`（发射适格表达式）。声明了它的 signal 在**外部提交**到达时先过一道判定：引擎对提交前已成立的事实（不含本次提交本身）求值这条表达式，整棵表达式就绪才准入，否则以类型化错误拒绝——链上整笔 revert `SignalAdmissionRejected`，事实流不落任何行。声明形态是表达式列表（`[]string`：每项完整的 `{source}::{condition}`、全体项 header source 一致；编译期折叠为一棵 AND）。不声明 `validWhen` 的 signal 无条件准入；已落库事实的重复提交按 first-win 幂等吸收，不看适格。表达式语言、编译期约束与求值语义的权威在语言层正本（`uvp-core/docs/zhixu-dsl-grammar.md` §5.6 发射适格位）；引擎内部产生的事实（dock 投递）不经此面。
+`sendSignals` 条目可以声明 `validWhen`（发射适格表达式）。声明了它的 signal 在**外部提交**到达时先过一道判定：引擎对提交前已成立的事实（不含本次提交本身）求值这条表达式，整棵表达式就绪才准入，否则以类型化错误拒绝——链上整笔 revert `SignalAdmissionRejected`，事实流不落任何行。声明形态是表达式列表（`[]string`：每项完整的 `{source}::{condition}`、全体项 header source 一致；编译期折叠为一棵 AND）。不声明 `validWhen` 的 signal 无条件准入；已落库事实的重复提交按 first-win 幂等吸收，不看适格。
+
+适格面的边界按事实来源分：外部提交在写入前按 pre-state 求值；引擎内部派生信号写入（`*FromModule` 族）位于该卡点之下；dock 输出发射在写入时按 B 侧 `validWhen` 复核（窗口未满足时跳过该 output，不记录失败态）。表达式语言、编译期约束与求值语义的权威在语言层正本（`uvp-core/docs/zhixu-dsl-grammar.md` §5.6 发射适格位）。
 
 ## 出生信号与首事实
 
-`trigger` 集合里的 signal 既能作为普通订单内 signal 提交，也能作为出生入口：提交时 `orderId` 为空且 signal 命中某个 stage 的 `trigger`，合约先在**空订单上下文**求值该信号的 `validWhen`（无 facts/files；负条件为真；存在/延时条件为假），通过后再按出生事实派生 oid、登记/创建订单，并把该 signal 写为首事实。同一出生事实重试幂等；空 `orderId` 提交非 trigger signal 被具名拒绝。
+`sendSignals` 条目上的 `trigger: true` 标记出生信号，是 DSL 声明面唯一的出生入口。空订单号 + 出生信号提交时，合约先在**空订单上下文**求值该信号的 `validWhen`（无 facts/files；负条件为真；存在/延时条件为假），通过后按出生事实纯函数派生订单号、登记/创建订单，并把该 signal 写为首事实。同一出生事实重试幂等；空订单号提交非出生信号被具名拒绝；带订单号的出生信号是普通订单内事实。
+
+链轨运行期有三条出生通道：outside-trigger 开放提交（计划承诺的 `birthAuthorizer` 签名提交，或 `birthAuthorizer` 为合约时的直接入口）、order-link 派生建单、治理分叉 `forkOrder`；订单号一律由合约从出生事实纯函数派生、调用方不自报。Dock 在既有订单上以 binding 承载发射，不创建订单。详见 [Order](order.md) 与 `uvp-chain.md`。
 
 ## 文本名到链上 key
 
@@ -88,7 +91,7 @@ signalKey = keccak256(abi.encode(sourceId, signalId))
 | `fail` | 验证失败。 |
 | `reject` | 业务拒绝。 |
 
-具体含义仍由 Zhixu、stage protocol、Product DTO 和业务证据解释。合约只认 `signalId` 和授权。
+这些是调用方约定的信号名，引擎没有内建语义；订单创建只由出生信号承载。具体含义仍由 Zhixu、stage protocol、Product DTO 和业务证据解释。合约只认 `signalId` 和授权。
 
 ## First Writer Wins
 
@@ -96,8 +99,8 @@ signalKey = keccak256(abi.encode(sourceId, signalId))
 
 同一个订单里，同一个 `signalKey` 只能成功提交一次：
 
-- 第一次提交会写入 `SignalRecord` 并发出 `SignalSubmitted`。
-- 后续重复提交被 first-win 幂等吸收：不产生第二条事实、不重复推进、不再过发射适格筛（at-least-once 重试安全）；`SignalAlreadyExists` revert 保留给引擎内部写入口。
+- 第一次提交会写入 signal record 并发出 `SignalSubmitted`。
+- 后续重复提交被 first-win 幂等吸收：只有一条事实、只推进一次、按已落库事实直接吸收且不过发射适格筛（at-least-once 重试安全）；`SignalAlreadyExists` revert 保留给引擎内部写入口。
 - 第一次成功写入就是该 `(planId, orderId, sourceId, signalId)` 的最终链上事实，不提供覆盖、撤销或管理员改写入口。
 
 `idempotencyKey` 会保存在事件和投影里，方便服务层识别请求来源；但合约语义上的去重键是 `(planId, orderId, sourceId, signalId)`。
@@ -125,6 +128,10 @@ signalKey = keccak256(abi.encode(sourceId, signalId))
 - 有载荷时，`payloadHash` 必须是链下 payload 规范化后的哈希；投影与消费方据此区分「有证据」与「纯动作/状态类 signal」。
 - 这是编码约定而非占位兜底：提交侧在无载荷时应显式写 `bytes32(0)`；消费方读到零值时按「无载荷」展示，而不是当作未知或报错。
 
+### 文件 patch 随 signal 提交
+
+阶段文件映射的写入走 direct `submitSignal` 尾部：调用携带 `bytes32 filesDigest` 与 `FilePatch filePatch`，`filesDigest` 必须等于该 patch 的 canonical digest。纯文件 patch 用 `signalId == 0` 提交——它不是业务信号，不增业务信号计数、不触发 hook、不跑适格；文件映射的键值、严格 ops、`baseHash` 与事件见 [File Resources](file-resources.md)。
+
 ## 授权是链上检查项
 
 Product API 可以把某个任务显示给某个参与方，但最终能否提交仍由合约检查：
@@ -133,7 +140,7 @@ Product API 可以把某个任务显示给某个参与方，但最终能否提�
 planId + orderId + signalKey + submitter
 ```
 
-授权可以来自 Order 创建时的显式授权，也可以来自有效 Executor patch 对 Plan 预声明 `sendSignals` 范围的动态委任，详见 [Signal 授权](../trust/signal-authorization.md)。两种路径都由合约检查；即使 UI 显示了按钮，没有有效授权仍会被拒绝。
+授权来自订单级显式 `SignalAuthorization`：订单创建时写入，或由 executor patch 生效时为新执行者写入显式授权集；既有显式授权不因后续 patch 被撤销。派生信号模块另有一条内部写入面（relation=0 的本单自产事实由 from 阶段当前执行者触发），它不是外部提交授权面的旁路。详见 [Signal 授权](../trust/signal-authorization.md)。两条路径都由合约检查；即使 UI 显示了按钮，没有有效授权仍会被拒绝。
 
 ## Signal 的协议边界
 

@@ -20,19 +20,19 @@ An order passes through seven steps from static Zhixu to on-chain fact. The six-
 
 ## 1. Author and Compile
 
-Store or developers write the Zhixu; the Compiler generates hooks, selector bindings, signal capabilities, `hooksHash`, `capabilitiesRoot`, the dock roots, and the runtime `planHash`. Compilation only validates rule structure; it does not certify real-world supplier capability.
+Store or developers write the Zhixu; the Compiler generates hooks, selector bindings, signal capabilities, file-writer capability leaves, `hooksHash`, `capabilitiesRoot`, `executorCandidatesRoot`, and the runtime `planHash`. Compilation only validates rule structure; it does not certify real-world supplier capability.
 
 ## 2. Configure and Freeze the StateMachine
 
-Deploy the StateMachine and six modules, then call `freezeModules()` once addresses are set. After freezing, the owner cannot replace a module; upgrades require deploying a new StateMachine and switching explicitly through the Deployment Registry.
+Deploy the StateMachine and seven modules (stage patch, derived signal, dock registry, plan metadata, order link, lens, file resource), then call `freezeModules()` once addresses are set. After freezing, the owner cannot replace a module; upgrades require deploying a new StateMachine and switching explicitly through the Deployment Registry.
 
 ## 3. Sign and Commit the Plan
 
-The publisher signs the PlanCommit (`publisher + hooksHash + capabilitiesRoot + dockRoutesRoot + dockInterfaceRoot + deadline`). Any relayer calls `commitPlan`; the contract verifies the hash of the full hooks and the publisher signature, and derives `planId = hash(publisher, planHash)` — `planHash` covers hooks, capabilitiesRoot, the two dock roots, and executorCandidatesRoot.
+The publisher signs the six-field PlanCommit (`publisher + hooksHash + capabilitiesRoot + executorCandidatesRoot + birthAuthorizer + deadline`). Any relayer calls `commitPlan`; the contract verifies the hash of the full hooks and the publisher signature, and derives `planId = hash(publisher, planHash)` — `planHash` is the runtime-hash triple (hooks, capabilitiesRoot, executorCandidatesRoot); `birthAuthorizer` only enters the commit digest and on-chain storage, not `planHash`.
 
 ## 4. Finalize the Plan
 
-The capability and binding tables are already folded into `capabilitiesRoot`, committed with the plan by the publisher at commit time. Any caller calls `finalizePlan(planId)` to finalize (permissionless); this step only finalizes and submits no table data. Only finalized Plans can create Orders.
+The three capability tables are already folded into `capabilitiesRoot` and the executor candidate set into `executorCandidatesRoot`, committed with the plan by the publisher at commit time. Any caller calls `finalizePlan(planId)` to finalize (permissionless); this step only finalizes and submits no table data. Only finalized Plans can create Orders.
 
 ## 5. Identity Directory (Optional)
 
@@ -40,7 +40,7 @@ After verifying subjects offline, Store may register `subjectId -> account` in i
 
 ## 6. Trigger Creates the Order
 
-The creator/submitter signs trigger typed data; any relayer broadcasts it. The contract binds the finalized `planId`, writes order-level signal authorizations, records the trigger fact, and materializes the initial stage. There is no registrar allowlist.
+On the DSL declaration surface, birth is expressed by `trigger: true` on a `sendSignals` entry: on the chain track, outside birth is submitted by the plan-committed `birthAuthorizer` with signed typed data (or by the contract direct entry), while order-link and governance fork each have their own entry points; any relayer may broadcast. The contract binds the finalized `planId`, writes order-level signal authorizations, records the birth fact, and materializes the initial stage.
 
 ## 7. Business Execution and Projection
 

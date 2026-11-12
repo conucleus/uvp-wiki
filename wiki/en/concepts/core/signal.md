@@ -17,7 +17,7 @@ Authorized submitters (participant wallets, executors, adapters) submit signals;
 
 ## What It Produces
 
-A successful submission writes an immutable `SignalRecord` and emits `SignalSubmitted`; it drives [Hook](hook.md) evaluation for hooks depending on that signal and may trigger `HookStatusChanged` or `HookReady`.
+A successful submission writes an immutable signal record and emits `SignalSubmitted`; it drives [Hook](hook.md) evaluation for hooks depending on that signal and may trigger `HookStatusChanged` or `HookReady`.
 
 ## Where Authority Comes From
 
@@ -29,9 +29,8 @@ Two places in a Zhixu stage relate directly to signals:
 
 | Field | Meaning |
 | --- | --- |
-| `trigger` | Optional birth signal set, a subset of the stage's `sendSignals`; omitted/empty means the stage cannot create orders, and each entry synthesizes one order-trigger hook. |
-| `receiveSignals` | Which input signals the stage waits for. Each key compiles into one [Hook](hook.md). |
-| `sendSignals` | Which output signals the stage may emit after execution; entries are objects `{name, validWhen?}` (see "Emission admission" below). |
+| `sendSignals` | Which output signals the stage may emit after execution; entries are objects `{name, validWhen?, trigger?}`; `trigger: true` marks a birth signal and `validWhen` is the emission admission declaration. |
+| `receiveSignals` | Which in-order input signals the stage waits for. Each key compiles into one [Hook](hook.md). |
 
 For example, a buyer commitment stage:
 
@@ -50,11 +49,15 @@ The meaning: once the commercial offer completes, the buyer commitment stage is 
 
 ## Emission Admission (validWhen)
 
-A `sendSignals` entry may declare `validWhen`, an emission admission expression. When an externally submitted signal carrying such a declaration arrives, the engine first evaluates the expression against the facts already committed on the order (excluding the submission itself): the whole expression must be ready for the emission to be admitted, otherwise it is rejected with a typed error — on chain the entire transaction reverts with `SignalAdmissionRejected`, and nothing is written to the fact stream. The declaration form is a list of expressions (`[]string`: each item a complete `{source}::{condition}`, all items sharing one header source; folded into a single AND tree at compile time). Signals without `validWhen` are admitted unconditionally; duplicate submissions of an already-recorded fact are absorbed first-win without re-screening. The expression language, compile-time constraints, and evaluation semantics are owned by the single canonical grammar manual (`uvp-core/docs/zhixu-dsl-grammar.md` §5.6 emission-admission position); facts produced inside the engine (dock delivery) do not pass this face.
+A `sendSignals` entry may declare `validWhen`, an emission admission expression. When an externally submitted signal carrying such a declaration arrives, the engine first evaluates the expression against the facts already committed on the order (excluding the submission itself): the whole expression must be ready for the emission to be admitted, otherwise it is rejected with a typed error — on chain the entire transaction reverts with `SignalAdmissionRejected`, and nothing is written to the fact stream. The declaration form is a list of expressions (`[]string`: each item a complete `{source}::{condition}`, all items sharing one header source; folded into a single AND tree at compile time). Signals without `validWhen` are admitted unconditionally; duplicate submissions of an already-recorded fact are absorbed first-win without re-screening.
+
+The admission face is scoped by fact origin: external submissions are evaluated against the pre-state before writing; engine-internal derived-signal writes (`*FromModule` family) stay below this chokepoint; dock output emission re-checks the B-side `validWhen` at write time (an unsatisfied window skips that output without recording a failure). The expression language, compile-time constraints, and evaluation semantics are owned by the single canonical grammar manual (`uvp-core/docs/zhixu-dsl-grammar.md` §5.6 emission-admission position).
 
 ## Birth Signals and the First Fact
 
-A signal in the `trigger` set can be submitted as an ordinary in-order signal, and can also serve as the birth entry: when `orderId` is empty and the signal belongs to some stage's `trigger`, the contract first evaluates that signal's `validWhen` in the **empty-order context** (no facts/files; negative conditions true; existence/delay conditions false), then derives the order id from the birth fact, registers/creates the order, and writes the signal as the first fact. Re-delivery of the same birth fact is idempotent; an empty `orderId` with a non-trigger signal is rejected by name.
+`trigger: true` on a `sendSignals` entry marks a birth signal, the only birth entry on the DSL declaration surface. When `orderId` is empty and the signal is a birth signal, the contract first evaluates that signal's `validWhen` in the **empty-order context** (no facts/files; negative conditions true; existence/delay conditions false), then derives the order id from the birth fact, registers/creates the order, and writes the signal as the first fact. Re-delivery of the same birth fact is idempotent; an empty `orderId` with a non-birth signal is rejected by name; a birth signal with an order id is an ordinary in-order fact.
+
+The chain track has three runtime birth channels: outside-trigger open submission (signed submission by the plan-committed `birthAuthorizer`, or the direct entry when `birthAuthorizer` is a contract), order-link derived creation, and governance fork `forkOrder`; order ids are always derived purely from birth facts and never self-reported. Dock carries emission through a binding on an existing order and does not create orders. See [Order](order.md) and `uvp-chain.md`.
 
 ## From Text Name to On-chain Key
 
@@ -88,7 +91,7 @@ The common name convention includes str, cmp, err, cxl, pass, fail, plus reject 
 | `fail` | Validation failed. |
 | `reject` | Business rejection. |
 
-Concrete meaning is still interpreted by the Zhixu, stage protocol, Product DTO, and business evidence. The contract only recognizes `signalId` and authorization.
+These are caller conventions; the engine has no built-in semantics for them, and order creation is carried only by birth signals. Concrete meaning is still interpreted by the Zhixu, stage protocol, Product DTO, and business evidence. The contract only recognizes `signalId` and authorization.
 
 ## First Writer Wins
 
@@ -96,7 +99,7 @@ For the protocol boundary overview, see [Protocol Boundaries](../protocol-bounda
 
 Within one order, a given `signalKey` can be successfully submitted only once:
 
-- The first submission writes the `SignalRecord` and emits `SignalSubmitted`.
+- The first submission writes the signal record and emits `SignalSubmitted`.
 - Later duplicate submissions are absorbed first-win: no second fact, no repeated advance, and no re-run of the emission admission screen (safe for at-least-once retries); the `SignalAlreadyExists` revert is reserved for engine-internal write entry points.
 - The first successful write is the final on-chain fact of that `(planId, orderId, sourceId, signalId)`; there is no overwrite, revocation, or admin rewrite entry point.
 
@@ -110,12 +113,24 @@ The contract does not store plaintext contracts, invoices, logistics documents, 
 
 | Field | Meaning |
 | --- | --- |
-| `payloadHash` | Hash of the evidence or action payload. The protocol constant `bytes32(0)` (`0x000...0`) means "no payload" — it is an explicit encoding of absence, not a missing value. |
+| `payloadHash` | Hash of the evidence or action payload. |
 | `metadataURI` | If needed, may point to off-chain metadata in projections or adapters. |
 | `submitter` | The authorized wallet address. |
 | `submittedAt` | The on-chain record time. |
 
 This boundary matters: chain provides verifiable ordering and permissions, not business file storage.
+
+### Encoding convention: payloadHash = bytes32(0) means no payload
+
+`payloadHash` is a required `bytes32` field, but not every submission carries a business payload. The protocol specifies:
+
+- `payloadHash = bytes32(0)` (that is, `0x0000…0000`) is a legal protocol constant meaning "this signal has no payload"; it is not missing data or an error state.
+- With a payload, `payloadHash` must be the hash of the canonicalized off-chain payload; projections and consumers use it to distinguish "has evidence" from "pure action/state signal".
+- This is an encoding convention, not a placeholder fallback: the submitting side writes `bytes32(0)` explicitly when there is no payload, and consumers read zero as "no payload" rather than unknown or error.
+
+### File patches ride the signal submission
+
+Stage file-map writes travel in the tail of the direct `submitSignal`: the call carries `bytes32 filesDigest` and `FilePatch filePatch`, and `filesDigest` must equal the patch's canonical digest. A pure file patch is submitted with `signalId == 0` — it is not a business signal, does not increment business signal counts, does not evaluate hooks, and does not run admission; key values, strict ops, `baseHash`, and events are covered in [File Resources](file-resources.md).
 
 ## Authorization Is an On-chain Check
 
@@ -125,7 +140,7 @@ Product API may show a task to some participant, but whether submission succeeds
 planId + orderId + signalKey + submitter
 ```
 
-Authorization can come from explicit grants at Order creation or from a valid Executor patch dynamically delegating within the Plan-predeclared `sendSignals` scope; see [Signal Authorization](../trust/signal-authorization.md). Both paths are checked by the contract; even if the UI shows a button, submission without valid authorization will be rejected.
+Authorization comes from the order-level explicit `SignalAuthorization`: written at order creation, or written as an explicit authorization set for the new executor when an executor patch takes effect; existing explicit authorizations are not revoked by later patches. The derived-signal module has a separate internal write face (relation=0 facts produced by the from stage's current executor) — it is not a bypass of the external-submission authorization face. See [Signal Authorization](../trust/signal-authorization.md). Both paths are checked by the contract; even if the UI shows a button, submission without valid authorization will be rejected.
 
 ## The Protocol Boundary of Signals
 

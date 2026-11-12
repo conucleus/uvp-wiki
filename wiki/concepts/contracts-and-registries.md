@@ -12,11 +12,11 @@ status: verified
 ## UVPStateMachine 与 modules
 
 - publisher 签名提交 Plan，任意 relayer 广播。
-- publisher 签名承诺 `hooksHash`、`capabilitiesRoot` 与两个 dock roots，`finalizePlan` 只落定稿。
+- publisher 签名承诺 PlanCommit 六字段：publisher / hooksHash / capabilitiesRoot / executorCandidatesRoot / birthAuthorizer / deadline；`capabilitiesRoot` 折叠 signal capability、selector binding 与 file writer 三张能力表，`finalizePlan` 只落定稿。
 - 只允许 finalized Plan 创建 Order。
 - creator/submitter 签名产生订单级权利；relayer 不需要 allowlist。
-- Signal、HookReady、stage patch、resource patch、docking 与 derived signal 都留下可重放事件。
-- 六个 module 配置完成后永久冻结地址。
+- Signal、HookReady、stage patch、阶段文件 patch、Dock 注册与 binding、derived signal 都留下可重放事件。
+- 七个 module（stage patch、derived signal、dock registry、plan metadata、order link、lens、file resource）配置完成后永久冻结地址。
 
 ## UVPIdentityRegistry
 

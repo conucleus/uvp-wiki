@@ -57,6 +57,6 @@ Order App 是人的订单界面；uvp-client 是自动化、宿主集成与执�
 - payload hash。
 - first-writer-wins signal 语义。
 - chain event proof。
-- active executor overlay。
+- 订单级显式 `SignalAuthorization` 与 EIP-712 签名；executor patch 另有 patch 授权面。
 
 Order App 不拥有订单状态；uvp-client 不拥有订单状态、会话或私钥。

@@ -7,17 +7,16 @@ status: verified
 
 # Store Console、Supplier 与 Governance API
 
-Store 相关 API 是凝结核、Store operator、reviewer 和 governance admin 使用的工作台表面。它们组织 Zhixu draft、supplier profile、docking session、review material、publication workflow、identity request 和 audit trail。凝结核治理秩序内部，Store API 负责平台 workflow，Identity Registry 投影负责 subject/account 解析。
+Store 相关 API 是凝结核、Store operator、reviewer 与 governance admin 使用的工作台表面，组织 Zhixu draft、supplier profile、Dock 声明与试配记录、review 材料、publication workflow、identity request 与 audit trail。它们属于产品侧应用的平台 workflow；协议事实仍来自 registry 与 state-machine 事件，身份解析来自 Identity Registry 投影。
 
-## 代码入口
+## 归属
 
-| 子系统 | 文件 |
+| 面 | 归属 |
 | --- | --- |
-| Store Console | `src/store-console/service.ts`、`zhixu-drafts.ts`、`docking.ts`、`audit.ts`、`runtime.ts`、`version.ts`、`access.ts` |
-| Store storage | `src/store-console/sqlite-store.ts`、`postgres-store.ts` |
-| Store Supplier | `src/store-suppliers/service.ts`、`sqlite-store.ts`、`postgres-store.ts` |
-| Governance | `src/governance/service.ts`、`adapter.ts`、`auth.ts`、`hashing.ts`、`store.ts` |
-| API routes | `src/api/routes/store-console.ts`、`store-docking.ts`、`store-suppliers.ts`、`governance.ts` |
+| Store 工作台与 Supplier directory | 产品侧应用（Store BFF 与工作流存储） |
+| Dock 声明编辑与试配记录 | 产品侧应用；编译校验与产物身份以 uvp-core `analyzeDock` / `uvp.dock.v1` 为准 |
+| Governance review 与 identity binding register/revoke request | 产品侧应用组织材料并发起请求；登记结果由 `UVPIdentityRegistry` 事件表达 |
+| 链投影与链读 | chain-services：`src/indexer/`、`src/projection/`、`src/api/routes/chain-read.ts`、`src/api/routes/identity-bindings.ts` |
 
 ## Store Console
 
@@ -26,7 +25,7 @@ Store Console 面向凝结核工作台：
 - Zhixu search、catalog、detail。
 - draft import、compile preview、submit review、request publication。
 - version、runtime、active recommendation、chain publication projection。
-- docking session，用来试拼 peer Zhixu、adapter 或 signal map。
+- Dock 声明草稿与试配记录，用来试拼 peer Zhixu、adapter 与 signalMap 输出面。
 - audit trail，用来记录平台 workflow 行为。
 
 这些状态是平台 workflow 和材料组织。身份绑定由 `UVPIdentityRegistry` 事件表达；能力、推荐和匹配仍是 Store 链下判断。
@@ -41,7 +40,7 @@ Supplier API 组织现实履约网络的材料：
 - participation history、open task、proof links。
 - review、publication request、revocation request。
 
-Store admin 可以维护平台目录和审核材料。秩序内部参与规则由凝结核决定，订单级授权由 Product BFF 生成并由合约检查。
+Store admin 可以维护平台目录和审核材料。秩序内部参与规则由凝结核决定，订单级授权由产品侧提交链路生成并由合约检查。
 
 ## Governance Workflow
 
@@ -62,5 +61,5 @@ Store review material
 - Store review 是平台 workflow，trust publication 看 registry event。
 - Store tag/search ranking 是目录和运营语义，公平性判断看凝结核材料和 Store or external institution 材料审核。
 - Contact/notification 成功是联系状态，履约完成看 signal/proof。
-- Docking draft 是试拼材料；正式运行看发布、注册、授权和 docking events。
+- Dock 声明与试配记录是链下材料；正式关系看 `registerDock`、`StageDockExecutorSelected`、`dock_link` 文件项与 `DockOutputSubmitted`。
 - Store audit trail 是平台留痕；链上 proof 单独展示。

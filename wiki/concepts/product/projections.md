@@ -62,7 +62,10 @@ chainId:contractAddress:blockNumber:transactionHash:logIndex
 | `SignalSubmitterAuthorized` | 保存授权，并把匹配任务标记为可分配。 |
 | `SignalSubmitted` | 保存 signal，把匹配任务标记为 submitted。 |
 | `StageExecutorPatchApplied` | 保存 executor overlay，并更新目标 stage 任务 assignee。 |
-| `StageResourcePatchApplied` | 保存 resource overlay。 |
+| `StageFilePatchApplied` / `StageFileOpApplied` | 保存阶段文件映射改写：批次 patch 与逐 op 的 `add` / `replace` / `remove`，按日志序重放。 |
+| `DockRegistered` | 记录静态 Dock（outputs、atoms、A 窗口程序），供链读投影。 |
+| `StageDockExecutorSelected` | 保存 dock 执行者一次性选择（target stage、dkid、executor、selector）。 |
+| `DockBindingPoked` / `DockOutputSubmitted` | 保存 binding 窗口求值与逐 output 发射事实；binding 身份取 `bindingId`。 |
 | `StageExecutorActivated` | 增加 executor activation proof。 |
 | `HookStatusChanged` | 更新 hook 状态和 `dueAt`；取消时取消任务。 |
 | `HookReady` | 创建或打开任务；Order 仍保持 registered。 |

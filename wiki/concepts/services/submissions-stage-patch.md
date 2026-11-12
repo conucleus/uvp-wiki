@@ -7,74 +7,46 @@ status: verified
 
 # Submissions 与 Stage Patch
 
-Submissions 负责记录已准备、已签名、已广播、失败、确认和可重试的提交状态。Stage Patch 是 selector 授权路径，用来在某个订单里修改目标 stage 的 executor 或 resource manifest；Plan 本身保持静态版本。
+本页说明链下提交路径与 stage patch 的边界：签名与 direct/relay 投递由参与方钱包、`uvp-client` 与应用侧完成；chain-services 只索引事件、重建投影并提供链读，不广播交易、不生成业务签名。
 
-## Submissions 代码入口
-
-| 文件 | 职责 |
-| --- | --- |
-| `src/submissions/service.ts` | submission 创建、状态变更、retry、查询。 |
-| `src/submissions/store.ts` | storage contract。 |
-| `src/submissions/sqlite-store.ts`、`postgres-store.ts` | durable submission store。 |
-| `src/submissions/typed-data.ts` | 提交相关 typed data 和签名校验辅助。 |
-| `src/submissions/broadcast-adapter.ts` | broadcast adapter interface。 |
-| `src/submissions/safe-broadcast-adapter.ts` | 保护广播边界。 |
-| `src/api/routes/submissions.ts` | HTTP submission route。 |
-
-## Order BFF 代码入口
-
-| 文件 | 职责 |
-| --- | --- |
-| `src/product/bff/service.ts` | draft、invite、participant、submit workflow。 |
-| `src/product/bff/authorization.ts` | Product authorization builder。 |
-| `src/product/bff/trigger.ts` | order registration/trigger 的广播适配与提交路径。 |
-| `src/product/bff/store.ts` | BFF storage contract。 |
-| `src/product/bff/sqlite-store.ts`、`postgres-store.ts` | durable draft/workflow store。 |
-| `src/product/bff/types.ts` | draft、invite、participant、registration 类型。 |
-| `src/api/routes/product-bff.ts` | HTTP route。 |
-
-## Submission 生命周期
+## 提交生命周期
 
 ```text
 prepare typed data
-  -> evidence / payload hash binding
+  -> payload hash binding
   -> participant signs EIP-712 typed data
-  -> submit signed payload
+  -> submit signed payload（direct 或 relay）
   -> verify signer and payload structure
-  -> broadcast, or record "not_attempted" (local explicit dry-run: no nonce reserved, audit records skipped)
+  -> broadcast
   -> track tx hash / failure / retry
   -> indexer confirms chain event
 ```
 
-Signal 提交入口不让普通用户处理 sourceId、signalId、ABI 或 gas，而是先准备可读 summary 和 EIP-712 typed data，再由授权钱包签名。
+- 业务签名只能来自被授权参与方的钱包；relayer 代付 gas 与广播，不生成业务签名。
+- submission 状态是 operational state：它说明一笔交易是否送出、失败或确认；订单推进来自 `SignalSubmitted`、`HookReady` 或 stage patch 事件。
+- Product 业务行、钱包会话与提交编排归产品侧应用；chain-services 只保留链投影与通用链读。
 
-Submission 状态是 operational state。它可以说明一笔交易是否送出、是否失败、是否确认；订单是否进入下一阶段来自 `SignalSubmitted`、`HookReady` 或 stage patch events。
-
-## Stage Patch 代码入口
-
-| 文件 | 职责 |
-| --- | --- |
-| `src/stage-patches/service.ts` | prepare/submit executor patch 或 resource patch。 |
-| `src/stage-patches/typed-data.ts` | selector-signed EIP-712 typed data。 |
-| `src/stage-patches/broadcast-adapter.ts` | patch 广播适配器。 |
-| `src/stage-patches/store.ts` | patch workflow storage。 |
-| `src/api/routes/stage-patches.ts` | Product task patch routes。 |
-
-## 两类 Stage Patch
-
-executor patch 选择或更换某个 order 的 active executor；resource patch 绑定 stage resource manifest。typed data 由 protocol bindings 和 Chain Services 一起维持；最终是否接受仍由合约权限、签名和 nonce 决定。
+## Stage Patch 的两类授权动作
 
 | Patch | 改什么 | 边界 |
 | --- | --- | --- |
-| executor patch | 某个订单里 target stage 的 active executor。 | Plan 和 supplier directory 保持原状，其他 signal 仍按授权检查。 |
-| resource patch | 某个订单里 target stage 的 resource handle / manifest。 | 证据明文留在链下，File Resource policy 仍按资源层解释。 |
+| executor patch | 某个订单里 target stage 的 active executor。 | Plan 静态版本不变；候选执行者由 `executorCandidatesRoot` 承诺，selector EIP-712 签名与订单级授权共同生效。 |
+| 阶段文件 patch | 某个订单里 target stage 的文件映射（`key -> contentHash + handle`）。 | 正文留在链下；`baseHash` 必填、整笔原子；事件 `StageFilePatchApplied` / `StageFileOpApplied`。 |
+
+- executor patch 入口：`UVPStagePatchModule.applyStageExecutorPatch` / `applyStageExecutorPatchFor`（assign / handoff 两 mode；`candidateProof` 成员证明），事件 `StageExecutorPatchApplied`。
+- dock 执行者选择：`selectStageDockExecutor` / `selectStageDockExecutorFor` 一次性选定，事件 `StageDockExecutorSelected`；binding 与 output 发射事件 `DockBindingPoked` / `DockOutputSubmitted`。
+- 阶段文件 patch 入口：direct `submitSignal` 尾部的 `filesDigest` / `FilePatch`（`signalId == 0` 为纯文件 patch），由 `UVPFileResourceModule.applyStageFilePatch` 落 `add` / `replace` / `remove`。
+- 两类 patch 都是订单级事实，projection 从同一事件流重建；typed data、call builder 与 digest 由 `uvp-client/package/src/core/` 与 `uvp-protocol/packages/protocol-bindings/` 维护。
+
+## 投影入口
+
+chain-services 的投影入口为 `src/indexer/projections/stage.ts`（`StageExecutorPatchApplied` / `StageDockExecutorSelected` / hook 生命周期）、`src/indexer/projections/stage-files.ts`（`StageFilePatchApplied` / `StageFileOpApplied`）与 `src/indexer/projections/dock.ts`（binding 与 output）；通用链读见 `src/api/routes/chain-read.ts`。
 
 ## 边界
 
 以下边界是[协议边界总纲](../protocol-boundaries.md)在提交路径上的具体化；patch 的授权与信任语义另见 [Stage Patch 授权](../trust/stage-patch.md)。
 
 - selector 签名必须来自被授权的 selector，不来自 relayer。
-- patch 只影响单个 order 的 overlay，不修改 plan version。
-- active executor overlay 影响后续 signal authorization 检查；已经发生的 signal 仍以事件为准。
-- resource manifest 是句柄和 hash，证据明文留在链下。
-- patch workflow rows 可以被重建或审计；contract event 是链上 proof。
+- patch 只影响单个 order 的执行者或文件引用，不修改 plan version。
+- 业务完成与 patch 结果都以链上事件为准；submission 状态不推进订单。
+- 文件映射只存 contentHash 与不透明 handle，业务正文留在链下。

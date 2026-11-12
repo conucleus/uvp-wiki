@@ -18,7 +18,10 @@ Indexer 是可重建服务层的重放入口。它从链读取 `UVPDeploymentReg
 | `src/indexer/viem-event-source.ts` | 从 EVM RPC 读取合约日志，保留 chain id、contract address、block、tx、log index。 |
 | `src/indexer/events.ts` | 把原始合约日志归一化成 `ChainEvent`，包括 state-machine、Identity Registry、deployment registry 事件。 |
 | `src/indexer/service.ts` | indexer 运行入口，支持普通同步和 `rebuild:indexer` 重建。 |
-| `src/indexer/projections.ts` | 从 state-machine 事件重建 order、task、timeline、proof projection。 |
+| `src/indexer/replay.ts` | 统一事件顺序与重放编排；`rebuildOrderProjections` 是投影重建的单一入口。 |
+| `src/indexer/projections/` | 按投影对象分文件重建投影：`order.ts`、`signal.ts`、`stage.ts`、`stage-files.ts`、`dock.ts`、`plan.ts`、`proof.ts`、`snapshot.ts`、`task.ts`。 |
+| `src/projection/plan-artifacts.ts`、`dock-artifacts.ts` | 计划/Dock 编译产物表的 Postgres store 与索引解析器；产物缺失 fail-closed。 |
+| `src/cli/record-plan-artifact.ts`、`record-dock-artifact.ts` | `plan_artifacts` / `dock_artifacts` 的生产写入入口（校验产物身份）。 |
 | `src/indexer/identity-projections.ts` | 从 Identity Registry 事件重建 subject/account identity projection。 |
 | `src/storage/projection-store.ts` | projection store contract，由 Postgres adapter 实现（PG-only）。 |
 
@@ -29,7 +32,7 @@ Indexer 至少要处理三类来源：
 | 来源 | 代表事件 | 投影用途 |
 | --- | --- | --- |
 | `UVPDeploymentRegistry` | active deployment / cutover 事件。 | 知道当前 state-machine 地址、部署版本和 release context。 |
-| `UVPStateMachine` | `OrderRegistered`、`SignalSubmitted`、`HookStatusChanged`、`HookReady`、`TimerPoked`、stage/resource patch events。 | 重建订单、任务、状态、timeline、proof rows。 |
+| `UVPStateMachine` | `OrderRegistered`、`SignalSubmitted`、`HookStatusChanged`、`HookReady`、`TimerPoked`、`StageExecutorPatchApplied`、`StageDockExecutorSelected`、`DockBindingPoked`、`DockOutputSubmitted`、`StageFilePatchApplied`、`StageFileOpApplied`。 | 重建订单、任务、阶段执行者、Dock binding 与窗口、阶段文件映射、状态、timeline、proof rows。 |
 | `UVPIdentityRegistry` | `IdentityBindingRegistered`、`IdentityBindingRevoked`。 | 重建 subject/account 身份目录及撤销历史；不做 Plan 或能力过滤。 |
 
 ## 输出投影
@@ -41,6 +44,7 @@ Indexer 至少要处理三类来源：
 | timeline projection | Product proof、Store runtime proof。 | 每一行都要能回到 tx/block/event。 |
 | proof projection | UI proof drawer、审计、release evidence。 | 保存 event proof，不保存证据明文。 |
 | identity projection | Store catalog、Product catalog、supplier directory。 | revoked 保持 revoked/blocked 展示。 |
+| dock projection | chain read snapshot、Store Dock 读面。 | 静态 Dock（`uvp.dock.v1`）与 binding（`uvp.dockBinding.v1`）：binding 身份、output 发射来自事件；A/B 窗口当前值是读时对 `dockOutputWindow` view 的 live enrichment，不持久化。 |
 | sync status | readiness、diagnostics、reconcile。 | 暴露 finality/reorg/sync lag，同步中状态保持 pending。 |
 
 DTO 字段定义见 [Product DTO](../product/dto.md)。

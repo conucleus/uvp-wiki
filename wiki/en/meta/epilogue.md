@@ -9,7 +9,7 @@ status: verified
 
 UVP was not "designed."
 
-It began as a vague intuition: could coordination boundaries be written as a language? If sources have causal chains, if signals can match against rules, if Zhixu definitions can dock into one another—these grammar fragments drifted in the mind, not yet a system.
+It began as a vague intuition: could coordination boundaries be written as a language? If sources have causal chains, if signals can match against rules, if Zhixu definitions can coordinate through static Docks—these grammar fragments drifted in the mind, not yet a system.
 
 So I first wrote them as a grammar draft, ran a proof-of-concept on the cloud with PostgreSQL triggers—that was UVP's embryo. Only after it ran could I write the formal whitebook and grammar. Then I handed just those two files to an AI and asked it to build uvp-eth from scratch.
 
