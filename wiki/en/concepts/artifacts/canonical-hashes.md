@@ -36,23 +36,23 @@ Implementations: `planIdFor()` in `UVPStateMachine.sol` and the chain-track comp
 
 ## On-chain runtime planHash
 
-The on-chain runtime `planHash` covers hooks, the root of the three capability tables, and the executor candidate-tree root:
+The on-chain runtime `planHash` covers hooks, the root of the three capability tables, and the supplier-binding root:
 
 ```text
 planHash = keccak256(abi.encode(
-  keccak256("uvp.plan.runtime.v5"),   // domain
+  keccak256("uvp.plan.runtime.v7"),   // domain
   hooksHash,                          // keccak256(abi.encode(CompactHook[]))
   capabilitiesRoot,                   // single Merkle root over three capability tables
-  executorCandidatesRoot              // single Merkle root over the (stageId, executor) candidate set
+  supplierBindingsRoot                // single Merkle root over the default/candidate (stageId, supplierId, kind) bindings
 ))
 ```
 
-The publisher signs the six-field PlanCommit (publisher, hooksHash, capabilitiesRoot, executorCandidatesRoot, birthAuthorizer, deadline) via EIP-712, and `UVPStateMachine` checks this runtime `planHash` at commit/finalize; `birthAuthorizer` is not in the preimage, and the Identity Registry is not involved. `hooksHash` covers the compact hooks' `(hookId, stageId, hookName, flags, instructions, dependencyKeys)`; executor routeId/routeHash are off-chain routing metadata and enter neither `hooksHash` nor the runtime `planHash`.
+The publisher signs the six-field PlanCommit (publisher, hooksHash, capabilitiesRoot, supplierBindingsRoot, birthAuthorizer, deadline) via EIP-712, and `UVPStateMachine` checks this runtime `planHash` at commit/finalize; `birthAuthorizer` is not in the preimage, and the Identity Registry is not involved. `hooksHash` covers the compact hooks' `(hookId, stageId, hookName, flags, instructions, dependencyKeys)`; executor routeId/routeHash are off-chain routing metadata and enter neither `hooksHash` nor the runtime `planHash`.
 
 ## Artifact Identity
 
-- The compiler-internal hook plan artifact (`uvp.hookPlan.v7`) hashes its payload under domain `uvp:hook-plan-artifact:v1`, including the definition snapshot, platform, compiled hooks, dependency index, executor routes, and so on.
-- The public on-chain artifact (`uvp.onchainHookPlan.v7`) hashes its payload minus the derived `triggers[]` read surface under domain `uvp:onchain-hook-plan-artifact:v1`. It serves as the registration args' `artifactHash` for source-artifact provenance and does not replace the on-chain runtime `planHash`; the artifact's `sourcePlanHash` anchors the internal hook plan.
+- The compiler-internal hook plan artifact (`uvp.hookPlan.v8`) hashes its payload under domain `uvp:hook-plan-artifact:v1`, including the definition snapshot, platform, compiled hooks, dependency index, executor routes, and so on.
+- The public on-chain artifact (`uvp.onchainHookPlan.v8`) hashes its payload minus the derived `triggers[]` read surface under domain `uvp:onchain-hook-plan-artifact:v1`. It serves as the registration args' `artifactHash` for source-artifact provenance and does not replace the on-chain runtime `planHash`; the artifact's `sourcePlanHash` anchors the internal hook plan.
 - Neither side accepts handwritten JSON: artifacts must be reproducibly generated from the definition by script.
 
 ## capabilitiesRoot (three capability tables)
@@ -72,12 +72,12 @@ fileWriterLeaf = keccak256(abi.encode(
   keccak256("UVP_FILE_WRITER_V1"),        // leaf domain
   targetStageId, writerStageId))
 
-executorCandidateLeaf = keccak256(abi.encode(
-  keccak256("UVP_EXECUTOR_CANDIDATE_V1"), // leaf domain
-  stageId, executor))
+supplierBindingLeaf = keccak256(abi.encodePacked(
+  keccak256("UVP_SUPPLIER_BINDING_V1"),   // leaf domain
+  stageId, supplierId, kind))
 ```
 
-The first three leaves mix into `capabilitiesRoot`; `executorCandidateLeaf` forms the separate `executorCandidatesRoot`. An empty table yields the root `keccak256("")`. The leaf formulas are byte-identical to `signalCapabilityLeaf`/`selectorBindingLeaf`/`fileWriterLeaf` in the `UVPPlanMetadataModule` contract and to the compiler's candidate leaf; the authoritative implementations are `uvp-protocol/packages/compiler/src/onchain/capabilities-root.ts` and `executor-candidates.ts`.
+The first three leaves mix into `capabilitiesRoot`; `supplierBindingLeaf` forms the separate `supplierBindingsRoot` (signed in the PlanCommit). An empty table yields the root `keccak256("")`. The leaf formulas are byte-identical to `signalCapabilityLeaf`/`selectorBindingLeaf`/`fileWriterLeaf` in the `UVPPlanMetadataModule` contract and to the compiler's `supplierBindingLeaf`; the authoritative implementations are `uvp-protocol/packages/compiler/src/onchain/capabilities-root.ts` and `supplier-bindings.ts`.
 
 ## Dock Identity, Binding, and File Patch
 

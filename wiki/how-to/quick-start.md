@@ -51,7 +51,7 @@ indexer、executor 和部署脚本同步。
 | `pnpm test` | 所有 package 的 test。 |
 | `pnpm build` | 所有 package 的 build。 |
 | `pnpm lint` | 有 lint 脚本的 package 执行 lint。 |
-| `pnpm verify:protocol-freeze` | 校验当前全部冻结 ABI/hash fixture、EIP-712 domain 与 `uvp-stack.v1.json` 兼容矩阵：stateMachine `0.19`、plan-registration `0.6`、stage-patch `0.9`、dock-registry `0.1`、file-resource `0.1`、lens `0.6`、plan-metadata `0.8`、derived-signal `0.5`、order-link `0.3`、deployment-registry `0.2`、identity-registry `0.1`；EIP-712 域 productSubmit `0.17`、orderLink `0.8`、derivedSignal `0.6`、stageExecutorPatch `0.4`。 |
+| `pnpm verify:protocol-freeze` | 校验当前全部冻结 ABI/hash fixture、EIP-712 domain 与 `uvp-stack.v1.json` 兼容矩阵：stateMachine `0.21`、plan-registration `0.7`、stage-patch `0.10`、dock-registry `0.1`、file-resource `0.2`、lens `0.7`、plan-metadata `0.8`、derived-signal `0.7`、order-link `0.4`、deployment-registry `0.2`、identity-registry `0.1`；EIP-712 域 productSubmit `0.19`、orderLink `0.9`、derivedSignal `0.7`、stageSupplierPatch `0.5`。 |
 | `pnpm no-spend:safety` | 运行 deploy 包的 no-spend 检查和环境文件校验；不花 gas。 |
 
 验证方式：对应命令退出码为 0。

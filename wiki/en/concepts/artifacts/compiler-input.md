@@ -46,7 +46,7 @@ Definition-level and chain-track acceptance domains reject these shapes before h
 - Birth signals declaring conflicting admission shapes (invalid expressions, non-existent references, inconsistent `validWhen` list header sources, nested delays, no-anchor delays, and so on).
 - A dock stage without a `receiveSignals` binding face, or plan-level executor routes/candidates pointing at a dock stage.
 - The stage materialization gate: a stage with neither birth signals nor `receiveSignals` compiles to zero hooks and is rejected overall on the chain target.
-- Deduplicated dependency keys over the limit (>1024), or one signalKey observed by non-birth hooks of more than one stage.
+- Deduplicated dependency keys over the limit (>1024), or per-key hook fan-out over the limit (one signalKey with more than 16 hooks).
 - `fileWriters` referencing non-existent stages or being self-inconsistent (duplicates, self-reference).
 - Dock documents: from/to unpublished, `to.stage` not a dock stage, output not in `sendSignals`, `signalMap` expressions with out-of-scope atoms or an empty set, and so on.
 
@@ -54,7 +54,7 @@ These errors must surface at compile time, not at contract registration or order
 
 ## How the Source Definition Enters Hashing
 
-The on-chain runtime `planHash` covers exactly three values: `hooksHash`, `capabilitiesRoot`, and `executorCandidatesRoot` (see [Canonical Hash](canonical-hashes.md)) — the canonicalized source Zhixu is not among them. A source-definition change that affects protocol semantics changes the hooks, capability tables, or candidate set, and therefore changes the `planHash`. The whole `OnchainHookPlanArtifact` additionally has a canonical payload hash (pinning the source definition snapshot via `sourcePlanHash`) used only for artifact provenance and fixture pinning; it does not act as the on-chain `planHash`. The compiled artifact should not be handwritten JSON; it must be reproducibly generated from the source definition by script.
+The on-chain runtime `planHash` covers exactly three values: `hooksHash`, `capabilitiesRoot`, and `supplierBindingsRoot` (see [Canonical Hash](canonical-hashes.md)) — the canonicalized source Zhixu is not among them. A source-definition change that affects protocol semantics changes the hooks, capability tables, or supplier bindings, and therefore changes the `planHash`. The whole `OnchainHookPlanArtifact` additionally has a canonical payload hash (pinning the source definition snapshot via `sourcePlanHash`) used only for artifact provenance and fixture pinning; it does not act as the on-chain `planHash`. The compiled artifact should not be handwritten JSON; it must be reproducibly generated from the source definition by script.
 
 The field list follows `uvp-protocol/packages/compiler/src/types` and the language-layer manual `uvp-core/docs/zhixu-dsl-grammar.md`.
 

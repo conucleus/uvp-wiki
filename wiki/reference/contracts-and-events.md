@@ -33,7 +33,7 @@ status: verified
 
 - 无参 constructor；
 - module 配置与一次 `freezeModules`；模块槽只接受有代码的地址，冻结后保持当前 module set；
-- publisher 签名的六字段 `PlanCommit`（publisher、hooksHash、capabilitiesRoot、executorCandidatesRoot、birthAuthorizer、deadline）经 `commitPlan` 提交，任意 relayer 可转交；`finalizePlan(bytes32)` 定稿 permissionless；
+- publisher 签名的六字段 `PlanCommit`（publisher、hooksHash、capabilitiesRoot、supplierBindingsRoot、birthAuthorizer、deadline）经 `commitPlan` 提交，任意 relayer 可转交；`finalizePlan(bytes32)` 定稿 permissionless；
 - 出生通道：outside trigger（`triggerOrderFromOutsideFor`；`birthAuthorizer` 为合约时用无签名直接入口 `triggerOrderFromOutsideByAuthorizer`）、order-link 模块的 `triggerOrderFromSignalFor`、治理分叉 `forkOrder`；orderId 由出生事实纯函数派生，调用方不可自报；
 - `submitSignal`：唯一的外部 signal 写入口，身份固定 `msg.sender`（合约 executor 可由 relayer/keeper 代付）；calldata 尾部携带 `bytes32 filesDigest` 与 `FilePatch filePatch`，`signalId == 0` 表示纯文件 patch；
 - module-only 写回入口（order-link `triggerOrderFromSignalFromModule`、derived `submitDerivedSignalFromModule`、dock output `submitDockOutputSignalFromModule`、stage executor 激活等）；
@@ -57,17 +57,17 @@ status: verified
 
 | 边界 | 冻结 ABI | EIP-712 域 |
 | --- | --- | --- |
-| `UVPStateMachine` / productSubmit | `0.19` | `0.17` |
-| `UVPPlanRegistration` | `0.6` | 主域 `0.17`（与 state machine 共用常量） |
-| `UVPStagePatchModule` | `0.9` | `stageExecutorPatch` `0.4` |
+| `UVPStateMachine` / productSubmit | `0.21` | `0.19` |
+| `UVPPlanRegistration` | `0.7` | 主域 `0.19`（与 state machine 共用常量） |
+| `UVPStagePatchModule` | `0.10` | `stageSupplierPatch` `0.5` |
 | `UVPDockRegistry` | `0.1` | 无签名域（注册 permissionless） |
 | `UVPPlanMetadataModule` | `0.8` | 无 |
-| `UVPOrderLinkModule` | `0.3` | `orderLink` `0.8` |
-| `UVPDerivedSignalModule` | `0.5` | `derivedSignal` `0.6` |
-| `UVPFileResourceModule` | `0.1` | 无（随 direct `submitSignal` 提交） |
+| `UVPOrderLinkModule` | `0.4` | `orderLink` `0.9` |
+| `UVPDerivedSignalModule` | `0.7` | `derivedSignal` `0.7` |
+| `UVPFileResourceModule` | `0.2` | 无（随 direct `submitSignal` 提交） |
 | `UVPIdentityRegistry` | `0.1` | 无 |
 | `UVPDeploymentRegistry` | `0.2` | 无 |
-| `UVPStateMachineLens` | `0.6` | 无 |
+| `UVPStateMachineLens` | `0.7` | 无 |
 
 订单身份是复合键 `(planId, orderId)`：indexer、replay、Product DTO 与 adapter 都按复合身份寻址，不把 bare `orderId` 当作全局主键。Dock 不是出生通道，订单创建只走本页列出的三条出生通道。
 
@@ -75,7 +75,7 @@ status: verified
 
 - **注册（permissionless）**：`registerDock(fromPlanId, fromSourceId, toPlanId, toStageId, toSourceId, docHash, outputs[])`；每个 output 携带 B 侧信号、A 侧窗口指令计划（atoms + `SIGNAL` / `NOT` / `AND` / `OR` / `DELAY`）与逐 atom/逐 output capability proof，合约经 `UVPPlanMetadataModule` 成员证明校验（`DockOutputCapabilityNotFound` / `DockAtomCapabilityNotFound`）。
 - **身份**：`dkid = bytes32(bytes16(docHash))`，docHash 由 Dock 文档内容派生（产物 `uvp.dock.v1` 的 `dkid = zd-<32hex>`）；重复注册 revert `DockAlreadyRegistered`。读面 `getDock` / `dockOutputCount` / `getDockOutput` 的入参是 **dkid word**（artifact `dkid` 右补零），不是注册调用里的 fromPlanId。
-- **dock 执行者选择（一次性）**：selector 调用 `selectStageDockExecutor`，或经 `selectStageDockExecutorFor` 携 selector 的 EIP-712 签名（域 `stageExecutorPatch` 0.4）；合约校验该 stage 的 `HOOK_FLAG_DOCK_EXECUTOR` 标记、selector binding 与执行者对 dock 全部 output 的订单级授权。同 dkid + executor 重放按幂等吸收，换选 revert `StageDockExecutorAlreadySelected`。
+- **dock 执行者选择（一次性）**：selector 调用 `selectStageDockExecutor`，或经 `selectStageDockExecutorFor` 携 selector 的 EIP-712 签名（域 `stageSupplierPatch` 0.5）；合约校验该 stage 的 `HOOK_FLAG_DOCK_EXECUTOR` 标记、selector binding 与执行者对 dock 全部 output 的订单级授权。同 dkid + executor 重放按幂等吸收，换选 revert `StageDockExecutorAlreadySelected`。
 - **binding（7 word，无 payload hash）**：`bindingId = keccak256(abi.encode("uvp.dock.binding_id.v1", dkid, toPlanId, toOrderId, toStageId, fromPlanId, fromOrderId))`；binding 由挂接 stage 的文件项 `dock_link` 确定，其值是 canonical A 订单号（`0x` + 64 hex）；`dock_link` 的 `contentHash` 只在 poke 时认证载荷正文，不匹配 revert `DockBindingContentHashMismatch`。
 - **窗口与发射**：`pokeDockBinding` 按 `block.timestamp` 求 A 窗口（与 hook 同一求值器；`~` 在事实到达时关闭、`+T` 延迟锚点），再复核 B 侧 `sendSignals.validWhen` 适格；逐 output first-win 发射（已存在的 B 事实不覆盖）。历史窗口时间不上链，读面 `getStageDockBinding` / `dockOutputWindow` 只给当前态与相对 `dueInSeconds`。
 
@@ -143,7 +143,7 @@ IdentityBindingRevoked            # UVPIdentityRegistry
 
 | 事件 | 自包含字段 | 用途 |
 | --- | --- | --- |
-| `PlanCommitted` | `hooksHash`、`capabilitiesRoot`、`executorCandidatesRoot`、`birthAuthorizer` | 重建 plan 承诺面与 outside 出生授权人。 |
+| `PlanCommitted` | `hooksHash`、`capabilitiesRoot`、`supplierBindingsRoot`、`birthAuthorizer` | 重建 plan 承诺面与 outside 出生授权人。 |
 | `SignalSubmitted` | `factStageId` | 事实归属阶段（0 = 词表外事实），per-stage 归属与计数可重建。 |
 | `OrderForked` | `forkPayloadHash`、`replayedFactKeys` | fork 单号派生载荷与血缘；清单内键是父单事实重放，清单外是 fork 单新生事实。 |
 | `DerivedSignalSubmitted` | `relation` | 目标单关系（0 = from==target 本单生产，1 = triggerOrigin 回写）。 |

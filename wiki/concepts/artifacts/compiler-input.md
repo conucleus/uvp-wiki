@@ -46,7 +46,7 @@ uvp-core analyze 的 wire schema 是 `uvp.zhixuAnalysis.v4`：它输出共享定
 - 出生信号声明了互相冲突的适格形态（表达式不合法、引用不存在、`validWhen` 列表 header source 不一致、嵌套延时、无锚延时等）。
 - dock 阶段没有 `receiveSignals` 绑定面，或 plan 级执行者路由/候选集指向 dock 阶段。
 - 阶段物化门：既无出生信号又无 `receiveSignals` 的阶段编译为零 hook，链上 target 整体拒绝。
-- 依赖键全计划去重后超限（>1024）、同一 signalKey 被多个阶段的非出生 hook 观察。
+- 依赖键全计划去重后超限（>1024）、单键 hook 扇出超限（单 signalKey >16 hook）。
 - `fileWriters` 引用不存在或不自洽（重复、自指）。
 - Dock 文档：from/to 未发布、`to.stage` 不是 dock 阶段、output 不在 `sendSignals`、`signalMap` 表达式 atoms 越界或空集等。
 
@@ -54,7 +54,7 @@ uvp-core analyze 的 wire schema 是 `uvp.zhixuAnalysis.v4`：它输出共享定
 
 ## 源定义如何进入哈希
 
-链上 runtime `planHash` 覆盖三元组：`hooksHash`、`capabilitiesRoot`、`executorCandidatesRoot`（公式见 [Canonical Hash](canonical-hashes.md)）——canonicalized source Zhixu 不在其中。影响协议语义的源定义变化会改变 hooks、能力表或候选集，因此必然改变 `planHash`；整个 `OnchainHookPlanArtifact` 另有 canonical payload hash（经 `sourcePlanHash` 锚定源定义快照），只用于产物追溯与 fixture 固定，不充当链上 `planHash`。编译产物不是手写 JSON，应由脚本从源定义可重复生成。
+链上 runtime `planHash` 覆盖三元组：`hooksHash`、`capabilitiesRoot`、`supplierBindingsRoot`（公式见 [Canonical Hash](canonical-hashes.md)）——canonicalized source Zhixu 不在其中。影响协议语义的源定义变化会改变 hooks、能力表或 supplier 绑定，因此必然改变 `planHash`；整个 `OnchainHookPlanArtifact` 另有 canonical payload hash（经 `sourcePlanHash` 锚定源定义快照），只用于产物追溯与 fixture 固定，不充当链上 `planHash`。编译产物不是手写 JSON，应由脚本从源定义可重复生成。
 
 字段清单以 `uvp-protocol/packages/compiler/src/types` 与语言层正本 `uvp-core/docs/zhixu-dsl-grammar.md` 为准。
 

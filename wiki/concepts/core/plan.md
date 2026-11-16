@@ -9,7 +9,7 @@ status: verified
 # Plan
 
 > 前置阅读：[核心概念](../README.md)
-Plan 是 Zhixu 针对某条链编译出的不可变运行规则。它只承载状态机必须知道的 hooks、dependency keys、selector bindings、signal capabilities、file-writer capability 叶和执行者候选集；供应商能力、推荐标签、履约材料与撮合逻辑不属于 Plan。
+Plan 是 Zhixu 针对某条链编译出的不可变运行规则。它只承载状态机必须知道的 hooks、dependency keys、selector bindings、signal capabilities、file-writer capability 叶和 supplier 绑定（default/candidate）；供应商能力、推荐标签、履约材料与撮合逻辑不属于 Plan。
 
 ## 谁使用
 
@@ -17,7 +17,7 @@ publisher 签名发布 Plan；registrar 基于已 finalized 的 Plan 创建 Orde
 
 ## 产生什么结果
 
-一次成功的发布产生 `planHash`、`planId` 和永久冻结的链上 hooks、`capabilitiesRoot` 与 `executorCandidatesRoot` 承诺；之后每个 Order 都引用这个不可变身份，规则变化只能通过发布新 Plan 表达。
+一次成功的发布产生 `planHash`、`planId` 和永久冻结的链上 hooks、`capabilitiesRoot` 与 `supplierBindingsRoot` 承诺；之后每个 Order 都引用这个不可变身份，规则变化只能通过发布新 Plan 表达。
 
 ## 权威来自哪里
 
@@ -28,26 +28,26 @@ Plan 的权威来自 publisher 的 EIP-712 签名、两步注册的 hash 校验�
 ```text
 hooksHash              = keccak256(abi.encode(hooks))
 capabilitiesRoot       = 三张能力表（signal capability + selector binding + file writer）的单棵 Merkle root
-executorCandidatesRoot = (stageId, executor) 候选集的单棵 Merkle root
+supplierBindingsRoot   = default/candidate (stageId, supplierId, kind) 绑定的单棵 Merkle root
 planHash               = keccak256(abi.encode(
-                           keccak256("uvp.plan.runtime.v5"),  // domain
+                           keccak256("uvp.plan.runtime.v7"),  // domain
                            hooksHash,
                            capabilitiesRoot,
-                           executorCandidatesRoot))
+                           supplierBindingsRoot))
 planId                 = keccak256(abi.encode(
                            keccak256("uvp.plan.id.v1"),       // domain
                            publisher,
                            planHash))
 ```
 
-`planHash` 的 preimage 是三元组：hooks、能力树根与执行者候选树根。能力表为空时 `capabilitiesRoot` 为 `keccak256("")`，候选集为空时 `executorCandidatesRoot` 按空 Merkle root 参与计算，公式不变。executor route 与 resources hash 是链下调度的路由元数据（进入产物本体但不进链上 runtime `planHash`）；叶公式与树规则见 [Canonical Hash](../artifacts/canonical-hashes.md)。编译器自己的 artifact hash 继续用于追溯源产物，但不冒充链上 `planHash`。把 publisher 放进 `planId`，可以避免不同发布者对同一内容争抢全局名字。
+`planHash` 的 preimage 是三元组：hooks、能力树根与 supplier 绑定树根。能力表为空时 `capabilitiesRoot` 为 `keccak256("")`；supplier 绑定为空时 `supplierBindingsRoot` 同样按 `keccak256("")` 参与计算，公式不变。executor route 与 resources hash 是链下调度的路由元数据（进入产物本体但不进链上 runtime `planHash`）；叶公式与树规则见 [Canonical Hash](../artifacts/canonical-hashes.md)。编译器自己的 artifact hash 继续用于追溯源产物，但不冒充链上 `planHash`。把 publisher 放进 `planId`，可以避免不同发布者对同一内容争抢全局名字。
 
 ## 两步凝固
 
-1. publisher 对六字段 PlanCommit（`publisher + hooksHash + capabilitiesRoot + executorCandidatesRoot + birthAuthorizer + deadline`）做 EIP-712 签名；任意 relayer 调用 `commitPlan`，同时提交完整 hooks，能力表随 commit 以 `capabilitiesRoot` 承诺。`birthAuthorizer` 只进 commit digest 与链上存储、不进 runtime `planHash`；它承诺 outside 出生提交者，零地址表示该计划关闭 outside 出生通道。
+1. publisher 对六字段 PlanCommit（`publisher + hooksHash + capabilitiesRoot + supplierBindingsRoot + birthAuthorizer + deadline`）做 EIP-712 签名；任意 relayer 调用 `commitPlan`，同时提交完整 hooks，能力表随 commit 以 `capabilitiesRoot` 承诺。`birthAuthorizer` 只进 commit digest 与链上存储、不进 runtime `planHash`；它承诺 outside 出生提交者，零地址表示该计划关闭 outside 出生通道。
 2. 任意调用者调用 `finalizePlan(planId)` 定稿（permissionless）；本步只落定稿，不提交表数据。
 
-pending Plan 不能创建 Order。finalized 后 hooks、`capabilitiesRoot` 与 `executorCandidatesRoot` 都不能修改；如果规则变化，发布新的 Plan。
+pending Plan 不能创建 Order。finalized 后 hooks、`capabilitiesRoot` 与 `supplierBindingsRoot` 都不能修改；如果规则变化，发布新的 Plan。
 
 ## Module 冻结
 

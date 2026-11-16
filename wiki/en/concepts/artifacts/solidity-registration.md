@@ -7,16 +7,16 @@ status: verified
 
 # On-chain Registration Parameters
 
-`OnchainHookPlanArtifact` (`uvp.onchainHookPlan.v7`) is not yet the final transaction parameter set. The compiler converts it into the compact structures required by `UVPStateMachine.commitPlan()`; the three capability tables (signal capability + selector binding + file writer) are folded off-chain into the single Merkle-tree `capabilitiesRoot`, committed together with `executorCandidatesRoot` by the publisher at commit time, and `finalizePlan(bytes32)` only finalizes. Table size is decoupled from registration gas cost, with no entry cap.
+`OnchainHookPlanArtifact` (`uvp.onchainHookPlan.v8`) is not yet the final transaction parameter set. The compiler converts it into the compact structures required by `UVPStateMachine.commitPlan()`; the three capability tables (signal capability + selector binding + file writer) are folded off-chain into the single Merkle-tree `capabilitiesRoot`, committed together with `supplierBindingsRoot` by the publisher at commit time, and `finalizePlan(bytes32)` only finalizes. Table size is decoupled from registration gas cost, with no entry cap.
 
-The on-chain runtime commitment is `planHash` (domain `uvp.plan.runtime.v5`), whose preimage is `(hooksHash, capabilitiesRoot, executorCandidatesRoot)`; `birthAuthorizer` only enters the PlanCommit digest and on-chain storage, not `planHash`. The artifact's derived `triggers[]` read surface enumerates every order-trigger hook's birth fact and does not enter the planHash preimage.
+The on-chain runtime commitment is `planHash` (domain `uvp.plan.runtime.v7`), whose preimage is `(hooksHash, capabilitiesRoot, supplierBindingsRoot)`; `birthAuthorizer` only enters the PlanCommit digest and on-chain storage, not `planHash`. The artifact's derived `triggers[]` read surface enumerates every order-trigger hook's birth fact and does not enter the planHash preimage.
 
 ## PlanCommit and Registration Entries
 
 The publisher signs a six-field PlanCommit via EIP-712:
 
 ```text
-publisher, hooksHash, capabilitiesRoot, executorCandidatesRoot, birthAuthorizer, deadline
+publisher, hooksHash, capabilitiesRoot, supplierBindingsRoot, birthAuthorizer, deadline
 ```
 
 Any relayer calls `commitPlan` with the signature and full hooks, and any caller calls `finalizePlan(planId)` to finalize. `birthAuthorizer` is the plan-level birth-submitter commitment: outside birth submissions must come from it, and the zero address closes the plan's outside birth channel (order-link and fork channels are unaffected).
@@ -69,7 +69,7 @@ An executor route (a stage's static executor and fileResources) is off-chain rou
 
 ## ABI Fixture
 
-Public ABI and freeze checks are maintained in the contract package. The current frozen set includes state-machine `v0.19`, plan-registration `v0.6`, stage-patch `0.9`, dock-registry `0.1`, file-resource `0.1`, lens `0.6`, and so on; EIP-712 domain versions follow the compatibility matrix (productSubmit `0.17`, orderLink `0.8`, derivedSignal `0.6`, stageExecutorPatch `0.4`). Verification command:
+Public ABI and freeze checks are maintained in the contract package. The current frozen set includes state-machine `v0.21`, plan-registration `v0.7`, stage-patch `0.10`, dock-registry `0.1`, file-resource `0.2`, lens `0.7`, and so on; EIP-712 domain versions follow the compatibility matrix (productSubmit `0.19`, orderLink `0.9`, derivedSignal `0.7`, stageSupplierPatch `0.5`). Verification command:
 
 ```bash
 pnpm verify:protocol-freeze
