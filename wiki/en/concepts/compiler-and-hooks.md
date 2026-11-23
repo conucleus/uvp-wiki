@@ -28,7 +28,7 @@ Hook Core output remains platform-neutral semantics with no Solidity ABI.
 
 - Loading YAML/JSON Zhixu.
 - Validating stages, `receiveSignals`, `sendSignals[].trigger` entries, static-executor constraints, `selectedStages`, executor reachability, and `fileWriters` references.
-- Consuming uvp-core's analyze wire `uvp.zhixuAnalysis.v4`, synthesizing birth hooks from each stage's normalized birth signal names, and generating the `OnchainHookPlanArtifact` (including the derived `triggers[]` enumeration); a separate `kind: Dock` document goes through `analyzeDock` into `uvp.dock.v1`.
+- Consuming uvp-core's analyze wire `uvp.zhixuAnalysis.v1`, synthesizing birth hooks from each stage's normalized birth signal names, and generating the `OnchainHookPlanArtifact` (including the derived `triggers[]` enumeration); a separate `kind: Dock` document goes through `analyzeDock` into `uvp.dock.v1`.
 - Generating Solidity `commitPlan`/`finalizePlan` parameters.
 - Computing `planId`, `planHash`, and hook/stage/source/signal/dependency/route ids.
 

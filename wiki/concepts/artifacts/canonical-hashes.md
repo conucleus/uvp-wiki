@@ -51,8 +51,8 @@ publisher 对六字段 PlanCommit（publisher、hooksHash、capabilitiesRoot、s
 
 ## Artifact 身份
 
-- 编译器内部 hook plan artifact（`uvp.hookPlan.v8`）的 `planHash` 用域 `uvp:hook-plan-artifact:v1`，payload 含定义快照、platform、compiled hooks、依赖索引、executor routes 等。
-- 公开 on-chain artifact（`uvp.onchainHookPlan.v8`）的 `planHash` 用域 `uvp:onchain-hook-plan-artifact:v1`，preimage 是 artifact payload 去掉派生读面 `triggers[]`。它作为注册参数里的 `artifactHash` 追溯源产物，不替代链上 runtime `planHash`；artifact 的 `sourcePlanHash` 锚定内部 hook plan。
+- 编译器内部 hook plan artifact（`uvp.hookPlan.v1`）的 `planHash` 用域 `uvp:hook-plan-artifact:v1`，payload 含定义快照、platform、compiled hooks、依赖索引、executor routes 等。
+- 公开 on-chain artifact（`uvp.onchainHookPlan.v1`）的 `planHash` 用域 `uvp:onchain-hook-plan-artifact:v1`，preimage 是 artifact payload 去掉派生读面 `triggers[]`。它作为注册参数里的 `artifactHash` 追溯源产物，不替代链上 runtime `planHash`；artifact 的 `sourcePlanHash` 锚定内部 hook plan。
 - 两边都不手写 JSON：产物必须由脚本从定义可重复生成。
 
 ## capabilitiesRoot（三张能力表）

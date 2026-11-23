@@ -102,7 +102,7 @@ GET  /product/submissions/:submissionId
 
 ## Order Overlay (protocol side)
 
-Executor patch: `UVPStagePatchModule`'s `StageExecutorPatch` typed data (domain `stageExecutorPatch` 0.4, mode closed set `assign`/`handoff`) → `applyStageExecutorPatchFor`; the signed entry carries `bindingProof`, `candidateProof`, and `executorAuthorizations`.
+Executor patch: `UVPStagePatchModule`'s `StageExecutorPatch` typed data (domain `stageSupplierPatch` 1, mode closed set `assign`/`handoff`) → `applyStageExecutorPatchFor`; the signed entry carries `bindingProof`, `candidateProof`, and `executorAuthorizations`.
 
 Stage file patch: submitted as the trailing `bytes32 filesDigest` + `FilePatch` on direct `submitSignal` (`signalId == 0` is a pure file patch), and applied by `UVPFileResourceModule.applyStageFilePatch` as `add` / `replace` / `remove`; `baseHash` is mandatory and equals the stage's current file version.
 

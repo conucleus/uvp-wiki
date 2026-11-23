@@ -19,7 +19,7 @@ status: verified
 
 ## 产生什么结果
 
-一条 Zhixu 编译出确定性的 hook plan 与 on-chain artifact（`uvp.hookPlan.v7` / `uvp.onchainHookPlan.v7`），经 `commitPlan` + `finalizePlan` 注册后成为可创建 Order 的 Plan；同一个 Plan 可以运行出多个 Order。跨秩序协作的 A→B 发射条件写在独立的 `kind: Dock` 文档里，编出 `uvp.dock.v1`，不进入 `Zhixu.spec`。
+一条 Zhixu 编译出确定性的 hook plan 与 on-chain artifact（`uvp.hookPlan.v1` / `uvp.onchainHookPlan.v1`），经 `commitPlan` + `finalizePlan` 注册后成为可创建 Order 的 Plan；同一个 Plan 可以运行出多个 Order。跨秩序协作的 A→B 发射条件写在独立的 `kind: Dock` 文档里，编出 `uvp.dock.v1`，不进入 `Zhixu.spec`。
 
 ## 权威来自哪里
 

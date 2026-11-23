@@ -28,7 +28,7 @@ Hook Core 的输出仍然是平台中立语义，不含 Solidity ABI。
 
 - 加载 YAML/JSON Zhixu。
 - 校验 stage、`receiveSignals`、`sendSignals[].trigger` 条目与静态 executor 约束、`selectedStages`、executor reachability 与 `fileWriters` 引用。
-- 调用 uvp-core 的 analyze wire `uvp.zhixuAnalysis.v4`，按每 stage 规范化的出生信号名合成出生钩子并生成 `OnchainHookPlanArtifact`（含派生的 `triggers[]` 枚举）；独立 `kind: Dock` 文档走 `analyzeDock` 出 `uvp.dock.v1`。
+- 调用 uvp-core 的 analyze wire `uvp.zhixuAnalysis.v1`，按每 stage 规范化的出生信号名合成出生钩子并生成 `OnchainHookPlanArtifact`（含派生的 `triggers[]` 枚举）；独立 `kind: Dock` 文档走 `analyzeDock` 出 `uvp.dock.v1`。
 - 生成 Solidity `commitPlan`/`finalizePlan` 参数。
 - 计算 `planId`、`planHash`、hook/stage/source/signal/dependency/route id。
 

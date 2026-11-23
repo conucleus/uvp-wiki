@@ -55,19 +55,21 @@ The module public boundaries include:
 
 The single mechanical reference for versions and frozen ABIs is the compatibility matrix `uvp-deploy/deploy/compatibility/uvp-stack.v1.json`; the authoritative implementation is the contract constants themselves. Signers must build EIP-712 typed data for the domain version of the deployed contract.
 
+Every frozen ABI is `0.1` and every EIP-712 domain is `1` (one fixed baseline).
+
 | Boundary | Frozen ABI | EIP-712 domain |
 | --- | --- | --- |
-| `UVPStateMachine` / productSubmit | `0.21` | `0.19` |
-| `UVPPlanRegistration` | `0.7` | main domain `0.19` (shared constants with the state machine) |
-| `UVPStagePatchModule` | `0.10` | `stageSupplierPatch` `0.5` |
+| `UVPStateMachine` / productSubmit | `0.1` | `1` |
+| `UVPPlanRegistration` | `0.1` | main domain `1` (shared constants with the state machine) |
+| `UVPStagePatchModule` | `0.1` | `stageSupplierPatch` `1` |
 | `UVPDockRegistry` | `0.1` | none (registration is permissionless) |
-| `UVPPlanMetadataModule` | `0.8` | none |
-| `UVPOrderLinkModule` | `0.4` | `orderLink` `0.9` |
-| `UVPDerivedSignalModule` | `0.7` | `derivedSignal` `0.7` |
-| `UVPFileResourceModule` | `0.2` | none (submitted with direct `submitSignal`) |
-| `UVPIdentityRegistry` | `0.1` | none |
-| `UVPDeploymentRegistry` | `0.2` | none |
-| `UVPStateMachineLens` | `0.7` | none |
+| `UVPPlanMetadataModule` | `0.1` | none |
+| `UVPDerivedSignalModule` | `0.1` | `derivedSignal` `1` |
+| `UVPFileResourceModule` | `0.1` | none (submitted with direct `submitSignal`) |
+| `UVPSupplierRegistry` | `0.1` | none (the only on-chain execution identity) |
+| `UVPIdentityRegistry` | `0.1` | none (grants no execution authority) |
+| `UVPDeploymentRegistry` | `0.1` | none |
+| `UVPStateMachineLens` | `0.1` | none |
 
 Order identity is the composite key `(planId, orderId)`: indexers, replay, Product DTOs, and adapters address by composite identity and never treat a bare `orderId` as a global primary key. A Dock is not a birth channel; order creation uses only the three birth channels listed on this page.
 
@@ -75,7 +77,7 @@ Order identity is the composite key `(planId, orderId)`: indexers, replay, Produ
 
 - **Registration (permissionless)**: `registerDock(fromPlanId, fromSourceId, toPlanId, toStageId, toSourceId, docHash, outputs[])`; each output carries the B-side signal, the A-side window instruction program (atoms + `SIGNAL` / `NOT` / `AND` / `OR` / `DELAY`), and per-atom/per-output capability proofs, which the contract verifies as membership proofs through `UVPPlanMetadataModule` (`DockOutputCapabilityNotFound` / `DockAtomCapabilityNotFound`).
 - **Identity**: `dkid = bytes32(bytes16(docHash))`, where docHash derives from Dock document content (the `uvp.dock.v1` artifact's `dkid = zd-<32hex>`); re-registration reverts `DockAlreadyRegistered`. The read surface `getDock` / `dockOutputCount` / `getDockOutput` takes a **dkid word** (artifact `dkid` right-padded with zeros), not the fromPlanId used at registration.
-- **Dock executor selection (one-time)**: the selector calls `selectStageDockExecutor`, or `selectStageDockExecutorFor` with the selector's EIP-712 signature (domain `stageSupplierPatch` 0.5); the contract checks the stage's `HOOK_FLAG_DOCK_EXECUTOR` mark, the selector binding, and that the executor holds order-level authorization for every dock output. Replays of the same dkid + executor are absorbed idempotently; a different selection reverts `StageDockExecutorAlreadySelected`.
+- **Dock executor selection (one-time)**: the selector calls `selectStageDockSupplier`, or `selectStageDockSupplierFor` with the selector's EIP-712 signature (domain `stageSupplierPatch` 1); the contract checks the stage's `HOOK_FLAG_DOCK_EXECUTOR` mark, the selector binding, and that the executor holds order-level authorization for every dock output. Replays of the same dkid + executor are absorbed idempotently; a different selection reverts `StageDockExecutorAlreadySelected`.
 - **Binding (seven words, no payload hash)**: `bindingId = keccak256(abi.encode("uvp.dock.binding_id.v1", dkid, toPlanId, toOrderId, toStageId, fromPlanId, fromOrderId))`; the binding is determined by the attached stage's `dock_link` file entry, whose value is the canonical A order id (`0x` + 64 hex). The `dock_link` record's `contentHash` only authenticates the revealed payload in poke; mismatch reverts `DockBindingContentHashMismatch`.
 - **Window and emission**: `pokeDockBinding` evaluates the A window against A facts at `block.timestamp` (the same evaluator as hooks; `~` closes on fact arrival and `+T` delays the anchor), then re-checks the B-side `sendSignals.validWhen` admission; each output emits first-win (an already-recorded B fact is never overwritten). Historical window times are not on chain; the read views `getStageDockBinding` / `dockOutputWindow` expose only the current state and relative `dueInSeconds`.
 

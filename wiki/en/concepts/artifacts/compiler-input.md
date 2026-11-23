@@ -33,7 +33,7 @@ The `Dock` document (`spec.from{zhixu,source}` / `spec.to{zhixu,stage}` / `spec.
 
 The default target is `hook_plan` (`evm` is its alias); `cloud`/`cloud_db` (cloud-track artifacts) and `analyze` (shared validation + hook IR + birth signal set + hook parse results) are also available. Dock documents go through an `analyzeDock` request (`{dock, published}`).
 
-The uvp-core analyze wire schema is `uvp.zhixuAnalysis.v4`: it emits shared definition validation results (including the chain track's birth-set validation and stage materialization gate), normalized per-stage birth signal names, parsed hook ASTs, signal capabilities, folded admissions, and each stage's executor config. The chain-track compiler only consumes the analyze result for lowering/decoration/shell assembly and does not re-implement validation.
+The uvp-core analyze wire schema is `uvp.zhixuAnalysis.v1`: it emits shared definition validation results (including the chain track's birth-set validation and stage materialization gate), normalized per-stage birth signal names, parsed hook ASTs, signal capabilities, folded admissions, and each stage's executor config. The chain-track compiler only consumes the analyze result for lowering/decoration/shell assembly and does not re-implement validation.
 
 ## What the Compiler Rejects
 

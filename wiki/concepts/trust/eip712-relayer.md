@@ -14,10 +14,9 @@ Relayer 可以帮助广播交易，但不能替参与方做业务决定。业务
 `protocol-bindings` 定义了浏览器可用的 EIP-712 helper。各域版本以 `uvp-deploy/deploy/compatibility/uvp-stack.v1.json` 为唯一机械对照：
 
 ```text
-UVPStateMachine（productSubmit）  version = 0.17
-UVPOrderLinkModule               version = 0.8
-UVPDerivedSignalModule           version = 0.6
-UVPStagePatchModule              version = 0.4
+UVPStateMachine（productSubmit）  version = 1
+UVPDerivedSignalModule           version = 1
+UVPStagePatchModule              version = 1
 ```
 
 Signal 提交的 primary type 是：

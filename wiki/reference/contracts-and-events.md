@@ -55,19 +55,21 @@ status: verified
 
 版本与冻结 ABI 的单一机械对照出处是兼容矩阵 `uvp-deploy/deploy/compatibility/uvp-stack.v1.json`；权威实现是合约常量本身。签名方必须按所部署合约的域版本构造 EIP-712 typed data。
 
+全部冻结 ABI 统一 `0.1`、全部 EIP-712 域统一 `1`（单一基线）。
+
 | 边界 | 冻结 ABI | EIP-712 域 |
 | --- | --- | --- |
-| `UVPStateMachine` / productSubmit | `0.21` | `0.19` |
-| `UVPPlanRegistration` | `0.7` | 主域 `0.19`（与 state machine 共用常量） |
-| `UVPStagePatchModule` | `0.10` | `stageSupplierPatch` `0.5` |
+| `UVPStateMachine` / productSubmit | `0.1` | `1` |
+| `UVPPlanRegistration` | `0.1` | 主域 `1`（与 state machine 共用常量） |
+| `UVPStagePatchModule` | `0.1` | `stageSupplierPatch` `1` |
 | `UVPDockRegistry` | `0.1` | 无签名域（注册 permissionless） |
-| `UVPPlanMetadataModule` | `0.8` | 无 |
-| `UVPOrderLinkModule` | `0.4` | `orderLink` `0.9` |
-| `UVPDerivedSignalModule` | `0.7` | `derivedSignal` `0.7` |
-| `UVPFileResourceModule` | `0.2` | 无（随 direct `submitSignal` 提交） |
-| `UVPIdentityRegistry` | `0.1` | 无 |
-| `UVPDeploymentRegistry` | `0.2` | 无 |
-| `UVPStateMachineLens` | `0.7` | 无 |
+| `UVPPlanMetadataModule` | `0.1` | 无 |
+| `UVPDerivedSignalModule` | `0.1` | `derivedSignal` `1` |
+| `UVPFileResourceModule` | `0.1` | 无（随 direct `submitSignal` 提交） |
+| `UVPSupplierRegistry` | `0.1` | 无（链上执行身份唯一来源） |
+| `UVPIdentityRegistry` | `0.1` | 无（不参与执行授权） |
+| `UVPDeploymentRegistry` | `0.1` | 无 |
+| `UVPStateMachineLens` | `0.1` | 无 |
 
 订单身份是复合键 `(planId, orderId)`：indexer、replay、Product DTO 与 adapter 都按复合身份寻址，不把 bare `orderId` 当作全局主键。Dock 不是出生通道，订单创建只走本页列出的三条出生通道。
 
@@ -75,7 +77,7 @@ status: verified
 
 - **注册（permissionless）**：`registerDock(fromPlanId, fromSourceId, toPlanId, toStageId, toSourceId, docHash, outputs[])`；每个 output 携带 B 侧信号、A 侧窗口指令计划（atoms + `SIGNAL` / `NOT` / `AND` / `OR` / `DELAY`）与逐 atom/逐 output capability proof，合约经 `UVPPlanMetadataModule` 成员证明校验（`DockOutputCapabilityNotFound` / `DockAtomCapabilityNotFound`）。
 - **身份**：`dkid = bytes32(bytes16(docHash))`，docHash 由 Dock 文档内容派生（产物 `uvp.dock.v1` 的 `dkid = zd-<32hex>`）；重复注册 revert `DockAlreadyRegistered`。读面 `getDock` / `dockOutputCount` / `getDockOutput` 的入参是 **dkid word**（artifact `dkid` 右补零），不是注册调用里的 fromPlanId。
-- **dock 执行者选择（一次性）**：selector 调用 `selectStageDockExecutor`，或经 `selectStageDockExecutorFor` 携 selector 的 EIP-712 签名（域 `stageSupplierPatch` 0.5）；合约校验该 stage 的 `HOOK_FLAG_DOCK_EXECUTOR` 标记、selector binding 与执行者对 dock 全部 output 的订单级授权。同 dkid + executor 重放按幂等吸收，换选 revert `StageDockExecutorAlreadySelected`。
+- **dock 执行者选择（一次性）**：selector 调用 `selectStageDockSupplier`，或经 `selectStageDockSupplierFor` 携 selector 的 EIP-712 签名（域 `stageSupplierPatch` 1）；合约校验该 stage 的 `HOOK_FLAG_DOCK_EXECUTOR` 标记、selector binding 与执行者对 dock 全部 output 的订单级授权。同 dkid + executor 重放按幂等吸收，换选 revert `StageDockExecutorAlreadySelected`。
 - **binding（7 word，无 payload hash）**：`bindingId = keccak256(abi.encode("uvp.dock.binding_id.v1", dkid, toPlanId, toOrderId, toStageId, fromPlanId, fromOrderId))`；binding 由挂接 stage 的文件项 `dock_link` 确定，其值是 canonical A 订单号（`0x` + 64 hex）；`dock_link` 的 `contentHash` 只在 poke 时认证载荷正文，不匹配 revert `DockBindingContentHashMismatch`。
 - **窗口与发射**：`pokeDockBinding` 按 `block.timestamp` 求 A 窗口（与 hook 同一求值器；`~` 在事实到达时关闭、`+T` 延迟锚点），再复核 B 侧 `sendSignals.validWhen` 适格；逐 output first-win 发射（已存在的 B 事实不覆盖）。历史窗口时间不上链，读面 `getStageDockBinding` / `dockOutputWindow` 只给当前态与相对 `dueInSeconds`。
 

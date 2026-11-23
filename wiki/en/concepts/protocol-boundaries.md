@@ -27,12 +27,17 @@ Store metadata is a read model: supplier capabilities, tags, reputation, search 
 
 ## Identity Boundary
 
-`UVPIdentityRegistry` only records revocable subject-to-wallet bindings (`IdentityBindingRegistered` / `IdentityBindingRevoked`) so observers can resolve "who stands behind this account". It does not certify Plans, does not record capability or reputation, and is not an admission condition for the StateMachine; capability judgment belongs to Nuclei and Store off-chain. See [Contracts and Registries](contracts-and-registries.md) and [Store or external institution](trust/domains.md).
+There is exactly one source of on-chain execution identity: `UVPSupplierRegistry`. It binds a SID permanently to one account and constrains usability through `pending/active/suspended/revoked` status; `UVPStateMachine` resolves the submitter of a stage fact only as `accountOf(effectiveSupplierId) + active`. No other registry participates in execution authorization:
+
+- `UVPIdentityRegistry` only records revocable subject-to-wallet bindings (`IdentityBindingRegistered` / `IdentityBindingRevoked`) so observers can resolve "who stands behind this account". It does not certify Plans, does not record capability or reputation, is not an admission condition for the StateMachine, and the StateMachine never reads it; capability judgment belongs to Nuclei and Store off-chain.
+- `zhixu-registry` (`zhixu-store/registry`) is an off-chain data registration layer (`ZhixuRecord` / `IdentityClaim`); it mints no SID and grants no on-chain execution authority.
+
+Treating an identity binding as submission authority is therefore a boundary violation, not an implementation detail: a new execution/authorization path that reads an identity-binding registry is rejected in review. See [Contracts and Registries](contracts-and-registries.md) and [Store or external institution](trust/domains.md).
 
 ## Authorization and Signatures
 
 - Business signatures come only from authorized participants' wallets; a relayer may broadcast transactions and pay gas but never creates business signatures.
-- Signal submission is gated by order-level `SignalSubmitterAuthorized`, signed as EIP-712 typed data.
+- Signal submission authority is the source stage's currently effective assigned supplier account (the SID must be active), signed as EIP-712 typed data; there is no order-level submitter allowlist.
 - Each `(planId, orderId, sourceId, signalId)` accepts exactly one successful write (first-writer-wins); later duplicate external submissions are absorbed idempotently (no repeated advance), with the `SignalAlreadyExists` revert reserved for engine-internal write entry points. Details: [Signal](core/signal.md) and [EIP-712 and Relayer](trust/eip712-relayer.md).
 
 ## Plan Lifecycle

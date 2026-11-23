@@ -44,7 +44,7 @@ Executor patch 至少受这些条件约束：
 
 | 代码 | 说明 |
 | --- | --- |
-| `UVPStagePatchModule.sol` | `applyStageExecutorPatch`、`applyStageExecutorPatchFor`、patch digest、mode 校验（EIP-712 域 `stageExecutorPatch` 0.4）。 |
+| `UVPStagePatchModule.sol` | `applyStageExecutorPatch`、`applyStageExecutorPatchFor`、patch digest、mode 校验（EIP-712 域 `stageSupplierPatch` 1）。 |
 | `UVPStateMachine.sol` | active executor 激活和后续 signal 检查。 |
 | `UVPPlanMetadataModule.sol` | 保存 `capabilitiesRoot`，验证 patch 携带的 bindingProof 与 stageFacts。 |
 | `protocol-bindings/src/index.ts` | stage executor patch typed data、call builder、signer recovery。 |

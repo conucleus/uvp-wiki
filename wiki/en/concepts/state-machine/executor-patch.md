@@ -44,7 +44,7 @@ This is Plan-bounded automatic delegation, not wildcard Signal authority for the
 
 | Code | Meaning |
 | --- | --- |
-| `UVPStagePatchModule.sol` | `applyStageExecutorPatch`, `applyStageExecutorPatchFor`, patch digest, mode checks (EIP-712 domain `stageExecutorPatch` 0.4). |
+| `UVPStagePatchModule.sol` | `applyStageExecutorPatch`, `applyStageExecutorPatchFor`, patch digest, mode checks (EIP-712 domain `stageSupplierPatch` 1). |
 | `UVPStateMachine.sol` | Active executor activation and later signal checks. |
 | `UVPPlanMetadataModule.sol` | Stores the `capabilitiesRoot` and verifies the bindingProof/stageFacts carried by patches. |
 | `protocol-bindings/src/index.ts` | Stage executor patch typed data, call builder, signer recovery. |

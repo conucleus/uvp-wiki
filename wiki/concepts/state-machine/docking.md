@@ -35,7 +35,7 @@ Dock 是跨秩序协作的唯一通道：一条秩序（B 侧）以独立 `kind:
 
 ## 执行者选择：B 订单的一次性决定
 
-挂接 stage 的 dock 执行者由订单级 stage patch 选定：`UVPStagePatchModule`（ABI 0.9）的 `selectStageDockExecutor` / `selectStageDockExecutorFor` 接收 `StageDockExecutorSelection`，selector 阶段用 EIP-712 签名（域 `stageExecutorPatch` 0.4；直接调用路径以 `msg.sender` 为 selector）。
+挂接 stage 的 dock 执行者由订单级 stage patch 选定：`UVPStagePatchModule`（ABI 0.1）的 `selectStageDockSupplier` / `selectStageDockSupplierFor` 接收 `StageDockSupplierSelection`，selector 阶段用 EIP-712 签名（域 `stageSupplierPatch` 1；直接调用路径以 `msg.sender` 为 selector）。
 
 合约校验三件事：该 stage 的 hooks 带 `HOOK_FLAG_DOCK_EXECUTOR`、selector 的 binding 关系、执行者对 Dock 全部输出信号的订单级授权。同 dkid + executor 的重放幂等吸收，换选响亮拒绝（`StageDockExecutorAlreadySelected`）；事件 `StageDockExecutorSelected` 记录 dockId、fromPlanId、executor、selector 与 patchHash。选中后固定，dock 阶段的执行者只走这条一次性选择路径（通用 executor patch 由 `StageExecutorPatchForbiddenOnDockStage` 拒绝）。
 

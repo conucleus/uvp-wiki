@@ -19,7 +19,7 @@ Nuclei and order designers write the Zhixu DSL; the compiler compiles it into on
 
 ## What It Produces
 
-A Zhixu compiles into deterministic hook plan and on-chain artifacts (`uvp.hookPlan.v7` / `uvp.onchainHookPlan.v7`); after registration via `commitPlan` + `finalizePlan` it becomes a Plan that can create Orders, and the same Plan can run many Orders. Cross-order A→B emission conditions live in a separate `kind: Dock` document compiled to `uvp.dock.v1`, not inside `Zhixu.spec`.
+A Zhixu compiles into deterministic hook plan and on-chain artifacts (`uvp.hookPlan.v1` / `uvp.onchainHookPlan.v1`); after registration via `commitPlan` + `finalizePlan` it becomes a Plan that can create Orders, and the same Plan can run many Orders. Cross-order A→B emission conditions live in a separate `kind: Dock` document compiled to `uvp.dock.v1`, not inside `Zhixu.spec`.
 
 ## Where Authority Comes From
 

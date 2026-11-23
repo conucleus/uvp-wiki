@@ -35,7 +35,7 @@ Both orders are independent `UVPStateMachine` orders with the composite identity
 
 ## Executor Selection: a One-Time Decision of the B Order
 
-The attach stage's dock executor is selected through the order-level stage patch: `UVPStagePatchModule` (ABI 0.9) exposes `selectStageDockExecutor` / `selectStageDockExecutorFor`, which take a `StageDockExecutorSelection`; the selector stage signs it with EIP-712 (domain `stageExecutorPatch` 0.4; the direct call path uses `msg.sender` as selector).
+The attach stage's dock executor is selected through the order-level stage patch: `UVPStagePatchModule` (ABI 0.1) exposes `selectStageDockSupplier` / `selectStageDockSupplierFor`, which take a `StageDockSupplierSelection`; the selector stage signs it with EIP-712 (domain `stageSupplierPatch` 1; the direct call path uses `msg.sender` as selector).
 
 The contract checks three things: the stage's hooks carry `HOOK_FLAG_DOCK_EXECUTOR`, the selector binding relation holds, and the executor holds order-level authorization for every Dock output signal. Replaying the same dkid + executor is absorbed idempotently; replacing the selection is rejected loudly (`StageDockExecutorAlreadySelected`). The `StageDockExecutorSelected` event records dockId, fromPlanId, executor, selector, and patchHash. Once selected, the executor stays fixed and the dock stage only follows this one-time selection path (generic executor patches reject with `StageExecutorPatchForbiddenOnDockStage`).
 

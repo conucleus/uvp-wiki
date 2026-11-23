@@ -102,7 +102,7 @@ GET  /product/submissions/:submissionId
 
 ## Order Overlay（协议面）
 
-executor patch：`UVPStagePatchModule` 的 `StageExecutorPatch` typed data（域 `stageExecutorPatch` 0.4，mode 闭集 `assign`/`handoff`）→ `applyStageExecutorPatchFor`；signed 入口携带 `bindingProof`、`candidateProof` 与 `executorAuthorizations`。
+executor patch：`UVPStagePatchModule` 的 `StageExecutorPatch` typed data（域 `stageSupplierPatch` 1，mode 闭集 `assign`/`handoff`）→ `applyStageExecutorPatchFor`；signed 入口携带 `bindingProof`、`candidateProof` 与 `executorAuthorizations`。
 
 阶段文件 patch：随 direct `submitSignal` 尾部 `bytes32 filesDigest` + `FilePatch` 提交（`signalId == 0` 为纯文件 patch），由 `UVPFileResourceModule.applyStageFilePatch` 落 `add` / `replace` / `remove`；`baseHash` 必填并等于该 stage 当前文件版本。
 

@@ -45,7 +45,7 @@ Success criterion: every item in that tutorial's "Success Criteria" section pass
 | `pnpm test` | Test all packages. |
 | `pnpm build` | Build all packages. |
 | `pnpm lint` | Run lint for packages that provide a lint script. |
-| `pnpm verify:protocol-freeze` | Verify all current frozen ABI/hash fixtures, EIP-712 domains, and the `uvp-stack.v1.json` compatibility matrix: stateMachine `0.21`, plan-registration `0.7`, stage-patch `0.10`, dock-registry `0.1`, file-resource `0.2`, lens `0.7`, plan-metadata `0.8`, derived-signal `0.7`, order-link `0.4`, deployment-registry `0.2`, identity-registry `0.1`; EIP-712 domains productSubmit `0.19`, orderLink `0.9`, derivedSignal `0.7`, stageSupplierPatch `0.5`. |
+| `pnpm verify:protocol-freeze` | Verify all current frozen ABI/hash fixtures, EIP-712 domains, and the `uvp-stack.v1.json` compatibility matrix: every frozen ABI fixture is `0.1` (stateMachine, plan-registration, stage-patch, dock-registry, file-resource, lens, plan-metadata, derived-signal, supplier-registry, deployment-registry, identity-registry); every EIP-712 domain is `1` (productSubmit, derivedSignal, stageSupplierPatch). |
 | `pnpm no-spend:safety` | Run the deploy package's no-spend checks plus environment-file validation; spends no gas. |
 
 Verification: the corresponding command exits with code 0.

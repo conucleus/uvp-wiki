@@ -7,7 +7,7 @@ status: verified
 
 # 链上注册参数
 
-`OnchainHookPlanArtifact`（`uvp.onchainHookPlan.v8`）还不是最终交易参数。编译器把它压缩成紧凑结构后，CompactHook 等参数构成 `commitPlan()` 的提交载荷；三张能力表（signal capability + selector binding + file writer）在链下折叠为单棵 Merkle 树的 `capabilitiesRoot`，与 `supplierBindingsRoot` 一起随 commit 被 publisher 承诺，`finalizePlan(bytes32)` 只落定稿。表规模与注册 gas 成本脱钩，没有条目上限。
+`OnchainHookPlanArtifact`（`uvp.onchainHookPlan.v1`）还不是最终交易参数。编译器把它压缩成紧凑结构后，CompactHook 等参数构成 `commitPlan()` 的提交载荷；三张能力表（signal capability + selector binding + file writer）在链下折叠为单棵 Merkle 树的 `capabilitiesRoot`，与 `supplierBindingsRoot` 一起随 commit 被 publisher 承诺，`finalizePlan(bytes32)` 只落定稿。表规模与注册 gas 成本脱钩，没有条目上限。
 
 链上 runtime 承诺面是 `planHash`（域 `uvp.plan.runtime.v7`），preimage 为 `(hooksHash, capabilitiesRoot, supplierBindingsRoot)`；`birthAuthorizer` 只进 PlanCommit digest 与链上存储，不进 `planHash`。artifact 的派生读面 `triggers[]` 枚举全部 order-trigger hook 的出生事实，不进 planHash 承诺面。
 
@@ -69,7 +69,7 @@ executor route（stage 的静态 executor 与 fileResources）是链下路由元
 
 ## ABI Fixture
 
-公共 ABI 和冻结校验在合约包中维护。当前冻结组合包括 state-machine `v0.21`、plan-registration `v0.7`、stage-patch `0.10`、dock-registry `0.1`、file-resource `0.2`、lens `0.7` 等；EIP-712 域版本以兼容矩阵为准（productSubmit `0.19`、orderLink `0.9`、derivedSignal `0.7`、stageSupplierPatch `0.5`）。验证命令：
+公共 ABI 和冻结校验在合约包中维护。当前冻结组合统一为 `0.1`（state-machine、plan-registration、stage-patch、dock-registry、file-resource、lens、plan-metadata、derived-signal、supplier-registry、deployment-registry、identity-registry）；EIP-712 域版本以兼容矩阵为准，全部为 `1`（productSubmit、derivedSignal、stageSupplierPatch）。验证命令：
 
 ```bash
 pnpm verify:protocol-freeze

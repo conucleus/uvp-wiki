@@ -47,7 +47,7 @@ BFF 的数据库保存 draft 与 workflow 状态。真正让订单存在的是 `
 
 订单级 patch 分两类，签名面与校验面不同：
 
-- executor patch：`UVPStagePatchModule` 的 `StageExecutorPatch` typed data（域 `stageExecutorPatch` 0.4，mode 闭集 `assign`/`handoff`），signed 入口 `applyStageExecutorPatchFor` 携带 selector 与 previous executor 签名、`bindingProof`、`candidateProof` 与 `executorAuthorizations`；patch 生效后把 Plan 预声明能力写为该订单的显式授权集。
+- executor patch：`UVPStagePatchModule` 的 `StageExecutorPatch` typed data（域 `stageSupplierPatch` 1，mode 闭集 `assign`/`handoff`），signed 入口 `applyStageExecutorPatchFor` 携带 selector 与 previous executor 签名、`bindingProof`、`candidateProof` 与 `executorAuthorizations`；patch 生效后把 Plan 预声明能力写为该订单的显式授权集。
 - 阶段文件 patch：没有独立的 patch typed data；它随 direct `submitSignal` 尾部 `bytes32 filesDigest` + `FilePatch` 提交（`signalId == 0` 为纯文件 patch），由 `UVPFileResourceModule.applyStageFilePatch` 落 `add` / `replace` / `remove`，写入方授权来自 stage 级 `fileWriters` capability 叶与订单级授权行。
 
 产品侧的 typed data 准备与提交编排由应用仓 backend 维护；协议侧字段与事件见 [合约与事件](../reference/contracts-and-events.md) 与 [Stage Overlay](state-machine/stage-overlay.md)。

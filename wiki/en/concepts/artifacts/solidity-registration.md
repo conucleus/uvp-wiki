@@ -7,7 +7,7 @@ status: verified
 
 # On-chain Registration Parameters
 
-`OnchainHookPlanArtifact` (`uvp.onchainHookPlan.v8`) is not yet the final transaction parameter set. The compiler converts it into the compact structures required by `UVPStateMachine.commitPlan()`; the three capability tables (signal capability + selector binding + file writer) are folded off-chain into the single Merkle-tree `capabilitiesRoot`, committed together with `supplierBindingsRoot` by the publisher at commit time, and `finalizePlan(bytes32)` only finalizes. Table size is decoupled from registration gas cost, with no entry cap.
+`OnchainHookPlanArtifact` (`uvp.onchainHookPlan.v1`) is not yet the final transaction parameter set. The compiler converts it into the compact structures required by `UVPStateMachine.commitPlan()`; the three capability tables (signal capability + selector binding + file writer) are folded off-chain into the single Merkle-tree `capabilitiesRoot`, committed together with `supplierBindingsRoot` by the publisher at commit time, and `finalizePlan(bytes32)` only finalizes. Table size is decoupled from registration gas cost, with no entry cap.
 
 The on-chain runtime commitment is `planHash` (domain `uvp.plan.runtime.v7`), whose preimage is `(hooksHash, capabilitiesRoot, supplierBindingsRoot)`; `birthAuthorizer` only enters the PlanCommit digest and on-chain storage, not `planHash`. The artifact's derived `triggers[]` read surface enumerates every order-trigger hook's birth fact and does not enter the planHash preimage.
 
@@ -69,7 +69,7 @@ An executor route (a stage's static executor and fileResources) is off-chain rou
 
 ## ABI Fixture
 
-Public ABI and freeze checks are maintained in the contract package. The current frozen set includes state-machine `v0.21`, plan-registration `v0.7`, stage-patch `0.10`, dock-registry `0.1`, file-resource `0.2`, lens `0.7`, and so on; EIP-712 domain versions follow the compatibility matrix (productSubmit `0.19`, orderLink `0.9`, derivedSignal `0.7`, stageSupplierPatch `0.5`). Verification command:
+Public ABI and freeze checks are maintained in the contract package. The current frozen set is uniformly `0.1` (state-machine, plan-registration, stage-patch, dock-registry, file-resource, lens, plan-metadata, derived-signal, supplier-registry, deployment-registry, identity-registry); EIP-712 domain versions follow the compatibility matrix and are all `1` (productSubmit, derivedSignal, stageSupplierPatch). Verification command:
 
 ```bash
 pnpm verify:protocol-freeze

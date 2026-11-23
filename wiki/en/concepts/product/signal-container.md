@@ -46,7 +46,7 @@ These fields can be derived from the existing `ProductTaskDTO`, prepare/submit A
 Product-side prepare/submit endpoints are maintained by the used-car application backend (the application `app-contract` is the single path source); this repository does not verify endpoint names. The protocol-side submission surfaces are fixed:
 
 - Ordinary signal: direct `submitSignal` (identity fixed to `msg.sender`; trailing `bytes32 filesDigest` + `FilePatch`).
-- Executor patch: `UVPStagePatchModule`'s `StageExecutorPatch` typed data → `applyStageExecutorPatchFor` (domain `stageExecutorPatch` 0.4, mode closed set `assign`/`handoff`).
+- Executor patch: `UVPStagePatchModule`'s `StageExecutorPatch` typed data → `applyStageExecutorPatchFor` (domain `stageSupplierPatch` 1, mode closed set `assign`/`handoff`).
 - Stage file patch: submitted as the trailing `FilePatch` on direct `submitSignal` (`signalId == 0` is a pure file patch) and applied by `UVPFileResourceModule.applyStageFilePatch` as `add` / `replace` / `remove`.
 
 ## Security rules

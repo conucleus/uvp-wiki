@@ -14,10 +14,9 @@ A relayer can help broadcast transactions, but it cannot make business decisions
 `protocol-bindings` defines browser-safe EIP-712 helpers. Domain versions follow the single mechanical source `uvp-deploy/deploy/compatibility/uvp-stack.v1.json`:
 
 ```text
-UVPStateMachine (productSubmit)   version = 0.17
-UVPOrderLinkModule               version = 0.8
-UVPDerivedSignalModule           version = 0.6
-UVPStagePatchModule              version = 0.4
+UVPStateMachine (productSubmit)   version = 1
+UVPDerivedSignalModule           version = 1
+UVPStagePatchModule              version = 1
 ```
 
 The primary type for signal submission is:

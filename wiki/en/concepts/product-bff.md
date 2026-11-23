@@ -47,7 +47,7 @@ After an order is born, participants or executors submit business signals throug
 
 Order-level patches split into two classes with different signing surfaces and checks:
 
-- executor patch: `UVPStagePatchModule`'s `StageExecutorPatch` typed data (domain `stageExecutorPatch` 0.4, mode closed set `assign`/`handoff`); the signed entry `applyStageExecutorPatchFor` carries the selector and previous-executor signatures, `bindingProof`, `candidateProof`, and `executorAuthorizations`. When the patch takes effect, the Plan's pre-declared capabilities become the order's explicit authorization set.
+- executor patch: `UVPStagePatchModule`'s `StageExecutorPatch` typed data (domain `stageSupplierPatch` 1, mode closed set `assign`/`handoff`); the signed entry `applyStageExecutorPatchFor` carries the selector and previous-executor signatures, `bindingProof`, `candidateProof`, and `executorAuthorizations`. When the patch takes effect, the Plan's pre-declared capabilities become the order's explicit authorization set.
 - stage file patch: there is no separate patch typed data; it rides the trailing `bytes32 filesDigest` + `FilePatch` on direct `submitSignal` (`signalId == 0` is a pure file patch), and `UVPFileResourceModule.applyStageFilePatch` applies `add` / `replace` / `remove`. Write authorization comes from the stage-level `fileWriters` capability leaves plus order-level authorization rows.
 
 The application backend owns product-side typed-data preparation and submission orchestration; for protocol fields and events see [Contracts and Events](../reference/contracts-and-events.md) and [Stage Overlay](state-machine/stage-overlay.md).

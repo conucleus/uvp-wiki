@@ -25,12 +25,17 @@ Store metadata 是读模型：供应商能力、标签、声誉、搜索排序�
 
 ## 身份边界
 
-`UVPIdentityRegistry` 只登记线下 subject 与钱包的可撤销绑定（`IdentityBindingRegistered` / `IdentityBindingRevoked`），帮助解析"这个账户代表谁"。它不认证 Plan，不记录能力或信誉，不是 StateMachine 准入条件；能力判断属于凝结核与 Store 链下判断。详见 [Contracts 与 Registries](contracts-and-registries.md) 与 [Store or external institution](trust/domains.md)。
+链上执行身份只有一个来源：`UVPSupplierRegistry`。它把 SID 永久绑定到一个 account，并以 `pending/active/suspended/revoked` 状态约束可用性；`UVPStateMachine` 只按 `accountOf(effectiveSupplierId) + active` 解析某个阶段事实的提交者。其他登记表都不参与执行授权：
+
+- `UVPIdentityRegistry` 只登记线下 subject 与钱包的可撤销绑定（`IdentityBindingRegistered` / `IdentityBindingRevoked`），帮助解析"这个账户代表谁"。它不认证 Plan、不记录能力或信誉、不是 StateMachine 准入条件，StateMachine 也不读取它；能力判断属于凝结核与 Store 链下判断。
+- `zhixu-registry`（`zhixu-store/registry`）是链下数据登记层（`ZhixuRecord` / `IdentityClaim`），不铸 SID、不参与链上执行授权。
+
+因此"把某个身份绑定当作发信权"不是实现细节，而是边界违规：新增执行/授权路径若读取身份绑定登记表，评审直接拒绝。详见 [Contracts 与 Registries](contracts-and-registries.md) 与 [Store or external institution](trust/domains.md)。
 
 ## 授权与签名
 
 - 业务签名只能来自被授权参与方的钱包；relayer 可以广播交易、代付 gas，但不生成业务签名。
-- Signal 提交受订单级 `SignalSubmitterAuthorized` 授权约束，签名采用 EIP-712 typed data。
+- Signal 提交的授权主体是 source 阶段当前生效的 assigned supplier account（SID 必须 active），签名采用 EIP-712 typed data；不存在订单级提交者白名单。
 - 同一个 `(planId, orderId, sourceId, signalId)` 只允许一次成功写入（first-writer-wins）；重复的外部提交被幂等吸收（不重复推进），`SignalAlreadyExists` revert 保留给引擎内部写入口。技术细节见 [Signal](core/signal.md) 与 [EIP-712 与 Relayer](trust/eip712-relayer.md)。
 
 ## Plan 生命周期

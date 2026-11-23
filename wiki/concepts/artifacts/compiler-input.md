@@ -33,7 +33,7 @@ status: verified
 
 默认 target 是 `hook_plan`（`evm` 为其别名），另有 `cloud`/`cloud_db`（云轨产物）与 `analyze`（共享校验 + hook IR + 出生信号集 + hook 解析结果）。Dock 文档走 `analyzeDock` 请求（`{dock, published}`）。
 
-uvp-core analyze 的 wire schema 是 `uvp.zhixuAnalysis.v4`：它输出共享定义校验结果（含链轨出生信号集校验与阶段物化门）、每 stage 规范化的出生信号名、解析后的 hook AST、signal capabilities、折叠后的 admissions 与每 stage 的执行者配置；链轨编译器只消费 analyze 结果做 lowering/装饰/壳层总装，不重复校验。
+uvp-core analyze 的 wire schema 是 `uvp.zhixuAnalysis.v1`：它输出共享定义校验结果（含链轨出生信号集校验与阶段物化门）、每 stage 规范化的出生信号名、解析后的 hook AST、signal capabilities、折叠后的 admissions 与每 stage 的执行者配置；链轨编译器只消费 analyze 结果做 lowering/装饰/壳层总装，不重复校验。
 
 ## 编译器会拒绝什么
 

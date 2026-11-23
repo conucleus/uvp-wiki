@@ -51,8 +51,8 @@ The publisher signs the six-field PlanCommit (publisher, hooksHash, capabilities
 
 ## Artifact Identity
 
-- The compiler-internal hook plan artifact (`uvp.hookPlan.v8`) hashes its payload under domain `uvp:hook-plan-artifact:v1`, including the definition snapshot, platform, compiled hooks, dependency index, executor routes, and so on.
-- The public on-chain artifact (`uvp.onchainHookPlan.v8`) hashes its payload minus the derived `triggers[]` read surface under domain `uvp:onchain-hook-plan-artifact:v1`. It serves as the registration args' `artifactHash` for source-artifact provenance and does not replace the on-chain runtime `planHash`; the artifact's `sourcePlanHash` anchors the internal hook plan.
+- The compiler-internal hook plan artifact (`uvp.hookPlan.v1`) hashes its payload under domain `uvp:hook-plan-artifact:v1`, including the definition snapshot, platform, compiled hooks, dependency index, executor routes, and so on.
+- The public on-chain artifact (`uvp.onchainHookPlan.v1`) hashes its payload minus the derived `triggers[]` read surface under domain `uvp:onchain-hook-plan-artifact:v1`. It serves as the registration args' `artifactHash` for source-artifact provenance and does not replace the on-chain runtime `planHash`; the artifact's `sourcePlanHash` anchors the internal hook plan.
 - Neither side accepts handwritten JSON: artifacts must be reproducibly generated from the definition by script.
 
 ## capabilitiesRoot (three capability tables)
