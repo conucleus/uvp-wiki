@@ -31,7 +31,7 @@ stage supplier patch 至少受这些条件约束：
 - selector 必须是 selector stage 当前生效的 assigned supplier account（`isEffectiveStageAccount`）。
 - patch nonce 必须递增。
 - target supplierId 不能为零，且该 SID 必须 `active`。
-- `previousSupplierId == 0` 是 assign（只在目标 stage 首个信号之前）；非零是 handoff（只在首信号之后，且需原 assigned supplier account 对同一 digest 的签名）。
+- `previousSupplierId == 0` 是 assign（只在目标 stage 首个信号之前）；非零是 handoff（只在首信号之后，且需原 assigned supplier account 对同一 digest 的签名；在 `UVPIdentityRegistry` 中撤销 supplier 为终态，会阻止后续 handoff）。
 - fixed 阶段 patch 恒拒；candidate 阶段必须命中 Plan `supplierBindingsRoot` 的 kind=1 candidate 叶（`candidateProof`）；dynamic 阶段免 proof、可指派任意 active SID；birth/dock 阶段 patch 恒拒。
 - patch 只改 `stage -> supplierId`，不写任何授权集；已经写入的 Signal 保持原样，历史 `SignalSubmitted` 保留原 submitter。
 

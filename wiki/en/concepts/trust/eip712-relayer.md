@@ -73,6 +73,6 @@ A relayer cannot:
 The signature carries a `deadline`. An expired signature cannot be submitted later, which prevents old business authorizations from being replayed long after they were granted.
 
 - **Direct submission**: `signature.length == 0`, and `msg.sender` must equal `submission.submitter`.
-- **Relayed submission**: `signature.length > 0`, and `msg.sender` is only the relayer; `submission.submitter` must sign `UVPStateMachineSignalSubmission` (ECDSA for EOAs, EIP-1271 for contract accounts). The `SignalSubmitted` event records both `submitter` and `relayer`.
+- **Relayed submission**: `signature.length > 0`, and `msg.sender` is only the relayer; `submission.submitter` must sign `UVPStateMachineSignalSubmission` (`submitSignal` supports EOA ECDSA and ERC-1271 contract-account signatures; `commitPlan` and module entrypoints accept EOA ECDSA only). The `SignalSubmitted` event records both `submitter` and `relayer`.
 
 In either mode, `submitter` must be the source stage's (at birth, the birth stage's) currently effective assigned supplier account, and that SID must be `active`.

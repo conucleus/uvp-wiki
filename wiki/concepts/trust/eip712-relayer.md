@@ -73,6 +73,6 @@ Relayer 不可以：
 签名带 `deadline`。过期签名不能继续提交，避免旧业务授权在很久以后被重放。
 
 - **直连提交**：`signature.length == 0`，`msg.sender` 必须等于 `submission.submitter`。
-- **签名代付**：`signature.length > 0`，`msg.sender` 仅作 relayer；`submission.submitter` 须对 `UVPStateMachineSignalSubmission` 签名（EOA 用 ECDSA，合约账户用 EIP-1271）。`SignalSubmitted` 事件同时记录 `submitter` 与 `relayer`。
+- **签名代付**：`signature.length > 0`，`msg.sender` 仅作 relayer；`submission.submitter` 须对 `UVPStateMachineSignalSubmission` 签名（`submitSignal` 支持 EOA ECDSA 与 ERC-1271 合约账户签名；`commitPlan` 及各模块入口仅支持 EOA ECDSA）。`SignalSubmitted` 事件同时记录 `submitter` 与 `relayer`。
 
 无论哪种形态，`submitter` 都必须是 source 阶段（出生时是出生阶段）当前生效的 assigned supplier account，且该 SID 必须 `active`。

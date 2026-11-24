@@ -31,7 +31,7 @@ A stage supplier patch is constrained by at least these checks:
 - The selector must be the selector stage's currently effective assigned supplier account (`isEffectiveStageAccount`).
 - The patch nonce must increase.
 - The target supplierId cannot be zero, and the SID must be `active`.
-- `previousSupplierId == 0` is an assign (only before the target stage's first signal); a non-zero value is a handoff (only after the first signal, and it requires the previous assigned supplier account's signature over the same digest).
+- `previousSupplierId == 0` is an assign (only before the target stage's first signal); a non-zero value is a handoff (only after the first signal, and it requires the previous assigned supplier account's signature over the same digest; revoking a supplier in `UVPIdentityRegistry` is terminal and prevents further handoff).
 - Fixed stages always reject a patch; candidate stages must hit the Plan's kind=1 candidate leaf in `supplierBindingsRoot` (`candidateProof`); dynamic stages need no proof and may assign any active SID; birth/dock stages always reject a patch.
 - The patch only changes `stage -> supplierId` and writes no authorization set; already-written Signals stay as recorded, and historical `SignalSubmitted` keeps its original submitter.
 

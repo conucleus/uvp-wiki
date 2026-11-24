@@ -61,7 +61,7 @@ pokeTimer(planId, orderId, hookId)
 
 检查通过后，合约发出 `TimerPoked` 并重新评估 hook。
 
-保活件的当前装配形态：`uvp-chain-services` 的 timer keeper(默认关闭，`UVP_TIMER_KEEPER_ENABLED` 开启)轮询投影里到期但仍为 `Wait` 的 hook，用产品 gas 池代发 `pokeTimer`——它是可重建的中继件，不产生协议事实。
+`pokeTimer` 是 permissionless 入口；`uvp-eth` 不包含链上或 `chain-services` timer keeper，定时推进由上层应用或外部调度器驱动。
 
 ## 产品层应该怎么展示
 

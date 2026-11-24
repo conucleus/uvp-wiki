@@ -61,7 +61,7 @@ The contract checks:
 
 After the check passes, the contract emits `TimerPoked` and reevaluates the hook.
 
-The current assembly of the keep-alive component: `uvp-chain-services`' timer keeper (off by default; enabled by `UVP_TIMER_KEEPER_ENABLED`) polls projections for hooks that are due but still `Wait` and sends `pokeTimer` from the product gas pool — it is a rebuildable relay component and produces no protocol facts.
+`pokeTimer` is permissionless; `uvp-eth` includes no on-chain or `chain-services` timer keeper, and upper-layer applications or external schedulers drive timer progression.
 
 ## How Product Surfaces Should Show It
 
