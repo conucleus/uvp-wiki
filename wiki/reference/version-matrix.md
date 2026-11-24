@@ -26,7 +26,6 @@ status: verified
 | Derived signal module ABI | `0.1` | Derived signal 模块冻结 ABI（EIP-712 domain version `1`）；发信权取 from 阶段 effective supplier，无目标单授权 fallback。 |
 | Product submit domain | `1` | Product signal submit EIP-712 domain；primary type `UVPStateMachineSignalSubmission`（11 字段，含 `targetStageId`、`filesHash`、`attributionHash`）。 |
 | Stage patch module ABI | `0.1` | `applyStageSupplierPatch` / `applyStageSupplierPatchFor` 与 dock 一次性选择 `selectStageDockSupplier` / `selectStageDockSupplierFor`（patch EIP-712 domain version `1`）；patch 载荷为 supplierId/previousSupplierId/patchNonce（`previousSupplierId == 0` assign、非零 handoff，无 mode/授权字段），候选关系用 `supplierBindingsRoot` 的 kind=1 candidate 叶证明。 |
-| DockRegistry ABI | `0.1` | 静态 Dock 注册表：`registerDock`/`DockRegistered`，原子/输出 capability proof 由 plan metadata 校验。 |
 | Plan metadata module ABI | `0.1` | plan metadata 冻结 ABI：`capabilitiesRoot` 下 capability 词表与 signal capability、stage selector binding 的成员校验；`fileWriters` 不在这里，见 PlanCommit `fileWritersHash`。 |
 | File resource module ABI | `0.1` | 阶段文件映射模块：`StageFile{string key; bytes payload}`，`applyStageFiles` 同 key 覆盖；无 `add/replace/remove`、无 `baseHash`/`patchHash`、无 handle/版本号；事件只有 `StageFileWritten`；写入鉴权按 target/writer 阶段的 assigned supplier。 |
 | Deployment manifest | `uvp-eth.addresses.v1` | 部署地址清单 schema。 |
