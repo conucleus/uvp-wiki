@@ -25,7 +25,7 @@ status: verified
 | Event name / topic / indexed fields | contracts | indexer、statemachine replay、Product projection、proof verifier | 更新 replay oracle、projection tests、contracts/events reference。 |
 | EIP-712 domain / typed data | contracts、protocol-bindings | Product submit、relayer、uvp-client、wallet UI | 更新 digest helpers、signing tests、staging domain 检查；staging 按当前 productSubmit 域版本签名。 |
 | Canonical hash / artifact schema | compiler、hook-core、statemachine | Plan publication、commitPlan/finalizePlan、release evidence | 更新 golden fixtures、canonical hash docs、compiler/statemachine tests。 |
-| Product DTO | product-dto | chain-services、Order App、uvp-client、periphery adapter | 更新 DTO tests、route tests、frontend/API consumers 和 ordinary-user copy。 |
+| Product DTO | 应用仓 `app-contract` / 链读 `chain-read-contract` | chain-services、Order App、uvp-client | 更新 DTO tests、route tests 与前端/API consumers。 |
 | Product API | chain-services | Order App/宿主（经 uvp-client/browser）、企业脚本/AI agent（经 uvp-client） | 更新 API reference、route tests、browser E2E、failure language。 |
 | Deployment manifest | uvp-deploy/deploy | chain-services、staging scripts、release records | 只提交 curated manifest/evidence；local generated address files 默认不提交。 |
 | Release evidence schema | uvp-deploy/deploy | release owner、audit、release evidence pack 消费方 | 保持 no-secret、redacted、可审计；不要把 raw logs 或 object bytes 当作 release record。 |

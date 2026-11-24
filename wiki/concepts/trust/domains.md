@@ -9,7 +9,7 @@ status: verified
 
 当前 Registry 明确是 **UVP Store 自己运营的身份准入域**。代码保留配置多个 Registry 地址的能力，为未来其他国家的合规主体或独立机构预留接口；首期只运行一个，也只对外宣传 Store 自己的 Registry。
 
-`UVPIdentityRegistry` 很薄，只回答一个问题：某个线下主体对应哪些链上钱包。它不认证 Plan，不声明供应商能力或信誉，不做推荐，也不决定谁能创建 Order 或提交 Signal。
+`UVPIdentityRegistry` 是唯一链上身份边界，含两个互不授权对方的命名空间：subject 命名空间回答“某个线下主体对应哪个链上钱包”（信任存证）；supplier 命名空间承载 SID 铸造、永久 account 绑定与 `pending/active/suspended/revoked` 状态（执行身份）。它不认证 Plan，不声明供应商能力或信誉，不做推荐；subject 绑定也不决定谁能创建 Order 或提交 Signal。
 
 ```solidity
 owner() -> address
@@ -35,7 +35,7 @@ getIdentityBinding(bindingId) -> IdentityBinding
 
 ## 撤销的实际含义
 
-撤销后，Store 不再把该钱包解析成当前默认身份，也不应继续放进默认目录。撤销不会回滚既有 Order、不撤销历史签名，也不能阻止用户手工输入原始钱包地址；真正的 Order/Signal 权利仍来自参与者签名、订单级授权和当前 executor overlay。
+撤销后，Store 不再把该钱包解析成当前默认身份，也不应继续放进默认目录。撤销不会回滚既有 Order、不撤销历史签名，也不能阻止用户手工输入原始钱包地址；真正的 Order/Signal 权利来自 source 阶段 assigned supplier account（supplier 命名空间）与签名。
 
 ## Store 的责任边界
 

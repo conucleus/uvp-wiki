@@ -15,7 +15,7 @@ The Supplier Directory is the Store's off-chain workbench: it maintains the supp
 
 | Tag layer | Maintained by | Meaning | Authority boundary |
 | --- | --- | --- | --- |
-| Nucleus internal tags | Nucleus / order organizers | A supplier fits a stage, role slot, or resource/evidence type. | Capability judgment belongs to the Nucleus; signal authorization arises in the Order. |
+| Nucleus internal tags | Nucleus / order organizers | A supplier fits a stage, role slot, or resource/evidence type. | Capability judgment belongs to the Nucleus; submission authority arises from the Order's `stage -> supplierId` assignment. |
 | Store platform tags | Store operators | Catalog classification, search, industry, risk, operational visibility. | The Store carries its own interpretation and operating responsibility. |
 | Identity binding | Identity Registry owner | Which wallet an offline subject corresponds to. | Contains no capability and creates no order permissions. |
 
@@ -43,7 +43,7 @@ Nucleus defines supplier requirements
   -> Store verifies identity material offline
   -> Registry owner registers the identity binding
   -> indexed IdentityBindingRegistered
-  -> order registration writes signal authorization
+  -> stage supplier patch assigns supplierId after order registration
   -> fulfillment proof feeds back into the supplier passport
 ```
 
@@ -55,8 +55,8 @@ Each step has a different authority: the Nucleus organizes internal candidates, 
 - The Identity Registry only decides how the current directory resolves a subject to a wallet.
 - Platform capability tags serve cataloging, search, and matching; the Store owns their interpretation and maintenance.
 - Contact or successful notification is operational workflow; business completion looks at on-chain signals/proof ([../protocol-boundaries.md](../protocol-boundaries.md)).
-- Supplier profiles serve as capability material; current-order submission rights look at signal authorization.
+- Supplier profiles serve as capability material; current-order submission rights look at `stage -> supplierId` and the SID active status.
 
 ## As a Dock peer
 
-A Zhixu enters cross-order collaboration in either of two roles: as the B side publishing an independent `kind: Dock` document that opens one of its `executor.supplierType: dock` stages as an A-side fact-driven output face, or as the A side referenced by `spec.from.zhixu` / `spec.from.source`, providing the fact source. The Store shows the peer Zhixu by definition uid (`zx-<32hex>`), its versioned Plan, the `signalMap` output faces of the related Dock declarations, and on-chain facts: `DockRegistered`, `StageDockExecutorSelected`, `DockBindingPoked`, `DockOutputSubmitted`, and both orders' signals / proof. B-order progress follows its own authorized signals / proof. For the onboarding flow and field details see [Dock Collaboration](../apps/zhixu-as-executor.md).
+A Zhixu enters cross-order collaboration in either of two roles: as the B side publishing an independent `kind: Dock` document that opens one of its `executor.supplierType: dock` stages as an A-side fact-driven output face, or as the A side referenced by `spec.from.zhixu` / `spec.from.source`, providing the fact source. The Store shows the peer Zhixu by definition uid (`zx-<32hex>`), its versioned Plan, the `signalMap` output faces of the related Dock declarations, and on-chain facts: `DockRegistered`, `StageDockSupplierSelected`, `DockBindingPoked`, `DockOutputSubmitted`, and both orders' signals / proof. B-order progress follows its own authorized signals / proof. For the onboarding flow and field details see [Dock Collaboration](../apps/zhixu-as-executor.md).

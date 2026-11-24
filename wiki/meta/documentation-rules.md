@@ -104,7 +104,7 @@ PRD 仍放在 `docs/product/`。Release record 仍放在 `uvp-deploy/deploy/rele
 - 更新 [Base Sepolia 预发](../how-to/base-sepolia-staging.md)、[发布与验证](../how-to/release-checklist.md)、[项目状态](status.md)；
 - 不写 secret 值。
 
-新增 periphery adapter 时：
+新增 应用仓 adapter 时：
 
 - 说明它消费哪些 core interface；
 - 说明它不拥有哪些事实；

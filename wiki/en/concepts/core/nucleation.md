@@ -23,7 +23,7 @@ A nucleus designs and maintains Zhixu DSL, which through compilation and publica
 
 ## Where Authority Comes From
 
-A nucleus is not automatically a Store operator, Identity Registry authority, registrar, or submitter wallet. It may appear in workflow materials and Store records, but on-chain authority still comes from the publisher signature on plan publication, order-level authorization, and participant signatures; order creation has no registrar permission gate — the current contracts have no registrar allowlist, birth facts are openly submitted, and the creator is first-come-first-served (see the [Core Glossary](../../reference/glossary.md)).
+A nucleus is not automatically a Store operator, Identity Registry authority, registrar, or submitter wallet. It may appear in workflow materials and Store records, but on-chain authority still comes from the publisher signature on plan publication, the stage's assigned supplier account, and participant signatures; order creation has no registrar permission gate — there is no registrar allowlist, the birth stage's assigned supplier account submits, and deduplication is by the explicit idempotency key (see the [Core Glossary](../../reference/glossary.md)).
 
 ```yaml
 spec:
@@ -65,7 +65,7 @@ Nucleus / 凝结核
   -> maintains order operation through proof and the supplier network
 ```
 
-A Zhixu is the reusable rulebook designed by the nucleus. A Plan is the chain-target artifact of one order version. An Order is one run of one Plan. A nucleus can maintain multiple orders or multiple versions; runtime still goes through plan publication, order registration, signal authorization, and chain proof.
+A Zhixu is the reusable rulebook designed by the nucleus. A Plan is the chain-target artifact of one order version. An Order is one run of one Plan. A nucleus can maintain multiple orders or multiple versions; runtime still goes through plan publication, order registration, assigned-supplier authority, and chain proof.
 
 ## Relation to Store
 

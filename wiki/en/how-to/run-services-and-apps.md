@@ -43,11 +43,11 @@ Broadcast and signing belong to the application backend's submission paths and u
 
 ## Store Workbench
 
-The Store workbench and Store Console API are provided by the used-car application repository; the `zhixu-store/registry` package in this repository is the non-user-facing data-layer library (`ZhixuRecord` / `IdentityClaim` registration, library only). See the application repository README for startup and configuration.
+The Store workbench and Store Console API are provided by the used-car application repository; the `zhixu-store/registry` package in this repository is the non-user-facing data-layer library (`ZhixuRecord` registration, library only). See the application repository README for startup and configuration.
 
 ## Order App
 
-Order App is the browser-based direct-chain order console (demo B): it connects an injected wallet, loads a plan artifact, signs `commitPlan` + `finalizePlan` to register the plan, signs `triggerOrderFromOutsideFor` to birth an order, then reads on-chain facts and events and submits signals. It needs no backend, session token, drafts, or invites.
+Order App is the browser-based direct-chain order console (demo B): it connects an injected wallet, loads a plan artifact, signs `commitPlan` + `finalizePlan` to register the plan, signs `submitSignal` (empty `orderId` + trigger signal) to birth an order, then reads on-chain facts and events and submits signals. It needs no backend, session token, drafts, or invites.
 
 ```bash
 pnpm --filter @uvp-eth/order-app dev

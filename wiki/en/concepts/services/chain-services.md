@@ -28,10 +28,10 @@ Rebuildable means the source of facts remains on chain. Chain Services turns eve
 | --- | --- | --- |
 | Is the plan committed and finalized | `UVPStateMachine` event | Index, query, and display the plan projection. |
 | Has the order started; has the signal been submitted | Events such as `OrderRegistered`, `SignalSubmitted`, `HookReady` | Replay into orders, tasks, timelines, and proof rows. |
-| Stage executors and Dock bindings | `StageExecutorPatchApplied`, `StageDockExecutorSelected`, `DockBindingPoked`, `DockOutputSubmitted` | Project executors, bindings, and output emission; current A/B windows are read live from `dockOutputWindow`. |
-| Stage file maps | `StageFilePatchApplied`, `StageFileOpApplied` | Replay `key -> contentHash + handle` in same-transaction log order. |
+| Stage suppliers and Dock bindings | `StageSupplierPatchApplied`, `StageSupplierAssigned`, `StageDockSupplierSelected`, `DockBindingPoked`, `DockOutputSubmitted` | Project supplier assignments, bindings, and output emission; current A/B windows are read live from `dockOutputWindow`. |
+| Stage file maps | `StageFileWritten` | Replay `key -> payload` in same-transaction log order. |
 | Which wallet does an offline subject correspond to | `UVPIdentityRegistry` event | Rebuild the identity binding projection for display names. |
-| Did the user sign a given business action | EIP-712 signer recovery and on-chain authorization | Validate the payload; never sign for the user. |
+| Did the user sign a given business action | EIP-712 signer recovery and on-chain authority checks | Validate the payload; never sign for the user. |
 | Store workflow and business rows | Application-side workflow storage | Not on chain; on-chain proof or trust publication is displayed separately. |
 
 ## Forkable Operating Model
@@ -64,7 +64,7 @@ When forking or self-deploying, these interface constraints must hold:
 
 | Subsystem | Input | Output |
 | --- | --- | --- |
-| Indexer | Deployment registry, state-machine, Identity Registry logs. | Normalized projections and sync status over `OrderRegistered`, `SignalSubmitted`, `HookStatusChanged`, `HookReady`, `StageExecutorPatchApplied`, `StageDockExecutorSelected`, `DockBindingPoked`, `DockOutputSubmitted`, `StageFilePatchApplied`, `StageFileOpApplied`, etc. |
+| Indexer | Deployment registry, state-machine, Identity Registry logs. | Normalized projections and sync status over `OrderRegistered`, `SignalSubmitted`, `HookStatusChanged`, `HookReady`, `StageSupplierPatchApplied`, `StageDockSupplierSelected`, `DockBindingPoked`, `DockOutputSubmitted`, `StageFileWritten`, etc. |
 | Projection storage | Replayed events, projection snapshots. | Postgres store; erasable, rebuildable query state. |
 | Plan/Dock artifacts | uvp-core compiled-artifact recording CLI. | Row-immutable `plan_artifacts` / `dock_artifacts` read projections; missing or identity-mismatched artifacts fail closed. |
 | Chain read API | Projection snapshots, plan artifacts, dock binding window reader. | `/chain/*`, `/identity/bindings` generic chain reads and A/B window live enrichment. |

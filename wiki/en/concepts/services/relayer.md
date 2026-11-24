@@ -15,7 +15,7 @@ The relayer is a protocol participant **role**, not a standalone service: it is 
 | --- | --- |
 | `src/submissions/broadcast-adapter.ts`, `src/submissions/safe-broadcast-adapter.ts` | Broadcast adapter and safe wrapper for Product signal submissions; avoids sending unverified payloads straight to chain. |
 | `src/stage-patches/broadcast-adapter.ts` | Broadcast assembly for selector-signed stage patches. |
-| The order trigger broadcast adapter in `src/product/query/bff/` | On-chain trigger broadcast for order registration. |
+| The order trigger broadcast adapter in `src/product/query/bff/` | On-chain trigger broadcast for order birth. |
 | `src/shared/broadcast/`, `src/config/preflight.ts` | Shared broadcast kit, plus fail-closed checks for runtime env, relayer key, and broadcast flags. |
 
 ## Transaction Boundary
@@ -28,7 +28,7 @@ participant signs EIP-712 payload
   -> indexer sees emitted chain event
 ```
 
-The relayer key represents only the gas payer, never a business actor. Authority for business actions comes from EIP-712 signatures, order-level signal authorization, and selector patch authorization.
+The relayer key represents only the gas payer, never a business actor. Authority for business actions comes from EIP-712 signatures, the source stage's assigned supplier account, and selector patch authority.
 
 ## Broadcast Adapter Semantics
 

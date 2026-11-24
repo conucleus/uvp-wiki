@@ -52,11 +52,11 @@ Order App 是人的订单界面；uvp-client 是自动化、宿主集成与执�
 
 两者最终都不能绕过：
 
-- 订单级 signal 授权。
+- assigned supplier account 发信权。
 - EIP-712 business signature。
 - payload hash。
 - first-writer-wins signal 语义。
 - chain event proof。
-- 订单级显式 `SignalAuthorization` 与 EIP-712 签名；executor patch 另有 patch 授权面。
+- `stage -> supplierId` 指派、`UVPIdentityRegistry.accountOf(supplierId)` 与 EIP-712 签名；stage supplier patch 另有 selector 授权面。
 
 Order App 不拥有订单状态；uvp-client 不拥有订单状态、会话或私钥。

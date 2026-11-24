@@ -47,7 +47,7 @@ status: verified | prototype | planned | archived
 - Distinguish implemented, fixture/local demo, staging evidence, and planned PRD; mark uncertain facts with `<!-- TODO(confirm): ... -->`; writing filler content is forbidden. Before publishing, convert the comment into a visible "pending confirmation" blockquote so the static site does not render escaped raw HTML.
 - Front-matter fields are fixed to `title` / `type` / `audience` / `preread` / `status`; `preread` takes exactly one bare relative path (e.g. `../core/executor.md`) — no quotes, no markdown link. The "Prerequisite reading" blockquote under the body H1 must stay consistent with that field.
 - Label Store metadata, database rows, and relayer queues as read-model or workflow state; label protocol facts as registry/state-machine events.
-- Keep funding, USDC, settlement-custody, and guarantee topics inside the periphery boundary.
+- Keep funding, USDC, settlement-custody, and guarantee topics inside the application-adapter boundary.
 - Private keys, RPC secrets, JWT secrets, and object-storage credentials are written only in redacted form.
 
 ## Information Architecture Rules
@@ -104,8 +104,8 @@ When changing the release/staging gate:
 - update [Base Sepolia Staging](../how-to/base-sepolia-staging.md), [Release and Verification](../how-to/release-checklist.md), and [Project Status](status.md);
 - never write secret values.
 
-When adding a periphery adapter:
+When adding an application-repository adapter:
 
 - explain which core interfaces it consumes;
 - explain which facts it does not own;
-- mark adapter events as adapter-side facts; reference the corresponding core interface or periphery contract for order/trust/funding source of truth respectively.
+- mark adapter events as adapter-side facts; reference the corresponding core interface or application adapter contract for order/trust/funding source of truth respectively.

@@ -45,7 +45,7 @@ Store 侧组织的是试配记录、审核材料与链上事实投影，属于�
 - 编辑 Dock 声明草稿，并按 `kind: Dock` 的字段闭集校验：`from` / `to` 定义 uid 的内容派生身份、`from.source` 与 `to.stage` 存在性、`to.stage` 的 dock 执行者声明、`signalMap` 输出名属于 `to.stage.sendSignals`、表达式 atoms 属于 `from.source` 的 `sendSignals`。
 - 试配检查 A/B 两侧 plan 的 capability 词表是否覆盖 `signalMap` 的 atoms 与 outputs（`UVPDockRegistry.registerDock` 会逐 atom / 逐 output 验证 capability proof），以及目标 stage 的 `sendSignals.validWhen` 是否表达 B 窗口。
 - 生成 operator review 材料与 proof checklist：声明原文、编译产物 `dkid` / `docHash`、capability 材料、两侧 Plan 身份。
-- 展示链上事实投影：`DockRegistered`（静态登记）、`StageDockExecutorSelected`（dock 执行者一次性选择）、`DockBindingPoked` / `DockOutputSubmitted`（binding poke 与 output 发射），以及 chain-services 的 `uvp.dock.v1` / `uvp.dockBinding.v1` 读面。A/B 窗口当前值读 `getStageDockBinding` / `dockOutputWindow` 的 live 值，窗口历史不在链上。
+- 展示链上事实投影：`DockRegistered`（静态登记）、`StageDockSupplierSelected`（dock 执行者一次性选择）、`DockBindingPoked` / `DockOutputSubmitted`（binding poke 与 output 发射），以及 chain-services 的 `uvp.dock.v1` / `uvp.dockBinding.v1` 读面。A/B 窗口当前值读 `getStageDockBinding` / `dockOutputWindow` 的 live 值，窗口历史不在链上。
 
 试配通过说明声明形状与材料齐备；协议事实仍由链上注册、执行者选择、binding 与 poke 产生。
 
@@ -56,12 +56,12 @@ B 侧发布 kind: Dock 文档
   -> 两侧 Plan 经 publisher 签名 commit 并 finalize（capabilitiesRoot 承诺 atoms 与 outputs）
   -> UVPDockRegistry.registerDock（permissionless；逐 atom / 逐 output capability proof）
   -> B 订单经出生通道创建（Dock 不建单）
-  -> selectStageDockExecutor / selectStageDockExecutorFor：selector 以 EIP-712 签名一次性选定 dock 执行者
+  -> selectStageDockSupplier / selectStageDockSupplierFor：selector 以 EIP-712 签名一次性选定 dock 执行者
   -> 阶段文件 patch 写入 dock_link = A 单号，建立 binding
   -> pokeDockBinding：按 block.timestamp 求 A 窗口并复核 B 侧 validWhen，逐 output first-win 发射 B 输出信号
 ```
 
-dock 执行者选中后固定：同 dkid + executor 的重放幂等吸收，换选 revert `StageDockExecutorAlreadySelected`。binding 身份是 7 个 32-byte word 的 `bindingId`（dkid、toPlanId、toOrderId、toStageId、fromPlanId、fromOrderId），不含 payload hash 或 generation；`dock_link` 文件项的 `contentHash` 只在 poke 时认证载荷正文，不匹配 revert `DockBindingContentHashMismatch`。poke permissionless，任何调用方都可在 A/B 窗口交集时推进发射，事件 `DockBindingPoked` / `DockOutputSubmitted` 长期在链上。
+dock supplier 选中后固定：同 dkid + supplier 的重放幂等吸收，换选 revert `StageDockSupplierAlreadySelected`。binding 身份是 7 个 32-byte word 的 `bindingId`（dkid、toPlanId、toOrderId、toStageId、fromPlanId、fromOrderId），不含 payload hash 或 generation；`dock_link` 文件项的 `contentHash` 只在 poke 时认证载荷正文，不匹配 revert `DockBindingContentHashMismatch`。poke permissionless，任何调用方都可在 A/B 窗口交集时推进发射，事件 `DockBindingPoked` / `DockOutputSubmitted` 长期在链上。
 
 ## 试配记录建议结构
 
@@ -71,13 +71,13 @@ dock 执行者选中后固定：同 dkid + executor 的重放幂等吸收，换�
 | signalMap | B 输出信号 → A 侧表达式；编译产物中每个 output 的 AST / dependencies / atoms。 |
 | 编译身份 | `uvp.dock.v1` 的 `dkid` 与 `docHash`。 |
 | 目标 stage 声明 | `executor.supplierType: dock`、`receiveSignals`、`sendSignals`（含 `validWhen`）。 |
-| capability checklist | A plan 的 atoms capability 材料、B plan 的 outputs capability 材料、`executorCandidatesRoot` 候选证明。 |
-| 链上事实 | `DockRegistered`、`StageDockExecutorSelected`、`DockBindingPoked`、`DockOutputSubmitted` 与两侧订单 proof。 |
+| capability checklist | A plan 的 atoms capability 材料、B plan 的 outputs capability 材料、`supplierBindingsRoot` 候选证明。 |
+| 链上事实 | `DockRegistered`、`StageDockSupplierSelected`、`DockBindingPoked`、`DockOutputSubmitted` 与两侧订单 proof。 |
 | review | operator note、风险、审批状态；不进入协议事实。 |
 
 ## 边界
 
 - Dock 是静态 A→B 订阅：两侧秩序对等，Dock 不创建订单、不改变订单号、不搬运事实。
 - Store 只组织声明草稿、试配与审核材料，并展示链上事实投影；每条事实的 owner 见 [协议边界](../protocol-boundaries.md)。
-- 正式关系看 `dock_link` 文件项与 `StageDockExecutorSelected`；output 发射看 `DockOutputSubmitted`；B 订单推进看授权 signal / proof。
-- Dock 声明与绑定的完整机制见 [Dock 与 Binding](../state-machine/docking.md)；执行者视角见 [Dock 协作](../apps/zhixu-as-executor.md)。
+- 正式关系看 `dock_link` 文件项与 `StageDockSupplierSelected`；output 发射看 `DockOutputSubmitted`；B 订单推进看授权 signal / proof。
+- Dock 声明与绑定的完整机制见 [Dock 与 Binding](../state-machine/docking.md)；dock supplier 协作见 [Dock 协作](../apps/zhixu-as-executor.md)。

@@ -30,7 +30,7 @@ For the project vision and the transaction-cost argument see [whitepaper.md](htt
 Zhixu rulebook
   -> compiled into a deterministic Plan (two-step commitPlan + finalizePlan registration)
   -> Identity Registry records subjects and wallets
-  -> Order created and signal authorizations written
+  -> Order created and birth fact written
   -> executors submit evidence hashes and signed Signals
   -> UVPStateMachine records events and advances HookReady
   -> Chain Services rebuilds orders, tasks, timelines, and proof rows

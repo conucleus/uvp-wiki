@@ -7,7 +7,7 @@ status: verified
 
 # EIP-712 与 Relayer
 
-Relayer 可以帮助广播交易，但不能替参与方做业务决定。业务动作必须由被授权 submitter 的钱包签名；“relayer 不是权利来源”是协议不变量之一，总述见 [协议边界](../protocol-boundaries.md)。
+Relayer 可以帮助广播交易，但不能替参与方做业务决定。业务动作必须由 assigned supplier account 的钱包签名；“relayer 不是权利来源”是协议不变量之一，总述见 [协议边界](../protocol-boundaries.md)。
 
 ## Typed Data
 
@@ -19,29 +19,38 @@ UVPDerivedSignalModule           version = 1
 UVPStagePatchModule              version = 1
 ```
 
-Signal 提交的 primary type 是：
+Signal 提交的 primary type 是 `UVPStateMachineSignalSubmission`（11 字段）：
 
 ```text
-UVPStateMachineSignal
+UVPStateMachineSignalSubmission(
+  bytes32 planId,
+  bytes32 orderId,
+  bytes32 sourceId,
+  bytes32 signalId,
+  bytes32 payloadHash,
+  bytes32 idempotencyKey,
+  bytes32 targetStageId,
+  bytes32 filesHash,
+  bytes32 attributionHash,
+  address submitter,
+  uint256 deadline
+)
 ```
 
-字段包括：
+域是 `EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)`，name `UVPStateMachine`、version `1`。`filesHash = keccak256(abi.encode(StageFile[]))`，`attributionHash = keccak256(abi.encode(FactAttribution(bytes32 sourceId,bytes32 signalId,bytes32 stageId,bytes32[] capabilityProof)))`；二者都在 typehash 内。`StageFile` 是 `{string key; bytes payload}`。
+
+Plan 注册的 primary type 是 `UVPStateMachinePlanCommit`：
 
 ```text
-planId
-orderId
-sourceId
-signalId
-payloadHash
-idempotencyKey
-submitter
-deadline
-filesDigest
+UVPStateMachinePlanCommit(
+  address publisher,
+  bytes32 hooksHash,
+  bytes32 capabilitiesRoot,
+  bytes32 supplierBindingsRoot,
+  bytes32 fileWritersHash,
+  uint256 deadline
+)
 ```
-
-Signal 提交走 direct `submitSignal`，业务身份是 `msg.sender`；`submitter` 字段出现在 `UVPStateMachineSignal` 签名信封中，产品提交签名按所部署合约的域版本构造 typed data。
-
-`submitSignal` 的调用尾部可携带 `attribution`（sourceId、signalId、stageId、capabilityProof）、`filesDigest` 与 `FilePatch`（阶段文件 patch）：attribution 全零表示不声明——plan 声明了能力词表时，提交词表外事实未携证即必拒（revert `InvalidSignalCapability`），仅零词表 plan 放行。这些尾参不进入 EIP-712 签名信封，typehash 与签名摘要保持不变。
 
 ## Relayer 的边界
 
@@ -56,13 +65,14 @@ Relayer 不可以：
 
 - 伪造 submitter 签名。
 - 替参与方选择业务 payload。
-- 绕过订单级 signal 授权。
+- 绕过 assigned supplier account 发信权。
 - 把 relayer 数据库状态当成订单状态。
 
-## Deadline
+## Deadline 与两种提交形态
 
 签名带 `deadline`。过期签名不能继续提交，避免旧业务授权在很久以后被重放。
 
-## Direct 提交
+- **直连提交**：`signature.length == 0`，`msg.sender` 必须等于 `submission.submitter`。
+- **签名代付**：`signature.length > 0`，`msg.sender` 仅作 relayer；`submission.submitter` 须对 `UVPStateMachineSignalSubmission` 签名（EOA 用 ECDSA，合约账户用 EIP-1271）。`SignalSubmitted` 事件同时记录 `submitter` 与 `relayer`。
 
-参与者直接调用 `submitSignal()`，业务身份是 `msg.sender`（授权 submitter）。contract executor 可由 relayer / keeper 代付调用其 own `submitSignal`，到状态机时 `msg.sender` 仍是该执行者。
+无论哪种形态，`submitter` 都必须是 source 阶段（出生时是出生阶段）当前生效的 assigned supplier account，且该 SID 必须 `active`。

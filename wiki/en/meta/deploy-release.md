@@ -13,7 +13,7 @@ The deployment and evidence components organize local closed-loop runs, Base Sep
 
 | Page | Purpose |
 | --- | --- |
-| [Periphery and Deployment](../concepts/periphery-and-deploy.md) | Relationship between the deploy directory, periphery adapters, and the release boundary. |
+| [App Adapters and Deploy](../concepts/periphery-and-deploy.md) | Relationship between the deploy directory, application adapters, and the release boundary. |
 | [Base Sepolia Staging](../how-to/base-sepolia-staging.md) | testnet preflight, broadcast rehearsal, secret environment, and evidence output. |
 | [Release and Verification](../how-to/release-checklist.md) | local baseline, Product baseline, staging gate, release evidence, claim language. |
 | [Project Status](status.md) | current verified/prototype/planned/blocked status. |

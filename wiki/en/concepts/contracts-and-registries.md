@@ -12,15 +12,15 @@ The on-chain fact layer consists of `UVPStateMachine`, the frozen functional mod
 ## UVPStateMachine and Modules
 
 - The publisher signs to commit a Plan; any relayer broadcasts.
-- The publisher's signature commits the six PlanCommit fields: publisher / hooksHash / capabilitiesRoot / executorCandidatesRoot / birthAuthorizer / deadline; `capabilitiesRoot` folds the signal capability, selector binding, and file writer capability tables, and `finalizePlan` only finalizes.
+- The publisher's signature commits the six PlanCommit fields: publisher / hooksHash / capabilitiesRoot / supplierBindingsRoot / fileWritersHash / deadline; `capabilitiesRoot` folds the signal capability and selector binding tables, `fileWriters` is committed separately by `fileWritersHash`, and `finalizePlan` only finalizes.
 - Only finalized Plans are allowed to create Orders.
-- Creator/submitter signatures create order-level rights; relayers need no allowlist.
-- Signal, HookReady, stage patch, stage file patch, Dock registration and bindings, and derived signals all leave replayable events.
-- Once configured, the seven modules' addresses (stage patch, derived signal, dock registry, plan metadata, order link, lens, file resource) are permanently frozen.
+- Submission authority is carried by the source stage's assigned supplier account (plan default -> per-order stage supplier patch -> one-time dock selection); a relayer only broadcasts and never creates business signatures.
+- Signal, HookReady, stage supplier patch, stage file writes, Dock registration and bindings, and derived signals all leave replayable events.
+- Once configured, the seven module addresses (stage patch, derived signal, dock registry, plan metadata, lens, file resource, identity registry) are permanently frozen.
 
 ## UVPIdentityRegistry
 
-The Registry is operated by Store, recording hashed/URI identity bindings of `subjectId <-> account` plus revocation history. It does not certify Plans, does not record capability/reputation, and is not an admission condition for the StateMachine. The code supports multiple Registry addresses; the first deployment uses one.
+The Registry is operated by Store and has two namespaces that do not authorize each other: the subject namespace records `subjectId <-> account` identity bindings with hash/URI and revocation history, purely as a trust attestation; the supplier namespace carries SID minting, a permanent account binding, and `pending/active/suspended/revoked` status, and is the StateMachine's only execution-authorization source. It does not certify Plans and does not record capability/reputation. Each StateMachine wires one `UVPIdentityRegistry` module slot.
 
 ## UVPDeploymentRegistry
 

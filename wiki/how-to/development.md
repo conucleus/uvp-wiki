@@ -34,7 +34,6 @@ pnpm verify:protocol-freeze
 | `@uvp-eth/compiler` | `pnpm --filter @uvp-eth/compiler test` |
 | `@uvp-eth/statemachine` | `pnpm --filter @uvp-eth/statemachine test` |
 | `@uvp-eth/protocol-bindings` | `pnpm --filter @uvp-eth/protocol-bindings test` |
-| `@uvp-eth/product-dto` | `pnpm --filter @uvp-eth/product-dto test` |
 | `@uvp-eth/chain-services` | `pnpm --filter @uvp-eth/chain-services check` |
 | `@uvp-eth/uvp-client` | `pnpm --filter @uvp-eth/uvp-client test` |
 | `@uvp-eth/zhixu-registry` | `pnpm --filter @uvp-eth/zhixu-registry test`（Postgres） |
@@ -63,6 +62,6 @@ forge test
 
 ## 新功能放哪里
 
-新功能属于哪个模块、各模块负责什么和不负责什么，见[模块地图](../reference/module-map.md)。判断口径：协议语义进 `uvp-protocol` 的 package 与 contracts，可重建服务进 `uvp-chain-services`，产品表面进 store / order-app，资金、担保、付款和 agent 适配进 `uvp-periphery`。
+新功能属于哪个模块、各模块负责什么和不负责什么，见[模块地图](../reference/module-map.md)。判断口径：协议语义进 `uvp-protocol` 的 package 与 contracts，可重建服务进 `uvp-chain-services`，产品表面进 store / order-app，资金、担保、付款和 agent 适配留在应用仓，不进本仓核心。
 
 跨模块改动需同步各模块内已有的 AGENTS.md（并非所有模块都有），以及相关接口文档。

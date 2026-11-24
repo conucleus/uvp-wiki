@@ -28,8 +28,8 @@ UVPDeploymentRegistry / UVPStateMachine / UVPIdentityRegistry events
 | --- | --- | --- |
 | plan 是否提交并 finalized | `UVPStateMachine` event | 索引、查询、展示 plan projection。 |
 | order 是否开始、signal 是否提交 | `OrderRegistered`、`SignalSubmitted`、`HookReady` 等事件 | 重放成订单、任务、timeline 和 proof rows。 |
-| stage 执行者与 Dock binding | `StageExecutorPatchApplied`、`StageDockExecutorSelected`、`DockBindingPoked`、`DockOutputSubmitted` | 投影执行者、binding 与 output 发射；A/B 窗口读时从 `dockOutputWindow` 取 live 值。 |
-| 阶段文件映射 | `StageFilePatchApplied`、`StageFileOpApplied` | 按同一事务内日志序重放 `key -> contentHash + handle`。 |
+| stage supplier 与 Dock binding | `StageSupplierPatchApplied`、`StageSupplierAssigned`、`StageDockSupplierSelected`、`DockBindingPoked`、`DockOutputSubmitted` | 投影 supplier 指派、binding 与 output 发射；A/B 窗口读时从 `dockOutputWindow` 取 live 值。 |
+| 阶段文件映射 | `StageFileWritten` | 按同一事务内日志序重放 `key -> payload`。 |
 | 线下主体对应哪个钱包 | `UVPIdentityRegistry` event | 重建 identity binding projection，供展示名称。 |
 | 用户是否签过某个业务动作 | EIP-712 signer recovery 和链上 authorization | 校验 payload；不替用户签名。 |
 | Store 工作流与业务行 | 产品侧应用 workflow storage | 不在链上；链上 proof 或 trust publication 另行展示。 |
@@ -64,7 +64,7 @@ fork 或自部署时必须守住这些接口约束：
 
 | 子系统 | 输入 | 输出 |
 | --- | --- | --- |
-| Indexer | deployment registry、state-machine、Identity Registry logs。 | `OrderRegistered`、`SignalSubmitted`、`HookStatusChanged`、`HookReady`、`StageExecutorPatchApplied`、`StageDockExecutorSelected`、`DockBindingPoked`、`DockOutputSubmitted`、`StageFilePatchApplied`、`StageFileOpApplied` 等事件的归一化投影与 sync status。 |
+| Indexer | deployment registry、state-machine、Identity Registry logs。 | `OrderRegistered`、`SignalSubmitted`、`HookStatusChanged`、`HookReady`、`StageSupplierPatchApplied`、`StageDockSupplierSelected`、`DockBindingPoked`、`DockOutputSubmitted`、`StageFileWritten` 等事件的归一化投影与 sync status。 |
 | Projection storage | replayed events、projection snapshot。 | Postgres store；可擦除重建的查询状态。 |
 | Plan/Dock artifacts | uvp-core 编译产物记录 CLI。 | `plan_artifacts` / `dock_artifacts` 行级不可变读投影；缺失或身份不一致 fail-closed。 |
 | Chain read API | 投影快照、plan artifacts、dock binding window reader。 | `/chain/*`、`/identity/bindings` 通用链读与 A/B 窗口 live enrichment。 |

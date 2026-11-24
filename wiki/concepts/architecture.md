@@ -63,7 +63,7 @@ flowchart LR
   StoreAPI --> ObjectStore
 ```
 
-这张图里的 Postgres、对象存储和 API 都是产品运行层。它们可以缓存、检索、展示和中继，但协议事实仍以合约事件、签名、hash、URI 和可重放 event provenance 为准。事实流沿「Zhixu -> Plan artifact -> PlanCommitted/PlanFinalized -> 订单注册与授权 -> Signal/Hook/timer/stage patch/dock binding 事件 -> 可重放投影」推进；数据库、对象存储、通知队列、Store draft、operator audit 和 submission status 都是投影或 workflow 状态，不能替代 `UVPStateMachine`、`UVPIdentityRegistry` 和链事件。
+这张图里的 Postgres、对象存储和 API 都是产品运行层。它们可以缓存、检索、展示和中继，但协议事实仍以合约事件、签名、hash、URI 和可重放 event provenance 为准。事实流沿「Zhixu -> Plan artifact -> PlanCommitted/PlanFinalized -> submitSignal 出生与发信权 -> Signal/Hook/timer/stage supplier patch/dock binding 事件 -> 可重放投影」推进；数据库、对象存储、通知队列、Store draft、operator audit 和 submission status 都是投影或 workflow 状态，不能替代 `UVPStateMachine`、`UVPIdentityRegistry` 和链事件。
 
 ## 分层边界
 
@@ -72,7 +72,7 @@ flowchart LR
 | 语义和编译 | `uvp-protocol/packages/hook-core/`、`uvp-protocol/packages/compiler/` | 解析 Zhixu、求值 Hook 语义、生成 deterministic artifact 和 hash。 | 注册订单、保存业务证据明文、替参与者签名。 |
 | 链上事实 | `uvp-protocol/contracts/uvp-contracts/` | Plan、Order、Signal、Hook、身份绑定、deployment cutover 的事实记录。 | Product 展示、Store workflow、私有文件存储。 |
 | 服务层（可重建） | `uvp-chain-services/service/`、`uvp-protocol/packages/chain-read-contract/` | chain indexer、projection、generic read API、可选 relay、proof verifier，以及各产品共享的 DTO contract。 | 成为 plan/order/signal/trust 的事实源，或生成业务签名。 |
-| 产品表面 | `uvp-order-app/app/`、`zhixu-store/registry/` | 把链上事实翻译成订单、任务、proof；registry 只登记自述与身份声明。 | 改写合约事实、绕过 order-level authorization。 |
+| 产品表面 | `uvp-order-app/app/`、`zhixu-store/registry/` | 把链上事实翻译成订单、任务、proof；registry 只登记自述与身份声明。 | 改写合约事实、绕过 assigned supplier 发信权。 |
 | 公共客户端 | `uvp-client/package/` | core/browser/headless SDK 与执行者 CLI：transport、Product V3 client、EIP-1193 签名、watcher、signal build/submit。 | 托管默认私钥、替业务方承担签名责任。 |
 | 部署和证据 | `uvp-deploy/` | release `deploy/`：address manifest、release record、compatibility matrix、staging gate；QA `qa/`：Anvil/Base Sepolia rehearsal、chaos。 | 重新定义协议语义或隐藏失败证据。 |
 
@@ -80,7 +80,7 @@ flowchart LR
 
 | 层 | 代码入口 | 事实或接口 |
 | --- | --- | --- |
-| DSL/语义 | `uvp-protocol/packages/hook-core/`、`uvp-protocol/packages/compiler/` | Hook expression、HookPlan、OnchainHookPlan、planId/planHash。 |
+| DSL/语义 | `uvp-core/`、`uvp-protocol/packages/hook-core/`、`uvp-protocol/packages/compiler/` | Hook expression、HookPlan、OnchainHookPlan、planId/planHash。 |
 | 链上执行 | `uvp-protocol/contracts/uvp-contracts/` | ABI、events、EIP-712 domain、`UVPStateMachine`、modules、`UVPIdentityRegistry`。 |
 | Replay/reference | `uvp-protocol/packages/statemachine/` | reference reducer、event replay、runtime semantic tests。 |
 | Bindings | `uvp-protocol/packages/protocol-bindings/` | browser-safe ABI、typed-data builders、hash helpers、calldata builders。 |
@@ -88,7 +88,6 @@ flowchart LR
 | Product surfaces | `uvp-order-app/app/`、`zhixu-store/registry/` | participant order/task UI、proof display；registry data layer。 |
 | Public client | `uvp-client/package/` | core/browser/headless SDK + executor CLI。 |
 | Deploy/evidence | `uvp-deploy/` | 部署域按车道：release `deploy/`（manifests/records/matrix）、QA `qa/`（Anvil harness、chaos）、ops `ops/`（console、runbooks）。 |
-| Periphery | `uvp-periphery/` | payment/funding/guarantee/agent adapters and demos。 |
 
 ## 子页
 
@@ -99,7 +98,7 @@ flowchart LR
 | [Compiler 与 Hook Core](compiler-and-hooks.md) | DSL 解析、Hook 语义、确定性编译产物和必须守住的编译语义。 |
 | [Contracts 与 Registries](contracts-and-registries.md) | StateMachine、Identity Registry 和 Deployment Registry 的边界。 |
 | [Product BFF](product-bff.md) | 订单 draft、invite、参与方确认、授权构建和注册提交工作流。 |
-| [Periphery 与部署](periphery-and-deploy.md) | adapter、demo 和部署记录如何围绕核心协议运行。 |
+| [应用适配与部署](periphery-and-deploy.md) | 应用仓 adapter、demo 和部署记录如何围绕核心协议运行。 |
 
 ## 架构规则
 
@@ -107,7 +106,7 @@ flowchart LR
 - 合约和链事件是 plan、order、signal、hook、publication、deployment cutover 的唯一事实源，见 [协议边界](protocol-boundaries.md#事实源)。
 - Store、Product API、Order App 和 uvp-client 只能消费、投影、展示、中继或提交授权动作，见 [协议边界](protocol-boundaries.md#产品表面与服务边界)。
 - Indexer 和 durable database 必须能从事件重建，不能成为协议事实源，见 [协议边界](protocol-boundaries.md#可重建性)。
-- Periphery 可以实现 funding、guarantee、payment、agent adapter，但必须消费核心接口，见 [协议边界](protocol-boundaries.md#外围适配)。
+- 应用仓 adapter 可以实现 funding、guarantee、payment、agent 能力，但必须消费核心接口，见 [协议边界](protocol-boundaries.md#外围适配)。
 - 任何跨模块改动都要检查 ABI、event、typed data、canonical hash、DTO、CLI 和 release evidence 是否漂移，见 [协议边界](protocol-boundaries.md#公共接口纪律)。
 
 ## 相关入口

@@ -7,7 +7,7 @@ status: verified
 
 # EIP-712 and Relayer
 
-A relayer can help broadcast transactions, but it cannot make business decisions on behalf of a participant. Business actions must be signed by the wallet of the authorized submitter; "the relayer is not a source of rights" is one of the protocol invariants — see [Protocol Boundaries](../protocol-boundaries.md) for the overview.
+A relayer can help broadcast transactions, but cannot make business decisions for a participant. Business actions must be signed by the authorized submitter's wallet; "the relayer is not a source of authority" is one of the protocol invariants — see [Protocol Boundaries](../protocol-boundaries.md) for the overview.
 
 ## Typed Data
 
@@ -19,29 +19,38 @@ UVPDerivedSignalModule           version = 1
 UVPStagePatchModule              version = 1
 ```
 
-The primary type for signal submission is:
+The primary type for signal submission is `UVPStateMachineSignalSubmission` (11 fields):
 
 ```text
-UVPStateMachineSignal
+UVPStateMachineSignalSubmission(
+  bytes32 planId,
+  bytes32 orderId,
+  bytes32 sourceId,
+  bytes32 signalId,
+  bytes32 payloadHash,
+  bytes32 idempotencyKey,
+  bytes32 targetStageId,
+  bytes32 filesHash,
+  bytes32 attributionHash,
+  address submitter,
+  uint256 deadline
+)
 ```
 
-The fields include:
+The domain is `EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)`, with name `UVPStateMachine` and version `1`. `filesHash = keccak256(abi.encode(StageFile[]))`, and `attributionHash = keccak256(abi.encode(FactAttribution(bytes32 sourceId,bytes32 signalId,bytes32 stageId,bytes32[] capabilityProof)))`; both are inside the typehash. `StageFile` is `{string key; bytes payload}`.
+
+The primary type for Plan registration is `UVPStateMachinePlanCommit`:
 
 ```text
-planId
-orderId
-sourceId
-signalId
-payloadHash
-idempotencyKey
-submitter
-deadline
-filesDigest
+UVPStateMachinePlanCommit(
+  address publisher,
+  bytes32 hooksHash,
+  bytes32 capabilitiesRoot,
+  bytes32 supplierBindingsRoot,
+  bytes32 fileWritersHash,
+  uint256 deadline
+)
 ```
-
-Signal submission uses direct `submitSignal`, and the business identity is `msg.sender`; the `submitter` field appears in the `UVPStateMachineSignal` signing envelope, and product submit signing builds typed data for the deployed contract's domain version.
-
-The call tail of `submitSignal` may carry `attribution` (sourceId, signalId, stageId, capabilityProof), `filesDigest`, and `FilePatch` (the stage file patch): an all-zero attribution means no claim — when the plan declares a capability vocabulary, submitting an off-vocabulary fact without a proof is always rejected (revert `InvalidSignalCapability`), while zero-vocabulary plans admit them. These tail parameters do not enter the EIP-712 signing envelope; the typehash and the signed digest stay unchanged.
 
 ## Relayer Boundary
 
@@ -56,13 +65,14 @@ A relayer cannot:
 
 - Forge a submitter signature.
 - Choose the business payload for the participant.
-- Bypass order-level signal authorization.
+- Bypass the assigned supplier account's submission authority.
 - Treat relayer database state as order state.
 
-## Deadline
+## Deadline and the Two Submission Modes
 
 The signature carries a `deadline`. An expired signature cannot be submitted later, which prevents old business authorizations from being replayed long after they were granted.
 
-## Direct Submission
+- **Direct submission**: `signature.length == 0`, and `msg.sender` must equal `submission.submitter`.
+- **Relayed submission**: `signature.length > 0`, and `msg.sender` is only the relayer; `submission.submitter` must sign `UVPStateMachineSignalSubmission` (ECDSA for EOAs, EIP-1271 for contract accounts). The `SignalSubmitted` event records both `submitter` and `relayer`.
 
-A participant calls `submitSignal()` directly, and the business identity is `msg.sender` (the authorized submitter). A contract executor can be called by a relayer / keeper and still be the submitter when the call reaches the state machine.
+In either mode, `submitter` must be the source stage's (at birth, the birth stage's) currently effective assigned supplier account, and that SID must be `active`.

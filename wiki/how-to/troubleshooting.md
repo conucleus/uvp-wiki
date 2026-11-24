@@ -52,7 +52,7 @@ pnpm test
 检查：
 
 - compiler output 是否改变 planHash；
-- signal authorization 是否缺失；
+- 当前 source 阶段 assigned supplier account 是否匹配；
 - duplicate signal 是否被 first-writer-wins 处理；
 - timer 是否到了 due time；
 - negative condition 是否取消了 hook；
@@ -64,7 +64,7 @@ Product API 没有 demo 数据源：空投影返回空数组，缺失明细返�
 
 检查：
 
-- `VITE_UVP_CHAIN_SERVICES_URL` 是否指向真实服务；
+- Chain Services 基址与 `/chain/*` 读面是否可达；
 - indexer projection 是否滞后或需要重建（`rebuild:indexer`）；
 - chain-services runtime profile 是否与你以为在跑的环境一致（存储键全环境必填，缺键启动即报错）；
 - identity projection 是否缺失或 plan 已 revoked。
@@ -73,10 +73,10 @@ Product API 没有 demo 数据源：空投影返回空数组，缺失明细返�
 
 检查：
 
-- `wallet` 或 `VITE_UVP_ORDER_APP_WALLET_ADDRESS` 是否和授权 submitter 一致；
+- 钱包是否等于 source 阶段 assigned supplier account（`accountOf(supplierId)`）；
 - `/product/me/tasks` 是否返回空；
-- order-level `SignalSubmitterAuthorized` 是否已 index；
-- supplier identity 是否 revoked；
+- 当前 source 阶段的 assigned supplier 是否 active、`accountOf(supplierId)` 是否等于提交钱包；
+- supplier SID 是否被 suspend/revoke；
 - task 是否等待其他前置 signal；
 - Product API URL 是否指向真实服务而不是 test/stub URL。
 
@@ -92,7 +92,7 @@ Relayer 是角色不是独立进程（广播由 submissions/stage-patches 广播
 - 当前环境是 local 还是非 local，适用上面哪一条行为；
 - gas-payer private key env name；
 - signer 是否等于 typed data 中的 submitter；
-- submitter 是否有 order-level authorization；
+- submitter 是否等于 source 阶段 assigned supplier account（`accountOf(supplierId)`）；
 - chain id 和 state-machine address 是否匹配；
 - pending/retry queue 是否已有失败记录。
 

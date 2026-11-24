@@ -15,7 +15,7 @@ Product DTOs and user surfaces define the object language that ordinary users an
 chain events
   -> rebuildable Chain Services projection
   -> Product DTO
-  -> Order App / host (uvp-client/browser) / periphery adapter
+  -> Order App / host (uvp-client/browser) / application-repo adapter
 ```
 
 The most important translation is from DSL stage to Product task:
@@ -39,7 +39,7 @@ Product DTOs land in two runnable surfaces: the Order App (participant create/in
 | Protocol language | What a product surface may say |
 | --- | --- |
 | `OrderRegistered` | The order has been created and is waiting for participants or task progress. |
-| `SignalSubmitterAuthorized` | A participant has been allowed to submit a class of action. |
+| `StageSupplierAssigned` / `StageSupplierPatchApplied` | An assigned supplier account is allowed to submit that stage's action. |
 | `HookReady` | A task is now actionable. |
 | `SignalSubmitted` | A participant submitted an evidence fingerprint or confirmation action. |
 | `HookStatusChanged` | Waiting on a condition, ready, cancelled, or still unmet. |
@@ -52,7 +52,7 @@ Ordinary users mainly see orders, tasks, participants, evidence, and proof. Prot
 | --- | --- |
 | [Product DTO](dto.md) | Ordinary-user order/task/proof/trust DTOs that hide hook and ABI details. |
 | [Signal Container](signal-container.md) | The product packaging for task, evidence, typed data, signature, submit, and proof. |
-| [Order App and client](apps.md) | How the Order App, uvp-client/browser, and periphery adapters consume the same Product projection. |
+| [Order App and client](apps.md) | How the Order App, uvp-client/browser, and application-repo adapters consume the same Product projection. |
 | [Product API Endpoints](../../reference/product-api-endpoints.md) | Current Product API routes and semantics. |
 
 ## Boundaries
@@ -62,7 +62,7 @@ Ordinary users mainly see orders, tasks, participants, evidence, and proof. Prot
 | [Chain Services](../services/chain-services.md) | Rebuild projections from chain events; provide a generic read API, optional relay, proof verifier, and chain health. |
 | Product DTO and user surfaces | Define how ordinary users and product frontends express order/task/proof/trust, and define the signal-container data contract. |
 | [Order App](../apps/order-app.md) / [UVP Client](../apps/uvp-client.md) | With a host-injected wallet: consume Product DTOs, sign typed data, and read proof. |
-| [zhixu-registry](../store/README.md) | Record ZhixuRecord / IdentityClaim self-descriptions and opaque refs; no UI, review, supplier, or audit workflow. |
+| [zhixu-registry](../store/README.md) | Record ZhixuRecord self-descriptions and opaque refs only; no UI, review, supplier, or audit workflow. |
 
 - Registry records, signatures, and opaque refs belong to the data layer; there is no storefront, supplier profile, review workflow, or JWT-session semantic.
 - The Product API can prepare typed data, verify signatures, call the relayer, and return proof; authorization checks are always enforced by contracts. The single authoritative statement of protocol invariants is [Protocol boundaries](../protocol-boundaries.md).

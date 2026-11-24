@@ -19,7 +19,7 @@ status: verified
 | `@uvp-eth/uvp-client/headless` | 私钥钱包处理、`HookReady` watcher、watch 状态与 job store、非花费 doctor | 浏览器 provider |
 | `@uvp-eth/uvp-client/cli` | 执行者命令：wallet、doctor、chain-once/chain-watch、chain-signal | 任何 server/队列 |
 
-ABI、EIP-712 typed data 与 canonical hash 单源在 `@uvp-eth/protocol-bindings`；通用 API DTO 单源在 `@uvp-eth/product-dto`。
+ABI、EIP-712 typed data 与 canonical hash 单源在 `@uvp-eth/protocol-bindings`；链读 DTO 单源在 `@uvp-eth/chain-read-contract`，产品 DTO 由应用仓 `app-contract` 拥有。
 
 ## CLI
 
@@ -81,7 +81,7 @@ watcher 语义：finality buffer（默认 1，非本地 runtime 必须显式）�
 ## 边界
 
 - 不起 HTTP server、不拥有数据库、不做业务裁决。
-- 不创建 order-level signal authorization；授权来自 `UVPStateMachine` 的 plan/order 事实。
+- 不创建提交者授权表；发信权来自 `UVPStateMachine` 的 `stage -> supplierId` 事实与 `UVPIdentityRegistry.accountOf`。
 - CLI/SDK 不托管私钥；只从显式 env 读取。
 - funding/guarantee/payment placeholder 属于 periphery/adapter 口径。
 

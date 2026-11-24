@@ -23,7 +23,7 @@ status: verified
     - name: str
     - name: cmp
     - name: err
-  executor: { supplierType: organization, supplierID: customer-desk }
+  executor: { supplierType: organization, supplierID: 7c1d3f52-9a4b-4e68-8f20-3b5d7a9c1e40 }
 ```
 
 - 出生信号条目属于本阶段 `sendSignals`、同阶段内唯一，编译期固定并进入 plan 承诺面。
@@ -33,45 +33,45 @@ status: verified
 
 ## 提交与出生判定
 
-- 空 `orderId` + 出生信号 → 出生提交：先按空订单上下文求值 `validWhen`（无 facts/files；否定条件为真、存在与延时成熟条件为假），不通过即 `SignalAdmissionRejected`；通过后按出生事实派生订单号，登记/创建订单，并把该信号写为首条事实。
+- 链轨只有一条入口：`UVPStateMachine.submitSignal(submission, signature)`，`orderId == bytes32(0)` 且 `(sourceId, signalId)` 命中带 `ORDER_TRIGGER_MINT` 的 trigger hook 时出生。
+- 提交者必须是该出生阶段当前生效的 assigned supplier account（SID 必须 `active`）。
+- 先按空订单上下文求值 `validWhen`（无 facts/files；否定条件为真、存在与延时成熟条件为假），不通过即 `SignalAdmissionRejected`；通过后校验 `(submitter, idempotencyKey)` 未被使用，再由 `_newOrderId` 运行期生成订单号、登记/创建订单，并把该信号写为首条事实。
 - 空 `orderId` + 非出生信号 → 具名拒绝（`NotTriggerSignal` 一类入口错误）。
-- 带 `orderId` 的出生信号按普通订单内信号处理，出生身份用于空 `orderId` 提交。
-- 同一出生事实重试幂等：同一定义、stage、signal 与载荷/幂等键得到同一订单号；`factKey` 的幂等语义由提交侧承载。
+- 带 `orderId` 的出生信号按普通订单内信号处理，出生身份只用于空 `orderId` 提交。
+- 同一出生事实重试幂等：同一 `(submitter, idempotencyKey)` 重试会 revert `DuplicateTriggerKey` 并携带 `existingOrderId`；载荷不参与订单号派生。
 - 出生事实自身即该订单首条事实，first-win 落定。
 
-## 三条出生通道（链轨运行期）
+## 唯一出生入口
 
-| 通道 | 摘要 |
+| 入口 | 摘要 |
 | --- | --- |
-| outside-trigger 开放提交 | 计划授权的出生提交者（`birthAuthorizer`）按 EIP-712 提交出生信号：签名入口 `triggerOrderFromOutsideFor`，合约入口 `triggerOrderFromOutsideByAuthorizer`。 |
-| order-link 派生建单 | `UVPOrderLinkModule` 的 from-signal trigger 入口派生订单，并把目标订单关联回来源。 |
-| 治理分叉 `forkOrder` | 从父单历史逐条核验后重放出带血缘的新单，服务履约中途的异常承接。 |
+| `submitSignal(orderId=0)` | 出生阶段 assigned supplier account 签名提交出生信号；签名可直连（`msg.sender == submitter`）或由 relayer 转发。合约按 `(planId, sourceId, signalId)` 解析 trigger hook，校验 birth admission 与 `usedTriggerKeys`。 |
 
-云轨引擎按空 `orderId` + 出生信号建单；Dock 在既有订单上建立 binding 并发射 B 输出信号，订单始终由上述出生通道创建。
+Dock 在既有订单上建立 binding 并发射 B 输出信号，订单始终由上述出生入口创建。
 
 ## 物化门
 
 链上阶段只能由本阶段 order-trigger hook 或 EMIT_READY hook 物化，每个阶段至少具备一个物化路径：
 
 - 出生阶段：每条出生信号合成一条 order-trigger hook，即使没有 `receiveSignals` 也能物化。
-- 其余阶段：带静态执行者（plain 或 dock）的 receive hook 编译为 EMIT_READY。
+- 其余阶段：带静态执行者（plain 或 dock）的 receive hook 编译为 EMIT_READY；无 `executor` 块的 dynamic 阶段由自身 receive hook 的 EMIT_READY 物化，并带 `HOOK_FLAG_DYNAMIC_EXECUTOR`（flags 位 32），运行期由 selector 在首信号前指派 supplierId。
 - 既无出生信号又无 `receiveSignals` 的阶段编译为零 hook、永不可物化，`uvp-core analyze` 在编译期整体拒绝。
-- dock 阶段：receive hooks 带 `HOOK_FLAG_DOCK_EXECUTOR` 标记（flags 位 16），执行者由订单级一次性选择写入；dock 阶段没有 order-trigger 钩子。
+- dock 阶段：receive hooks 带 `HOOK_FLAG_DOCK_EXECUTOR` 标记（flags 位 16），supplier 由订单级一次性选择写入；dock 阶段没有 order-trigger 钩子。
 
-hook flags 全集：`1 = ORDER_TRIGGER_MINT`、`4 = EMIT_READY`、`8 = ADMISSION`、`16 = DOCK_EXECUTOR`。
+hook flags 全集：`1 = ORDER_TRIGGER_MINT`、`4 = EMIT_READY`、`8 = ADMISSION`、`16 = DOCK_EXECUTOR`、`32 = DYNAMIC_EXECUTOR`。
 
 ## 运行与证明
 
 ```text
 出生信号 submitted with empty orderId
   -> admission（validWhen 在空订单上下文求值）
-  -> OrderRegistered + first fact
+  -> _newOrderId + OrderTriggered + first fact
   -> order-trigger HookReady
 
 receive hook evaluates
   -> HookStatusChanged
   -> (if emitReady) HookReady(planId, orderId, hookId, stageId, hookName)
-  -> 后续 fact 由授权 signal 或 Dock 发射写入
+  -> 后续 fact 由 assigned supplier signal 或 Dock 发射写入
 ```
 
 `HookReady` 只表示任务或入口可处理，不表示业务完成。完成、失败与取消由授权的 `SignalSubmitted` 或 Dock 发射事件表达；未知或重试状态以显式状态呈现。

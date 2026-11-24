@@ -15,9 +15,9 @@ Permissions and audit in the Store constrain platform workflow. Audit records pr
 
 | Permission domain | Examples | Boundary |
 | --- | --- | --- |
-| Nucleation workbench permissions | Import Zhixu, maintain design material, organize supplier requirements, submit publication material. | Does not automatically gain trust publication or order signal authorization. |
+| Nucleation workbench permissions | Import Zhixu, maintain design material, organize supplier requirements, submit publication material. | Does not automatically gain trust publication or assigned-supplier submission authority. |
 | Store platform permissions | review, catalog tags, visibility, publication request, revocation request, audit export. | Does not design internal rules for the Nucleus and does not decide on-chain trust. |
-| On-chain business permissions | register order, submit signal, stage patch, stage file patch. | Decided by contracts, EIP-712, and order-level authorization. |
+| On-chain business permissions | submit signal, stage supplier patch, stage file write. | Decided by contracts, EIP-712, and the assigned supplier account. |
 
 ## Sensitive actions
 
@@ -53,7 +53,7 @@ The Store should distinguish capabilities such as read, nucleation_operator, ope
 | A metadata field, platform tag, or contact was changed. | The supplier is already trusted. |
 | A Nucleus submitted design material or publication material. | The Store reviewer has completed review, or the publisher has signed publication. |
 | A governance request was created or a broadcast attempted. | The tx has been accepted by the chain and indexed. |
-| A Dock declaration draft or trial-pairing record was saved or reviewed. | The Dock is registered (`DockRegistered`), a binding exists (`StageDockExecutorSelected` + `dock_link` file record), or an output was emitted (`DockOutputSubmitted`). |
+| A Dock declaration draft or trial-pairing record was saved or reviewed. | The Dock is registered (`DockRegistered`), a binding exists (`StageDockSupplierSelected` + `dock_link` file record), or an output was emitted (`DockOutputSubmitted`). |
 
 A public claim only becomes true after the corresponding chain event is observed.
 

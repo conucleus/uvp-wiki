@@ -45,7 +45,7 @@ The Store side organizes trial-pairing records, review material, and projections
 - Edit Dock declaration drafts and validate them against the `kind: Dock` field closure: content-derived identity of the `from` / `to` definition uids, existence of `from.source` and `to.stage`, the dock executor declaration on `to.stage`, `signalMap` output names belonging to `to.stage.sendSignals`, and expression atoms belonging to the `from.source` stage's `sendSignals`.
 - Trial pairing checks whether the A/B plans' capability vocabularies cover the `signalMap` atoms and outputs (`UVPDockRegistry.registerDock` proves every atom and every output against a capability proof), and whether the target stage's `sendSignals.validWhen` expresses the B window.
 - Generate operator review material and a proof checklist: the declaration text, the compiled `dkid` / `docHash`, capability material, and both plans' identities.
-- Display on-chain fact projections: `DockRegistered` (static registration), `StageDockExecutorSelected` (one-time dock executor selection), and `DockBindingPoked` / `DockOutputSubmitted` (binding poke and output emission), plus the chain-services `uvp.dock.v1` / `uvp.dockBinding.v1` read faces. Current A/B window values come live from `getStageDockBinding` / `dockOutputWindow`; window history is not on chain.
+- Display on-chain fact projections: `DockRegistered` (static registration), `StageDockSupplierSelected` (one-time dock executor selection), and `DockBindingPoked` / `DockOutputSubmitted` (binding poke and output emission), plus the chain-services `uvp.dock.v1` / `uvp.dockBinding.v1` read faces. Current A/B window values come live from `getStageDockBinding` / `dockOutputWindow`; window history is not on chain.
 
 Passing trial pairing means the declaration shape and material are complete; protocol facts are still produced by on-chain registration, executor selection, binding, and poke.
 
@@ -56,12 +56,12 @@ The B side publishes the kind: Dock document
   -> both plans are publisher-signed, committed, and finalized (capabilitiesRoot commits atoms and outputs)
   -> UVPDockRegistry.registerDock (permissionless; per-atom / per-output capability proofs)
   -> the B order is created through a birth channel (Dock does not create orders)
-  -> selectStageDockExecutor / selectStageDockExecutorFor: the selector signs an EIP-712 one-time dock executor selection
+  -> selectStageDockSupplier / selectStageDockSupplierFor: the selector signs an EIP-712 one-time dock executor selection
   -> a stage file patch writes dock_link = A order id, establishing the binding
   -> pokeDockBinding evaluates the A window at block.timestamp and rechecks the B-side validWhen, emitting B output signals per output first-win
 ```
 
-The dock executor is fixed once selected: replaying the same dkid + executor is absorbed idempotently, and a different selection reverts with `StageDockExecutorAlreadySelected`. The binding identity is the 7-word `bindingId` (dkid, toPlanId, toOrderId, toStageId, fromPlanId, fromOrderId) with no payload hash or generation; the `dock_link` file record's `contentHash` only authenticates the payload body at poke time and a mismatch reverts with `DockBindingContentHashMismatch`. Poke is permissionless: any caller can advance emission when the A/B windows intersect, and the `DockBindingPoked` / `DockOutputSubmitted` events stay on chain.
+The dock supplier is fixed once selected: replaying the same dkid + supplier is absorbed idempotently, and a different selection reverts with `StageDockSupplierAlreadySelected`. The binding identity is the 7-word `bindingId` (dkid, toPlanId, toOrderId, toStageId, fromPlanId, fromOrderId) with no payload hash or generation; the `dock_link` file record's `contentHash` only authenticates the payload body at poke time and a mismatch reverts with `DockBindingContentHashMismatch`. Poke is permissionless: any caller can advance emission when the A/B windows intersect, and the `DockBindingPoked` / `DockOutputSubmitted` events stay on chain.
 
 ## Suggested trial-pairing record
 
@@ -71,13 +71,13 @@ The dock executor is fixed once selected: replaying the same dkid + executor is 
 | signalMap | B output signal → A-side expression; the compiled per-output AST / dependencies / atoms. |
 | Compile identity | The `uvp.dock.v1` `dkid` and `docHash`. |
 | Target stage declaration | `executor.supplierType: dock`, `receiveSignals`, `sendSignals` (including `validWhen`). |
-| Capability checklist | A-plan atom capability material, B-plan output capability material, and the `executorCandidatesRoot` candidate proof. |
-| On-chain facts | `DockRegistered`, `StageDockExecutorSelected`, `DockBindingPoked`, `DockOutputSubmitted`, and both orders' proof. |
+| Capability checklist | A-plan atom capability material, B-plan output capability material, and the `supplierBindingsRoot` candidate proof. |
+| On-chain facts | `DockRegistered`, `StageDockSupplierSelected`, `DockBindingPoked`, `DockOutputSubmitted`, and both orders' proof. |
 | review | Operator notes, risks, approval status; does not enter protocol facts. |
 
 ## Boundaries
 
 - A Dock is a static A→B subscription: the two orders are peers, and a Dock creates no order, changes no order id, and moves no facts.
 - The Store only organizes declaration drafts, trial pairing, and review material, and displays on-chain fact projections; each fact's owner is defined by [Protocol Boundaries](../protocol-boundaries.md).
-- The formal relation is read from the `dock_link` file record and `StageDockExecutorSelected`; output emission from `DockOutputSubmitted`; B-order progress from authorized signals / proof.
+- The formal relation is read from the `dock_link` file record and `StageDockSupplierSelected`; output emission from `DockOutputSubmitted`; B-order progress from authorized signals / proof.
 - For the full declaration and binding mechanism see [Dock and Binding](../state-machine/docking.md); for the executor view see [Dock Collaboration](../apps/zhixu-as-executor.md).

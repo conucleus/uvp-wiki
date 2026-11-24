@@ -32,15 +32,15 @@ The indexer must handle at least three sources:
 | Source | Representative events | Projection purpose |
 | --- | --- | --- |
 | `UVPDeploymentRegistry` | Active deployment / cutover events. | Know the current state-machine address, deployment version, and release context. |
-| `UVPStateMachine` | `OrderRegistered`, `SignalSubmitted`, `HookStatusChanged`, `HookReady`, `TimerPoked`, `StageExecutorPatchApplied`, `StageDockExecutorSelected`, `DockBindingPoked`, `DockOutputSubmitted`, `StageFilePatchApplied`, `StageFileOpApplied`. | Rebuild orders, tasks, stage executors, dock bindings and windows, stage file maps, status, timelines, and proof rows. |
-| `UVPIdentityRegistry` | `IdentityBindingRegistered`, `IdentityBindingRevoked`. | Rebuild the subject/account identity directory and revocation history; never filters Plans or capability. |
+| `UVPStateMachine` | `OrderRegistered`, `SignalSubmitted`, `HookStatusChanged`, `HookReady`, `TimerPoked`, `StageSupplierPatchApplied`, `StageDockSupplierSelected`, `DockBindingPoked`, `DockOutputSubmitted`, `StageFileWritten`. | Rebuild orders, tasks, stage suppliers, dock bindings and windows, stage file maps, status, timelines, and proof rows. |
+| `UVPIdentityRegistry` | `IdentityBindingRegistered`, `IdentityBindingRevoked` (subject namespace); `SupplierRegistered`, `SupplierStatusChanged` (supplier namespace). | Rebuild the subject/account identity directory and the supplier SID/account/status projection; never filters Plans or capability. |
 
 ## Output Projections
 
 | Projection | Consumers | Notes |
 | --- | --- | --- |
 | Order projection | Product API, Store order search. | Must carry `chainId`, `stateMachineAddress`, and `deploymentId`. |
-| Task projection | Order App, uvp-client, Product `/me/tasks`. | Derived from hook readiness and submitter authorization, not manual backend assignment. |
+| Task projection | Order App, uvp-client, Product `/me/tasks`. | Derived from hook readiness and assigned-supplier authority, not manual backend assignment. |
 | Timeline projection | Product proof, Store runtime proof. | Every row must trace back to a tx/block/event. |
 | Proof projection | UI proof drawer, audits, release evidence. | Stores event proof, not plaintext evidence. |
 | Identity projection | Store catalog, Product catalog, supplier directory. | Revoked stays displayed as revoked/blocked. |

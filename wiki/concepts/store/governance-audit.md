@@ -15,9 +15,9 @@ Store 里的权限和 audit 约束平台 workflow。Audit 记录证明某个 Sto
 
 | 权限域 | 例子 | 边界 |
 | --- | --- | --- |
-| 凝结核工作台权限 | 导入 Zhixu、维护设计材料、组织 supplier requirements、提交发布材料。 | 不自动获得 trust publication 或 order signal authorization。 |
+| 凝结核工作台权限 | 导入 Zhixu、维护设计材料、组织 supplier requirements、提交发布材料。 | 不自动获得 trust publication 或 assigned supplier 发信权。 |
 | Store 平台权限 | review、catalog tag、visibility、publication request、revocation request、audit export。 | 不替凝结核设计内部规则，不判定链上 trust。 |
-| 链上业务权限 | register order、submit signal、stage patch、阶段文件 patch。 | 由合约、EIP-712 与订单级授权决定。 |
+| 链上业务权限 | submit signal、stage supplier patch、阶段文件写入。 | 由合约、EIP-712 与 assigned supplier account 决定。 |
 
 ## 敏感动作
 
@@ -53,7 +53,7 @@ Store 应区分 read、nucleation_operator、operator、reviewer、governance_ad
 | 某个 metadata 字段、platform tag 或 contact 被修改。 | supplier 已经 trusted。 |
 | 某个凝结核提交了设计材料或发布材料。 | Store reviewer 已完成审核，或 publisher 已签名发布。 |
 | 某个 governance request 被创建或广播尝试。 | tx 已经被链接受并 index。 |
-| 某个 Dock 声明草稿或试配记录被保存或 review。 | Dock 已经注册（`DockRegistered`）、binding 已经建立（`StageDockExecutorSelected` + `dock_link` 文件项），或 output 已经发射（`DockOutputSubmitted`）。 |
+| 某个 Dock 声明草稿或试配记录被保存或 review。 | Dock 已经注册（`DockRegistered`）、binding 已经建立（`StageDockSupplierSelected` + `dock_link` 文件项），或 output 已经发射（`DockOutputSubmitted`）。 |
 
 Public claim 只有在对应链事件被观察到后才成立。
 

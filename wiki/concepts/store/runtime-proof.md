@@ -11,7 +11,7 @@ status: verified
 > 前置阅读：[秩序商店（Store）](README.md)
 Store 的履约视图把订单、任务、供应商参与、证据 hash 和链上 proof 组织给 operator 看。它是围绕链事件重建的视图，事实来源是 registry/state-machine events。
 
-<!-- StageExecutorPatchApplied 经 module patch 路径发出；ABI/事件版本以当前冻结 fixture 为准。 -->
+<!-- StageSupplierPatchApplied 经 module patch 路径发出；ABI/事件版本以当前冻结 fixture 为准。 -->
 
 ## 视图来源
 
@@ -20,11 +20,11 @@ Store 的履约视图把订单、任务、供应商参与、证据 hash 和链�
 | 订单是否注册 | `OrderRegistered` projection。 |
 | 任务是否 ready | `HookReady` 和 hook status projection。 |
 | Signal 是否提交 | `SignalSubmitted` proof row。 |
-| Executor 是否 active | `StageExecutorPatchApplied` / `StageExecutorActivated` projection。 |
+| Supplier 是否 active | `StageSupplierPatchApplied` / `StageSupplierAssigned` projection 与 `UVPIdentityRegistry.statusOf`。 |
 | Evidence 绑定 | Product evidence metadata、content hash、metadata hash、payload hash。 |
 | Supplier 历史参与 | order/task projection + supplier metadata/identity projection。 |
 | Plan 与身份 | `UVPStateMachine` Plan finalization + `UVPIdentityRegistry` identity binding projection。 |
-| Dock 注册与 binding | `DockRegistered` 静态登记、`StageDockExecutorSelected` 执行者选择、`DockBindingPoked` / `DockOutputSubmitted` output 发射的 projection；当前 A/B 窗口读 `getStageDockBinding` / `dockOutputWindow`。 |
+| Dock 注册与 binding | `DockRegistered` 静态登记、`StageDockSupplierSelected` 执行者选择、`DockBindingPoked` / `DockOutputSubmitted` output 发射的 projection；当前 A/B 窗口读 `getStageDockBinding` / `dockOutputWindow`。 |
 
 ## Store 应展示什么
 
@@ -33,8 +33,8 @@ Store 的履约视图把订单、任务、供应商参与、证据 hash 和链�
 - revoked plan/supplier 的 historical proof；
 - indexer syncing/rebuild 状态；
 - evidence hash 和 metadata URI，不展示业务文件明文。
-- receive hook、ready time、assigned executor、blocked reason；
-- dock 阶段的执行者选择与 binding proof chain（`StageDockExecutorSelected` → `DockBindingPoked` → `DockOutputSubmitted`），当 stage 由 dock 执行者承接时。
+- receive hook、ready time、assigned supplier、blocked reason；
+- dock 阶段的执行者选择与 binding proof chain（`StageDockSupplierSelected` → `DockBindingPoked` → `DockOutputSubmitted`），当 stage 由 dock 执行者承接时。
 
 ## Proof 卡片最低字段
 

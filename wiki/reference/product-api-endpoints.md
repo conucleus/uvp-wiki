@@ -61,7 +61,7 @@ GET  /product/me/tasks/:taskId
 GET  /product/me/activity-feed
 ```
 
-Plan 发布状态来自 `UVPStateMachine.PlanRegistered` 投影。任务来自 `HookReady`，执行钱包来自 Plan 声明的 signal capability 与订单级 `SignalSubmitterAuthorized`。角色名称只负责展示。
+Plan 发布状态来自 `UVPStateMachine.PlanRegistered` 投影。任务来自 `HookReady`，执行钱包来自 `stage -> supplierId` 指派与 `UVPIdentityRegistry.accountOf(supplierId)`，且 SID 必须 active。角色名称只负责展示。
 
 ### 访问口径：timeline/proof 走参与者门，业务档案凭身份与归属
 
@@ -98,13 +98,13 @@ POST /product/tasks/:taskId/submit
 GET  /product/submissions/:submissionId
 ```
 
-`prepare-submit` 生成 EIP-712 typed data。`submit` 验证签名并交给 relayer；链上结果以 `SignalSubmitted` 为准。协议侧 signal 写入口是 direct `submitSignal`（身份固定 `msg.sender`，合约 executor 可由 relayer 代付）。
+`prepare-submit` 生成 EIP-712 typed data。`submit` 验证签名并交给 relayer；链上结果以 `SignalSubmitted` 为准。协议侧 signal 写入口是 `submitSignal`（submitter 必须是 assigned supplier account；空 signature 时 `msg.sender == submitter`，非空 signature 时 `msg.sender` 仅作 relayer）。
 
 ## Order Overlay（协议面）
 
-executor patch：`UVPStagePatchModule` 的 `StageExecutorPatch` typed data（域 `stageSupplierPatch` 1，mode 闭集 `assign`/`handoff`）→ `applyStageExecutorPatchFor`；signed 入口携带 `bindingProof`、`candidateProof` 与 `executorAuthorizations`。
+stage supplier patch：`UVPStagePatchModule` 的 `StageSupplierPatch` typed data（域 `stageSupplierPatch` 1，以 `previousSupplierId` 区分 assign/handoff）→ `applyStageSupplierPatchFor`；signed 入口携带 `bindingProof` 与 `candidateProof`。
 
-阶段文件 patch：随 direct `submitSignal` 尾部 `bytes32 filesDigest` + `FilePatch` 提交（`signalId == 0` 为纯文件 patch），由 `UVPFileResourceModule.applyStageFilePatch` 落 `add` / `replace` / `remove`；`baseHash` 必填并等于该 stage 当前文件版本。
+阶段文件写入：随 `submitSignal` 的 `files: StageFile[]` 提交（`signalId == 0` 为纯文件写入），由 `UVPFileResourceModule.applyStageFiles` 同 key 覆盖。
 
 产品侧的 typed data 准备与提交编排由应用仓 backend 维护，端点名以应用仓 API 契约为准。
 
@@ -172,7 +172,7 @@ POST /store/suppliers/:supplierId/notification-profile/prepare
 
 Dock 工作台（Store 链下 workflow）：
 
-Dock 试拼会话、validate 与 draft map 属 Store 链下材料；应用仓维护其端点与存储。链上事实以 `DockRegistered`、`StageDockExecutorSelected`、`DockBindingPoked`、`DockOutputSubmitted` 与两侧订单事件为准。
+Dock 试拼会话、validate 与 draft map 属 Store 链下材料；应用仓维护其端点与存储。链上事实以 `DockRegistered`、`StageDockSupplierSelected`、`DockBindingPoked`、`DockOutputSubmitted` 与两侧订单事件为准。
 
 Listing 与页面装饰：
 

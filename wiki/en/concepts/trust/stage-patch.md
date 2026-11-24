@@ -7,25 +7,15 @@ status: verified
 
 # Stage Patch Authorization
 
-A stage patch is a controlled runtime change action for an order and comes in two kinds: an executor patch selects or hands off the executor of a target stage within the order, and a stage file patch rewrites the target stage's file map. Both reuse order-level authorization; the Plan stays a static version and the change lands only on the single Order.
+A stage patch is a controlled runtime change action for an order and comes in two kinds: a stage supplier patch selects or hands off the target stage's supplier within the order, and a stage file write rewrites the target stage's file map. Both reuse assigned-supplier authority; the Plan stays a static version and the change lands only on the single Order.
 
-## Internal Signals
+## Where Authority Comes From
 
-Product submission flows derive internal order-level authorizations per action:
+Authority reuses the stage's assigned supplier:
 
-| Action | Internal signal |
-| --- | --- |
-| `stage_executor_patch` | `EXECUTOR_PATCH_SIGNAL_ID` |
-| Pure stage file patch | `FILE_WRITE_SIGNAL_ID` (the writer stage's reserved authorization row) |
-| File patch riding a business signal | Reuses that business signal's authorization row |
-
-The source usually comes from the stage that initiated the patch:
-
-```text
-sourceId = keccak256(stageId)
-```
-
-When an order is registered these rows can be written through `SignalAuthorization[]`; the executor patch selector must be the order creator or hold an order-level authorization for `(selectorStageId, EXECUTOR_PATCH_SIGNAL_ID)`.
+- A stage supplier patch's selector must be the selector stage's currently effective assigned supplier account (or be authorized by its signature).
+- A stage file write's submitter must be the target stage's assigned supplier account, or the assigned supplier account of a writer stage declared in the target stage's `fileWriters`.
+- Every path resolves through `UVPIdentityRegistry.accountOf(supplierId)`, and the SID must be `active`.
 
 ## Stage-to-target Binding
 
@@ -35,22 +25,24 @@ The change relation between two stages is constrained by the stage-to-target bin
 selectorStageId -> targetStageId
 ```
 
-The contract verifies it with `UVPPlanMetadataModule.verifyStageSelectorBinding` against a `capabilitiesRoot` membership proof; an executor patch without a declared binding is rejected. Stage file writes are additionally constrained by the target stage's `fileWriters` allowlist (a `UVP_FILE_WRITER_V1` capability leaf).
+The contract verifies it with `UVPPlanMetadataModule.verifyStageSelectorBinding` against a `capabilitiesRoot` membership proof; a supplier patch without a declared binding is rejected. Stage file writes are additionally constrained by the target stage's `fileWriters` allowlist (`StageFileWriter[]`, committed by the PlanCommit `fileWritersHash`).
 
-## Executor Patch
+## Stage Supplier Patch
 
-An executor patch selects or hands off the executor of the target stage within an order, with the closed mode set `assign` / `handoff`: `assign` lands before the target stage's first signal, while `handoff` lands after the first signal and requires the previous executor's signature over the same EIP-712 digest.
+A stage supplier patch selects or hands off the target stage's supplier within an order, distinguished by `previousSupplierId`: `0` is a first assignment (assign, only before the target stage's first signal), and a non-zero value is a handoff (only after the first signal, and it requires the previous assigned supplier account's signature over the same EIP-712 digest).
 
-The contract checks the increasing nonce, order-level authorization, the stage-to-target binding, and that the candidate executor belongs to the candidate set committed by the Plan via `executorCandidatesRoot` (a `candidateProof` membership proof; a Plan without a candidate set is fail-closed for all executor patches). The patch's EIP-712 signature carries `authorizationsHash`; on effect the contract writes the new executor's authorizations for the Plan's predeclared current-order `(sourceId, signalId)` pairs as order-level explicit authorizations. The executor need not be in the authorization table when the Order is created, but the patch cannot grant signal authority the Plan did not declare. First-writer-wins still applies, and a Signal already written keeps its original submitter.
+The contract checks the increasing nonce, that the selector is the selector stage's assigned supplier account, the stage-to-target binding, and that the candidate supplier belongs to the Plan's kind=1 candidate leaf committed through `supplierBindingsRoot` (a Merkle proof; fixed stages always reject a patch, dynamic stages need no proof and may assign any active supplier, birth/dock stages always reject). When the patch takes effect it only changes `stage -> supplierId` and writes no authorization set; first-writer-wins still applies, and an already-written Signal keeps its original submitter. The event is `StageSupplierPatchApplied`.
 
-## Stage File Patch
+## Dock Supplier Selection
 
-A stage file patch rewrites the target stage's `fileResources` map (`key -> (contentHash, handle)`); the chain stores only a content hash and an opaque handle. The entry point is the tail of `submitSignal`: `signalId == 0` means a pure file patch (no business signal), otherwise a business signal is submitted first and the file patch applied in the same transaction. The write is owned by `UVPFileResourceModule.applyStageFilePatch`, whose ops are `add` / `replace` / `remove`; `baseHash` is mandatory (the stage's current file version), the patch is whole-and-atomic with rollback on any failure, and there is no nonce. Events `StageFilePatchApplied` / `StageFileOpApplied` are replayed by the indexer in same-transaction log order.
+For a dock stage, the selector calls `selectStageDockSupplier` (or `selectStageDockSupplierFor` with the selector's EIP-712 signature) to select the supplier once. The contract checks the dock marker, the selector binding, the SID's active status, and the dkid/stage/plan relation; replaying the same dkid+supplier is absorbed idempotently, re-selection reverts `StageDockSupplierAlreadySelected`, and the event is `StageDockSupplierSelected`.
 
-Write authorization combines the stage-level `fileWriters` allowlist with the `SignalAuthorization` table: a signal + file request reuses the business signal's existing authorization row (`writerStageId == 0` resolves to the signal's stage), and a pure file patch uses the writer stage's `FILE_WRITE_SIGNAL_ID` row.
+## Stage File Writes
+
+A stage file write directly changes the target stage's `{key, payload}` map, and the chain stores only the opaque payload. The entry is `submitSignal`'s `files: StageFile[]`: `signalId == 0` is a pure file write (no business signal), otherwise the business signal and the file writes take effect atomically in one transaction; `UVPFileResourceModule.applyStageFiles` settles it and the same key overwrites; there is no operation state machine, per-key version history, or nonce. The only event is `StageFileWritten`, which indexers replay in same-transaction log order.
 
 ## Why It Belongs to the Authorization System
 
-A stage patch changes an order's execution path and stage file references. Both patch kinds require order-level authorization and an EIP-712 signature, so the Store or a backend cannot bypass participant permissions to change an executor or a file reference; the contract and the projection recover state from the same event stream.
+A stage patch changes an order's execution path and stage file references. Both actions require an assigned supplier account and an EIP-712 signature, so the Store or a backend cannot bypass supplier permissions to change a supplier or a file reference; the contract and projection recover state from the same event stream.
 
-For the executor patch mechanism see [Executor Patch](../state-machine/executor-patch.md), for the stage file patch mechanism see [Stage File Patch](../state-machine/file-patch.md), and for the authorization layering overview see [Protocol Boundaries](../protocol-boundaries.md).
+For the supplier patch mechanism see [Stage Supplier Patch](../state-machine/executor-patch.md), for the stage file write mechanism see [Stage File Map](../state-machine/file-patch.md), and for the authorization layering overview see [Protocol Boundaries](../protocol-boundaries.md).

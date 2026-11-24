@@ -21,8 +21,8 @@ The Order BFF handles the product process of "turning an order-creatable Zhixu i
 - verify that the Zhixu has an active Store version;
 - verify whether the plan is published or revoked;
 - verify whether the supplier wallet is revoked;
-- build `SignalAuthorization[]` from the order permission table and participant list;
-- prepare the birth payload, `triggerHookId`, and initial trigger typed data;
+- resolve the birth stage's assigned supplier account and the plan artifact, and prepare the birth payload and `UVPStateMachineSignalSubmission` typed data;
+- not generate a submitter authorization table: submission authority is decided by on-chain assigned-supplier state;
 - track the birth submission and retries.
 
 Workflow:
@@ -31,8 +31,7 @@ Workflow:
 create order draft
   -> invite participants
   -> participants accept with wallet
-  -> build SignalAuthorization[]
-  -> prepare birth payload + trigger typed data
+  -> prepare birth payload + signal-submission typed data
   -> wallet signs; direct submit or relay
   -> chain events: OrderRegistered / OrderTriggered / StageMaterialized
 ```
@@ -41,14 +40,14 @@ The BFF database stores draft and workflow state. What actually makes an order e
 
 ## Signal submission entry
 
-After an order is born, participants or executors submit business signals through Product tasks: the product surface first prepares a readable summary and EIP-712 typed data, then the authorized wallet signs. On chain, the only fact is direct `submitSignal` (identity fixed to `msg.sender`; a contract executor may be paid for by a relayer) plus `SignalSubmitted`. The product side never signs for participants and never guesses authorization from role copy.
+After an order is born, participants or executors submit business signals through Product tasks: the product surface first prepares a readable summary and EIP-712 typed data, then the assigned supplier account signs. On chain, the fact is `submitSignal` (with an empty signature, `msg.sender` must equal the submitter; with a non-empty signature, `msg.sender` is only the relayer) plus `SignalSubmitted`. The product side never signs for participants and never guesses authority from role copy.
 
 ## Stage patch submission entry
 
 Order-level patches split into two classes with different signing surfaces and checks:
 
-- executor patch: `UVPStagePatchModule`'s `StageExecutorPatch` typed data (domain `stageSupplierPatch` 1, mode closed set `assign`/`handoff`); the signed entry `applyStageExecutorPatchFor` carries the selector and previous-executor signatures, `bindingProof`, `candidateProof`, and `executorAuthorizations`. When the patch takes effect, the Plan's pre-declared capabilities become the order's explicit authorization set.
-- stage file patch: there is no separate patch typed data; it rides the trailing `bytes32 filesDigest` + `FilePatch` on direct `submitSignal` (`signalId == 0` is a pure file patch), and `UVPFileResourceModule.applyStageFilePatch` applies `add` / `replace` / `remove`. Write authorization comes from the stage-level `fileWriters` capability leaves plus order-level authorization rows.
+- stage supplier patch: `UVPStagePatchModule`'s `StageSupplierPatch` typed data (domain `stageSupplierPatch` 1, with `previousSupplierId` distinguishing assign/handoff); the signed entry `applyStageSupplierPatchFor` carries the selector and previous supplier signatures, `bindingProof`, and `candidateProof`. When the patch takes effect it only changes `stage -> supplierId`; it writes no authorization set.
+- stage file write: there is no separate typed data; it is submitted with `submitSignal`'s `files: StageFile[]` (`signalId == 0` is a pure file write), and `UVPFileResourceModule.applyStageFiles` overwrites the same key. Write authority comes from the target/writer stage's assigned supplier account and the `fileWriters` allowlist.
 
 The application backend owns product-side typed-data preparation and submission orchestration; for protocol fields and events see [Contracts and Events](../reference/contracts-and-events.md) and [Stage Overlay](state-machine/stage-overlay.md).
 

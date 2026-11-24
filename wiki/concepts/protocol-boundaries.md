@@ -13,7 +13,7 @@ status: verified
 
 ## 事实源
 
-合约和链事件是 plan、order、signal、hook、publication、deployment cutover 的唯一事实源。后端、Store、Order App、uvp-client 和 periphery adapter 只能消费、投影、展示、中继或扩展核心状态，不能改写它们。数据流与判定规则详见 [数据流与事实源](data-flow-and-truth.md)。
+合约和链事件是 plan、order、signal、hook、publication、deployment cutover 的唯一事实源。后端、Store、Order App、uvp-client 和 应用仓 adapter 只能消费、投影、展示、中继或扩展核心状态，不能改写它们。数据流与判定规则详见 [数据流与事实源](data-flow-and-truth.md)。
 
 ## 可重建性
 
@@ -25,34 +25,34 @@ Store metadata 是读模型：供应商能力、标签、声誉、搜索排序�
 
 ## 身份边界
 
-链上执行身份只有一个来源：`UVPSupplierRegistry`。它把 SID 永久绑定到一个 account，并以 `pending/active/suspended/revoked` 状态约束可用性；`UVPStateMachine` 只按 `accountOf(effectiveSupplierId) + active` 解析某个阶段事实的提交者。其他登记表都不参与执行授权：
+链上执行身份只有一个来源：`UVPIdentityRegistry`。它把 SID 永久绑定到一个 account，并以 `pending/active/suspended/revoked` 状态约束可用性；`UVPStateMachine` 只按 `accountOf(effectiveSupplierId) + active` 解析某个阶段事实的提交者。其他登记表都不参与执行授权：
 
-- `UVPIdentityRegistry` 只登记线下 subject 与钱包的可撤销绑定（`IdentityBindingRegistered` / `IdentityBindingRevoked`），帮助解析"这个账户代表谁"。它不认证 Plan、不记录能力或信誉、不是 StateMachine 准入条件，StateMachine 也不读取它；能力判断属于凝结核与 Store 链下判断。
-- `zhixu-registry`（`zhixu-store/registry`）是链下数据登记层（`ZhixuRecord` / `IdentityClaim`），不铸 SID、不参与链上执行授权。
+- `UVPIdentityRegistry` 的 subject 命名空间只登记线下 subject 与钱包的可撤销绑定（`IdentityBindingRegistered` / `IdentityBindingRevoked`），帮助解析"这个账户代表谁"；它不认证 Plan、不记录能力或信誉，不参与 StateMachine 发信权校验。同一 registry 的 supplier 命名空间（SID 铸造、永久 account 绑定、`pending/active/suspended/revoked`）才是执行身份来源，StateMachine 只读取这一命名空间。
+- `zhixu-registry`（`zhixu-store/registry`）是链下数据登记层（`ZhixuRecord`），不铸 SID、不参与链上执行授权。
 
 因此"把某个身份绑定当作发信权"不是实现细节，而是边界违规：新增执行/授权路径若读取身份绑定登记表，评审直接拒绝。详见 [Contracts 与 Registries](contracts-and-registries.md) 与 [Store or external institution](trust/domains.md)。
 
 ## 授权与签名
 
 - 业务签名只能来自被授权参与方的钱包；relayer 可以广播交易、代付 gas，但不生成业务签名。
-- Signal 提交的授权主体是 source 阶段当前生效的 assigned supplier account（SID 必须 active），签名采用 EIP-712 typed data；不存在订单级提交者白名单。
+- Signal 提交的授权主体是 source 阶段当前生效的 assigned supplier account（SID 必须 active），签名采用 EIP-712 typed data。
 - 同一个 `(planId, orderId, sourceId, signalId)` 只允许一次成功写入（first-writer-wins）；重复的外部提交被幂等吸收（不重复推进），`SignalAlreadyExists` revert 保留给引擎内部写入口。技术细节见 [Signal](core/signal.md) 与 [EIP-712 与 Relayer](trust/eip712-relayer.md)。
 
 ## Plan 生命周期
 
-Plan 通过 `commitPlan()` 提交并绑定 publisher 签名（PlanCommit 六字段：publisher / hooksHash / capabilitiesRoot / executorCandidatesRoot / birthAuthorizer / deadline），再经 `finalizePlan()` 落定稿；只有 finalized Plan 可以创建 Order。Plan 身份由发布者与提交内容共同确定（`planId = hash(publisher, planHash)`）。部署时冻结的 modules 不能被 owner 替换；升级必须部署新 StateMachine 并经 Deployment Registry 显式 cutover。详见 [Contracts 与 Registries](contracts-and-registries.md)、[Canonical Hash](artifacts/canonical-hashes.md) 与 [Plan 与订单生命周期](lifecycle.md)。
+Plan 通过 `commitPlan()` 提交并绑定 publisher 签名（PlanCommit 六字段：publisher / hooksHash / capabilitiesRoot / supplierBindingsRoot / fileWritersHash / deadline），再经 `finalizePlan()` 落定稿；只有 finalized Plan 可以创建 Order。Plan 身份由发布者与提交内容共同确定（`planId = hash(publisher, runtimePlanHash)`，runtime hash 域 `uvp.plan.runtime.v8`）。部署时冻结的 modules 不能被 owner 替换；升级必须部署新 StateMachine 并经 Deployment Registry 显式 cutover。详见 [Contracts 与 Registries](contracts-and-registries.md)、[Canonical Hash](artifacts/canonical-hashes.md) 与 [Plan 与订单生命周期](lifecycle.md)。
 
 ## 订单与证据边界
 
-Order 一旦注册即是一条独立事实流；核心协议不为 Order 定义 running/completed/cancelled 等终态，Product 展示的完成度来自授权 signal 与 proof。合同、发票、物流单据、照片、OCR 原文等业务材料不明文上链——链上只保存 payloadHash、metadata URI、阶段文件映射（内容哈希与句柄）、签名与事件。Proof row 应能追溯到 tx、block、log、合约、chain id、事件与 payload context。详见 [File Resources](core/file-resources.md)、[Evidence、Proof 与 File Resource](services/evidence-proof.md)。
+Order 一旦注册即是一条独立事实流；核心协议不为 Order 定义 running/completed/cancelled 等终态，Product 展示的完成度来自授权 signal 与 proof。合同、发票、物流单据、照片、OCR 原文等业务材料不明文上链——链上只保存 payloadHash、metadata URI、阶段文件 opaque `{key,payload}`、签名与事件。Proof row 应能追溯到 tx、block、log、合约、chain id、事件与 payload context。详见 [File Resources](core/file-resources.md)、[Evidence、Proof 与 File Resource](services/evidence-proof.md)。
 
 ## 产品表面与服务边界
 
-Product API 可以准备 typed data、验证签名、调用 relayer 并返回 proof，但授权检查始终由合约执行；Store review 是平台 workflow，不等于 trust publication；Order App 与 uvp-client 不暴露 HookPlan/sourceId/ABI/calldata/gas 细节，也不能绕过订单级 signal 授权。角色名称只负责展示，权利来自链上授权状态。
+Product API 可以准备 typed data、验证签名、调用 relayer 并返回 proof，但授权检查始终由合约执行；Store review 是平台 workflow，不等于 trust publication；Order App 与 uvp-client 不暴露 HookPlan/sourceId/ABI/calldata/gas 细节，也不能绕过 assigned supplier account 发信权。角色名称只负责展示，权利来自链上 assigned supplier 状态。
 
 ## 外围适配
 
-funding、USDC、资金托管、guarantee、settlement、支付、物流和企业系统 adapter 都属于 periphery 语境（`uvp-periphery/`）：它们围绕核心状态机运行，消费 `UVPStateMachine`、可选的 Identity Registry 名称解析、Product DTO 或 uvp-client 接口，但不得把资金、担保、付款、释放、退款、争议赔付等状态改造成新的核心事实源。
+funding、USDC、资金托管、guarantee、settlement、支付、物流和企业系统 adapter 属于应用仓 adapter：它们围绕核心状态机运行，消费 `UVPStateMachine`、`UVPIdentityRegistry` 名称解析、Product DTO 或 uvp-client 接口，但不得把资金、担保、付款、释放、退款、争议赔付等状态改造成新的核心事实源。
 
 ## 公共接口纪律
 

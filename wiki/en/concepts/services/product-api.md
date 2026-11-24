@@ -34,12 +34,12 @@ The Product API hides low-level details such as HookPlan, sourceId, signalId, AB
 
 ## `/product/me`
 
-`/product/me` must filter tasks from an explicit wallet address, which can come from a query, header, or wallet context. Display names, role labels, or Store metadata may only assist presentation; authority comes from state-machine projection and order-level submitter authorization.
+`/product/me` must filter tasks from an explicit wallet address, which can come from a query, header, or wallet context. Display names, role labels, or Store metadata may only assist presentation; authority comes from state-machine projection and the `stage -> supplierId` / `accountOf(supplierId)` assigned-supplier resolution.
 
 ## Boundaries
 
 - The Product API may prepare typed data, verify signatures, call the relayer, and return proof.
-- Order-level authorization is still checked by the contract.
+- The assigned supplier account and the SID's active status are still checked by the contract.
 - Drafts, submission status, and notification state are labeled workflow/projection state.
 - Revoked plan/supplier entries remain displayed as revoked/blocked in the Product API.
 - Staging readiness is service-instance health and boundary checking; production claims require release evidence.

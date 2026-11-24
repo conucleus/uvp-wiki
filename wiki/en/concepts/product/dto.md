@@ -34,7 +34,7 @@ settlementPreview.disclaimer = "当前不托管、不划转、不释放、不退
 (no custody, transfer, release, or refund of any funds; only payment conditions and proof are recorded)
 ```
 
-This means the core UVP protocol is not a payment provider. Stablecoins, settlement custody, or guarantees should be integrated by a periphery adapter.
+This means the core UVP protocol is not a payment provider. Stablecoins, settlement custody, or guarantees should be integrated by an application-repository adapter.
 
 ## ProductTaskDTO
 
@@ -69,7 +69,7 @@ Task statuses map as:
 | `cancelled` | `blocked` |
 | unknown | `blocked` |
 
-DTO field and status mapping is authoritative in the `@uvp-eth/product-dto` package type definitions.
+DTO field and status mapping is authoritative in the application repository's `app-contract` types and the `@uvp-eth/chain-read-contract` chain-read types.
 
 ## Related Pages
 

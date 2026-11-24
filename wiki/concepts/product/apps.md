@@ -13,7 +13,7 @@ Order App 与 uvp-client 站在不同用户位置消费同一套链上事实；`
 
 | 表面 | 一句话定位 | 详见 |
 | --- | --- | --- |
-| zhixu-registry | permissionless 的 ZhixuRecord / IdentityClaim 登记数据层：只存自述、签名与 opaque refs，无 UI、无审核、无推荐。 | [zhixu-registry](../../reference/module-map.md) |
+| zhixu-registry | permissionless 的 ZhixuRecord 登记数据层：只存自述、签名与 opaque refs，无 UI、无审核、无推荐。 | [zhixu-registry](../../reference/module-map.md) |
 | Order App | 普通参与者的任务工具：待办、提交确认、证据指纹、链上证明、readiness。 | [Order App](../apps/order-app.md) |
 | uvp-client | 公共客户端四入口：`browser` 供宿主注入钱包消费 Product DTO；`headless`/`cli` 供脚本与 chain executor 走 watcher/signal。 | [UVP Client](../apps/uvp-client.md)、[Order App 与 UVP Client](../apps/order-app-vs-uvp-client.md) |
 
@@ -21,4 +21,4 @@ Order App 与 uvp-client 站在不同用户位置消费同一套链上事实；`
 
 ## Periphery Adapter
 
-资金、担保、AI/MCP、demo executor 可以放在 `uvp-periphery`。它们消费 `UVPStateMachine`、可选的 `UVPIdentityRegistry` 名称解析、Product DTO 或 `@uvp-eth/uvp-client`，而不是定义新的核心订单真相。
+资金、担保、AI/MCP、demo executor 可以放在应用仓。它们消费 `UVPStateMachine`、`UVPIdentityRegistry` 的 supplier 名称解析、Product DTO 或 `@uvp-eth/uvp-client`，而不是定义新的核心订单真相。

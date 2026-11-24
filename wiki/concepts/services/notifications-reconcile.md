@@ -23,7 +23,7 @@ Notifications 和 Reconcile 是可重建服务层里的运行辅助系统。前�
 通知可以从这些事实派生：
 
 - `HookReady`：某个环节已经 ready，需要通知对应执行方。
-- order-level submitter authorization：谁有资格提交某个 signal。
+- assigned supplier account：谁有资格提交某个阶段的 signal（`stage -> supplierId` + `accountOf`）。
 - supplier identity projection：供应商是否 active/revoked。
 - supplier contact profile：如何联系、通知偏好、负责人、可用时段。
 

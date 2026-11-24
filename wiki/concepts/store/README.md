@@ -10,7 +10,7 @@ status: retired
 
 Store/workbench 前端已删除；`zhixu-store/registry/` 现在只提供 `@uvp-eth/zhixu-registry` 数据层：
 
-- 只登记 `ZhixuRecord`（planId/planHash、descriptor、schemaHash、version、registeredBy 签名）与 `IdentityClaim`（wallet、subject、descriptor、签名、opaque attestationRefs）；
+- 只登记 `ZhixuRecord`（planId/planHash、descriptor、schemaHash、version、registeredBy 签名）；不做钱包身份声明（身份绑定归 `UVPIdentityRegistry`）。
 - permissionless 写入，无 allowlist、审核、推荐、排名、supplier workflow 或 KYC；
 - 登记 ≠ 背书；身份声明不参与订单授权，订单授权仍由链上 plan/slot/signal 决定。
 

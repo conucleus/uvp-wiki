@@ -33,7 +33,7 @@ settlementPreview.adapterStatus = "placeholder"
 settlementPreview.disclaimer = "当前不托管、不划转、不释放、不退款任何资金，只记录付款条件和证明。"
 ```
 
-这表示核心 UVP 协议不是支付提供方。稳定币、资金托管或担保应由 periphery adapter 接入。
+这表示核心 UVP 协议不是支付提供方。稳定币、资金托管或担保应由 应用仓 adapter 接入。
 
 ## ProductTaskDTO
 
@@ -49,7 +49,7 @@ settlementPreview.disclaimer = "当前不托管、不划转、不释放、不退
 | proofSummary | 摘要证明。 |
 | proofRows | 具体链事件证明。 |
 
-`canSubmit` 是产品辅助判断，不是最终授权。合约仍会检查显式 Signal 授权或 Plan 限定的 executor 动态委任。
+`canSubmit` 是产品辅助判断，不是最终授权。合约仍会检查 source 阶段 assigned supplier account、SID active 状态与签名。
 
 ## 状态映射
 
@@ -68,7 +68,7 @@ Order 不承载业务生命周期状态：
 | `cancelled` | `blocked` |
 | unknown | `blocked` |
 
-DTO 字段与状态映射以 `@uvp-eth/product-dto` 包类型定义为准。
+DTO 字段与状态映射以应用仓 `app-contract` 类型定义与链读 `@uvp-eth/chain-read-contract` 为准。
 
 ## 相关页面
 

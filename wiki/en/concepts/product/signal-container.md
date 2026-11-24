@@ -30,7 +30,7 @@ Minimal contents:
 | `taskId` | Product task. |
 | `orderId` | Owning order. |
 | `stageId` | Corresponding stage. |
-| `actionKind` | `submit_signal` or `stage_executor_patch`; a stage file patch is expressed as the `FilePatch` companion surface of `submit_signal` (`signalId == 0` is a pure file patch). |
+| `actionKind` | `submit_signal` or `stage_supplier_patch`; a stage file write is expressed by `submit_signal`'s `files: StageFile[]` (`signalId == 0` is a pure file write). |
 | `requiredInputs` | Inputs the user or system must provide. |
 | `evidenceSpec` | Publisher-configured structured evidence requirements (key/label/inputKind/accept, ...); the sole source of task evidence rules — absent spec means no evidence slots. |
 | `acceptedActor` | Accepted wallet, supplier subject, trust status. |
@@ -45,9 +45,9 @@ These fields can be derived from the existing `ProductTaskDTO`, prepare/submit A
 
 Product-side prepare/submit endpoints are maintained by the used-car application backend (the application `app-contract` is the single path source); this repository does not verify endpoint names. The protocol-side submission surfaces are fixed:
 
-- Ordinary signal: direct `submitSignal` (identity fixed to `msg.sender`; trailing `bytes32 filesDigest` + `FilePatch`).
-- Executor patch: `UVPStagePatchModule`'s `StageExecutorPatch` typed data → `applyStageExecutorPatchFor` (domain `stageSupplierPatch` 1, mode closed set `assign`/`handoff`).
-- Stage file patch: submitted as the trailing `FilePatch` on direct `submitSignal` (`signalId == 0` is a pure file patch) and applied by `UVPFileResourceModule.applyStageFilePatch` as `add` / `replace` / `remove`.
+- Ordinary signal: `submitSignal` (submitter must be the assigned supplier account; with an empty signature `msg.sender == submitter`, with a non-empty signature `msg.sender` is only a relayer).
+- Stage supplier patch: `UVPStagePatchModule`'s `StageSupplierPatch` typed data → `applyStageSupplierPatchFor` (domain `stageSupplierPatch` 1, with `previousSupplierId` distinguishing assign/handoff).
+- Stage file write: submitted as `files: StageFile[]` on `submitSignal` (`signalId == 0` is a pure file write) and applied by `UVPFileResourceModule.applyStageFiles` with same-key overwrite.
 
 ## Security rules
 

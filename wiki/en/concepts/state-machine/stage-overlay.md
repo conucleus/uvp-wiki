@@ -1,61 +1,59 @@
 ---
-title: Stage Overlay (Executor Patch and Stage File Patch)
+title: Stage Overlay (Supplier Patch and Stage File Writes)
 type: explanation
 audience: 工程贡献者
 status: verified
 ---
 
-# Stage Overlay (Executor Patch and Stage File Patch)
+# Stage Overlay (Supplier Patch and Stage File Writes)
 
-Stage overlay is the order-level patch mechanism: it lets one order assign a new executor for a target stage, or rewrite that stage's file map, without modifying the Plan. Both actions are order-level execution facts, and both keep the Plan statically auditable. The contract checks and code entry points of each kind are in [Executor Patch](executor-patch.md) and [Stage File Patch](file-patch.md).
+Stage overlay is the order-level change mechanism: it lets one order assign a new supplier for a target stage, or write that stage's file map, without modifying the Plan. Both actions are order-level execution facts, and both keep the Plan statically auditable. The contract checks and code entry points of each kind are in [Stage Supplier Patch](executor-patch.md) and [Stage File Writes](file-patch.md).
 
-## Executor Patch
+## Stage Supplier Patch
 
-`StageExecutorPatchApplied` / `StageExecutorActivated` change the target stage executor of a single order; the Plan and the Supplier Directory stay as published. The contract requires:
+`StageSupplierPatchApplied` (the first-assignment path also emits `StageSupplierAssigned`) changes the target stage supplier of a single order; the Plan and the Supplier Directory stay as published. The contract requires:
 
 - A `StageSelectorBinding` between the patching stage and the target stage (membership proven by the bindingProof carried with the patch).
-- The patch selector holds order-level authorization for the internal `EXECUTOR_PATCH_SIGNAL_ID` (the order creator may act as selector, still subject to the binding and candidate-set gates).
-- The target executor must be a member of the `executorCandidatesRoot` committed by the Plan at `commitPlan` (candidateProof membership proof; plans without a committed candidate set fail closed for all executor patches).
-- The mode set is `assign` / `handoff`: `assign` lands before the target stage's first signal, `handoff` lands after it and requires the previous executor's signature over the same digest.
+- The patch selector must be the selector stage's currently effective assigned supplier account; there is no order-level internal patch authorization table.
+- The target supplier of a candidate stage must hit the Plan's kind=1 candidate leaf in `supplierBindingsRoot` committed at `commitPlan` (candidateProof membership proof); fixed stages always reject; dynamic stages need no proof and may assign any active SID; birth/dock stages always reject.
+- `previousSupplierId` distinguishes: `0` is an assign (before the target stage's first signal), non-zero is a handoff (after the first signal, and it requires the previous assigned supplier account's signature over the same digest).
 - The nonce must increase, so an older patch cannot overwrite a newer one.
 
-When a patch activates, the contract writes the target stage's Plan-declared `(sourceId, signalId)` capabilities as an explicit order-level authorization set (its hash is committed by the selector signature). The selected wallet gains exactly that submittable scope; a patch cannot expand Plan capabilities. A later handoff moves the still-unwritten scope to the new executor; already-written Signals stay as recorded and keep their original submitters.
+A patch only changes `stage -> supplierId` and writes no authorization set. The selected SID's supplier account thereby gains that stage's submission authority; a patch cannot expand the Plan's capability boundary. A later handoff moves the same stage, as long as it has not been written for the first time, to the new supplier; already-written Signals stay as recorded, and historical `SignalSubmitted` keeps its original submitter.
 
-A dock-stage executor is a separate one-time selection path: `UVPStagePatchModule.selectStageDockExecutor` selects the dock executor and emits `StageDockExecutorSelected`; replacing the selection is rejected with `StageDockExecutorAlreadySelected`. It is not a generic executor patch; see [Executor Patch](executor-patch.md) and [Dock and Binding](docking.md).
+A dock-stage supplier is a separate one-time selection path: `UVPStagePatchModule.selectStageDockSupplier` selects the dock supplier and emits `StageDockSupplierSelected`; replacing the selection is rejected with `StageDockSupplierAlreadySelected`. It is not a generic stage supplier patch; see [Stage Supplier Patch](executor-patch.md) and [Dock and Binding](docking.md).
 
-## Stage File Patch
+## Stage File Writes
 
-The stage file map is a stage fact owned by `UVPFileResourceModule`: each stage keeps `key -> (contentHash, handle)`; the chain stores only the content hash and an opaque, bounded handle, never plaintext, and carries no file-type semantics.
+The stage file map is a stage fact owned by `UVPFileResourceModule`: each stage keeps `StageFile{string key; bytes payload}`; the chain stores only the opaque payload, never the body, and carries no file-type semantics.
 
-An order-level rewrite travels in the trailing `FilePatch` of `submitSignal`:
+An order-level write travels in `submitSignal`'s `files` field:
 
 ```text
-submitSignal(planId, orderId, sourceId, signalId, payloadHash, idempotencyKey,
-             attribution, filesDigest, FilePatch filePatch)
-
-FilePatch {
-  bytes32 targetStageId;
-  bytes32 baseHash;        // required: the stage's current file version
-  bytes32 writerStageId;   // 0 resolves to the signal's stage
-  bytes32[] writerProof;   // fileWriters capability-leaf membership proof
-  FileOp[] ops;            // add / replace / remove
-}
+submitSignal(
+  SignalSubmission {
+    ...,
+    targetStageId,
+    files: StageFile[]   // { string key; bytes payload }
+  },
+  signature
+)
 ```
 
-- `signalId == 0` is a pure file patch: it carries no business signal and is submitted on its own; `filesDigest = keccak256(canonicalFilePatch(planId, orderId, filePatch))`.
-- `add` requires the key to be absent; `replace` / `remove` require it to be present. Preconditions are strict and the whole patch is atomic: any failing op rolls the whole transaction back.
-- `baseHash` is required and must equal the stage's file version at signing time (`filesHash = keccak256(abi.encode(oldHash, patchHash))` rolling); a mismatch rejects the whole patch.
-- The map always holds exactly one current value per key; replacements use `replace` / `remove`, and an already-applied `patchHash` is absorbed first-win.
+- `signalId == 0` is a pure file write: it carries no business signal and is submitted on its own.
+- Re-writing the same key overwrites it; each key has exactly one current payload, with no per-key version history.
+- Entries apply one by one and the whole call is atomic; any failure rolls the whole transaction back.
+- One call carries at most 16 entries; a key is ≤128 bytes and a payload ≤4096 bytes.
 
-Events: `StageFilePatchApplied` (once per transaction, with `patchHash` / `baseHash` / `writerStageId` / `opCount`) and `StageFileOpApplied` (once per op, with `kind` / `key` / `contentHash` / `handle`). Indexers replay them in log order within the same transaction. Authorization and the full rule set are in [Stage File Patch](file-patch.md).
+Events: `StageFileWritten` (one per key write, carrying `key` / `payload` / `submitter`); indexers replay in log order within the same transaction and never derive. Authorization and the full rule set are in [Stage File Writes](file-patch.md).
 
 ## Why the Plan Is Not Modified
 
-The Plan is the publisher-signed static version. Runtime supplier selection, executor handoff, and file-map rewrites are execution facts of one order: they land only as order-level chain records, while the Plan's commitment surface stays intact. Anyone can replay these overlays from events.
+The Plan is the publisher-signed static version. Runtime supplier selection, handoff, and file writes are execution facts of one order: they land only as order-level chain records, while the Plan's commitment surface stays intact. Any participant can replay these overlays from events.
 
 ## Boundaries
 
-- An executor patch changes who executes; a stage file patch changes which files the stage references. Their fields and signed payloads are never mixed.
-- An executor patch is not supplier capability proof; capability and matching remain Store judgments, while the Identity Registry only resolves subject-to-account identity.
-- A stage file patch never puts business plaintext on chain; text is carried by object storage, metadata URIs, and content hashes.
-- Neither patch represents business completion; outcomes still come from the target source/signal's `SignalSubmitted` and hook status.
+- A stage supplier patch changes "who carries the stage"; a stage file write changes "which opaque payload the stage stores". Their fields and signed payloads are never mixed.
+- A stage supplier patch is not supplier capability proof; capability and matching remain Store judgments, while `UVPIdentityRegistry` only resolves SID, account, and active status.
+- A stage file write never puts a business body on chain; the body is carried by object storage, metadata URIs, and content hashes.
+- Neither action represents business completion; outcomes still come from the target source/signal's `SignalSubmitted` and hook status.

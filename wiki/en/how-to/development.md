@@ -34,7 +34,6 @@ pnpm verify:protocol-freeze
 | `@uvp-eth/compiler` | `pnpm --filter @uvp-eth/compiler test` |
 | `@uvp-eth/statemachine` | `pnpm --filter @uvp-eth/statemachine test` |
 | `@uvp-eth/protocol-bindings` | `pnpm --filter @uvp-eth/protocol-bindings test` |
-| `@uvp-eth/product-dto` | `pnpm --filter @uvp-eth/product-dto test` |
 | `@uvp-eth/chain-services` | `pnpm --filter @uvp-eth/chain-services check` |
 | `@uvp-eth/uvp-client` | `pnpm --filter @uvp-eth/uvp-client test` |
 | `@uvp-eth/zhixu-registry` | `pnpm --filter @uvp-eth/zhixu-registry test` (Postgres) |
@@ -63,6 +62,6 @@ For the full interface map and owners, see [Public Interfaces](../reference/publ
 
 ## Where to Put New Features
 
-Which module a new feature belongs to, and what each module is and is not responsible for, see the [Module Map](../reference/module-map.md). Judgment rule: protocol semantics go into `uvp-protocol` packages and contracts; rebuildable services go into `uvp-chain-services`; product surfaces go into store / order-app; funding, guarantee, payment, and agent adapters go into `uvp-periphery`.
+Which module a new feature belongs to, and what each module is and is not responsible for, see the [Module Map](../reference/module-map.md). Judgment rule: protocol semantics go into `uvp-protocol` packages and contracts; rebuildable services go into `uvp-chain-services`; product surfaces go into store / order-app; funding, guarantee, payment, and agent adapters stay in application repositories.
 
 Cross-module changes must sync each module's existing AGENTS.md (not every module has one), plus the relevant interface docs.

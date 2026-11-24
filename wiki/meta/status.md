@@ -38,4 +38,4 @@ pnpm no-spend:safety
 pnpm -r --if-present --workspace-concurrency=1 run test
 ```
 
-合约测试在 `uvp-protocol/contracts/uvp-contracts` 中运行 `forge test`。Store 前端在 `zhixu-store/app` 中运行 `pnpm build`。
+合约测试在 `uvp-protocol/contracts/uvp-contracts` 中运行 `forge test`。Store/Product 前端表面由应用仓维护；本仓 `zhixu-store/registry` 是 library only。

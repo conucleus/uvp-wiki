@@ -15,10 +15,10 @@ Definition identity is a content-derived uid:
 
 ```text
 uid = zx-<32hex>
-preimage = keccak256("uvp:definition-uid:v2:" + canonical(definition document with metadata.name / metadata.annotations stripped))
+preimage = keccak256("uvp:definition-uid:v2:" + canonical(definition document with metadata.name / metadata.annotations / metadata.labels / spec.platform / spec.nucleation stripped))
 ```
 
-`metadata.labels` is definition content and participates in derivation; `metadata.name` and `metadata.annotations` are display-only and excluded. The same content yields the same uid across environments and tracks; republishing is an idempotent no-op, while any content change is a new identity. The authoritative implementation is `uvp_ir::derive_definition_uid`; the chain-track TS compiler uses the same formula and pins it cross-language with `uvp-core/fixtures/commitments/golden-vectors.v1.json`.
+`metadata.name`, `metadata.annotations`, and `metadata.labels` are display/search only, while `spec.platform` and `spec.nucleation` are track/nucleus declarations; none of them participates in the uid. The same logical content yields the same uid across environments and tracks; republishing is an idempotent no-op, while any content change is a new identity. The authoritative implementation is `uvp_ir::derive_definition_uid`; the chain-track TS compiler uses the same formula and pins it cross-language with `uvp-core/fixtures/commitments/golden-vectors.v1.json`.
 
 ## PlanId
 
@@ -28,36 +28,37 @@ preimage = keccak256("uvp:definition-uid:v2:" + canonical(definition document wi
 planId = keccak256(abi.encode(
   keccak256("uvp.plan.id.v1"), // domain
   publisher,                   // address
-  planHash                     // on-chain runtime planHash (next section)
+  runtimePlanHash              // on-chain runtime planHash (next section)
 ))
 ```
 
-Implementations: `planIdFor()` in `UVPStateMachine.sol` and the chain-track compiler. Changing the publisher or the planHash changes the `planId`.
+Implementations: `planIdFor()` in `UVPStateMachine.sol` and the chain-track compiler. Changing the publisher or the runtimePlanHash changes the `planId`.
 
 ## On-chain runtime planHash
 
-The on-chain runtime `planHash` covers hooks, the root of the three capability tables, and the supplier-binding root:
+The on-chain runtime `planHash` covers hooks, the capabilities root, the supplier-binding root, and the file-writer allowlist:
 
 ```text
 planHash = keccak256(abi.encode(
-  keccak256("uvp.plan.runtime.v7"),   // domain
+  keccak256("uvp.plan.runtime.v8"),   // domain
   hooksHash,                          // keccak256(abi.encode(CompactHook[]))
-  capabilitiesRoot,                   // single Merkle root over three capability tables
-  supplierBindingsRoot                // single Merkle root over the default/candidate (stageId, supplierId, kind) bindings
+  capabilitiesRoot,                   // single Merkle root over signal capability + selector binding
+  supplierBindingsRoot,               // single Merkle root over the default/candidate (stageId, supplierId, kind) bindings
+  fileWritersHash                     // keccak256(abi.encode(StageFileWriter[]))
 ))
 ```
 
-The publisher signs the six-field PlanCommit (publisher, hooksHash, capabilitiesRoot, supplierBindingsRoot, birthAuthorizer, deadline) via EIP-712, and `UVPStateMachine` checks this runtime `planHash` at commit/finalize; `birthAuthorizer` is not in the preimage, and the Identity Registry is not involved. `hooksHash` covers the compact hooks' `(hookId, stageId, hookName, flags, instructions, dependencyKeys)`; executor routeId/routeHash are off-chain routing metadata and enter neither `hooksHash` nor the runtime `planHash`.
+The publisher signs the six-field PlanCommit (publisher, hooksHash, capabilitiesRoot, supplierBindingsRoot, fileWritersHash, deadline) via EIP-712, and `UVPStateMachine` checks this runtime `planHash` at commit/finalize. `hooksHash` covers the compact hooks' `(hookId, stageId, hookName, flags, instructions, dependencyKeys)`; supplier routeId/routeHash are off-chain routing metadata and enter neither `hooksHash` nor the runtime `planHash`.
 
 ## Artifact Identity
 
-- The compiler-internal hook plan artifact (`uvp.hookPlan.v1`) hashes its payload under domain `uvp:hook-plan-artifact:v1`, including the definition snapshot, platform, compiled hooks, dependency index, executor routes, and so on.
+- The compiler-internal hook plan artifact (`uvp.hookPlan.v1`) hashes its payload under domain `uvp:hook-plan-artifact:v1`, including the definition snapshot, platform, compiled hooks, dependency index, supplier routes, and so on.
 - The public on-chain artifact (`uvp.onchainHookPlan.v1`) hashes its payload minus the derived `triggers[]` read surface under domain `uvp:onchain-hook-plan-artifact:v1`. It serves as the registration args' `artifactHash` for source-artifact provenance and does not replace the on-chain runtime `planHash`; the artifact's `sourcePlanHash` anchors the internal hook plan.
 - Neither side accepts handwritten JSON: artifacts must be reproducibly generated from the definition by script.
 
-## capabilitiesRoot (three capability tables)
+## capabilitiesRoot (two capability tables)
 
-The signal capability, selector binding, and file writer tables are not registered on-chain item by item. The compiler mixes them into a single domain-separated sorted-pairing Merkle tree off-chain (sorted and deduplicated, odd tail leaf promoted, `keccak256(min ‖ max)` per level); only the root lives on-chain, and membership is verified by the caller recomputing the leaf from its fields and carrying a proof. Leaf formulas:
+The signal capability and selector binding tables are not registered on-chain item by item. The compiler mixes them off-chain into a single domain-separated sorted-pairing Merkle tree (sorted and deduplicated, odd tail leaf promoted, `keccak256(min ‖ max)` per level); only the root lives on-chain, and membership is verified by the caller recomputing the leaf from its fields and carrying a proof. Leaf formulas:
 
 ```text
 signalCapabilityLeaf = keccak256(abi.encode(
@@ -68,18 +69,14 @@ selectorBindingLeaf = keccak256(abi.encode(
   keccak256("UVP_SELECTOR_BINDING_V1"),   // leaf domain
   selectorStageId, targetStageId))
 
-fileWriterLeaf = keccak256(abi.encode(
-  keccak256("UVP_FILE_WRITER_V1"),        // leaf domain
-  targetStageId, writerStageId))
-
 supplierBindingLeaf = keccak256(abi.encodePacked(
   keccak256("UVP_SUPPLIER_BINDING_V1"),   // leaf domain
   stageId, supplierId, kind))
 ```
 
-The first three leaves mix into `capabilitiesRoot`; `supplierBindingLeaf` forms the separate `supplierBindingsRoot` (signed in the PlanCommit). An empty table yields the root `keccak256("")`. The leaf formulas are byte-identical to `signalCapabilityLeaf`/`selectorBindingLeaf`/`fileWriterLeaf` in the `UVPPlanMetadataModule` contract and to the compiler's `supplierBindingLeaf`; the authoritative implementations are `uvp-protocol/packages/compiler/src/onchain/capabilities-root.ts` and `supplier-bindings.ts`.
+The first two leaves mix into `capabilitiesRoot`; `supplierBindingLeaf` forms the separate `supplierBindingsRoot` (signed in the PlanCommit). `fileWriters` does not produce a capability leaf; it enters the PlanCommit separately as the ABI-encoded hash of `StageFileWriter{targetStageId, writerStageId}[]`, `fileWritersHash`. An empty table yields the root `keccak256("")`. The authoritative implementations are `uvp-protocol/packages/compiler/src/onchain/capabilities-root.ts` and `supplier-bindings.ts`.
 
-## Dock Identity, Binding, and File Patch
+## Dock Identity, Binding, and Stage Supplier Patch
 
 Dock is a separate `kind: Dock` document with content-derived identity:
 
@@ -101,15 +98,23 @@ bindingId = keccak256(abi.encode(
 
 The `dock_link` file entry's `contentHash` only authenticates the payload body at poke time; a mismatch reverts `DockBindingContentHashMismatch`, and it never enters the bindingId, events, views, or fact provenance. Current window values are evaluated live by read views; historical window times are not on chain.
 
-The canonical digest of a stage file patch:
+The stage supplier patch EIP-712 primary type is:
 
 ```text
-filesDigest = keccak256(abi.encode(
-  keccak256("UVP_FILE_PATCH_V1"),
-  planId, orderId, targetStageId, baseHash, writerStageId, ops))
+UVPStagePatchModuleStageSupplierPatch(
+  bytes32 planId, bytes32 orderId, bytes32 selectorStageId, bytes32 targetStageId,
+  bytes32 supplierId, bytes32 previousSupplierId, uint256 patchNonce,
+  address selector, uint256 deadline)
 ```
 
-`writerProof` is a witness and does not enter the digest. The stage executor patch payload hash uses domain `uvp:stage-executor-patch-payload:v1`, covering selector/target stage, executor, role, metadata hash, mode, previousExecutor, approval source/signal, nonce, and metadata URI — not file fields.
+The dock supplier selection primary type is:
+
+```text
+UVPStagePatchModuleStageDockSupplierSelection(
+  bytes32 planId, bytes32 orderId, bytes32 selectorStageId, bytes32 targetStageId,
+  bytes32 dockId, bytes32 supplierId, uint256 patchNonce,
+  address selector, uint256 deadline)
+```
 
 ## Stable IDs
 
@@ -122,7 +127,7 @@ hookName = keccak256(hookName)
 sourceId = keccak256(source)
 signalId = keccak256(signalName)
 signalKey = keccak256(abi.encode(sourceId, signalId))
-routeId = keccak256(stageIdentifier#executorRoute)
+routeId = keccak256(stageIdentifier#supplierRoute)
 selectorBindingHash = hashCanonical("uvp:onchain-stage-selector-binding:v1", ...)
 ```
 
@@ -130,13 +135,13 @@ For `bytes32,bytes32`, the compiler's byte concatenation matches Solidity `abi.e
 
 ## routeHash and Absent fileResources
 
-An executor route is off-chain routing metadata, and `fileResources` is optional input to the route hash formula. When a route/plan does **not** declare `fileResources`, the protocol requires ZERO_HASH (32 zero bytes, `0x0000…0000`) to enter the computation as `resourcesHash`:
+A supplier route is off-chain routing metadata, and `fileResources` is optional input to the route hash formula. When a route/plan does **not** declare `fileResources`, the protocol requires ZERO_HASH (32 zero bytes, `0x0000…0000`) to enter the computation as `resourcesHash`:
 
 ```text
 resourcesHash = fileResources undeclared ? ZERO_HASH : keccak256(canonicalJSON(fileResources))
 
 routeHash = hashCanonical("uvp:onchain-hook-route:v1", {
-  stageId, stageIdentifier, executorHash, resourcesHash
+  stageId, stageIdentifier, supplierHash, resourcesHash
 })
 ```
 

@@ -43,11 +43,11 @@ pnpm --filter @uvp-eth/chain-services dock-artifact:record -- \
 
 ## Store 工作台
 
-Store 工作台与 Store Console API 由 used-car 应用仓提供；本仓 `zhixu-store/registry` 是非面向用户的数据层库（`ZhixuRecord` / `IdentityClaim` 登记，library only）。启动方式与配置见应用仓 README。
+Store 工作台与 Store Console API 由 used-car 应用仓提供；本仓 `zhixu-store/registry` 是非面向用户的数据层库（`ZhixuRecord` 登记，library only）。启动方式与配置见应用仓 README。
 
 ## Order App
 
-Order App 是浏览器内的链上直连订单控制台（demo B）：连接注入式钱包，载入 plan artifact，签 `commitPlan` + `finalizePlan` 注册计划，再签 `triggerOrderFromOutsideFor` 出生订单，随后读链上事实与事件、提交 signal。它不依赖 backend、会话 token、草稿或邀请。
+Order App 是浏览器内的链上直连订单控制台（demo B）：连接注入式钱包，载入 plan artifact，签 `commitPlan` + `finalizePlan` 注册计划，再签 `submitSignal`（空 `orderId` + 出生信号）出生订单，随后读链上事实与事件、提交 signal。它不依赖 backend、会话 token、草稿或邀请。
 
 ```bash
 pnpm --filter @uvp-eth/order-app dev

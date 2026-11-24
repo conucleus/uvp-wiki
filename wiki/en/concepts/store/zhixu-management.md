@@ -21,7 +21,7 @@ The Nucleation workbench serves order designers and organizers. It provides Zhix
 | Store operator/reviewer | Maintains the catalog, reviews material, sets visibility and recommendations. | Store institutional rules and access control. |
 | Publisher | Signs to publish a Plan. | StateMachine publisher rights and EIP-712 signatures. |
 | Registry operator | Verifies offline subjects and registers subject/account bindings. | Identity Registry owner rights. |
-| Order participant | Accepts an order role and submits authorized Signals. | Order-level explicit authorization and EIP-712 signatures (executor patches additionally carry patch authorization). |
+| Order participant | Accepts an order role and submits authorized Signals. | Source stage assigned supplier account and EIP-712 signatures (stage supplier patches carry their own selector authorization). |
 
 Authority sources for each object are unified in the [README.md](README.md) "Information objects and authority sources" table; this page does not restate boundary arguments.
 

@@ -74,7 +74,7 @@ spec:
 
 - **B-side static subscription**: the contract is fixed at compile time (`uvp.dock.v1`); runtime only evaluates identity and windows, and new document content yields a new `dkid`.
 - **A/B are peers with independent governance**: each side has its own plan, authorization, orders, and proofs; side B decides which A facts to read and which outputs to emit.
-- **One-time dock-executor selection**: responsibility is fixed inside the order, re-selection has a named rejection, and the executor must hold order-level authorization for every Dock output signal.
+- **One-time dock-executor selection**: responsibility is fixed inside the order, re-selection has a named rejection, and the selector must be the selector stage's assigned supplier account and the selected SID must be active.
 - **Binding expressed by the A order id**: the same A order returns to the same binding and capabilities replay; the binding identity is the seven-word `bindingId`.
 
 ## Runtime Path
@@ -93,7 +93,7 @@ A order fact submitted
 | Question | Proof source |
 | --- | --- |
 | Is the Dock declaration registered? | `DockRegistered` and `getDock(dkid)`. |
-| Who takes the B stage? | `StageDockExecutorSelected` and `getActiveStageDockSelection` / `activeStageExecutor`. |
+| Who takes the B stage? | `StageDockSupplierSelected` and `getActiveStageDockSelection` / `activeStageExecutor`. |
 | What is the binding identity? | The seven-word `bindingId` and the `dock_link` file record. |
 | What are the current A/B windows? | `dockOutputWindow` / `getStageDockBinding` and the `uvp.dockBinding.v1` read surface (relative `dueInSeconds`, no persisted window history). |
 | Was a B output emitted? | `DockOutputSubmitted` and `SignalSubmitted` on the B order. |

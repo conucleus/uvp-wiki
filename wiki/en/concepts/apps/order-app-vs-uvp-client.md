@@ -52,11 +52,11 @@ This section is the single authoritative statement for the execution surface.
 
 Neither entry can bypass:
 
-- order-level signal authorization;
+- assigned-supplier submission authority;
 - EIP-712 business signatures;
 - payload hashes;
 - first-writer-wins signal semantics;
 - chain event proofs;
-- order-level explicit `SignalAuthorization` plus EIP-712 signatures; executor patches are checked against their own patch authorization surface.
+- `stage -> supplierId` assignment, `UVPIdentityRegistry.accountOf(supplierId)`, and EIP-712 signatures; stage supplier patches have their own selector authorization surface.
 
 Order App owns no order state; uvp-client owns no order state, session, or private key.

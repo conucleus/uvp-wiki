@@ -23,9 +23,9 @@ The evidence and proof subsystems handle handles, hashes, metadata, and proof vi
 | `src/proof-verifier/service.ts` | Metadata hash, evidence hash, and Zhixu hash alignment checks. |
 | `src/api/routes/evidence.ts` | Evidence upload metadata and proof route. |
 
-## A File Resource Is a Handle
+## A File Resource Is an Application Resource Declaration
 
-A File Resource is a verifiable resource handle — fileType, object namespace, and URI policy plus metadata/content hashes, ultimately landing as an on-chain proof row. In practice it is an off-chain object such as S3, R2, private object storage, or a local rehearsal adapter. For the full model and type definitions, see [File Resources](../core/file-resources.md).
+A File Resource is an application-interpretable resource declaration: `fileType` (an open string) and the remaining opaque payload are defined by the application and may carry an object namespace, URI policy, and metadata/content hashes; at runtime the chain stores only `StageFile{key, payload}` plus `StageFileWritten`, while the body stays in S3, R2, private object storage, or a local rehearsal adapter. For the full model, see [File Resources](../core/file-resources.md).
 
 ## What the Proof Verifier Does
 
@@ -37,8 +37,8 @@ A File Resource is a verifiable resource handle — fileType, object namespace, 
 Proof verifier boundaries:
 
 - Whether goods were actually delivered is judged by business participants, evidence, and their own review processes.
-- Identity Registry publication expresses only the binding between an offline subject and an on-chain account; it does not certify supplier capability or reputation, which remain Store off-chain business data.
-- Object-handle accessibility cannot generate `SignalSubmitted`.
+- The Identity Registry's subject namespace expresses only the binding between an offline subject and an on-chain account, while its supplier namespace expresses only SID/account/active status; neither certifies supplier capability or reputation, which remain Store off-chain business data.
+- Opaque payload accessibility cannot generate `SignalSubmitted`.
 - Hash alignment is a proof condition; hook readiness comes from state-machine events.
 
 ## The Plaintext Evidence Boundary

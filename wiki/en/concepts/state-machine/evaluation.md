@@ -67,7 +67,7 @@ struct EvalValue {
 }
 ```
 
-`wait/ready/cxl` are hook runtime statuses; the cloud-side semantic layer additionally has `init` (a not-yet-converged initial state), which is not an on-chain `Instruction[]` evaluation result. Hooks evaluate only over the current order's event set: a birth signal is admitted in the empty-order context and then written as the first fact, while B output signals emitted by a Dock into a satisfied A/B window enter the same order event set. Aggregation (matching) semantics are expressed as multiple in-order conditions paired by the executor.
+`wait/ready/cxl` are hook runtime statuses; the cloud-side semantic layer additionally has `init` (a not-yet-converged initial state), which is not an on-chain `Instruction[]` evaluation result. Hooks evaluate only over the current order's event set: a birth signal is admitted in the empty-order context and then written as the first fact, while B output signals emitted by a Dock into a satisfied A/B window enter the same order event set. Aggregation (matching) semantics are expressed as multiple in-order conditions paired by the supplier.
 
 ## Operator Semantics
 
@@ -88,10 +88,10 @@ one order scope only the first submission writes a `SignalRecord`
 (first-writer-wins); later duplicate external submissions are absorbed
 idempotently without repeated advance (the `SignalAlreadyExists` revert is
 reserved for engine-internal write entry points).
-The contract checks whether the submitter holds an explicit order-level authorization for that `source`/`signal`; an executor patch or a dock-executor selection writes the corresponding authorization set into the order when it takes effect. Every
+The contract resolves the source stage's currently effective assigned supplier account (plan default -> per-order stage supplier patch -> one-time dock selection), verifies the account through `UVPIdentityRegistry.accountOf(supplierId)`, and requires the SID to be `active`; there is no submitter authorization table. Every
 replay oracle, index, and Product API must carry `planId` and must not merge
-orders across plans by bare `orderId`. For the authorization model, see
-[Signal Authorization](../trust/signal-authorization.md).
+orders across plans by bare `orderId`. For the signature and relay model, see
+[EIP-712 and Relayer](../trust/eip712-relayer.md).
 
 ## The Contract Is the Authority
 

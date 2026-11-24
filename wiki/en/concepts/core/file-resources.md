@@ -9,19 +9,19 @@ status: verified
 # File Resources
 
 > Prerequisite reading: [Core Concepts](../README.md)
-`fileResources` are stage resource handles. They describe which off-chain objects, protocol files, evidence templates, acceptance criteria, or resource manifests a stage needs to reference. On the DSL side they are static declarations; runtime rewrites of a stage's file map for one order are order-level facts carried by the file module. On-chain facts come from authorized signals, content hashes, opaque handles, and events; file plaintext stays off-chain.
+`fileResources` are stage resource declarations. They describe which off-chain objects, protocol files, evidence templates, acceptance criteria, or resource manifests a stage needs to reference. On the DSL side they are static declarations; runtime writes to a stage's file map for one order are order-level facts carried by the file module. On-chain facts come from authorized signals, opaque payloads, and events; file plaintext stays off-chain.
 
 ## Who Uses It
 
-Nuclei declare fileResources on stages; Store/Product API use them to present protocol and evidence requirements; Order App and uvp-client translate them into upload and validation flows; operators and executors use the same handle model during order-level stage file patches.
+Nuclei declare fileResources on stages; Store/Product API use them to present protocol and evidence requirements; Order App and uvp-client translate them into upload and validation flows; operators and assigned suppliers use the same opaque payload model during order-level file writes.
 
 ## What It Produces
 
-Static declarations enter the compiled artifact's stage route metadata, so read surfaces such as Product API and uvp-client can present protocol and evidence requirements; runtime rewrites are stage file patches — the order atomically rewrites the target stage's file map (`key -> (contentHash, handle)`) with strict ops in its own context, producing `StageFilePatchApplied` / `StageFileOpApplied` events. Whether business is complete still follows authorized signals and proof, not the files themselves.
+Static declarations enter the compiled artifact's stage route metadata, so read surfaces such as Product API and uvp-client can present protocol and evidence requirements; runtime writes set the target stage's file map to `StageFile{string key; bytes payload}`, with the same key overwritten, and produce `StageFileWritten` events. Whether business is complete still follows authorized signals and proof, not the files themselves.
 
 ## Where Authority Comes From
 
-Whether resources satisfy requirements is finally decided by authorized signals and proof, not by the files themselves; only content hashes, opaque handles, and patch events are stored on chain, and plaintext always stays off-chain.
+Whether resources satisfy requirements is finally decided by authorized signals and proof, not by the files themselves; only opaque `{key, payload}` and write events are stored on chain, and plaintext always stays off-chain.
 
 The current compiler's TS shell defines it as a loose handle:
 
@@ -32,59 +32,54 @@ interface FileResourceLike {
 }
 ```
 
-This loose interface is only the shell shape — it is **not** a semantic open-endedness promise: the `fileType` closed set is enforced by the Go cloud-side compile entries (`v0.IsValidFileResourceType`, one shared set across /compile, /validate, and /signal) and the TS chain-track precheck (`FILE_TYPES`, same set); Rust `uvp-core` passes `file_resources` through as opaque JSON values and does not validate `fileType`. Legal values are the closed set `local` / `http` / `txcloud` / `plain_text` (see the table below); invented values outside the set are rejected at compile time. `fileResources`' first responsibility is "a resolvable resource reference" — the storage backend is determined by the handle type, and the DSL offers no arbitrary storage-backend extension point.
+`fileType` only has to be a non-empty string, and its **value domain is open**: neither uvp-core nor the chain-track TS compiler dispatches on type or maintains a closed set, and the entry's remaining keys are application-defined opaque payload preserved verbatim. `fileResources`' first responsibility is "an application-interpretable resource reference"; the storage backend and file type are decided by the application layer.
 
-## Resource Handles
+## Resource Declarations
 
-A stage can use `fileResources` to point to off-chain protocol files, evidence templates, or object-storage resources, with verification info attached:
+A stage can use `fileResources` to point to off-chain protocol files, evidence templates, or object-storage resources, with application-defined verification info attached:
 
 ```yaml
 fileResources:
   stage_protocol:
-    fileType: http
-    httpFile:
-      url: "https://example.com/protocols/payment-settlement-v1.json"
+    fileType: app_protocol_ref
+    locator: "https://example.com/protocols/payment-settlement-v1.json"
   evidence_bucket:
-    fileType: txcloud
-    txCloudFile:
-      bucket: "evidence-bucket"
-      region: "ap-guangzhou"
-      objectKey: "protocols/payment-settlement-v1.json"
+    fileType: app_object_ref
+    bucket: "evidence-bucket"
+    region: "ap-guangzhou"
+    objectKey: "protocols/payment-settlement-v1.json"
 ```
 
-This YAML gives Store, Product API, uvp-client, or adapters one resource handle: they can display the protocol, compute hashes, surface evidence requirements, and check acceptance rules. On chain, content hashes, opaque handles, and stage file patch events are stored.
+These keys are interpreted by the application: Store, Product API, uvp-client, or an adapter can display the protocol, compute hashes, surface evidence requirements, and check acceptance rules. The chain stores opaque payloads and stage file write events.
 
 ## What fileType Means
 
-`fileType` indicates the handle type; legal values are the DSL closed set (the Go cloud-side compile entries and the TS chain-track precheck reject values outside the set at compile time, by one shared collection):
+`fileType` is an application-defined handle type whose only protocol constraint is a non-empty string:
 
-| fileType | Meaning |
+| Value | Meaning |
 | --- | --- |
-| `local` | Local file-path handle (`localFile.path`); suited to fixtures and development samples. |
-| `http` | HTTP/HTTPS file URL handle (`httpFile.url`). |
-| `txcloud` | Off-chain object-storage (Tencent Cloud COS) handle (`txCloudFile` bucket/region/objectKey); production must not expose plaintext credentials. |
-| `plain_text` | Inline plaintext (base64); local fixtures or development samples only, never a production evidence carrier. |
+| Any non-empty string | Interpreted by the application layer; the core does not read it, does not validate type-specific fields, and does not dispatch on type. |
 
-There is no `manifest` / `uri` / `ipfs` / `arweave` / `object_storage` / `onchain` fileType — and no DSL handle for storing resources directly on chain. Contracts, invoices, logistics documents, photos, reports, and vehicle-condition evidence should never go on chain in plaintext; when a verifiable reference is needed, express it via a handle plus a content hash, or keep only hashes and metadata URIs on chain.
+There is no protocol built-in `local` / `http` / `txcloud` / `plain_text` closed set; those are local conventions of some applications or cloud-side resolvers, not the DSL acceptance domain. Contracts, invoices, logistics documents, photos, reports, and vehicle-condition evidence should never go on chain in plaintext; when a verifiable reference is needed, express it as an opaque payload plus a content hash, or keep only hashes and metadata URIs on chain.
 
 ## Stage File Map
 
 The runtime file map is an order-level fact owned by `UVPFileResourceModule` (the `UVPStateMachine` only routes through the `fileResourceModule()` directory, and the module trusts `msg.sender == stateMachine` as its only trust gate). Each stage's map is:
 
 ```text
-key -> (contentHash, handle)
+key -> payload
 ```
 
-- `handle` is an opaque, bounded (≤512 bytes) reference; the engine neither parses it, stores the body, nor touches application storage.
-- The chain defines no `fileType` and carries no type/storage semantics: file types are backend-defined, freestyle, and non-enumerable, and the engine provides only the minimal primitive.
-- Writes are strict, whole-patch atomic `add` / `replace` / `remove`: `add` requires the key absent, `replace`/`remove` require it present; any failure rolls back the whole request.
-- `baseHash` is mandatory and must equal the stage's current files version at signing time (`filesHash = keccak256(abi.encode(oldHash, patchHash))` rolling); a mismatch rejects the whole request. The map holds exactly one current value per key; replacement is expressed with `replace`/`remove`, there is no nonce, and an already-applied `patchHash` is absorbed first-win.
+- `StageFile` is `{string key; bytes payload}`; a key is ≤128 bytes, a payload is ≤4096 bytes, and one call carries ≤16 entries.
+- The engine does not parse key/payload, stores no body, and never touches application storage.
+- Re-writing the same key overwrites it; each key has exactly one current payload, with no per-key version history and no operation state machine.
+- A write is atomic as a whole: if any file entry fails, the whole call rolls back.
 
-Write authorization comes from the stage-level `fileWriters` allowlist (the target stage declares which stages may write its files; the stage itself is implicitly writable and never self-referenced) plus the existing `SignalAuthorization` table — see [Stage File Patch](../state-machine/file-patch.md). File patches travel in the tail of the direct `submitSignal` with `bytes32 filesDigest` and `FilePatch`; a pure file patch uses `signalId == 0`, is not a business signal, does not increment business signal counts, does not evaluate hooks, does not run admission, and is not subject to the executor patch "stage already has signal" timing gate.
+Write authority comes from the stage-level `fileWriters` allowlist (the target stage declares which stages may write its files; the stage itself is implicitly writable and never self-referenced), and the write reuses the target/writer stages' currently assigned supplier accounts; see [Stage File Map](../state-machine/file-patch.md). File writes travel through direct `submitSignal`'s `files: StageFile[]`; a pure file write uses `signalId == 0`, is not a business signal, does not increment business signal counts, does not evaluate hooks, does not run admission, and is not subject to the stage supplier patch "target stage already has a signal" timing gate.
 
 ## Store and Product Display Boundary
 
-Store can organize resource handles into:
+Store can organize resource declarations into:
 
 - stage protocol, evidence requirement, acceptance criteria;
 - manifest hash, metadata URI, content hash;
@@ -99,11 +94,11 @@ For contributor security rules see ../../meta/documentation-rules.md.
 - Putting contract, invoice, logistics file, photo, or report plaintext on chain.
 - Treating `fileResources` as meaning resource requirements are met; business completion follows signal/proof.
 - Treating object-storage accessibility as more than an auxiliary condition; on-chain proof follows events and hashes.
-- Confusing stage file patch with executor patch: they are two independent order-level actions, each with its own authorization face.
+- Confusing stage file writes with stage supplier patches: they are two independent order-level actions, each with its own authorization face.
 
 ## Related Pages
 
-- [Stage File Patch](../state-machine/file-patch.md)
+- [Stage File Map](../state-machine/file-patch.md)
 - [Evidence, Proof, and File Resource](../services/evidence-proof.md)
 - [Artifacts and Hashes](../artifacts-and-hashes.md)
 - [Stage Overlay](../state-machine/stage-overlay.md)

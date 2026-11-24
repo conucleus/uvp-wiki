@@ -11,7 +11,7 @@ The key design of `uvp-eth` is that on-chain contracts and chain events are the 
 
 ## Main Data Flow
 
-The main data flow advances along "compiled artifacts -> Plan registration -> order registration and authorization -> participants submit signals -> contract events -> indexer normalization -> projection rebuild -> Product DTO". For the full flow diagram, see [Architecture](architecture.md).
+The main data flow advances along "compiled artifacts -> Plan registration -> order birth and submission authority -> participants submit signals -> contract events -> indexer normalization -> projection rebuild -> Product DTO". For the full flow diagram, see [Architecture](architecture.md).
 
 ## Must Come from Chain
 
@@ -25,9 +25,9 @@ The main data flow advances along "compiled artifacts -> Plan registration -> or
 | Whether a Plan is usable | The publisher signature plus `PlanCommitted` / `PlanFinalized`. |
 | Which real-world subject a wallet maps to | `UVPIdentityRegistry` binding/revocation events; capability judgment remains with Store. |
 | Whether a deployment version is active | `UVPDeploymentRegistry` cutover events. |
-| Whether the stage executor changed | Stage Patch Module's `StageExecutorPatchApplied` and the StateMachine's `StageExecutorActivated`. |
-| Whether the stage file map was updated | `StageFilePatchApplied` / `StageFileOpApplied`. |
-| Whether the Dock declaration is registered and the dock executor selected | `UVPDockRegistry`'s `DockRegistered`; `StageDockExecutorSelected` (selected once on the attach stage). |
+| Whether the stage supplier changed | Stage Patch Module's `StageSupplierPatchApplied` and the StateMachine's `StageSupplierAssigned`. |
+| Whether the stage file map was updated | `StageFileWritten`. |
+| Whether the Dock declaration is registered and the dock executor selected | `UVPDockRegistry`'s `DockRegistered`; `StageDockSupplierSelected` (selected once on the attach stage). |
 | Whether a dock binding is established / emitted | `DockBindingPoked` (A/B windows and binding) and `DockOutputSubmitted` (B-side output facts carrying the binding id). |
 
 ## Cacheable but Must Be Rebuildable
@@ -35,10 +35,10 @@ The main data flow advances along "compiled artifacts -> Plan registration -> or
 | Data | Rule |
 | --- | --- |
 | `StateMachineOrderProjection` | Rebuilt from state-machine events. |
-| `StateMachineTaskProjection` | Rebuilt from `HookReady`, authorizations, executor patches / stage file patches, and signal events. |
+| `StateMachineTaskProjection` | Rebuilt from `HookReady`, assigned suppliers, stage supplier patches / stage file writes, and signal events. |
 | Product proof rows | Generated from event provenance. |
 | Supplier identity projection | Rebuilt from Identity Registry events. |
-| Stage patch and dock binding projections | Rebuilt from the `StageExecutorPatchApplied`, `StageFilePatchApplied` / `StageFileOpApplied`, `StageDockExecutorSelected`, `DockBindingPoked`, and `DockOutputSubmitted` event families. |
+| Stage patch and dock binding projections | Rebuilt from the `StageSupplierPatchApplied`, `StageFileWritten`, `StageDockSupplierSelected`, `DockBindingPoked`, and `DockOutputSubmitted` event families. |
 | Store catalog state | May merge metadata; Plan publication and identity-binding status must come from chain events. |
 
 ## Operational Aids Only

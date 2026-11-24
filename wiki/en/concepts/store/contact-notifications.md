@@ -22,11 +22,11 @@ The Store can maintain contact and notification workflows because real fulfillme
 
 ## Sources and boundaries
 
-- Notification triggers may come from `HookReady`, order-level authorization, supplier identity, and Product task projections.
+- Notification triggers may come from `HookReady`, `StageSupplierAssigned`/`StageSupplierPatchApplied`, supplier status, and Product task projections.
 - Notification state only shows whether the Store/chain-services attempted to contact or remind someone; contact is not fulfillment, see [../protocol-boundaries.md](../protocol-boundaries.md).
 - Business completion must be expressed by an on-chain signal from an authorized submitter ([../protocol-boundaries.md](../protocol-boundaries.md)).
 - Contact details, credentials, private notes, certificates, contracts, invoices, and evidence plaintext should not go on chain.
-- A notification to a Dock peer means the dock executor or adapter has been reminded; whether a binding exists is read from the `dock_link` file record and `StageDockExecutorSelected`, and whether an output was emitted is read from `DockOutputSubmitted`. Notification state never changes protocol facts.
+- A notification to a Dock peer means the dock executor or adapter has been reminded; whether a binding exists is read from the `dock_link` file record and `StageDockSupplierSelected`, and whether an output was emitted is read from `DockOutputSubmitted`. Notification state never changes protocol facts.
 
 ## Relationship with chain services
 

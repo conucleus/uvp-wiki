@@ -11,7 +11,7 @@ status: verified
 > Prerequisite reading: [Glossary](../reference/glossary.md)
 When unsure about terminology, check the [Core Glossary](../reference/glossary.md) first.
 
-The core of `uvp-eth` is a state-machine protocol that lands Zhixu (order) coordination rulebooks on the EVM chain. Contracts and chain events are the source of truth; Store, Product API, Order App, uvp-client, and periphery adapters compile, index, display, sign, and submit around that source of truth. These objects are the language layer consumed jointly by every product.
+The core of `uvp-eth` is a state-machine protocol that lands Zhixu coordination rulebooks on the EVM chain. Contracts and chain events are the source of truth; Store, Product API, Order App, uvp-client, and application adapters compile, index, display, sign, and submit around that source of truth. These objects are the language layer consumed jointly by every product.
 
 Read the shortest object relationship first:
 
@@ -41,10 +41,10 @@ The engineering implementation then breaks this relationship into compiled artif
 | Object | Start with | Core question |
 | --- | --- | --- |
 | Plan | [Plan](core/plan.md) | How a Zhixu becomes a static, certifiable, registrable compiled artifact. |
-| Source | [Source Causal Chain](core/source.md) | How the causal context of a signal chains, forks, and converges. |
+| Source | [Source Causal Chain](core/source.md) | How the causal context of a signal chains and converges. |
 | Hook | [Hook](core/hook.md) | How readiness and state changes derive from signal conditions. |
 | Trigger | [Trigger](core/trigger.md) | Which hook opens actionable tasks when Ready and emits `HookReady`. |
-| File Resources | [File Resources](core/file-resources.md) | How stage file mappings (content hash + handle) point to off-chain protocols, evidence templates, or file resources. |
+| File Resources | [File Resources](core/file-resources.md) | How stage file mappings (`StageFile{key,payload}`) point to off-chain protocols, evidence templates, or file resources. |
 
 ### Read When You Need Organization and Material Review
 
@@ -56,9 +56,9 @@ The engineering implementation then breaks this relationship into compiled artif
 
 ## Where Supplier and Executor Sit
 
-Supplier is how the Store organizes real-world fulfillment subjects: nuclei can describe requirements in their order design, while Store maintains profiles, capability tags, contacts, matching, and proof materials; `UVPIdentityRegistry` only registers subject-to-wallet bindings. Actual task authorization still comes from Order signatures and order-level authorization; capability tags are not a protocol precondition.
+Supplier is how the Store organizes real-world fulfillment subjects: nuclei can describe requirements in their order design, while Store maintains profiles, capability tags, contacts, matching, and proof materials; `UVPIdentityRegistry` registers the subject and supplier namespaces. Actual submission authority is carried by the source stage's assigned supplier account; capability tags are not a protocol precondition.
 
-Executor is the runtime execution binding of an order: a static Zhixu may declare a default executor; stages with stage-executor-patch capability may assign or hand off an executor at runtime; dock-stage executors are selected once through `selectStageDockExecutor`. The contract ultimately decides whether a signal is accepted using order-level authorization and EIP-712 signatures.
+Executor is the runtime execution binding of an order: a static Zhixu may declare a default executor; stages with stage supplier patch capability may assign or hand off a supplier at runtime; dock-stage executors are selected once through `selectStageDockSupplier`. The contract ultimately decides whether a signal is accepted using the assigned supplier account and EIP-712 signatures.
 
 ## Zhixu, Nuclei, and Suppliers Reappear in the Store
 
@@ -66,7 +66,7 @@ The same objects carry different emphasis in different sections:
 
 | Section | Zhixu / nucleus emphasis | Supplier emphasis |
 | --- | --- | --- |
-| Core concepts | DSL fields, `spec.nucleation.id`, Plan compilation, plan hash, chain registration, order instance. | Capability subject, trust subject, capability passport, signal authorization boundary. |
+| Core concepts | DSL fields, `spec.nucleation.id`, Plan compilation, plan hash, chain registration, order instance. | Capability subject, trust subject, capability passport, assigned-supplier submission boundary. |
 | Zhixu Store | Store gives nuclei a workbench for design, organization, publication materials, proof, and material-review requests. | How nuclei organize supplier networks, and how Store maintains directory, contacts, platform tags, proof, and material-review request material. |
 
 ## How to Read
@@ -81,9 +81,9 @@ The same objects carry different emphasis in different sections:
 | Chapter | Description |
 | --- | --- |
 | [Architecture](architecture.md) | Module boundaries, dependency direction, source of truth, and data flow. |
-| [State Machine](state-machine/README.md) | How the contract stores signals, evaluates hooks, and handles timers and order-level patches (executor patch and stage file patch); part of the core component chain. |
+| [State Machine](state-machine/README.md) | How the contract stores signals, evaluates hooks, and handles timers and order-level patches (stage supplier patch and stage file writes); part of the core component chain. |
 | [Artifacts and Hashes](artifacts-and-hashes.md) | Compiled artifacts, canonical hashes, stable IDs, and registration parameters. |
-| [Trust and Authorization](trust/README.md) | Identity Registry, Plan publication, order-level signal authorization, EIP-712, and the relayer boundary. |
+| [Trust and Authorization](trust/README.md) | Identity Registry, Plan publication, assigned-supplier submission authority, EIP-712, and the relayer boundary. |
 | [Product Surfaces](product/README.md) | How chain-services project chain events into orders, tasks, and proofs ordinary users can read. |
 | [Zhixu Store](store/README.md) | The Store is a first-class product/governance system that gives nuclei a workbench, and reinterprets Zhixu/Supplier, identity verification, contact notifications, fulfillment records, and platform workflow. |
 | [Order App and uvp-client](apps/order-app-vs-uvp-client.md) | How the participant app and the executor integration surface consume tasks and submit signals. |
@@ -93,14 +93,14 @@ The same objects carry different emphasis in different sections:
 - Contracts and chain events decide the real state of plan, order, signal, hook, and publication; Store, Order App, and Product API organize user language and metadata, while protocol facts come from chain events.
 - Indexer databases must be rebuildable from events and cannot become the source of truth.
 - Relayers may sponsor or forward transactions, but must not generate business signatures for participants.
-- Supplier identity (material review) and order-level signal authorization are layered separately.
-- Executor patches and stage file patches affect only a single Order; Plans stay static versions.
+- Supplier identity (material review) and on-chain execution authority are layered separately: submission authority is carried only by the source stage's assigned supplier account, and there is no submitter authorization table.
+- Stage supplier patches and stage file writes affect only a single Order; Plans stay static versions.
 - Cross-order collaboration is carried by a static `kind: Dock` declaration on the B side (`from`/`to`/`signalMap`): the attaching stage declares a dock executor with `supplierType: dock` and selects it once; the binding is determined by that stage's `dock_link` file entry, and `pokeDockBinding` emits B-side signals output by output inside the A/B window.
-- A receive Hook with `emitReady=true` opens an actionable task when Ready; on-chain orders are created through the three birth channels (outside-trigger / order-link / fork) and resolved as `(planId, orderId)`.
-- Stage file mappings (`fileResources` declarations plus `UVPFileResourceModule` key -> content hash + handle) carry file references; plaintext business documents stay off chain.
+- A receive Hook with `emitReady=true` opens an actionable task when Ready; on-chain orders are created through the single birth entry `submitSignal(orderId=0)` and resolved as `(planId, orderId)`.
+- Stage file mappings (`fileResources` declarations plus `UVPFileResourceModule`'s `StageFile{key,payload}`) carry file references; plaintext business documents stay off chain.
 - Store metadata organizes objects and catalogs; plan/supplier identity comes from registry events.
 - Store admins own platform workflow; nuclei own governance inside their Zhixu; Identity Registry operators own identity verification and binding.
 - UVP Client is the executor integration surface, working around the state machine and Product API.
-- Funding, payment, guarantee, and agent adapters may appear as implementations of Supplier or Executor roles, consuming signal/proof around core interfaces without adding new sources of truth.
+- Funding, payment, guarantee, and agent adapters live in application repositories and appear as implementations of Supplier or Executor roles, consuming signal/proof around core interfaces without adding new sources of truth.
 
 For the full discussion of these boundaries, see [Protocol Boundaries](protocol-boundaries.md).

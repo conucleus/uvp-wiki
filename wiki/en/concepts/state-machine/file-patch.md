@@ -1,81 +1,75 @@
 ---
-title: Stage File Patch
+title: Stage File Writes
 type: explanation
 audience: 工程贡献者
 status: verified
 ---
 
-# Stage File Patch
+# Stage File Writes
 
-A stage file patch rewrites the file map of one target stage at order level: the order keeps its Plan and changes only that stage's `fileResources` mapping (`key -> (contentHash, handle)`). The chain stores content hashes and opaque handles; business plaintext stays in object storage or participant-private storage. For the static resource object see [File Resources](../core/file-resources.md).
+A stage file write is an order-level file-map change: an order does not modify the Plan, it only writes the target stage's `{key, payload}` map. The chain stores opaque payloads; business bodies stay in object storage or participant-private storage. For static resource declarations see [File Resources](../core/file-resources.md).
 
 ## Data Structure and Entry Point
 
 The file map is owned by `UVPFileResourceModule`; the core `UVPStateMachine` reaches it only through the `fileResourceModule()` directory, and the module treats `msg.sender == stateMachine` as its single trust gate.
 
-The order-level entry point is the trailing part of direct `submitSignal`:
+The order-level entry point is direct `submitSignal`'s `files` field:
 
 ```text
-submitSignal(planId, orderId, sourceId, signalId, payloadHash, idempotencyKey,
-             attribution, bytes32 filesDigest, FilePatch filePatch)
-
-FilePatch {
-  bytes32 targetStageId;
-  bytes32 baseHash;        // required: the stage's current file version
-  bytes32 writerStageId;   // 0 resolves to the signal's stage
-  bytes32[] writerProof;   // fileWriters capability-leaf membership proof
-  FileOp[] ops;            // {kind, key, contentHash, handle}
-}
+submitSignal(
+  SignalSubmission {
+    ...,
+    targetStageId,
+    files: StageFile[]   // StageFile { string key; bytes payload }
+  },
+  signature
+)
 ```
 
-- `signalId == 0`: a pure file patch, with no business signal, submitted on its own; `filesDigest = keccak256(canonicalFilePatch(planId, orderId, filePatch))`.
-- `signalId != 0`: the business signal is submitted first, then the file patch is applied in the same transaction (one business signal, one target stage).
-- One request carries at most one business signal and one target stage.
+- `signalId == 0`: a pure file write with no business signal, submitted on its own.
+- `signalId != 0`: the business signal is submitted first, then the file writes are applied in the same transaction (one business signal, one target stage).
+- One call carries at most 16 file entries; a key is ≤128 bytes and a payload is ≤4096 bytes.
 
-## Keys and Ops
+## Keys and Overwrite
 
-| op | Precondition | Result |
-| --- | --- | --- |
-| `add` | key absent | writes `key -> (contentHash, handle)` |
-| `replace` | key present | replaces the current value |
-| `remove` | key present | deletes the key |
+```text
+key -> payload
+```
 
-- `handle` is an opaque, bounded (≤512 bytes) reference; the engine never resolves it, never stores plaintext, and never reaches application storage.
-- The chain defines no `fileType` and carries no type/storage semantics: file types are backend-defined, freestyle, and non-enumerable; the engine exposes only a minimal primitive.
-- `baseHash` is required and equals the stage's file version at signing time (`filesHash = keccak256(abi.encode(oldHash, patchHash))` rolling); a mismatch rejects the whole patch.
-- The map always holds exactly one current value per key; replacement uses `replace` / `remove`, there is no nonce, and an already-applied `patchHash` is absorbed first-win instead of being recorded twice.
+- `payload` is an opaque, bounded (≤4096 bytes) byte string; the engine does not parse it, stores no body, and never reaches application storage.
+- The chain defines no `fileType` and carries no type/storage semantics: file types are application-defined, non-enumerable open strings, and the engine provides only the minimal primitive.
+- Re-writing the same key overwrites it; each key has exactly one current payload, with no per-key version history and no operation state machine.
+- Entries within one write apply one by one; any failure rolls the whole call back.
 
 ## Authorization
 
-Writer authorization comes from the stage-level `fileWriters` allowlist (the target stage declares which stages may write its files; the stage itself is implicitly allowed and does not self-reference). At compile time every `(targetStageId, writerStageId)` pair is folded into a `UVP_FILE_WRITER_V1` capability leaf inside `capabilitiesRoot`; on chain `UVPPlanMetadataModule.verifyFileWriter` verifies membership proofs.
+Writer authorization comes from the stage-level `fileWriters` allowlist (the target stage declares which stages may write its files; the stage itself is implicitly writable and never self-referenced). `fileWriters` produces no capability leaf: the compiler turns each `(targetStageId, writerStageId)` pair into `StageFileWriter[]`, separately signed and committed by the PlanCommit's `fileWritersHash`.
 
-Submitter authentication reuses the `SignalAuthorization` table:
+The concrete submitter is resolved by assigned supplier account:
 
-- signal + file: the business signal's existing authorization row; `writerStageId == 0` resolves to the signal's stage, and a different target must additionally pass that target's `fileWriters` allowlist.
-- pure file patch: the writer stage's reserved `FILE_WRITE_SIGNAL_ID` row.
-- static and dynamic executors are both just rows on that table; `activeStageExecutor` is not a file-write oracle.
+- signal + file: the submitter is the assigned supplier account of the source/stage owning the business signal; if the target differs, the target's `fileWriters` allowlist must also contain that writer stage.
+- pure file write: the submitter is the assigned supplier account of the target stage or of a writer stage declared in `fileWriters`.
+- All SIDs must be `active`; static, dynamic, and dock stages all resolve through the same `accountOf(effective supplier)`.
 
 ## Events and Replay
 
-- `StageFilePatchApplied`: once per transaction, with `patchHash` / `baseHash` / `writerStageId` / `opCount`.
-- `StageFileOpApplied`: once per op, with `kind` / `key` / `contentHash` / `handle`.
+- `StageFileWritten`: one event per key write, carrying `key` / `payload` / `submitter`.
 
-Indexers replay the file map in log order within the same transaction instead of deriving it; projections can be rebuilt from these events plus `order_stage_record.file_resources`.
+Indexers replay the file map in log order within the same transaction instead of deriving it; projections can be rebuilt from these events and the order facts.
 
 ## Relationship to Business Signals
 
-- A pure file patch is a first-class patch fact: it does not increment business signal counts, evaluate hooks, or run admission.
-- File writes are independent of the "stage already has a signal" timing gate; that gate belongs to executor patch assign/handoff.
-- Terminal state is driven only by the local stage/order end; a file patch only changes the file handles the stage references.
+- A pure file write is a first-class fact: it does not increment business signal counts, evaluate hooks, or run admission.
+- File writes are not subject to the "target stage already has a signal" stage supplier patch timing gate.
+- Terminal state is driven only by the local stage/order end; a file write only changes that stage's opaque payload.
 
 ## Code Entry Points
 
 | Code | Meaning |
 | --- | --- |
-| `UVPFileResourceModule.sol` | `applyStageFilePatch`, `fileWriters` capability checks, `StageFilePatchApplied` / `StageFileOpApplied`. |
-| `UVPStateMachine.sol` | Trailing `filesDigest` / `FilePatch` entry in `submitSignal`; the `signalId == 0` pure file branch. |
-| `UVPPlanMetadataModule.sol` | `verifyFileWriter` membership verification. |
-| `protocol-bindings/src/index.ts` | File patch typed data / call builder and signer recovery. |
-| `uvp-chain-services/service/src/` | `/chain/*` projections and Product API read surface. |
+| `UVPFileResourceModule.sol` | `applyStageFiles`, `getStageFile`, `StageFileWritten`. |
+| `UVPStateMachine.sol` | `submitSignal`'s `files` entry; the `signalId == 0` pure file branch and `isAuthorizedFileWriter` check. |
+| `protocol-bindings/src/index.ts` | `StageFile` typed data / call builder and signer recovery. |
+| `uvp-chain-services/service/src/` | `/chain/*` projections and the Product API read surface. |
 
-See [Stage Overlay](stage-overlay.md) for the overview, and [Executor Patch](executor-patch.md) for the other overlay kind.
+See [Stage Overlay](stage-overlay.md) for the overview, and [Stage Supplier Patch](executor-patch.md) for the other overlay kind.

@@ -10,7 +10,7 @@ status: verified
 
 > 前置阅读：[Dock 与 Binding](../state-machine/docking.md)
 
-跨秩序协作的唯一形态是 Dock：B 侧发布独立 `kind: Dock` 文档声明 A→B 发射条件；B 订单在挂接 stage 一次性选定 dock 执行者，写入 `dock_link`（A 单号）建立 binding，poke 求 A/B 窗口并把满足的 B 输出信号发射到 B 订单。A 侧保持自己的订单、授权与生命周期。
+跨秩序协作的唯一形态是 Dock：B 侧发布独立 `kind: Dock` 文档声明 A→B 发射条件；B 订单在挂接 stage 一次性选定 dock supplier，写入 `dock_link`（A 单号）建立 binding，poke 求 A/B 窗口并把满足的 B 输出信号发射到 B 订单。A 侧保持自己的订单、授权与生命周期。
 
 ## 核心模型
 
@@ -73,7 +73,7 @@ spec:
 
 - **B 侧声明静态订阅**：契约在编译期固定（`uvp.dock.v1`），运行期只做身份与窗口求值，Dock 文档内容变即新 `dkid`。
 - **A/B 对等、独立治理**：两侧各自有 plan、授权、订单与证明；B 侧自主决定接收哪些 A 事实、发哪些输出信号。
-- **dock 执行者一次性选择**：责任在订单内固定，换选有具名拒绝；执行者必须对 Dock 全部输出信号持有订单级授权。
+- **dock supplier 一次性选择**：责任在订单内固定，换选有具名拒绝；selector 必须是 selector stage 的 assigned supplier account，选中 SID 必须 active。
 - **binding 以 A 单号表达**：同一 A 单回到同一 binding，能力可回放；binding 身份是 7 word 的 `bindingId`。
 
 ## 运行时路径
@@ -92,7 +92,7 @@ A 订单事实提交
 | 问题 | 证明来源 |
 | --- | --- |
 | Dock 声明是否已注册 | `DockRegistered` 与 `getDock(dkid)`。 |
-| 谁承接 B 阶段 | `StageDockExecutorSelected` 与 `getActiveStageDockSelection` / `activeStageExecutor`。 |
+| 谁承接 B 阶段 | `StageDockSupplierSelected`、`stageSupplierAssignment` 与 `getStageDockBinding`。 |
 | binding 身份是什么 | 7 word 的 `bindingId` 与 `dock_link` 文件记录。 |
 | A/B 窗口当前状态 | `dockOutputWindow` / `getStageDockBinding` 与 `uvp.dockBinding.v1` 读面（相对 `dueInSeconds`，无持久窗口历史）。 |
 | B 输出是否发射 | `DockOutputSubmitted` 与 B 订单上的 `SignalSubmitted`。 |

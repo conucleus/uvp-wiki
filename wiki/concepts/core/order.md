@@ -13,34 +13,32 @@ Order 是“订单”。在协议里，它是从某个已注册 [Plan](plan.md) 
 
 ## 谁使用
 
-授权参与者经各出生通道创建订单（DSL 声明面是 `sendSignals[].trigger: true`；链轨运行期通道见下）；参与方、executor 和 adapter 向它提交授权 signal；Product/Store/uvp-client 把它投影成任务、通知和 proof 视图。
+授权参与者经唯一的出生入口创建订单（DSL 声明面是 `sendSignals[].trigger: true`，链轨为 `submitSignal(orderId=0)`）；参与方、assigned supplier 和 adapter 向它提交授权 signal；Product/Store/uvp-client 把它投影成任务、通知和 proof 视图。
 
 ## 产生什么结果
 
-创建时发出 `OrderRegistered`、`OrderTriggered`、`OrderMaterialized`、`StageMaterialized` 等事件；运行中持续产生 signal record、hook runtime、executor patch、阶段文件 patch、dock binding 和 proof row，构成一条可重放的事件流。治理分叉另发 `OrderForked`。
+创建时发出 `OrderTriggered`、`OrderRegistered`、`OrderMaterialized`、`StageMaterialized` 等事件；运行中持续产生 signal record、hook runtime、stage supplier patch、阶段文件写入、dock binding 和 proof row，构成一条可重放的事件流。
 
 ## 权威来自哪里
 
-Order 的全部事实来自 `UVPStateMachine` 事件：signal 是否有效、hook 是否 ready、执行者选择与文件映射是否生效，都以链上事件为准；Product DTO 只是读模型。
+Order 的全部事实来自 `UVPStateMachine` 事件：signal 是否有效、hook 是否 ready、supplier 选择与文件映射是否生效，都以链上事件为准；Product DTO 只是读模型。
 
 ## Order 创建
 
-订单创建在 DSL 声明面只有一条通道：`sendSignals` 条目标记 `trigger: true` 的出生信号，以空订单号提交即出生。链轨运行期入口由此派生为三条通道：
+订单创建在 DSL 声明面只有一条通道：`sendSignals` 条目标记 `trigger: true` 的出生信号，以空订单号提交即出生。链轨同样只有 `submitSignal(orderId=0)` 一条入口：
 
-1. outside-trigger 开放提交：计划承诺的 `birthAuthorizer` 以 EIP-712 签名调用 `triggerOrderFromOutsideFor`；`birthAuthorizer` 为合约时由它直接调用无签名入口 `triggerOrderFromOutsideByAuthorizer`。每条出生信号一条 birth hook，提交方用 `triggerHookId` + `triggerStageId` 显式选择出生线。
-2. order-link 派生建单：`UVPOrderLinkModule` 上的 `triggerOrderFromSignalFor`（状态机内部只有模块可调的 `triggerOrderFromSignalFromModule`）。
-3. 治理分叉 `forkOrder`：从父单历史逐条核验后重放出带血缘的新单，单号由父单信息与 fork 载荷纯函数派生，同载荷幂等。
-
-订单号一律由合约从出生事实纯函数派生、调用方不可自报。Dock 在既有订单上以 binding 承载发射，不创建订单。
+1. 出生阶段当前生效的 assigned supplier account 签署 EIP-712 `UVPStateMachineSignalSubmission`；签名可直连或由任意 relayer 转发。
+2. 合约按 `(planId, sourceId, signalId)` 解析 trigger hook，校验 deadline、plan finalized、SID active、birth admission 和 `(submitter, idempotencyKey)` 去重。
+3. `_newOrderId` 在运行期生成订单号，调用方不可自报；出生事实写为首条事实，trigger hook 必须 Ready，初始 stage 被物化。
 
 创建时合约会：
 
 - 校验 deadline、submitter 与 plan 状态（只有 finalized Plan 可以出生）。
 - 校验所选出生 hook 带 `ORDER_TRIGGER_MINT` 标记且属于该 stage。
 - 在空订单上下文中求值出生信号的 `validWhen`；不通过 revert `SignalAdmissionRejected`，订单不存在、零事实行。
-- 校验提交者授权与（词表计划下的）事实归属证明。
-- 派生 `orderId`、写入订单级 signal 授权、记录出生事实、materialize ready 的出生阶段。
-- 发出 `OrderRegistered`、`OrderTriggered`、`OrderMaterialized`、`StageMaterialized` 和 `SignalSubmitterAuthorized`。
+- 校验 submitter 是出生阶段 effective supplier account，并校验（词表计划下的）事实归属证明。
+- 生成 `orderId`、记录出生事实、materialize ready 的出生阶段。
+- 发出 `OrderTriggered`、`OrderRegistered`、`OrderMaterialized`、`StageMaterialized`；`SignalSubmitted` 记录 submitter 与 relayer。
 
 ## Order 里的动态事实
 
@@ -48,10 +46,10 @@ Order 的全部事实来自 `UVPStateMachine` 事件：signal 是否有效、hoo
 | --- | --- |
 | signal records | `SignalSubmitted`。 |
 | hook runtime | `HookStatusChanged`、`HookReady`、`TimerPoked`。 |
-| executor patch | `StageExecutorPatchApplied`、`StageExecutorActivated`。 |
-| 阶段文件 patch | `StageFilePatchApplied`、`StageFileOpApplied`。 |
-| dock 执行者选择与 binding | `StageDockExecutorSelected`、`DockBindingPoked`、`DockOutputSubmitted`。 |
-| task projection | chain-services 从 `HookReady` 和授权事件重建。 |
+| stage supplier patch | `StageSupplierPatchApplied`、`StageSupplierAssigned`。 |
+| 阶段文件写入 | `StageFileWritten`。 |
+| dock supplier 选择与 binding | `StageDockSupplierSelected`、`DockBindingPoked`、`DockOutputSubmitted`。 |
+| task projection | chain-services 从 `HookReady` 与事实事件重建。 |
 | proof rows | event provenance。 |
 
 ## Order 和 Product Order
@@ -66,6 +64,6 @@ Product task ID、Store 的 Dock 试配记录 ID、adapter job ID 都是工作�
 
 ## 不设关闭与纠错入口
 
-Order 不需要被“关闭”才能保持一致性。业务方可以停止继续写入，也可以从同一个 Zhixu 重新创建新的 Order。Signal 采用 first-writer-wins，去重与不可覆盖语义见 [Signal](signal.md)；如果首次写入的业务事实有误，核心协议不覆盖或删除旧事实，而是创建新的 Order 重新执行，并由上层产品把两条事实流的业务关系展示清楚。非协作换人走治理分叉：父单留档、新单承继（见 `uvp-chain.md`）。
+Order 不需要被“关闭”才能保持一致性。业务方可以停止继续写入，也可以从同一个 Zhixu 重新创建新的 Order。Signal 采用 first-writer-wins，去重与不可覆盖语义见 [Signal](signal.md)；如果首次写入的业务事实有误，核心协议不覆盖或删除旧事实，而是创建新的 Order 重新执行，并由上层产品把两条事实流的业务关系展示清楚。非协作换人没有协议内绕过原 supplier 签名的 patch 路径；需要新单时按出生入口重新建单（见 `uvp-chain.md`）。
 
-如果某个 stage 由另一条 Zhixu 承接，会形成 B 订单上的 dock binding：目标阶段以 `supplierType: dock` 声明，订单在挂接 stage 一次性选定 dock 执行者，并把 A 订单号写入 `dock_link` 文件项即建立 binding；`pokeDockBinding` 在 A/B 时间窗交集时把 B 侧输出信号发射为本订单事实，逐 output first-win。binding 只作用于既有 B 订单——B 订单由 B 秩序自己的出生通道创建（见 [阶段文件 Patch](../state-machine/file-patch.md) 与 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md)）。Store/Product 只保存试配、contact、review 和展示状态，运行态 proof 以订单的链上事件为准。
+如果某个 stage 由另一条 Zhixu 承接，会形成 B 订单上的 dock binding：目标阶段以 `supplierType: dock` 声明，订单在挂接 stage 一次性选定 dock supplier，并把 A 订单号写入 `dock_link` 文件项即建立 binding；`pokeDockBinding` 在 A/B 时间窗交集时把 B 侧输出信号发射为本订单事实，逐 output first-win。binding 只作用于既有 B 订单——B 订单由 B 秩序自己的出生入口创建（见 [阶段文件映射](../state-machine/file-patch.md) 与 [Zhixu 作为 Executor](../apps/zhixu-as-executor.md)）。Store/Product 只保存试配、contact、review 和展示状态，运行态 proof 以订单的链上事件为准。

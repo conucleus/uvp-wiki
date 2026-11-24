@@ -115,8 +115,8 @@ sendSignals: [{name: requested, trigger: true}, {name: str}, {name: cmp}, {name:
 - 出生信号条目必须属于本阶段 `sendSignals`、同阶段内不重复，出生集编译期固定并随 plan 承诺进入链上产物与云侧投影。
 - 一个阶段可有多个出生信号；一个 plan 可有多个出生阶段；出生阶段不必是首个阶段。
 - 出生阶段必须由静态 plain 执行者承接（`individual`/`organization` + `supplierID`），出生权不随 dock 绑定或运行时 patch 漂移。
-- 空订单号 + 出生信号：先在空订单上下文（无 facts/files——负条件为真、存在/延时条件为假）求值该信号的 `validWhen`，通过后按出生事实纯函数派生订单号、创建订单并把该信号写为首条事实；同一出生事实重试幂等。空订单号 + 非出生信号被具名拒绝；带订单号的出生信号是普通订单内事实。
-- 链轨运行期有三条出生通道：outside-trigger 开放提交、order-link 派生建单、治理分叉 `forkOrder`（见 [Order](order.md)）；Dock 在既有订单上以 binding 承载发射，不创建订单。
+- 空订单号 + 出生信号：先在空订单上下文（无 facts/files——负条件为真、存在/延时条件为假）求值该信号的 `validWhen`，通过后校验幂等键并由运行期生成订单号、创建订单，把该信号写为首条事实；同一出生事实重试幂等。空订单号 + 非出生信号被具名拒绝；带订单号的出生信号是普通订单内事实。
+- 链轨运行期只有 `submitSignal(orderId=0)` 一条出生入口：出生阶段当前生效的 assigned supplier account 签署并提交，任意 relayer 可广播；Dock 在既有订单上以 binding 承载发射，不创建订单。
 
 ## `receiveSignals` 与同单事实连接
 
@@ -131,7 +131,7 @@ receiveSignals:
 
 ## `selectedStages`
 
-`selectedStages` 是某个 stage 对目标 stage 的 executor patch 能力。例如在报关闭环中，买家提交的阶段可以为 `complete` 指定具体执行者。编译器把这个关系变成 selector binding，合约在 executor patch 时检查这个 stage-to-target 绑定。
+`selectedStages` 是某个 stage 对目标 stage 的 stage supplier patch 能力。例如在报关闭环中，买家提交的阶段可以为 `complete` 指定具体 supplier。编译器把这个关系变成 selector binding，合约在 stage supplier patch 时检查这个 stage-to-target 绑定。
 
 ```yaml
 selectedStages:
@@ -154,17 +154,16 @@ selectedStages:
 
 ## `fileResources` 与 `fileWriters`
 
-`fileResources` 记录阶段协议、证据要求、验收标准或资源句柄。一个阶段可以指向链下 protocol 文件或对象存储资源，`fileType` 取值是闭集 `local` / `http` / `txcloud` / `plain_text`（详见 [File Resources](file-resources.md)）：
+`fileResources` 记录阶段协议、证据要求、验收标准或资源引用。一个阶段可以指向链下 protocol 文件或对象存储资源；`fileType` 只要求非空字符串、值域开放（应用自定义，core 不解释），详见 [File Resources](file-resources.md)：
 
 ```yaml
 fileResources:
   sourcing_contract:
-    fileType: http
-    httpFile:
-      url: "https://example.com/protocols/supplier-sourcing-v1.json"
+    fileType: app_protocol_ref
+    locator: "https://example.com/protocols/supplier-sourcing-v1.json"
 ```
 
-这些业务文件不进链。链上只记录内容哈希、句柄与阶段文件 patch 事件；运行期改写由 `UVPFileResourceModule` 承载（`key -> (contentHash, handle)`），授权走 `fileWriters` allowlist。
+这些业务文件不进链。链上只记录 opaque `{key, payload}` 与 `StageFileWritten` 事件；运行期写入由 `UVPFileResourceModule` 承载（`StageFile{key, payload}`，同 key 覆盖），授权走 `fileWriters` allowlist。
 
 ## Zhixu、Plan、Order 的区别
 
@@ -173,6 +172,6 @@ fileResources:
 | Nucleus / 凝结核 | 组织主体 | 发起、设计和维护 Zhixu 的秩序组织者；`nucleation` 是字段和成核上下文。 |
 | 秩序 (Zhixu) | 静态 DSL | 可复用协作规则书。 |
 | Plan | 链目标产物 | 某个 Zhixu 针对 EVM 编译出的 artifact、hash 和注册参数。 |
-| Order | 动态实例 | 某个 Plan 的一次运行，包含 signal、hook runtime、stage executor patch、阶段文件 patch、dock binding 和 proof。 |
+| Order | 动态实例 | 某个 Plan 的一次运行，包含 signal、hook runtime、stage supplier patch、阶段文件写入、dock binding 和 proof。 |
 
 一条 Zhixu 可以编译成多个不同平台或版本的 Plan；同一个 Plan 可以产生多个 Order。

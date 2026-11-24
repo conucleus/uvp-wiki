@@ -40,7 +40,7 @@ Supplier API 组织现实履约网络的材料：
 - participation history、open task、proof links。
 - review、publication request、revocation request。
 
-Store admin 可以维护平台目录和审核材料。秩序内部参与规则由凝结核决定，订单级授权由产品侧提交链路生成并由合约检查。
+Store admin 可以维护平台目录和审核材料。秩序内部参与规则由凝结核决定，发信权由链上 assigned supplier 状态与合约检查，产品侧只准备 typed data。
 
 ## Governance Workflow
 
@@ -61,5 +61,5 @@ Store review material
 - Store review 是平台 workflow，trust publication 看 registry event。
 - Store tag/search ranking 是目录和运营语义，公平性判断看凝结核材料和 Store or external institution 材料审核。
 - Contact/notification 成功是联系状态，履约完成看 signal/proof。
-- Dock 声明与试配记录是链下材料；正式关系看 `registerDock`、`StageDockExecutorSelected`、`dock_link` 文件项与 `DockOutputSubmitted`。
+- Dock 声明与试配记录是链下材料；正式关系看 `registerDock`、`StageDockSupplierSelected`、`dock_link` 文件项与 `DockOutputSubmitted`。
 - Store audit trail 是平台留痕；链上 proof 单独展示。

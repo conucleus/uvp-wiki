@@ -55,9 +55,9 @@ buyer_commit:
 
 ## 出生信号与首事实
 
-`sendSignals` 条目上的 `trigger: true` 标记出生信号，是 DSL 声明面唯一的出生入口。空订单号 + 出生信号提交时，合约先在**空订单上下文**求值该信号的 `validWhen`（无 facts/files；负条件为真；存在/延时条件为假），通过后按出生事实纯函数派生订单号、登记/创建订单，并把该 signal 写为首事实。同一出生事实重试幂等；空订单号提交非出生信号被具名拒绝；带订单号的出生信号是普通订单内事实。
+`sendSignals` 条目上的 `trigger: true` 标记出生信号，是 DSL 声明面唯一的出生入口。空订单号 + 出生信号提交时，合约先在**空订单上下文**求值该信号的 `validWhen`（无 facts/files；负条件为真；存在/延时条件为假），通过后校验 `(submitter, idempotencyKey)` 未被使用，再由 `_newOrderId` 运行期生成订单号、登记/创建订单，并把该 signal 写为首事实。同一出生事实重试幂等（重复 revert `DuplicateTriggerKey` 并携带 `existingOrderId`）；空订单号提交非出生信号被具名拒绝；带订单号的出生信号是普通订单内事实。
 
-链轨运行期有三条出生通道：outside-trigger 开放提交（计划承诺的 `birthAuthorizer` 签名提交，或 `birthAuthorizer` 为合约时的直接入口）、order-link 派生建单、治理分叉 `forkOrder`；订单号一律由合约从出生事实纯函数派生、调用方不自报。Dock 在既有订单上以 binding 承载发射，不创建订单。详见 [Order](order.md) 与 `uvp-chain.md`。
+链轨运行期只有 `submitSignal(orderId=0)` 一条出生入口：出生阶段当前生效的 assigned supplier account 签署并提交出生信号，任意 relayer 可广播；订单号由合约运行期生成，调用方不可自报。Dock 在既有订单上以 binding 承载发射，不创建订单。详见 [Order](order.md) 与 `uvp-chain.md`。
 
 ## 文本名到链上 key
 
@@ -128,9 +128,9 @@ signalKey = keccak256(abi.encode(sourceId, signalId))
 - 有载荷时，`payloadHash` 必须是链下 payload 规范化后的哈希；投影与消费方据此区分「有证据」与「纯动作/状态类 signal」。
 - 这是编码约定而非占位兜底：提交侧在无载荷时应显式写 `bytes32(0)`；消费方读到零值时按「无载荷」展示，而不是当作未知或报错。
 
-### 文件 patch 随 signal 提交
+### 文件写入随 signal 提交
 
-阶段文件映射的写入走 direct `submitSignal` 尾部：调用携带 `bytes32 filesDigest` 与 `FilePatch filePatch`，`filesDigest` 必须等于该 patch 的 canonical digest。纯文件 patch 用 `signalId == 0` 提交——它不是业务信号，不增业务信号计数、不触发 hook、不跑适格；文件映射的键值、严格 ops、`baseHash` 与事件见 [File Resources](file-resources.md)。
+阶段文件映射的写入走 direct `submitSignal` 的 `files: StageFile[]`：每项是 `{string key; bytes payload}`，同 key 覆盖。纯文件写入用 `signalId == 0` 提交——它不是业务信号，不增业务信号计数、不触发 hook、不跑适格；文件映射的键值、覆盖语义与事件见 [File Resources](file-resources.md)。
 
 ## 授权是链上检查项
 
@@ -140,7 +140,7 @@ Product API 可以把某个任务显示给某个参与方，但最终能否提�
 planId + orderId + signalKey + submitter
 ```
 
-授权来自订单级显式 `SignalAuthorization`：订单创建时写入，或由 executor patch 生效时为新执行者写入显式授权集；既有显式授权不因后续 patch 被撤销。派生信号模块另有一条内部写入面（relation=0 的本单自产事实由 from 阶段当前执行者触发），它不是外部提交授权面的旁路。详见 [Signal 授权](../trust/signal-authorization.md)。两条路径都由合约检查；即使 UI 显示了按钮，没有有效授权仍会被拒绝。
+发信权来自 source 阶段的 assigned supplier account：合约按 `stage -> supplierId`（计划 default → 订单级 stage supplier patch → dock 一次性选择）解析 effective supplier，再经 `UVPIdentityRegistry.accountOf(supplierId)` 得到账户，并要求 SID `active`。派生信号模块另有一条内部写入面（relation=0 的本单自产事实由 from 阶段当前 assigned supplier 触发）。即使 UI 显示了按钮，没有有效发信权仍会被拒绝。
 
 ## Signal 的协议边界
 

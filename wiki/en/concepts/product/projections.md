@@ -46,7 +46,7 @@ This key enters Product proof rows, helping users confirm "which event, on which
 | `deploymentId` | Deployment identifier. |
 | `planId` / `planHash` | The plan bound to the order. |
 | `status` | Order registration status; no lifecycle is derived from hooks/tasks. |
-| `authorizations` | Order-level signal authorization view. |
+| `stageSupplierAssignments` | Assigned stage supplier view. |
 | `signals` | Accepted signals. |
 | `hooks` | Hook status and dueAt. |
 | `tasks` | Tasks generated from `HookReady` and similar events. |
@@ -59,14 +59,13 @@ This key enters Product proof rows, helping users confirm "which event, on which
 | --- | --- |
 | `PlanRegistered` | Create or update plan proof and attach it to matching orders. |
 | `OrderRegistered` | Create the order projection with initial status registered. |
-| `SignalSubmitterAuthorized` | Save the authorization and mark matching tasks assignable. |
 | `SignalSubmitted` | Save the signal and mark matching tasks submitted. |
-| `StageExecutorPatchApplied` | Save the executor overlay and update the target stage task's assignee. |
-| `StageFilePatchApplied` / `StageFileOpApplied` | Save stage file-map rewrites: the patch batch and each op's `add` / `replace` / `remove`, replayed in log order. |
+| `StageSupplierPatchApplied` | Save the supplier assignment and update the target stage task's assignee. |
+| `StageFileWritten` | Save each stage file-map key write, replayed in log order. |
 | `DockRegistered` | Record the static Dock (outputs, atoms, A-window program) for chain-read projections. |
-| `StageDockExecutorSelected` | Save the one-time dock executor selection (target stage, dkid, executor, selector). |
+| `StageDockSupplierSelected` | Save the one-time dock supplier selection (target stage, dkid, supplierId, selector). |
 | `DockBindingPoked` / `DockOutputSubmitted` | Save binding window evaluation and per-output emission facts; binding identity is `bindingId`. |
-| `StageExecutorActivated` | Add executor activation proof. |
+| `StageSupplierAssigned` | Add supplier assignment activation proof. |
 | `HookStatusChanged` | Update hook status and `dueAt`; cancel tasks when cancelled. |
 | `HookReady` | Create or open a task; the Order stays registered. |
 | `TimerPoked` | Record timer proof and timeline. |

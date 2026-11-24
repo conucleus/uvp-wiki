@@ -7,25 +7,15 @@ status: verified
 
 # Stage Patch 授权
 
-Stage patch 是订单运行时的受控变更动作，分两类：executor patch 在订单上选择或交接目标 stage 的执行者；阶段文件 patch 改写目标 stage 的文件映射。两类都复用订单级授权，Plan 保持静态版本，变更只落在单个 Order 上。
+Stage patch 是订单运行时的受控变更动作，分两类：stage supplier patch 在订单上选择或交接目标 stage 的 supplier；阶段文件写入改写目标 stage 的文件映射。两类都复用 assigned supplier 授权，Plan 保持静态版本，变更只落在单个 Order 上。
 
-## 内部 Signal
+## 授权来源
 
-Product 提交流程按动作生成内部订单级授权：
+授权直接复用阶段 assigned supplier：
 
-| Action | 内部 signal |
-| --- | --- |
-| `stage_executor_patch` | `EXECUTOR_PATCH_SIGNAL_ID` |
-| 纯阶段文件 patch | `FILE_WRITE_SIGNAL_ID`（writer stage 的保留授权行） |
-| 随业务 signal 的文件 patch | 复用该业务 signal 的授权行 |
-
-source 通常取发起 patch 的 stage：
-
-```text
-sourceId = keccak256(stageId)
-```
-
-建单时可通过 `SignalAuthorization[]` 写入这些行；executor patch 的 selector 必须是订单创建者，或持有 `(selectorStageId, EXECUTOR_PATCH_SIGNAL_ID)` 的订单级授权。
+- stage supplier patch 的 selector 必须是 selector stage 当前生效的 assigned supplier account（或由其签名授权）；
+- 阶段文件写入的 submitter 必须是 target stage 的 assigned supplier account，或 target stage `fileWriters` 声明的 writer stage 的 assigned supplier account；
+- 所有路径都经 `UVPIdentityRegistry.accountOf(supplierId)` 解析，且 SID 必须 `active`。
 
 ## Stage-to-target Binding
 
@@ -35,22 +25,24 @@ sourceId = keccak256(stageId)
 selectorStageId -> targetStageId
 ```
 
-合约用 `UVPPlanMetadataModule.verifyStageSelectorBinding` 按 `capabilitiesRoot` 成员证明校验该关系；未声明绑定的 executor patch 拒绝。阶段文件写入另由目标 stage 的 `fileWriters` allowlist 约束（`UVP_FILE_WRITER_V1` capability 叶）。
+合约用 `UVPPlanMetadataModule.verifyStageSelectorBinding` 按 `capabilitiesRoot` 成员证明校验该关系；未声明绑定的 supplier patch 拒绝。阶段文件写入另由目标 stage 的 `fileWriters` allowlist 约束（`StageFileWriter[]`，由 PlanCommit `fileWritersHash` 承诺）。
 
-## Executor Patch
+## Stage Supplier Patch
 
-Executor patch 在订单上选择或交接目标 stage 的执行者，mode 闭集为 `assign` / `handoff`：`assign` 在目标 stage 首个信号之前落窗，`handoff` 在首个信号之后并需前一执行者对同一 EIP-712 digest 的签名。
+Stage supplier patch 在订单上选择或交接目标 stage 的 supplier，以 `previousSupplierId` 区分：`0` 为首次指派（assign，只在目标 stage 首个信号之前），非零为交接（handoff，只在首个信号之后，且需原 assigned supplier account 对同一 EIP-712 digest 签名）。
 
-合约检查 nonce 递增、订单级授权、stage-to-target binding，以及候选执行者属于 Plan 通过 `executorCandidatesRoot` 承诺的候选集（`candidateProof` 成员证明；未承诺候选集的 Plan 对所有 executor patch fail-closed）。patch 的 EIP-712 签名携带 `authorizationsHash`，生效时合约把新执行者对 Plan 预声明 current-order `(sourceId, signalId)` 的授权集写成订单级显式授权；执行者无需在 Order 创建时已列入授权表，但 patch 不能赋予 Plan 未声明的 signal 权限。first-writer-wins 仍然适用，已写入的 Signal 保留原 submitter。
+合约检查 nonce 递增、selector 是 selector stage 的 assigned supplier account、stage-to-target binding，以及候选 supplier 属于 Plan 通过 `supplierBindingsRoot` 承诺的 kind=1 candidate 叶（Merkle proof；fixed 阶段 patch 恒拒，dynamic 阶段免 proof、可指派任意 active supplier，birth/dock 阶段 patch 恒拒）。patch 生效只改 `stage -> supplierId`，不写任何授权集；first-writer-wins 仍然适用，已写入的 Signal 保留原 submitter。事件为 `StageSupplierPatchApplied`。
 
-## 阶段文件 Patch
+## Dock Supplier 选择
 
-阶段文件 patch 改写目标 stage 的 `fileResources` 映射（`key -> (contentHash, handle)`），链上只保存内容哈希与不透明句柄。入口在 `submitSignal` 尾部：`signalId == 0` 时是纯文件 patch（不带业务信号），否则一笔交易内先提交业务信号再应用 patch；文件写入由 `UVPFileResourceModule.applyStageFilePatch` 落账，ops 为 `add` / `replace` / `remove`，`baseHash` 必填（等于该 stage 当前文件版本），整笔原子、任一失败回滚，没有 nonce。事件 `StageFilePatchApplied` / `StageFileOpApplied`，索引器按同一事务内日志序重放。
+dock 阶段由 selector 调用 `selectStageDockSupplier`（或携 selector EIP-712 签名的 `selectStageDockSupplierFor`）一次性选定 supplier。合约校验 dock 标记、selector binding、SID active 与 dkid/stage/plan 关系；同 dkid+supplier 重放幂等吸收，换选 revert `StageDockSupplierAlreadySelected`；事件为 `StageDockSupplierSelected`。
 
-写入方授权来自 stage 级 `fileWriters` allowlist 与 `SignalAuthorization` 表的组合：signal + file 用业务 signal 的既有授权行（`writerStageId == 0` 解析为信号所属 stage），纯文件 patch 用 writer stage 的 `FILE_WRITE_SIGNAL_ID` 行。
+## 阶段文件写入
+
+阶段文件写入直接改目标 stage 的 `{key, payload}` 映射，链上只保存 opaque payload。入口在 `submitSignal` 的 `files: StageFile[]`：`signalId == 0` 时是纯文件写入（不带业务信号），否则一笔交易内业务信号与文件写入原子生效；`UVPFileResourceModule.applyStageFiles` 落账，同 key 覆盖，没有 `add/replace/remove`、`baseHash`、`patchHash`、handle 或 nonce。事件只有 `StageFileWritten`，索引器按同一事务内日志序重放。
 
 ## 为什么它属于授权体系
 
-Stage patch 会改变订单执行路径与阶段文件引用。两类 patch 都要求订单级授权与 EIP-712 签名，Store 或后端无法绕过参与者权限改执行者或文件引用；合约和 projection 从同一事件流恢复状态。
+Stage patch 会改变订单执行路径与阶段文件引用。两类动作都要求 assigned supplier account 与 EIP-712 签名，Store 或后端无法绕过供应商权限改 supplier 或文件引用；合约和 projection 从同一事件流恢复状态。
 
-executor patch 机制见 [Executor Patch](../state-machine/executor-patch.md)，阶段文件 patch 机制见 [阶段文件 Patch](../state-machine/file-patch.md)；授权分层总述见 [协议边界](../protocol-boundaries.md)。
+supplier patch 机制见 [Stage Supplier Patch](../state-machine/executor-patch.md)，阶段文件写入机制见 [阶段文件映射](../state-machine/file-patch.md)；授权分层总述见 [协议边界](../protocol-boundaries.md)。

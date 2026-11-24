@@ -55,7 +55,7 @@ Replay is always strict — there is no lenient mode; any mismatch throws rather
 Check:
 
 - whether the compiler output changed `planHash`;
-- whether signal authorization is missing;
+- whether the source stage's assigned supplier account matches;
 - whether a duplicate signal was handled first-writer-wins;
 - whether the timer has reached its due time;
 - whether a negative condition canceled the hook;
@@ -67,7 +67,7 @@ The Product API has no demo data source: an empty projection returns an empty ar
 
 Check:
 
-- whether `VITE_UVP_CHAIN_SERVICES_URL` points at the real service;
+- whether the Chain Services base URL and `/chain/*` reads are reachable;
 - whether the indexer projection is lagging or needs a rebuild (`rebuild:indexer`);
 - whether the chain-services runtime profile matches the environment you think you are running;
 - whether the identity projection is missing or the plan has been revoked.
@@ -76,9 +76,9 @@ Check:
 
 Check:
 
-- whether `wallet` or `VITE_UVP_ORDER_APP_WALLET_ADDRESS` matches the authorized submitter;
+- whether the wallet equals the source stage's assigned supplier account (`accountOf(supplierId)`);
 - whether `/product/me/tasks` is returning empty;
-- whether order-level `SignalSubmitterAuthorized` has been indexed;
+- whether the current source stage's assigned supplier is active and `accountOf(supplierId)` equals the submitting wallet;
 - whether supplier identity has been revoked;
 - whether the task is waiting on other prerequisite signals;
 - whether the Product API URL points at the real service instead of a test/stub URL.
@@ -95,7 +95,7 @@ Check:
 - whether the environment is local or non-local, and which behavior above applies;
 - the gas-payer private key env name;
 - whether the signer equals the submitter in the typed data;
-- whether the submitter has order-level authorization;
+- whether the submitter equals the source stage's assigned supplier account (`accountOf(supplierId)`);
 - whether chain id and state-machine address match;
 - whether the pending/retry queue already contains failure records.
 

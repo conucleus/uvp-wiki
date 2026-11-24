@@ -56,6 +56,6 @@ Compiler 的确定性保证各方得到同一个 plan hash。合约注册 compac
 - `receiveSignals` 的 key 是本 stage 的 receive hook 名称，value 是该 hook 的规范化表达式；`sendSignals` 中 `trigger: true` 的出生信号由 analyze 规范化后合成 order-trigger hook。
 - Hook 的订单入口由 `orderTriggerKind` 明确表达（闭集 `none`/`trigger`）；Ready 事件是否对外发出由独立的 `emitReady` 布尔值表达；dock 阶段以 `HOOK_FLAG_DOCK_EXECUTOR` 标记区分。
 - 每条出生信号合成一条 order-trigger hook（单条 `SIGNAL` 指令、`emitReady=true`，注册位置位 `ORDER_TRIGGER_MINT`）；一个 stage/plan 可有多条出生信号，出生时用 `triggerHookId` + `triggerStageId` 显式选择。
-- `supplierType: dock` 的阶段由另一条秩序承接：B 侧发布独立 `kind: Dock` 文档（`spec.from` / `spec.to` / `spec.signalMap`），`signalMap` 值是 Hook DSL 发射适格表达式、header source 固定为 `spec.from.source`；该文档由 `analyzeDock` 编出 `uvp.dock.v1`。挂接 stage 只声明 `supplierType: dock`（B 侧无需 `supplierID`），执行者在订单上经 `selectStageDockExecutor` 一次性选定，binding 由 `dock_link` 文件项与 `pokeDockBinding` 的 A/B 时间窗发射承载。
+- `supplierType: dock` 的阶段由另一条秩序承接：B 侧发布独立 `kind: Dock` 文档（`spec.from` / `spec.to` / `spec.signalMap`），`signalMap` 值是 Hook DSL 发射适格表达式、header source 固定为 `spec.from.source`；该文档由 `analyzeDock` 编出 `uvp.dock.v1`。挂接 stage 只声明 `supplierType: dock`（B 侧无需 `supplierID`），执行者在订单上经 `selectStageDockSupplier` 一次性选定，binding 由 `dock_link` 文件项与 `pokeDockBinding` 的 A/B 时间窗发射承载。
 - Hook 表达式按单调存在逻辑求值：`A` 表示 signal 已出现，`~A` 表示 signal 尚未出现；signal 出现后不会消失。
 - Hook 表达式必须有正向锚点；纯缺席条件不能成为可推进 hook。

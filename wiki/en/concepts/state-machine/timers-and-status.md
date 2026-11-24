@@ -61,8 +61,10 @@ The contract checks:
 
 After the check passes, the contract emits `TimerPoked` and reevaluates the hook.
 
+The current assembly of the keep-alive component: `uvp-chain-services`' timer keeper (off by default; enabled by `UVP_TIMER_KEEPER_ENABLED`) polls projections for hooks that are due but still `Wait` and sends `pokeTimer` from the product gas pool — it is a rebuildable relay component and produces no protocol facts.
+
 ## How Product Surfaces Should Show It
 
 Product DTOs can display `Wait + dueAt` as "waiting until a certain time, then automatically or manually rechecking". But actual progression still requires an on-chain transaction. The frontend must not mark the task as ready just because local time has passed; it must wait for `HookReady` or a new `HookStatusChanged`.
 
-Who may submit the signal that drives evaluation is decided by order-level authorization; see [Signal Authorization](../trust/signal-authorization.md).
+Who may submit the signal that drives evaluation is decided by the source stage's assigned supplier account; see [EIP-712 and Relayer](../trust/eip712-relayer.md).

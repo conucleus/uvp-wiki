@@ -59,14 +59,13 @@ chainId:contractAddress:blockNumber:transactionHash:logIndex
 | --- | --- |
 | `PlanRegistered` | 创建或更新计划证明，并附着到匹配订单。 |
 | `OrderRegistered` | 创建订单投影，初始状态为 registered。 |
-| `SignalSubmitterAuthorized` | 保存授权，并把匹配任务标记为可分配。 |
 | `SignalSubmitted` | 保存 signal，把匹配任务标记为 submitted。 |
-| `StageExecutorPatchApplied` | 保存 executor overlay，并更新目标 stage 任务 assignee。 |
-| `StageFilePatchApplied` / `StageFileOpApplied` | 保存阶段文件映射改写：批次 patch 与逐 op 的 `add` / `replace` / `remove`，按日志序重放。 |
+| `StageSupplierPatchApplied` | 保存 supplier overlay，并更新目标 stage 任务 assignee。 |
+| `StageFileWritten` | 保存阶段文件映射的逐 key 写入，按日志序重放。 |
 | `DockRegistered` | 记录静态 Dock（outputs、atoms、A 窗口程序），供链读投影。 |
-| `StageDockExecutorSelected` | 保存 dock 执行者一次性选择（target stage、dkid、executor、selector）。 |
+| `StageDockSupplierSelected` | 保存 dock supplier 一次性选择（target stage、dkid、supplierId、selector）。 |
 | `DockBindingPoked` / `DockOutputSubmitted` | 保存 binding 窗口求值与逐 output 发射事实；binding 身份取 `bindingId`。 |
-| `StageExecutorActivated` | 增加 executor activation proof。 |
+| `StageSupplierAssigned` | 增加 executor activation proof。 |
 | `HookStatusChanged` | 更新 hook 状态和 `dueAt`；取消时取消任务。 |
 | `HookReady` | 创建或打开任务；Order 仍保持 registered。 |
 | `TimerPoked` | 记录 timer proof 和 timeline。 |

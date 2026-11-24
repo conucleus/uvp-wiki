@@ -1,63 +1,60 @@
 ---
-title: Executor Patch
+title: Stage Supplier Patch
 type: explanation
 audience: 工程贡献者
 status: verified
 ---
 
-# Executor Patch
+# Stage Supplier Patch
 
-Executor patch is one kind of Stage Overlay runtime change. It affects only the target stage executor of one Order. It does not modify the Plan and does not modify the Supplier Directory.
+A stage supplier patch is one kind of Stage Overlay runtime change. It affects only the target stage supplier of one Order. It does not modify the Plan and does not modify the Store's Supplier Directory.
 
 ## What It Solves
 
-Some stage executors are settled at order runtime by a selector stage. The Plan fixes the flow and the candidate scope; the concrete wallet lands as an order-level decision. For example, after a buyer confirms materials, the buyer can assign a concrete customs broker wallet for a later customs stage.
+Some stage suppliers are selected or handed off at order runtime by a selector stage: the Plan fixes the flow, the selector relation, and the candidate scope, while the concrete SID lands at order level. For example, after a buyer confirms materials, the buyer can assign a concrete customs broker SID for a later customs stage.
 
 ```text
 selector stage
-  -> stage_executor_patch typed data
-  -> selector wallet signature
-  -> applyStageExecutorPatchFor
-  -> StageExecutorPatchApplied
-  -> StageExecutorActivated
-  -> Plan-declared target-stage signal authority is delegated to executor
-  -> target stage future signal must match active executor
+  -> StageSupplierPatch typed data
+  -> selector (assigned supplier account) signature
+  -> applyStageSupplierPatchFor
+  -> StageSupplierPatchApplied
+  -> stage -> supplierId assignment updated
+  -> target stage future signal must be signed by accountOf(new SID)
 ```
 
 ## Contract Checks
 
-Executor patch is constrained by at least these checks:
+A stage supplier patch is constrained by at least these checks:
 
-- Selector stage and target stage must have a `StageSelectorBinding`.
-- The selector must have order-level internal patch authorization.
-- Patch nonce must increase.
-- Executor address cannot be zero.
-- The mode set is `assign` / `handoff`: `assign` lands before the target stage's first signal, `handoff` lands after it and requires the previous executor's signature over the same digest.
-- The Plan must declare at least one current-order signal capability for the target stage through `sendSignals`, and must commit the executor candidate set through `executorCandidatesRoot` (candidateProof membership proof; plans without a committed candidate set fail closed for all executor patches).
-- Eligibility is proven by the submitter: the patch carries a bindingProof (membership proof for the selector-binding leaf) and stageFacts (capability-leaf proofs for the target stage), which the contract verifies against `capabilitiesRoot`; all-zero means no proof carried.
-- After activation, the contract automatically delegates those Plan-declared `(sourceId, signalId)` capabilities to the new executor; the wallet does not need to be in the candidate-wallet authorization table when the Order is created.
-- A later handoff moves the still-unwritten capability scope to the new executor; already-written Signals stay as recorded and keep their original submitters.
+- The selector stage and target stage must have a `StageSelectorBinding` (`bindingProof` verified against `capabilitiesRoot`).
+- The selector must be the selector stage's currently effective assigned supplier account (`isEffectiveStageAccount`).
+- The patch nonce must increase.
+- The target supplierId cannot be zero, and the SID must be `active`.
+- `previousSupplierId == 0` is an assign (only before the target stage's first signal); a non-zero value is a handoff (only after the first signal, and it requires the previous assigned supplier account's signature over the same digest).
+- Fixed stages always reject a patch; candidate stages must hit the Plan's kind=1 candidate leaf in `supplierBindingsRoot` (`candidateProof`); dynamic stages need no proof and may assign any active SID; birth/dock stages always reject a patch.
+- The patch only changes `stage -> supplierId` and writes no authorization set; already-written Signals stay as recorded, and historical `SignalSubmitted` keeps its original submitter.
 
-This is Plan-bounded automatic delegation, not wildcard Signal authority for the executor. The selector may change who executes, but cannot expand what the Zhixu has declared that this stage may emit. The selector binding is a public-interface constraint frozen when the Plan is published; patches can only consume it, never bypass or rewrite it. For the public-interface boundary, see [Protocol Boundaries](../protocol-boundaries.md).
+This is a Plan-bounded supplier assignment, not wildcard Signal-writing authority for the supplier. The selector may change who carries the stage, but cannot expand what the Zhixu has declared that this stage may emit. The selector binding is a public-interface constraint frozen when the Plan is published; patches can only consume it, never bypass or rewrite it. For the public-interface boundary, see [Protocol Boundaries](../protocol-boundaries.md).
 
 ## Code Entry Points
 
 | Code | Meaning |
 | --- | --- |
-| `UVPStagePatchModule.sol` | `applyStageExecutorPatch`, `applyStageExecutorPatchFor`, patch digest, mode checks (EIP-712 domain `stageSupplierPatch` 1). |
-| `UVPStateMachine.sol` | Active executor activation and later signal checks. |
-| `UVPPlanMetadataModule.sol` | Stores the `capabilitiesRoot` and verifies the bindingProof/stageFacts carried by patches. |
-| `protocol-bindings/src/index.ts` | Stage executor patch typed data, call builder, signer recovery. |
-| `uvp-chain-services/service/src/stage-patches/` | Product API prepare/submit executor patch. |
+| `UVPStagePatchModule.sol` | `applyStageSupplierPatch`, `applyStageSupplierPatchFor`, patch digest, assign/handoff and candidate checks (EIP-712 domain `stageSupplierPatch` 1). |
+| `UVPStateMachine.sol` | `activateStageSupplierFromModule`, effective-supplier resolution, and later signal checks. |
+| `UVPPlanMetadataModule.sol` | Stores the `capabilitiesRoot` and verifies `bindingProof`. |
+| `protocol-bindings/src/index.ts` | Stage supplier patch typed data, call builder, signer recovery. |
+| `uvp-chain-services/service/src/stage-patches/` | Chain-read projection. |
 
-## Dock-Stage Executor: a One-Time Selection Path
+## Dock Supplier: a One-Time Selection Path
 
-A dock-stage executor does not use the generic executor patch. It is selected once through `UVPStagePatchModule.selectStageDockExecutor`: the `StageDockExecutorSelected` event records dockId, fromPlanId, executor, selector, and patchHash; replays of the same dkid + executor are absorbed idempotently, replacing the selection rejects with `StageDockExecutorAlreadySelected`, and later generic patches reject with `StageExecutorPatchForbiddenOnDockStage`. See [Dock and Binding](docking.md).
+A dock-stage supplier does not use the generic stage supplier patch. It is selected once through `UVPStagePatchModule.selectStageDockSupplier`: the `StageDockSupplierSelected` event records targetStageId, dockId, supplierId, and patchNonce; replays of the same dkid + supplier are absorbed idempotently, replacing the selection rejects with `StageDockSupplierAlreadySelected`, and later generic patches reject with `StageSupplierPatchForbiddenOnDockStage`. See [Dock and Binding](docking.md).
 
 ## Boundaries
 
-- Executor patch is not supplier capability proof; capability and matching remain Store judgments, while Identity Registry only resolves subject-to-account identity.
-- Executor patch is not business completion; whether an outcome occurred still comes from the target source/signal `SignalSubmitted`.
-- Executor patch does not write back to the Plan; the Plan remains the published static version.
+- A stage supplier patch is not supplier capability proof; capability and matching remain Store judgments, while `UVPIdentityRegistry` only resolves the SID, account, and active status.
+- A stage supplier patch is not business completion; whether an outcome occurred still comes from the target source/signal `SignalSubmitted`.
+- A stage supplier patch does not write back to the Plan; the Plan remains the published static version.
 
-See [Stage Overlay: Executor Patch and Stage File Patch](stage-overlay.md) for the overview.
+See [Stage Overlay: Supplier Patch and Stage File Writes](stage-overlay.md) for the overview.

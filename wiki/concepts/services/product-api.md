@@ -34,12 +34,12 @@ Product API 对普通用户隐藏 HookPlan、sourceId、signalId、ABI、gas 等
 
 ## `/product/me`
 
-`/product/me` 必须从显式 wallet 地址过滤任务，可以来自 query、header 或钱包上下文。display name、role label 或 Store metadata 只能辅助展示，authority 来自 state-machine projection 和 order-level submitter authorization。
+`/product/me` 必须从显式 wallet 地址过滤任务，可以来自 query、header 或钱包上下文。display name、role label 或 Store metadata 只能辅助展示，authority 来自 state-machine projection 与 `stage -> supplierId` / `accountOf(supplierId)` 的 assigned supplier 解析。
 
 ## 边界
 
 - Product API 可以 prepare typed data、验证签名、调用 relayer、返回 proof。
-- order-level authorization 仍由合约检查。
+- assigned supplier account 与 SID active 仍由合约检查。
 - draft、submission status 或 notification state 标注为 workflow/projection 状态。
 - revoked plan/supplier 在 Product API 中保持 revoked/blocked 展示。
 - Staging readiness 是服务实例健康和边界检查；production claim 需要 release evidence。

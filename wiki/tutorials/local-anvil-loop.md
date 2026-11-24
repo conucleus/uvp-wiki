@@ -12,7 +12,7 @@ status: verified
 这个教程验证最小链上语义闭环：
 
 ```text
-Zhixu -> HookPlan -> OnchainHookPlan -> commitPlan+finalizePlan / triggerOrderFromOutsideFor
+Zhixu -> HookPlan -> OnchainHookPlan -> commitPlan+finalizePlan / submitSignal(orderId=0)
   -> submitSignal/pokeTimer -> HookReady/HookStatusChanged
   -> statemachine chain replay oracle
 ```
@@ -49,11 +49,11 @@ uvp-deploy/qa/scripts/bootstrap-local-anvil.sh --self-update
 
 1. 启动或连接本地 Anvil。
 2. 构建 workspace 和合约。
-3. 部署 `UVPDeploymentRegistry`、`UVPIdentityRegistry`、`UVPStateMachine` 与七个 modules（stage patch、derived signal、dock registry、plan metadata、order link、lens、file resource），并冻结 modules。
+3. 部署 `UVPDeploymentRegistry`、`UVPIdentityRegistry`、`UVPStateMachine` 与七个 modules（stage patch、derived signal、dock registry、plan metadata、lens、file resource、identity registry），并冻结 modules。
 4. 编译 UVP update Zhixu YAML，目标为 `platform.type=blockchain`、
    `platform.provider=eth`、`platform.network=base`。
 5. 由 publisher 签名并发布当前 Plan。
-6. 由 creator 签 trigger typed data，创建 Order 并写入 signal submitter authorizations。
+6. 由出生阶段 assigned supplier account 签署 `UVPStateMachineSignalSubmission`，以空 `orderId` 创建 Order。
 7. 提交链上 Signals。
 8. 对 `HookReady`、`HookStatusChanged`、`TimerPoked` 做 replay oracle 校验。
 9. `--self-update` 模式部署下一套 State Machine 与冻结 modules，登记 deployment cutover，并验证旧 Order 仍绑定原 Plan。
@@ -101,7 +101,7 @@ reducer 一致。
 uvp-deploy/qa/scripts/bootstrap-local-anvil.sh
 ```
 
-它会部署当前合约和冻结模块，编译并发布 Plan，创建 Order，写入 Signal 授权，提交场景 Signal，并核对链事件与回放结果。
+它会部署当前合约和冻结模块，编译并发布 Plan，创建 Order，由出生阶段 assigned supplier account 提交场景 Signal，并核对链事件与回放结果。
 
 随后配置 Chain Services 使用生成的地址清单：
 
@@ -111,11 +111,14 @@ UVP_RPC_URL=http://127.0.0.1:8545 \
 pnpm --filter @uvp-eth/chain-services dev:api
 ```
 
-启动 Store 或 Order App：
+启动 Order App：
 
 ```bash
-VITE_UVP_CHAIN_SERVICES_URL=http://127.0.0.1:8787 pnpm --filter @uvp-eth/zhixu-store-web dev
-VITE_UVP_CHAIN_SERVICES_URL=http://127.0.0.1:8787 pnpm --filter @uvp-eth/order-app dev
+VITE_UVP_STATE_MACHINE=<address from uvp-deploy/deploy/addresses/anvil.local.json> \
+VITE_CHAIN_ID=31337 \
+VITE_RPC_URL=http://127.0.0.1:8545 \
+VITE_UVP_FROM_BLOCK=0 \
+pnpm --filter @uvp-eth/order-app dev
 ```
 
 Product API 的 Order、Task、Plan 发布和 proof 来自链上投影；Store 供应商能力与匹配资料仍是链下数据。这条边界的正式表述见[协议边界](../concepts/protocol-boundaries.md)。

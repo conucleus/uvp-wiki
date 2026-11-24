@@ -61,7 +61,7 @@ GET  /product/me/tasks/:taskId
 GET  /product/me/activity-feed
 ```
 
-Plan publication status comes from the `UVPStateMachine.PlanRegistered` projection. Tasks come from `HookReady`; executor wallets come from Plan-declared signal capabilities and order-level `SignalSubmitterAuthorized`. Role names are display only.
+Plan publication status comes from the `UVPStateMachine.PlanRegistered` projection. Tasks come from `HookReady`; executor wallets come from the `stage -> supplierId` assignment and `UVPIdentityRegistry.accountOf(supplierId)`, with an active SID. Role names are display only.
 
 ### Access policy: timeline/proof use the participant gate, business records require identity and ownership
 
@@ -102,9 +102,9 @@ GET  /product/submissions/:submissionId
 
 ## Order Overlay (protocol side)
 
-Executor patch: `UVPStagePatchModule`'s `StageExecutorPatch` typed data (domain `stageSupplierPatch` 1, mode closed set `assign`/`handoff`) → `applyStageExecutorPatchFor`; the signed entry carries `bindingProof`, `candidateProof`, and `executorAuthorizations`.
+Stage supplier patch: `UVPStagePatchModule`'s `StageSupplierPatch` typed data (domain `stageSupplierPatch` 1, with `previousSupplierId` distinguishing assign/handoff) → `applyStageSupplierPatchFor`; the signed entry carries `bindingProof` and `candidateProof`.
 
-Stage file patch: submitted as the trailing `bytes32 filesDigest` + `FilePatch` on direct `submitSignal` (`signalId == 0` is a pure file patch), and applied by `UVPFileResourceModule.applyStageFilePatch` as `add` / `replace` / `remove`; `baseHash` is mandatory and equals the stage's current file version.
+Stage file write: submitted as `files: StageFile[]` on `submitSignal` (`signalId == 0` is a pure file write) and applied by `UVPFileResourceModule.applyStageFiles` with same-key overwrite.
 
 The application backend owns product-side typed-data preparation and submission orchestration; endpoint names follow the application API contract.
 
@@ -172,7 +172,7 @@ POST /store/suppliers/:supplierId/notification-profile/prepare
 
 Dock workbench (Store off-chain workflow):
 
-Dock assembly sessions, validation, and draft maps are Store off-chain materials; the application repository owns their endpoints and storage. On-chain facts are `DockRegistered`, `StageDockExecutorSelected`, `DockBindingPoked`, `DockOutputSubmitted`, and the two orders' events.
+Dock assembly sessions, validation, and draft maps are Store off-chain materials; the application repository owns their endpoints and storage. On-chain facts are `DockRegistered`, `StageDockSupplierSelected`, `DockBindingPoked`, `DockOutputSubmitted`, and the two orders' events.
 
 Listings and page decoration:
 

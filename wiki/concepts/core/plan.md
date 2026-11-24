@@ -27,31 +27,33 @@ Plan 的权威来自 publisher 的 EIP-712 签名、两步注册的 hash 校验�
 
 ```text
 hooksHash              = keccak256(abi.encode(hooks))
-capabilitiesRoot       = 三张能力表（signal capability + selector binding + file writer）的单棵 Merkle root
+capabilitiesRoot       = 两张能力表（signal capability + selector binding）的单棵 Merkle root
 supplierBindingsRoot   = default/candidate (stageId, supplierId, kind) 绑定的单棵 Merkle root
+fileWritersHash        = keccak256(abi.encode(StageFileWriter[]))
 planHash               = keccak256(abi.encode(
-                           keccak256("uvp.plan.runtime.v7"),  // domain
+                           keccak256("uvp.plan.runtime.v8"),  // domain
                            hooksHash,
                            capabilitiesRoot,
-                           supplierBindingsRoot))
+                           supplierBindingsRoot,
+                           fileWritersHash))
 planId                 = keccak256(abi.encode(
                            keccak256("uvp.plan.id.v1"),       // domain
                            publisher,
                            planHash))
 ```
 
-`planHash` 的 preimage 是三元组：hooks、能力树根与 supplier 绑定树根。能力表为空时 `capabilitiesRoot` 为 `keccak256("")`；supplier 绑定为空时 `supplierBindingsRoot` 同样按 `keccak256("")` 参与计算，公式不变。executor route 与 resources hash 是链下调度的路由元数据（进入产物本体但不进链上 runtime `planHash`）；叶公式与树规则见 [Canonical Hash](../artifacts/canonical-hashes.md)。编译器自己的 artifact hash 继续用于追溯源产物，但不冒充链上 `planHash`。把 publisher 放进 `planId`，可以避免不同发布者对同一内容争抢全局名字。
+`planHash` 的 preimage 是四元组：hooks、能力树根、supplier 绑定树根与 file-writer 名单哈希。能力表为空时 `capabilitiesRoot` 为 `keccak256("")`；supplier 绑定为空时 `supplierBindingsRoot` 同样按 `keccak256("")` 参与计算；空 `StageFileWriter[]` 的 `fileWritersHash` 是空数组 ABI 编码的 keccak，不套用空树根。supplier route 与 resources hash 是链下调度的路由元数据（进入产物本体但不进链上 runtime `planHash`）；叶公式与树规则见 [Canonical Hash](../artifacts/canonical-hashes.md)。编译器自己的 artifact hash 继续用于追溯源产物，但不冒充链上 `planHash`。把 publisher 放进 `planId`，可以避免不同发布者对同一内容争抢全局名字。
 
 ## 两步凝固
 
-1. publisher 对六字段 PlanCommit（`publisher + hooksHash + capabilitiesRoot + supplierBindingsRoot + birthAuthorizer + deadline`）做 EIP-712 签名；任意 relayer 调用 `commitPlan`，同时提交完整 hooks，能力表随 commit 以 `capabilitiesRoot` 承诺。`birthAuthorizer` 只进 commit digest 与链上存储、不进 runtime `planHash`；它承诺 outside 出生提交者，零地址表示该计划关闭 outside 出生通道。
+1. publisher 对六字段 PlanCommit（`publisher + hooksHash + capabilitiesRoot + supplierBindingsRoot + fileWritersHash + deadline`）做 EIP-712 签名；任意 relayer 调用 `commitPlan`，同时提交完整 hooks、`StageSupplierBinding[]` 与 `StageFileWriter[]`。`fileWritersHash` 与 `supplierBindingsRoot` 都由合约重算校验；`fileWriters` 不生成 capability 叶。
 2. 任意调用者调用 `finalizePlan(planId)` 定稿（permissionless）；本步只落定稿，不提交表数据。
 
-pending Plan 不能创建 Order。finalized 后 hooks、`capabilitiesRoot` 与 `supplierBindingsRoot` 都不能修改；如果规则变化，发布新的 Plan。
+pending Plan 不能创建 Order。finalized 后 hooks、`capabilitiesRoot`、`supplierBindingsRoot` 与 `fileWritersHash` 都不能修改；如果规则变化，发布新的 Plan。
 
 ## Module 冻结
 
-StateMachine 部署并配置七个 module（stage patch、derived signal、dock registry、plan metadata、order link、lens、file resource）后调用 `freezeModules()`。冻结后的 module 地址不能由 owner 更换，因此“代码含义”不依赖部署者日后的善意。新实现只能通过新的 StateMachine deployment 和显式 cutover 引入。各合约与 registry 的职责分工见 [Contracts and Registries](../contracts-and-registries.md)。
+StateMachine 部署并配置七个 module（stage patch、derived signal、dock registry、plan metadata、lens、file resource、identity registry）后调用 `freezeModules()`。冻结后的 module 地址不能由 owner 更换，因此“代码含义”不依赖部署者日后的善意。新实现只能通过新的 StateMachine deployment 和显式 cutover 引入。各合约与 registry 的职责分工见 [Contracts and Registries](../contracts-and-registries.md)。
 
 ## 不承担的责任
 

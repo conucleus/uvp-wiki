@@ -11,7 +11,7 @@ status: verified
 > Prerequisite reading: [Zhixu Store](README.md)
 The Store's fulfillment view organizes orders, tasks, supplier participation, evidence hashes, and on-chain proof for operators. It is a view rebuilt around chain events; the source of truth is registry/state-machine events.
 
-<!-- StageExecutorPatchApplied is emitted via the module patch path; ABI/event versions follow the current frozen fixtures. -->
+<!-- StageSupplierPatchApplied is emitted via the module patch path; ABI/event versions follow the current frozen fixtures. -->
 
 ## View sources
 
@@ -20,11 +20,11 @@ The Store's fulfillment view organizes orders, tasks, supplier participation, ev
 | Whether the order is registered | `OrderRegistered` projection. |
 | Whether the task is ready | `HookReady` and the hook status projection. |
 | Whether the signal was submitted | `SignalSubmitted` proof row. |
-| Whether the executor is active | `StageExecutorPatchApplied` / `StageExecutorActivated` projection. |
+| Whether the executor is active | `StageSupplierPatchApplied` / `StageSupplierAssigned` projection. |
 | Evidence binding | Product evidence metadata, content hash, metadata hash, payload hash. |
 | Supplier historical participation | order/task projection + supplier metadata/identity projection. |
 | Plan and identity | `UVPStateMachine` Plan finalization + `UVPIdentityRegistry` identity binding projection. |
-| Dock registration and binding | The `DockRegistered` static registration, `StageDockExecutorSelected` executor selection, and `DockBindingPoked` / `DockOutputSubmitted` output emission projections; current A/B windows are read from `getStageDockBinding` / `dockOutputWindow`. |
+| Dock registration and binding | The `DockRegistered` static registration, `StageDockSupplierSelected` executor selection, and `DockBindingPoked` / `DockOutputSubmitted` output emission projections; current A/B windows are read from `getStageDockBinding` / `dockOutputWindow`. |
 
 ## What the Store should show
 
@@ -34,7 +34,7 @@ The Store's fulfillment view organizes orders, tasks, supplier participation, ev
 - indexer syncing/rebuild status;
 - evidence hash and metadata URI, without showing business file plaintext.
 - receive hook, ready time, assigned executor, blocked reason;
-- the dock-stage executor selection and binding proof chain (`StageDockExecutorSelected` → `DockBindingPoked` → `DockOutputSubmitted`) when a stage is received by a dock executor.
+- the dock-stage supplier selection and binding proof chain (`StageDockSupplierSelected` → `DockBindingPoked` → `DockOutputSubmitted`) when a stage is received by a dock supplier.
 
 ## Minimum fields for a proof card
 

@@ -15,9 +15,9 @@ The compiler input is `ZhixuDefinition`; cross-order collaboration has a separat
 | --- | --- |
 | `metadata.name` | Required slug (`^[a-z][a-z0-9_-]{0,99}$`); display-only, not part of definition identity derivation. |
 | `metadata.uid` | Not a DSL field: an occurrence in the source definition is loudly rejected as an unknown field; identity is the content-derived uid `zx-<32hex>`. |
-| `metadata.labels` | Part of the definition content, participating in content-derived identity. |
+| `metadata.labels` | Part of the definition document but excluded from content-derived identity (display/search metadata). |
 | `metadata.annotations` | Free-form annotations; never part of identity or hash derivation (no native version semantics). |
-| `spec.platform` | Track declaration, participates in hashing. |
+| `spec.platform` | Track declaration; recorded in the artifact but excluded from definition identity. |
 | `stages[].name` | The stage identifier (`stageIdentifier`) itself, unique within the Zhixu. |
 | `stages[].source` | Input to hook source and `sourceId`. |
 | `stages[].sendSignals` | Outbound signal declarations (entries are objects `{name, validWhen?}`, with `trigger: true` marking birth signals: capability list + birth set + emission-admission artifacts). |
@@ -25,7 +25,7 @@ The compiler input is `ZhixuDefinition`; cross-order collaboration has a separat
 | `stages[].executor` | Executor route, reachability, and dock-executor marking. |
 | `stages[].selectedStages` | Selector binding and executor closure. |
 | `stages[].fileResources` | Static resource handles and stage route metadata. |
-| `stages[].fileWriters` | Cross-stage file-write allowlist, compiled into file-writer capability leaves. |
+| `stages[].fileWriters` | Cross-stage file-write allowlist, compiled into `StageFileWriter[]` and committed by the PlanCommit `fileWritersHash` (it produces no capability leaf). |
 
 The `Dock` document (`spec.from{zhixu,source}` / `spec.to{zhixu,stage}` / `spec.signalMap`) is compiled separately by `uvp-core analyzeDock` into `uvp.dock.v1`: `from.zhixu`/`to.zhixu` must be content-derived uids of published definitions, `to.stage` must be carried with `executor.supplierType: dock`, and `signalMap` atoms must land on `sendSignals` of stages under `from.source`.
 
@@ -54,7 +54,7 @@ These errors must surface at compile time, not at contract registration or order
 
 ## How the Source Definition Enters Hashing
 
-The on-chain runtime `planHash` covers exactly three values: `hooksHash`, `capabilitiesRoot`, and `supplierBindingsRoot` (see [Canonical Hash](canonical-hashes.md)) — the canonicalized source Zhixu is not among them. A source-definition change that affects protocol semantics changes the hooks, capability tables, or supplier bindings, and therefore changes the `planHash`. The whole `OnchainHookPlanArtifact` additionally has a canonical payload hash (pinning the source definition snapshot via `sourcePlanHash`) used only for artifact provenance and fixture pinning; it does not act as the on-chain `planHash`. The compiled artifact should not be handwritten JSON; it must be reproducibly generated from the source definition by script.
+The on-chain runtime `planHash` covers the four-tuple `hooksHash`, `capabilitiesRoot`, `supplierBindingsRoot`, and `fileWritersHash` (see [Canonical Hash](canonical-hashes.md)) — the canonicalized source Zhixu is not among them. A source-definition change that affects protocol semantics changes the hooks, capability tables, supplier bindings, or file-writer allowlist, and therefore changes the `planHash`. The whole `OnchainHookPlanArtifact` additionally has a canonical payload hash (pinning the source definition snapshot via `sourcePlanHash`) used only for artifact provenance and fixture pinning; it does not act as the on-chain `planHash`. The compiled artifact should not be handwritten JSON; it must be reproducibly generated from the source definition by script.
 
 The field list follows `uvp-protocol/packages/compiler/src/types` and the language-layer manual `uvp-core/docs/zhixu-dsl-grammar.md`.
 

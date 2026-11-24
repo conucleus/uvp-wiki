@@ -16,21 +16,21 @@ status: verified
 | UVP / 通用价值协议 | Universal Value Protocol，一套协作协议和产品语言，用来记录被授权的业务信号，以及这些信号带来的状态后果。 | `uvp-eth` 是 EVM/Web3 实现轨道。 |
 | [秩序 / Zhixu](../concepts/core/zhixu.md) | 描述“一类订单应该怎么运行”的可复用协作规则书。 | `ZhixuDefinition`、`kind: "Zhixu"`、compiler input。 |
 | [Plan](../concepts/core/plan.md) / 秩序版本 | 某个 Zhixu 编译后的确定性链上版本。 | `OnchainHookPlanArtifact`、`commitPlan()` + `finalizePlan()` 两步注册定稿、`PlanRegistered`。 |
-| [Order](../concepts/core/order.md) / 订单 | 某个 Plan 的一次具体运行。 | `UVPStateMachine.Order`、`triggerOrderFromOutsideFor()`（状态机开放出生入口）/ `triggerOrderFromSignalFor()`（`UVPOrderLinkModule` 派生建单入口）、`OrderRegistered`、`OrderTriggered`。 |
+| [Order](../concepts/core/order.md) / 订单 | 某个 Plan 的一次具体运行。 | `UVPStateMachine.Order`、`submitSignal(orderId=0)`（唯一出生入口）、`OrderRegistered`、`OrderTriggered`。 |
 | [Dock](../concepts/state-machine/docking.md) | B 侧发布的静态 A→B 时间窗订阅：声明“B 的哪个阶段的哪条输出信号，在 A 的哪条 source 上满足什么事实条件时发射”。Dock 不创建订单。 | `kind: "Dock"`、`spec.from` / `spec.to` / `spec.signalMap`、`uvp.dock.v1`、`UVPDockRegistry.registerDock`。 |
 | dkid | Dock 的内容派生身份：同一内容跨环境得到同一身份；链上按右补零的 32-byte word 使用。 | `zd-<32hex>`（`dkid`）、`dkid = bytes32(bytes16(docHash))`、`getDock(dkid)`。 |
 | [凝结核 / Nucleus](../concepts/core/nucleation.md) | 发起、设计并维护某类 Zhixu 的组织核心。它让一类协作规则成形、获得边界并持续维护；可以是团队、组织、项目 owner 或 workflow owner。 | `spec.nucleation.id`、Store 凝结核工作台。 |
 | nucleation / 成核上下文 | 成核过程、上下文或字段名，不是主体名。现有 DSL/API 保留这个拼写以避免 public interface 漂移。 | `spec.nucleation.id`、`nucleationId`。 |
 | Stage / 阶段 | 秩序 (Zhixu) 里的一个步骤或执行段，stage 名在秩序内全局唯一。 | `spec.stages[]`、`stageIdentifier`、`stageId`。 |
-| [Supplier](../concepts/core/supplier.md) | Store 组织的现实或数字主体；能力资料是 Store 链下判断。 | Store metadata、Identity Binding。 |
-| [Executor](../concepts/core/executor.md) | 被选中或当选来处理当前 Order 阶段或提交该阶段 signal 的 Supplier 或 submitter。 | order authorization、stage executor overlay、EIP-712 submitter。 |
-| dock 执行者 | 承接 B 侧 dock 阶段订单执行的主体；订单在挂接 stage 经 stage patch 一次性选定后固定。 | `HOOK_FLAG_DOCK_EXECUTOR`、`selectStageDockExecutor` / `selectStageDockExecutorFor`、`StageDockExecutorSelected`。 |
+| [Supplier](../concepts/core/supplier.md) | Store 组织的现实或数字主体；能力资料是 Store 链下判断。 | Store metadata、`UVPIdentityRegistry` supplier 命名空间的 SID/account/status。 |
+| [Executor](../concepts/core/executor.md) | 处理当前 Order 阶段或提交该阶段 signal 的角色；链上不实体化。 | `stage -> supplierId` 指派、`accountOf(supplierId)`、EIP-712 submitter。 |
+| dock 执行者 | 承接 B 侧 dock 阶段订单执行的主体；订单在挂接 stage 经 stage patch 一次性选定后固定。 | `HOOK_FLAG_DOCK_EXECUTOR`、`selectStageDockSupplier` / `selectStageDockSupplierFor`、`StageDockSupplierSelected`。 |
 | [Source](../concepts/core/source.md) | signal 所属的因果命名空间，回答“这个动作进入哪条业务推进线”。 | `source`、`sourceId`、`signalKey`。 |
 | [Signal](../concepts/core/signal.md) | 状态机为某个 Order 接受的最小业务事实。 | `submitSignal()`、`SignalSubmitted`、`SignalRecord`。 |
 | [Hook](../concepts/core/hook.md) | 状态机条件；不是 HTTP webhook，也不是回调。 | `CompiledHook`、`HookStatusChanged`。 |
 | [Trigger](../concepts/core/trigger.md) | 订单入口语义：stage 的出生信号合成 order-trigger hook；`orderTriggerKind` 闭集为 `none`/`trigger`，`emitReady` 独立控制是否发出可执行任务的 `HookReady`。 | `sendSignals[].trigger`、`orderTriggerKind`、`triggers[]`、`emitReady`、`HookReady`。 |
 | Trigger signal / 出生信号 | stage 出生信号集合中的 sendSignal；以空 `orderId` 提交并过 admission 后创建订单、写入首事实。 | `trigger: true`、`SignalAdmissionRejected`、`NotTriggerSignal`。 |
-| [File Resource](../concepts/core/file-resources.md) | 阶段协议、证据模板、资源清单等链下材料的句柄，不是明文文件存储。 | `fileResources`、`key -> (contentHash, handle)`、`StageFilePatchApplied`。 |
+| [File Resource](../concepts/core/file-resources.md) | 阶段协议、证据模板、资源清单等链下材料的声明，不是明文文件存储。 | `fileResources`、`StageFile{key,payload}`、`StageFileWritten`。 |
 | OnchainHookPlan | 面向 EVM 注册和材料审核的紧凑链上产物。 | `OnchainHookPlanArtifact`、compact hooks、dependency indexes、selector bindings、派生 `triggers[]`。 |
 | HookPlan IR | 编译器内部中间形态，不是 Store/import/deploy 的公开流程。 | `compileZhixuOnchainHookPlan()` 内部使用。 |
 
@@ -39,15 +39,15 @@ status: verified
 | 术语 | 普通解释 | 代码或链上对应物 |
 | --- | --- | --- |
 | [Identity Binding](../concepts/contracts-and-registries.md) / 身份绑定 | Store Registry 对现实主体与钱包对应关系作出的可撤销登记，不包含 Plan 或能力材料审核。 | `IdentityBindingRegistered`、`IdentityBindingRevoked`。 |
-| [Authorization](../concepts/trust/signal-authorization.md) / 授权 | 某个钱包可以为某个 Order 提交特定 source/signal，或执行受控 stage patch。 | `SignalSubmitterAuthorized`、`SignalSubmitterRevoked`、stage patch authorization。 |
+| Execution Authority / 发信权 | 某个 supplier account 可以为某个 Order 的特定阶段提交 signal，或执行受控 stage supplier patch。 | `stage -> supplierId`、`UVPIdentityRegistry.accountOf`、`StageSupplierPatchApplied`。 |
 | [Publisher](../concepts/lifecycle.md) | 以自有密钥签署 Plan commit 的账户或机制：协议层不设 publisher 白名单，发布面 permissionless（谁能作为 publisher 对外发布属 Store/治理域的准入判断）。 | `commitPlan()` 提交 + `finalizePlan()` 定稿（仅 finalized Plan 可创建 Order）。 |
-| [Registrar](../concepts/lifecycle.md) | 创建 trigger order 的账户或机制：订单创建者以 trigger typed data 的签名 submitter 身份创建 Order；合约不设 registrar allowlist，出生开放提交、creator 先到先得。`triggerOrderFromSignalFor` 归属 order-link 模块合约。 | `triggerOrderFromOutsideFor()`（`UVPStateMachine`）/ `triggerOrderFromSignalFor()`（`UVPOrderLinkModule`）。 |
-| [Registry Boundary](../concepts/contracts-and-registries.md) | 一个 `UVPIdentityRegistry` 地址就是一个身份解析域。首期由 Store 运营一个，未来可配置多个独立合规主体。StateMachine 不读取它。 | `registryAddress`、`bindingId`、`UVPIdentityRegistry.owner()`。 |
+| [Registrar](../concepts/lifecycle.md) | 创建 trigger order 的账户或机制：出生阶段当前生效的 assigned supplier account 以 `UVPStateMachineSignalSubmission` 签名提交；合约不设 registrar allowlist，按 `(submitter, idempotencyKey)` 去重。 | `submitSignal(orderId=0)`（`UVPStateMachine`）、`DuplicateTriggerKey`。 |
+| [Registry Boundary](../concepts/contracts-and-registries.md) | 一个 `UVPIdentityRegistry` 就是 StateMachine 接线的唯一链上身份边界，含 subject 与 supplier 两个命名空间；supplier 命名空间是发信权来源。 | `identityRegistry` 模块槽、`bindingId`、`UVPIdentityRegistry.owner()`。 |
 | [HookReady](../concepts/state-machine/README.md) | 带有 `emitReady=true` 的 receive hook ready 后发出的事件，表示 Product task 可以打开。 | `HookReady(planId, orderId, hookId, stageId, hookName)`。 |
-| [Stage Overlay](../concepts/state-machine/stage-overlay.md) | Order 运行时对 executor 或阶段文件映射的订单级改写，不改变 Plan。 | executor patch / 阶段文件 patch 事件。 |
-| [Stage Patch](../concepts/state-machine/stage-overlay.md) | 受控的订单动作，用来改写 executor 或阶段文件映射；这里的 patch 不是代码补丁。 | `StageExecutorPatchApplied`、`StageFilePatchApplied`、`StageFileOpApplied`。 |
+| [Stage Overlay](../concepts/state-machine/stage-overlay.md) | Order 运行时对 stage supplier 或阶段文件映射的订单级改写，不改变 Plan。 | stage supplier patch / 阶段文件写入事件。 |
+| [Stage Patch](../concepts/state-machine/stage-overlay.md) | 受控的订单动作，用来改写 stage supplier 或阶段文件映射；这里的 patch 不是代码补丁。 | `StageSupplierPatchApplied`、`StageFileWritten`。 |
 | [Selector Binding](../concepts/state-machine/stage-overlay.md) | Plan 里声明“某个 stage 可以 patch 哪个目标 stage”的规则。 | selector stage id、target stage id、binding key。 |
-| dock 执行者选择 | 订单级一次性决定：在挂接 stage 上选定 dock 执行者，选中后固定；换选响亮拒绝。 | `selectStageDockExecutor` / `selectStageDockExecutorFor`、`StageDockExecutorSelected`、`StageDockExecutorAlreadySelected`。 |
+| dock 执行者选择 | 订单级一次性决定：在挂接 stage 上选定 dock 执行者，选中后固定；换选响亮拒绝。 | `selectStageDockSupplier` / `selectStageDockSupplierFor`、`StageDockSupplierSelected`、`StageDockSupplierAlreadySelected`。 |
 | binding / `dock_link` | binding 是 A→B 的运行期关系，由挂接 stage 的文件项 `dock_link` 确定；`dock_link` 的值是 canonical A 单号，写入即建立、改写即切换。 | `dock_link`（key = `keccak("dock_link")`）、`bindingId`（7 个 32-byte word）。 |
 | pokeDockBinding | permissionless 求值入口：认证 `dock_link` 载荷、按 `block.timestamp` 求 A 窗口、复核 B 窗口，逐 output first-win 发射 B 信号。 | `pokeDockBinding`、`DockBindingPoked`、`DockOutputSubmitted`、`DockBindingContentHashMismatch`。 |
 | 窗口 (Window) | A 窗口是 A 侧 `validWhen` 时间窗程序（`~` 在事实到达时关闭、`+T` 延迟锚点）；B 窗口是 B 侧 `sendSignals.validWhen` 发射适格；A/B 交集才发射。历史窗口时间不上链。 | `uvp.dock.v1` output window、`dockOutputWindow`、`uvp.dockBinding.v1`、`dueInSeconds`。 |
@@ -73,9 +73,8 @@ status: verified
 | 术语 | 普通解释 | 代码或运行对应物 |
 | --- | --- | --- |
 | `signalMap` | Dock 文档里的发射条件声明：key 是 B 侧输出信号名，value 是 A 侧 `validWhen` 表达式。 | `Dock.spec.signalMap`、`uvp.dock.v1` output。 |
-| [Periphery Adapter](../concepts/periphery-and-deploy.md) | 围绕核心状态机的资金、担保、付款、agent 或业务系统适配层。 | `uvp-periphery/`。 |
 | [Relayer](../concepts/services/relayer.md) | 广播已签名交易、可能代付 gas 的参与方角色或钱包。它不是业务签名者。 | 应用仓提交编排、`submitSignal()`（合约 executor 可由 relayer 代付）。 |
-| [EIP-712](../concepts/trust/eip712-relayer.md) | 钱包签结构化业务动作的格式。 | typed data builders、`UVPStateMachineSignal`、`UVPStagePatchModuleStageExecutorPatch`。 |
+| [EIP-712](../concepts/trust/eip712-relayer.md) | 钱包签结构化业务动作的格式。 | typed data builders、`UVPStateMachineSignalSubmission`、`UVPStagePatchModuleStageSupplierPatch`。 |
 | Anvil | 本地开发和协议闭环使用的 EVM 链。 | local Anvil scripts。 |
 | Base Sepolia | 公共 EVM 测试网目标，用于 staging/rehearsal claim。 | chain id `84532`。 |
 

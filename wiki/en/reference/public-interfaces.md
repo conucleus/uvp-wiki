@@ -13,7 +13,7 @@ When changing any of these, treat the change per the protocol boundaries and syn
 
 ## Positioning of Protocol Bindings
 
-`@uvp-eth/protocol-bindings` is the browser-safe protocol bindings package. It provides ABI constants, typed-data builders, calldata builders, address/bytes32 validation, stage patch helpers, dock selection / poke / registration calldata builders, the file patch digest helper (`filePatchDigest`), and capability leaf/proof helpers (`signalCapabilityLeaf`, `selectorBindingProofFor`, `fileWriterProofFor`, `capabilitiesRootOf`).
+`@uvp-eth/protocol-bindings` is the browser-safe protocol bindings package. It provides ABI constants, typed-data builders, calldata builders, address/bytes32 validation, stage patch helpers, dock selection / poke / registration calldata builders, and capability leaf/proof helpers (`signalCapabilityLeaf`, `selectorBindingProofFor`, `capabilitiesRootOf`).
 
 It reads no environment variables, stores no private keys, submits no transactions, and makes no business authorization decisions. Order App, uvp-client, Chain Services, and deploy scripts can reuse it to avoid hand-writing ABI, typed data, or calldata on their own.
 
@@ -25,7 +25,7 @@ It reads no environment variables, stores no private keys, submits no transactio
 | Event name / topic / indexed fields | contracts | indexer, statemachine replay, Product projection, proof verifier | Update the replay oracle, projection tests, and the contracts/events reference. |
 | EIP-712 domain / typed data | contracts, protocol-bindings | Product submit, relayer, uvp-client, wallet UI | Update digest helpers, signing tests, and the staging domain check; staging signs with the current productSubmit domain version. |
 | Canonical hash / artifact schema | compiler, hook-core, statemachine | Plan publication, commitPlan/finalizePlan, release evidence | Update golden fixtures, canonical hash docs, and compiler/statemachine tests. |
-| Product DTO | product-dto | chain-services, Order App, uvp-client, periphery adapter | Update DTO tests, route tests, frontend/API consumers, and ordinary-user copy. |
+| Product DTO | application-repository `app-contract` / chain-read `chain-read-contract` | chain-services, Order App, uvp-client | Update DTO tests, route tests, and frontend/API consumers. |
 | Product API | chain-services | Order App/hosts (via uvp-client/browser), enterprise scripts/AI agents (via uvp-client) | Update the API reference, route tests, browser E2E, and failure language. |
 | Deployment manifest | uvp-deploy/deploy | chain-services, staging scripts, release records | Commit only curated manifest/evidence; local generated address files are not committed by default. |
 | Release evidence schema | uvp-deploy/deploy | release owner, audit, release-evidence consumers | Keep it no-secret, redacted, and auditable; do not treat raw logs or object bytes as release records. |
@@ -55,7 +55,7 @@ release record or PRD trace
 - The Product BFF database is a rebuildable read model; the source of truth for plan/order/signal/hook is chain events; see [Sources of Truth](../concepts/protocol-boundaries.md#source-of-truth).
 - Relayer configuration is broadcast configuration; business authorization comes from order authorization and signatures; see [Authorization and Signatures](../concepts/protocol-boundaries.md#authorization-and-signatures).
 - Product surfaces read chain projections: empty projections return empty results, there is no demo profile to switch on, and operational aids never change protocol truth; for the complete boundary see [Protocol Boundaries](../concepts/protocol-boundaries.md).
-- Funding, USDC, settlement-custody, guarantee, and payment adapters belong to adapter/periphery; see [Periphery Adapters](../concepts/protocol-boundaries.md#periphery-adapters).
+- Funding, USDC, settlement-custody, guarantee, and payment adapters belong to application repositories; see [Protocol Boundaries](../concepts/protocol-boundaries.md#peripheral-adapters).
 
 ## Related References
 

@@ -21,7 +21,7 @@ Zhixu Catalog 是凝结核维护秩序设计、编译材料和 Store 展示资�
 | Store operator/reviewer | 维护目录、审核资料、设置可见性和推荐。 | Store 机构规则与访问控制。 |
 | Publisher | 签名发布 Plan。 | StateMachine publisher 权限与 EIP-712 签名。 |
 | Registry operator | 核验线下主体并登记 subject/account。 | Identity Registry owner 权限。 |
-| Order participant | 接受订单角色并提交被授权的 Signal。 | 订单级显式授权与 EIP-712 签名（executor patch 时另有 patch 授权）。 |
+| Order participant | 接受订单角色并提交被授权的 Signal。 | source 阶段 assigned supplier account 与 EIP-712 签名（stage supplier patch 另有 selector 授权）。 |
 
 各对象的权威来源统一见 [README.md](README.md)「信息对象与权威来源」表；本页不复述边界论述。
 

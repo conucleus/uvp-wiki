@@ -32,7 +32,7 @@ Indexer 至少要处理三类来源：
 | 来源 | 代表事件 | 投影用途 |
 | --- | --- | --- |
 | `UVPDeploymentRegistry` | active deployment / cutover 事件。 | 知道当前 state-machine 地址、部署版本和 release context。 |
-| `UVPStateMachine` | `OrderRegistered`、`SignalSubmitted`、`HookStatusChanged`、`HookReady`、`TimerPoked`、`StageExecutorPatchApplied`、`StageDockExecutorSelected`、`DockBindingPoked`、`DockOutputSubmitted`、`StageFilePatchApplied`、`StageFileOpApplied`。 | 重建订单、任务、阶段执行者、Dock binding 与窗口、阶段文件映射、状态、timeline、proof rows。 |
+| `UVPStateMachine` | `OrderRegistered`、`SignalSubmitted`、`HookStatusChanged`、`HookReady`、`TimerPoked`、`StageSupplierPatchApplied`、`StageDockSupplierSelected`、`DockBindingPoked`、`DockOutputSubmitted`、`StageFileWritten`。 | 重建订单、任务、阶段 supplier、Dock binding 与窗口、阶段文件映射、状态、timeline、proof rows。 |
 | `UVPIdentityRegistry` | `IdentityBindingRegistered`、`IdentityBindingRevoked`。 | 重建 subject/account 身份目录及撤销历史；不做 Plan 或能力过滤。 |
 
 ## 输出投影
@@ -40,7 +40,7 @@ Indexer 至少要处理三类来源：
 | 投影 | 消费方 | 注意事项 |
 | --- | --- | --- |
 | order projection | Product API、Store order search。 | 必须带 `chainId`、`stateMachineAddress`、`deploymentId`。 |
-| task projection | Order App、uvp-client、Product `/me/tasks`。 | 来自 hook readiness 和 submitter authorization，不来自后台手工分配。 |
+| task projection | Order App、uvp-client、Product `/me/tasks`。 | 来自 `HookReady` 与 `stage -> supplierId`/`accountOf(supplierId)` 解析，不来自后台手工分配。 |
 | timeline projection | Product proof、Store runtime proof。 | 每一行都要能回到 tx/block/event。 |
 | proof projection | UI proof drawer、审计、release evidence。 | 保存 event proof，不保存证据明文。 |
 | identity projection | Store catalog、Product catalog、supplier directory。 | revoked 保持 revoked/blocked 展示。 |

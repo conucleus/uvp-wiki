@@ -13,7 +13,7 @@ Order App and uvp-client consume the same on-chain facts from different runtime 
 
 | Surface | One-line positioning | See |
 | --- | --- | --- |
-| zhixu-registry | Permissionless ZhixuRecord / IdentityClaim registry data layer: self-descriptions, signatures, and opaque refs only; no UI, review, or recommendation. | [Module Map](../../reference/module-map.md) |
+| zhixu-registry | Permissionless ZhixuRecord registry data layer: self-descriptions, signatures, and opaque refs only; no UI, review, or recommendation. | [Module Map](../../reference/module-map.md) |
 | Order App | The ordinary participant task tool: to-dos, submission confirmation, evidence fingerprints, on-chain proof, readiness. | [Order App](../apps/order-app.md) |
 | uvp-client | Integration tool for executors, enterprise systems, and supervised AI agent scripts: Product API mode and chain watcher mode paths. | [UVP Client](../apps/uvp-client.md), [Order App vs UVP Client](../apps/order-app-vs-uvp-client.md) |
 
@@ -21,4 +21,4 @@ The shared bottom line: none of these surfaces own order state — the authorize
 
 ## Periphery adapters
 
-Funding, guarantee, AI/MCP, and demo executors can live in `uvp-periphery`. They consume `UVPStateMachine`, optional `UVPIdentityRegistry` name resolution, Product DTOs, or uvp-client instead of defining new core order truth.
+Funding, guarantee, AI/MCP, and demo executors can live in application repositories. They consume `UVPStateMachine`, `UVPIdentityRegistry` supplier-name resolution, Product DTOs, or uvp-client instead of defining new core order truth.

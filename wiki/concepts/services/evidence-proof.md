@@ -23,9 +23,9 @@ Evidence 和 proof 子系统处理链下材料的句柄、hash、metadata 和证
 | `src/proof-verifier/service.ts` | metadata hash、evidence hash、Zhixu hash 对齐检查。 |
 | `src/api/routes/evidence.ts` | evidence upload metadata 和 proof route。 |
 
-## File Resource 是句柄
+## File Resource 是应用资源声明
 
-File Resource 是可验证的资源句柄：fileType、object namespace、URI policy 加上 metadata/content hash，最终落到链上 proof row；常见形态是 S3、R2、私有对象存储或本地 rehearsal adapter 这类链下对象。完整模型与类型定义见 [File Resources](../core/file-resources.md)。
+File Resource 是应用可解释的资源声明：`fileType`（开放字符串）与其余 opaque payload 由应用定义，可携带 object namespace、URI policy、metadata/content hash；链上运行时只保存 `StageFile{key, payload}` 与 `StageFileWritten`，正文留在 S3、R2、私有对象存储或本地 rehearsal adapter。完整模型见 [File Resources](../core/file-resources.md)。
 
 ## Proof verifier 做什么
 
@@ -37,7 +37,7 @@ File Resource 是可验证的资源句柄：fileType、object namespace、URI po
 Proof verifier 的边界：
 
 - 货物是否真的送达由业务参与方、证据和各自的审查流程判断。
-- Identity Registry publication 只表达线下主体与链上账户的绑定关系，不认证供应商能力或信誉；供应商能力/信誉属于 Store 链下经营数据。
+- `UVPIdentityRegistry` 的 subject 绑定只表达线下主体与链上账户的关系，supplier 命名空间只表达 SID/account/active 状态；两者都不认证供应商能力或信誉，能力/信誉属于 Store 链下经营数据。
 - object handle 可访问性不能生成 `SignalSubmitted`。
 - hash 对齐是证明条件；hook ready 来自状态机事件。
 

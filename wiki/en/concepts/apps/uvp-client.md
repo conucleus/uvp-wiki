@@ -19,7 +19,7 @@ status: verified
 | `@uvp-eth/uvp-client/headless` | private-key wallet handling, `HookReady` watcher, watch state/job store, non-spending doctor | browser provider |
 | `@uvp-eth/uvp-client/cli` | executor commands: wallet, doctor, chain-once/chain-watch, chain-signal | any server/queue |
 
-ABI, EIP-712 typed data, and canonical hashes are single-sourced in `@uvp-eth/protocol-bindings`; generic API DTOs are single-sourced in `@uvp-eth/product-dto`.
+ABI, EIP-712 typed data, and canonical hashes are single-sourced in `@uvp-eth/protocol-bindings`; chain-read DTOs are single-sourced in `@uvp-eth/chain-read-contract`, and product DTOs are owned by the application repository's `app-contract`.
 
 ## CLI
 
@@ -81,8 +81,8 @@ Watcher semantics: finality buffer (default 1; explicit for non-local runtimes),
 ## Boundaries
 
 - No HTTP server, no database ownership, no business ruling.
-- No order-level signal authorization; authorization comes from `UVPStateMachine` plan/order facts.
+- No submitter authorization table; authority comes from `UVPStateMachine`'s `stage -> supplierId` facts and `UVPIdentityRegistry.accountOf`.
 - CLI/SDK never custodies keys; keys come from explicit env vars only.
-- Funding/guarantee/payment placeholders belong to periphery/adapter surfaces.
+- Funding/guarantee/payment placeholders belong to application-repository adapter surfaces.
 
 See [Protocol boundaries](../protocol-boundaries.md) for invariants and [Order App vs UVP Client](order-app-vs-uvp-client.md) for the surface split.

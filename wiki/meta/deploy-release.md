@@ -13,7 +13,7 @@ status: verified
 
 | 页面 | 作用 |
 | --- | --- |
-| [Periphery 与部署](../concepts/periphery-and-deploy.md) | deploy 目录、periphery adapter 和 release boundary 的关系。 |
+| [应用适配与部署](../concepts/periphery-and-deploy.md) | deploy 目录、应用仓 adapter 和 release boundary 的关系。 |
 | [Base Sepolia Staging](../how-to/base-sepolia-staging.md) | testnet preflight、broadcast rehearsal、secret 环境和证据输出。 |
 | [发布与验证](../how-to/release-checklist.md) | local baseline、Product baseline、staging gate、release evidence、claim 语言。 |
 | [项目状态](status.md) | 当前 verified/prototype/planned/blocked 状态。 |

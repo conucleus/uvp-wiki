@@ -22,11 +22,11 @@ Store 可以维护联系和通知工作流，因为真实履约需要找到人�
 
 ## 来源和边界
 
-- 通知触发可以来自 `HookReady`、order-level authorization、supplier identity 和 Product task projection。
+- 通知触发可以来自 `HookReady`、`StageSupplierAssigned`/`StageSupplierPatchApplied`、supplier 状态和 Product task projection。
 - 通知状态只能说明 Store/chain-services 是否尝试联系或提醒；contact 不等于履约，见 [../protocol-boundaries.md](../protocol-boundaries.md)。
-- 业务完成必须由授权 submitter 的链上 signal 表示（[../protocol-boundaries.md](../protocol-boundaries.md)）。
+- 业务完成必须由 assigned supplier account 的链上 signal 表示（[../protocol-boundaries.md](../protocol-boundaries.md)）。
 - 联系方式、凭证、私密 note、证件、合同、invoice、evidence plaintext 不应上链。
-- 对 Dock 对接方的通知表示相应 dock 执行者或 adapter 已被提醒；binding 是否建立看 `dock_link` 文件项与 `StageDockExecutorSelected`，output 是否发射看 `DockOutputSubmitted`。通知状态不改变协议事实。
+- 对 Dock 对接方的通知表示相应 dock 执行者或 adapter 已被提醒；binding 是否建立看 `dock_link` 文件项与 `StageDockSupplierSelected`，output 是否发射看 `DockOutputSubmitted`。通知状态不改变协议事实。
 
 ## 与 chain-services 的关系
 

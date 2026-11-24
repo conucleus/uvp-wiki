@@ -15,7 +15,7 @@ One doctrinal sentence frames all the boundaries below: the system promises corr
 
 ## Source of Truth
 
-Contracts and chain events are the only source of truth for plan, order, signal, hook, publication, and deployment cutover state. Backends, Store, Order App, uvp-client, and periphery adapters may consume, project, present, relay, or extend core state — they cannot rewrite it. See [Data Flow and Source of Truth](data-flow-and-truth.md).
+Contracts and chain events are the only source of truth for plan, order, signal, hook, publication, and deployment cutover state. Backends, Store, Order App, uvp-client, and application adapters may consume, project, present, relay, or extend core state — they cannot rewrite it. See [Data Flow and Source of Truth](data-flow-and-truth.md).
 
 ## Rebuildability
 
@@ -27,34 +27,34 @@ Store metadata is a read model: supplier capabilities, tags, reputation, search 
 
 ## Identity Boundary
 
-There is exactly one source of on-chain execution identity: `UVPSupplierRegistry`. It binds a SID permanently to one account and constrains usability through `pending/active/suspended/revoked` status; `UVPStateMachine` resolves the submitter of a stage fact only as `accountOf(effectiveSupplierId) + active`. No other registry participates in execution authorization:
+There is exactly one source of on-chain execution identity: `UVPIdentityRegistry`. It binds a SID permanently to one account and constrains usability through `pending/active/suspended/revoked` status; `UVPStateMachine` resolves the submitter of a stage fact only as `accountOf(effectiveSupplierId) + active`. No other registry participates in execution authorization:
 
-- `UVPIdentityRegistry` only records revocable subject-to-wallet bindings (`IdentityBindingRegistered` / `IdentityBindingRevoked`) so observers can resolve "who stands behind this account". It does not certify Plans, does not record capability or reputation, is not an admission condition for the StateMachine, and the StateMachine never reads it; capability judgment belongs to Nuclei and Store off-chain.
-- `zhixu-registry` (`zhixu-store/registry`) is an off-chain data registration layer (`ZhixuRecord` / `IdentityClaim`); it mints no SID and grants no on-chain execution authority.
+- The subject namespace of `UVPIdentityRegistry` only records revocable offline-subject-to-wallet bindings (`IdentityBindingRegistered` / `IdentityBindingRevoked`) so observers can resolve "who stands behind this account"; it does not certify Plans, does not record capability or reputation, and does not participate in the StateMachine's submission-authority checks. The supplier namespace of the same registry (SID minting, permanent account binding, `pending/active/suspended/revoked`) is the execution-identity source, and the StateMachine reads only that namespace.
+- `zhixu-registry` (`zhixu-store/registry`) is an off-chain data registration layer (`ZhixuRecord`); it mints no SID and grants no on-chain execution authority.
 
 Treating an identity binding as submission authority is therefore a boundary violation, not an implementation detail: a new execution/authorization path that reads an identity-binding registry is rejected in review. See [Contracts and Registries](contracts-and-registries.md) and [Store or external institution](trust/domains.md).
 
 ## Authorization and Signatures
 
 - Business signatures come only from authorized participants' wallets; a relayer may broadcast transactions and pay gas but never creates business signatures.
-- Signal submission authority is the source stage's currently effective assigned supplier account (the SID must be active), signed as EIP-712 typed data; there is no order-level submitter allowlist.
+- Signal submission authority is the source stage's currently effective assigned supplier account (the SID must be active), signed as EIP-712 typed data.
 - Each `(planId, orderId, sourceId, signalId)` accepts exactly one successful write (first-writer-wins); later duplicate external submissions are absorbed idempotently (no repeated advance), with the `SignalAlreadyExists` revert reserved for engine-internal write entry points. Details: [Signal](core/signal.md) and [EIP-712 and Relayer](trust/eip712-relayer.md).
 
 ## Plan Lifecycle
 
-A Plan is committed via `commitPlan()` binding the publisher signature (the six PlanCommit fields: publisher / hooksHash / capabilitiesRoot / executorCandidatesRoot / birthAuthorizer / deadline), then finalized via `finalizePlan()`; only finalized Plans can create Orders. Plan identity derives from publisher plus committed content (`planId = hash(publisher, planHash)`). Modules frozen at deployment cannot be swapped by the owner; upgrades require deploying a new StateMachine and an explicit Deployment Registry cutover. See [Contracts and Registries](contracts-and-registries.md), [Canonical Hash](artifacts/canonical-hashes.md), and [Plan and Order Lifecycle](lifecycle.md).
+A Plan is committed via `commitPlan()` binding the publisher signature (the six PlanCommit fields: publisher / hooksHash / capabilitiesRoot / supplierBindingsRoot / fileWritersHash / deadline), then finalized via `finalizePlan()`; only finalized Plans can create Orders. Plan identity derives from publisher plus committed content (`planId = hash(publisher, runtimePlanHash)`, runtime hash domain `uvp.plan.runtime.v8`). Modules frozen at deployment cannot be swapped by the owner; upgrades require deploying a new StateMachine and an explicit Deployment Registry cutover. See [Contracts and Registries](contracts-and-registries.md), [Canonical Hash](artifacts/canonical-hashes.md), and [Plan and Order Lifecycle](lifecycle.md).
 
 ## Order and Evidence Boundary
 
-Once registered, an Order is an independent fact stream; the core protocol defines no terminal running/completed/cancelled states, and product-visible completion comes from authorized signals and proofs. Contracts, invoices, logistics documents, photos, OCR text, and other business materials never go on chain in plaintext — chains store only payloadHash, metadata URIs, stage file mappings (content hashes and handles), signatures, and events. A proof row should trace to tx, block, log, contract, chain id, event, and payload context. See [File Resources](core/file-resources.md) and [Evidence, Proof, and File Resource](services/evidence-proof.md).
+Once registered, an Order is an independent fact stream; the core protocol defines no terminal running/completed/cancelled states, and product-visible completion comes from authorized signals and proofs. Contracts, invoices, logistics documents, photos, OCR text, and other business materials never go on chain in plaintext — chains store only payloadHash, metadata URIs, opaque stage file `{key,payload}` entries, signatures, and events. A proof row should trace to tx, block, log, contract, chain id, event, and payload context. See [File Resources](core/file-resources.md) and [Evidence, Proof, and File Resource](services/evidence-proof.md).
 
 ## Product Surfaces and Service Boundaries
 
-Product API may prepare typed data, verify signatures, call the relayer, and return proofs, but authorization checks always execute in the contract; Store review is platform workflow, not trust publication; Order App and uvp-client never expose HookPlan/sourceId/ABI/calldata/gas details and cannot bypass order-level signal authorization. Role names are display-only; rights come from on-chain authorization state.
+Product API may prepare typed data, verify signatures, call the relayer, and return proofs, but authorization checks always execute in the contract; Store review is platform workflow, not trust publication; Order App and uvp-client never expose HookPlan/sourceId/ABI/calldata/gas details and cannot bypass the assigned supplier account's submission authority. Role names are display-only; rights come from on-chain assigned-supplier state.
 
-## Periphery Adapters
+## Application Adapters
 
-Funding, USDC, settlement custody, guarantee, payments, logistics, and enterprise-system adapters belong to periphery (`uvp-periphery/`): they run around the core state machine, consuming `UVPStateMachine`, optional Identity Registry name resolution, Product DTO, or uvp-client interfaces — they must not turn funding, guarantee, payment, release, refund, or disputed-payout state into new core facts.
+Funding, USDC, settlement custody, guarantee, payments, logistics, and enterprise-system adapters belong to application repositories: they run around the core state machine, consuming `UVPStateMachine`, `UVPIdentityRegistry` name resolution, Product DTO, or uvp-client interfaces — they must not turn funding, guarantee, payment, release, refund, or disputed-payout state into new core facts.
 
 ## Public Interface Discipline
 

@@ -9,7 +9,7 @@ status: verified
 
 The current Registry is explicitly the **identity-admission domain operated by UVP Store itself**. The code keeps the ability to configure multiple Registry addresses, reserving the interface for future compliance entities in other jurisdictions or independent institutions; for the first phase only one runs, and only the Store's own Registry is presented externally.
 
-`UVPIdentityRegistry` is thin and answers only one question: which on-chain wallets correspond to a given real-world subject. It does not certify Plans, does not claim supplier capability or reputation, makes no recommendations, and does not decide who may create an Order or submit a Signal.
+`UVPIdentityRegistry` is the only on-chain identity boundary and has two namespaces that do not authorize each other: the subject namespace answers "which on-chain wallet corresponds to a given offline subject" (trust attestation); the supplier namespace carries SID minting, a permanent account binding, and `pending/active/suspended/revoked` status (execution identity). It does not certify Plans, does not claim supplier capability or reputation, and makes no recommendations; a subject binding also does not decide who may create an Order or submit a Signal.
 
 ```solidity
 owner() -> address
@@ -35,7 +35,7 @@ One subject may bind multiple wallets; within the same Registry a wallet can hav
 
 ## What Revocation Actually Means
 
-After revocation, the Store no longer resolves that wallet as the current default identity and should not keep it in the default directory. Revocation does not roll back existing Orders, does not revoke historical signatures, and cannot stop a user from manually entering a raw wallet address; genuine Order/Signal rights still come from participant signatures, order-level authorization, and the current executor overlay.
+After revocation, the Store no longer resolves that wallet as the current default identity and should not keep it in the default directory. Revocation does not roll back existing Orders, does not revoke historical signatures, and cannot stop a user from manually entering a raw wallet address; genuine Order/Signal rights still come from the source stage's assigned supplier account (the supplier namespace) and the signature.
 
 ## The Store's Responsibility Boundary
 

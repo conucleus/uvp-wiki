@@ -25,7 +25,7 @@ status: verified
 | `stages[].executor` | executor route、reachability 与 dock 执行者标记。 |
 | `stages[].selectedStages` | selector binding 和 executor closure。 |
 | `stages[].fileResources` | 静态资源句柄与 stage route 元数据。 |
-| `stages[].fileWriters` | 跨阶段文件写 allowlist，编译为 file-writer capability 叶。 |
+| `stages[].fileWriters` | 跨阶段文件写 allowlist，编译为 `StageFileWriter[]` 并由 PlanCommit `fileWritersHash` 承诺（不生成 capability 叶）。 |
 
 `Dock` 文档（`spec.from{zhixu,source}` / `spec.to{zhixu,stage}` / `spec.signalMap`）由 `uvp-core analyzeDock` 单独编译为 `uvp.dock.v1`：`from.zhixu`/`to.zhixu` 必须是已发布定义的内容派生 uid，`to.stage` 以 `executor.supplierType: dock` 承接，`signalMap` 的 atoms 落在 `from.source` 的阶段的 `sendSignals` 上。
 
@@ -54,7 +54,7 @@ uvp-core analyze 的 wire schema 是 `uvp.zhixuAnalysis.v1`：它输出共享定
 
 ## 源定义如何进入哈希
 
-链上 runtime `planHash` 覆盖三元组：`hooksHash`、`capabilitiesRoot`、`supplierBindingsRoot`（公式见 [Canonical Hash](canonical-hashes.md)）——canonicalized source Zhixu 不在其中。影响协议语义的源定义变化会改变 hooks、能力表或 supplier 绑定，因此必然改变 `planHash`；整个 `OnchainHookPlanArtifact` 另有 canonical payload hash（经 `sourcePlanHash` 锚定源定义快照），只用于产物追溯与 fixture 固定，不充当链上 `planHash`。编译产物不是手写 JSON，应由脚本从源定义可重复生成。
+链上 runtime `planHash` 覆盖四元组：`hooksHash`、`capabilitiesRoot`、`supplierBindingsRoot`、`fileWritersHash`（公式见 [Canonical Hash](canonical-hashes.md)）——canonicalized source Zhixu 不在其中。影响协议语义的源定义变化会改变 hooks、能力表、supplier 绑定或 file-writer 名单，因此必然改变 `planHash`；整个 `OnchainHookPlanArtifact` 另有 canonical payload hash（经 `sourcePlanHash` 锚定源定义快照），只用于产物追溯与 fixture 固定，不充当链上 `planHash`。编译产物不是手写 JSON，应由脚本从源定义可重复生成。
 
 字段清单以 `uvp-protocol/packages/compiler/src/types` 与语言层正本 `uvp-core/docs/zhixu-dsl-grammar.md` 为准。
 

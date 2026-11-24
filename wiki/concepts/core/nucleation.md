@@ -75,7 +75,7 @@ Nucleus / 凝结核
   -> 通过 proof 和 supplier network 维护秩序运转
 ```
 
-秩序 (Zhixu) 是凝结核设计出的可复用规则书。Plan 是某个秩序版本的链目标产物。Order 是某个 Plan 的一次运行实例。凝结核可以维护多个秩序或多个版本；运行时仍经过 plan publication、order registration、signal authorization 和 chain proof。
+秩序 (Zhixu) 是凝结核设计出的可复用规则书。Plan 是某个秩序版本的链目标产物。Order 是某个 Plan 的一次运行实例。凝结核可以维护多个秩序或多个版本；运行时仍经过 plan publication、order registration、assigned supplier 发信权和 chain proof。
 
 ## 和 Store 的关系
 

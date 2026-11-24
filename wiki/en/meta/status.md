@@ -38,4 +38,4 @@ pnpm no-spend:safety
 pnpm -r --if-present --workspace-concurrency=1 run test
 ```
 
-Contract tests run as `forge test` inside `uvp-protocol/contracts/uvp-contracts`. The Store frontend runs `pnpm build` inside `zhixu-store/app`.
+Contract tests run as `forge test` inside `uvp-protocol/contracts/uvp-contracts`. Store/Product frontends are maintained by application repositories; this repository's `zhixu-store/registry` is library-only.

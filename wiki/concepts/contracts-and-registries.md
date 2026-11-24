@@ -12,15 +12,15 @@ status: verified
 ## UVPStateMachine 与 modules
 
 - publisher 签名提交 Plan，任意 relayer 广播。
-- publisher 签名承诺 PlanCommit 六字段：publisher / hooksHash / capabilitiesRoot / executorCandidatesRoot / birthAuthorizer / deadline；`capabilitiesRoot` 折叠 signal capability、selector binding 与 file writer 三张能力表，`finalizePlan` 只落定稿。
+- publisher 签名承诺 PlanCommit 六字段：publisher / hooksHash / capabilitiesRoot / supplierBindingsRoot / fileWritersHash / deadline；`capabilitiesRoot` 折叠 signal capability 与 selector binding 两张能力表，`fileWriters` 由 `fileWritersHash` 单独承诺，`finalizePlan` 只落定稿。
 - 只允许 finalized Plan 创建 Order。
-- creator/submitter 签名产生订单级权利；relayer 不需要 allowlist。
-- Signal、HookReady、stage patch、阶段文件 patch、Dock 注册与 binding、derived signal 都留下可重放事件。
-- 七个 module（stage patch、derived signal、dock registry、plan metadata、order link、lens、file resource）配置完成后永久冻结地址。
+- 发信权由 source 阶段 assigned supplier account 承载（计划 default → 订单级 stage supplier patch → dock 一次性选择）；relayer 只广播，不生成业务签名。
+- Signal、HookReady、stage supplier patch、阶段文件写入、Dock 注册与 binding、derived signal 都留下可重放事件。
+- 七个 module（stage patch、derived signal、dock registry、plan metadata、lens、file resource、identity registry）配置完成后永久冻结地址。
 
 ## UVPIdentityRegistry
 
-Registry 由 Store 运营，记录 `subjectId <-> account` 的带 hash/URI 身份绑定及撤销历史。它不认证 Plan，不记录 capability/reputation，也不是 StateMachine 准入条件。代码支持多个 Registry 地址，首期部署一个。
+Registry 由 Store 运营，含两个互不授权对方的命名空间：subject 命名空间记录 `subjectId <-> account` 的带 hash/URI 身份绑定及撤销历史，只作信任存证；supplier 命名空间承载 SID 铸造、永久 account 绑定与 `pending/active/suspended/revoked` 状态，是 StateMachine 唯一执行授权来源。它不认证 Plan，不记录 capability/reputation。每个 StateMachine 接线一个 `UVPIdentityRegistry` 模块槽。
 
 ## UVPDeploymentRegistry
 

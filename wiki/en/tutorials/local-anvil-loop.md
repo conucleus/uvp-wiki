@@ -12,7 +12,7 @@ status: verified
 This tutorial verifies the smallest on-chain semantic loop:
 
 ```text
-Zhixu -> HookPlan -> OnchainHookPlan -> commitPlan+finalizePlan / triggerOrderFromOutsideFor
+Zhixu -> HookPlan -> OnchainHookPlan -> commitPlan+finalizePlan / submitSignal(orderId=0)
   -> submitSignal/pokeTimer -> HookReady/HookStatusChanged
   -> statemachine chain replay oracle
 ```
@@ -97,7 +97,7 @@ After the protocol loop, you can bring up the user-facing local surfaces. First 
 uvp-deploy/qa/scripts/bootstrap-local-anvil.sh
 ```
 
-It deploys the current contracts and frozen modules, compiles and publishes the Plan, creates an Order, writes signal authorizations, submits scenario signals, and cross-checks chain events against replay results.
+It deploys the current contracts and frozen modules, compiles and publishes the Plan, creates an Order from the birth stage's assigned supplier account, submits scenario signals, and cross-checks chain events against replay results.
 
 Then configure Chain Services to use the generated address manifest:
 
@@ -107,11 +107,14 @@ UVP_RPC_URL=http://127.0.0.1:8545 \
 pnpm --filter @uvp-eth/chain-services dev:api
 ```
 
-Start the Store or Order App:
+Start the Order App:
 
 ```bash
-VITE_UVP_CHAIN_SERVICES_URL=http://127.0.0.1:8787 pnpm --filter @uvp-eth/zhixu-store-web dev
-VITE_UVP_CHAIN_SERVICES_URL=http://127.0.0.1:8787 pnpm --filter @uvp-eth/order-app dev
+VITE_UVP_STATE_MACHINE=<address from uvp-deploy/deploy/addresses/anvil.local.json> \
+VITE_CHAIN_ID=31337 \
+VITE_RPC_URL=http://127.0.0.1:8545 \
+VITE_UVP_FROM_BLOCK=0 \
+pnpm --filter @uvp-eth/order-app dev
 ```
 
 The Product API's Orders, Tasks, Plan publications, and proofs come from on-chain projections; Store supplier capabilities and matching profiles remain off-chain data. These boundaries are formally stated in [Protocol Boundaries](../concepts/protocol-boundaries.md).

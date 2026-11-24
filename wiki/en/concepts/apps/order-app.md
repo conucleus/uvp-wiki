@@ -39,7 +39,7 @@ The following is a snapshot as of writing; the repository is authoritative.
 
 ## Split from UVP Client
 
-Order App faces human participants while uvp-client faces automation and enterprise integration; for the common boundary — neither can bypass order-level signal authorization, EIP-712 business signatures, first-writer-wins, and other protocol invariants — see [Common boundaries](order-app-vs-uvp-client.md#common-boundaries), with the invariant overview in [Protocol boundaries](../protocol-boundaries.md).
+Order App faces human participants while uvp-client faces automation and enterprise integration; for the common boundary — neither can bypass assigned-supplier submission authority, EIP-712 business signatures, first-writer-wins, and other protocol invariants — see [Common boundaries](order-app-vs-uvp-client.md#common-boundaries), with the invariant overview in [Protocol boundaries](../protocol-boundaries.md).
 
 ## Interface language boundary
 

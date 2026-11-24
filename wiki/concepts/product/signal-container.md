@@ -45,9 +45,9 @@ task -> evidence/input -> prepare typed data -> business signature -> submit -> 
 
 产品侧 prepare/submit 端点由 used-car 应用仓 backend 维护（路径单源在应用仓 `app-contract`），本仓不核验端点名；协议侧提交面固定为：
 
-- 普通 signal：direct `submitSignal`（身份固定 `msg.sender`；尾部 `bytes32 filesDigest` + `FilePatch`）。
-- executor patch：`UVPStagePatchModule` 的 `StageExecutorPatch` typed data → `applyStageExecutorPatchFor`（域 `stageSupplierPatch` 1，mode 闭集 `assign`/`handoff`）。
-- 阶段文件 patch：随 direct `submitSignal` 尾部 `FilePatch` 提交（`signalId == 0` 为纯文件 patch），由 `UVPFileResourceModule.applyStageFilePatch` 落 `add` / `replace` / `remove`。
+- 普通 signal：`submitSignal`（submitter 必须是 assigned supplier account；空 signature 时 `msg.sender == submitter`，非空 signature 时 `msg.sender` 仅作 relayer）。
+- stage supplier patch：`UVPStagePatchModule` 的 `StageSupplierPatch` typed data → `applyStageSupplierPatchFor`（域 `stageSupplierPatch` 1，以 `previousSupplierId` 区分 assign/handoff）。
+- 阶段文件写入：随 `submitSignal` 的 `files: StageFile[]` 提交（`signalId == 0` 为纯文件写入），由 `UVPFileResourceModule.applyStageFiles` 同 key 覆盖。
 
 ## 安全规则
 
